@@ -38,9 +38,9 @@ Quellen:
 2. **Run:** Gegnerwellen laufen von oben auf einen Zaun zu. Die Helden schießen automatisch, die Munition kommt aus einer Schneide-Maschine.
 3. **Im Run aufsteigen:** Bei jedem Aufstieg wählt man 1 von 3 Karten: einen neuen Helden aufnehmen oder einen Helden verbessern.
 4. **Bosse:** Jedes Gebiet endet mit einem Boss, jede Stage mit einem Endboss.
-5. **Belohnung:** Gold, Heldenkarten, Sterne, Battle-Pass-Fortschritt (?).
+5. **Belohnung:** Gold, Totenköpfe, Medaillen, Erkennungsmarken und Heldenkarten für mehrere Helden. Eine Siegesserie erhöht die Belohnung.
 6. **Außerhalb der Runs aufwerten:**
-   - Helden-Level (Sammlung)
+   - Helden: Level mit Karten, Rang mit Medaillen, Fähigkeiten mit Erkennungsmarken
    - Tech-Baum und Talente (Upgrades)
    - Booster
    - Basislager
@@ -55,43 +55,94 @@ Quellen:
 
 ### Bildschirm-Aufbau (von oben nach unten)
 
-- **Kopfzeile:** „Area 5“, Fortschrittsbalken mit Edelstein-Symbol (z. B. 51/74, vermutlich besiegte von allen Gegnern), „Wave 11/11“
-- **Gegnerfeld:** Ein Pfad bzw. eine Bahn, Gegner laufen von oben nach unten. Jeder hat einen Lebensbalken, Schadenszahlen schweben auf.
+- **Kopfzeile:**
+  - Pause-Knopf
+  - „Gebiet 3“ und „Welle 15/15“
+  - ein **Erfahrungsbalken** mit grünem Edelstein-Symbol. Besiegte Gegner füllen ihn. Ist er voll, kommt „Fähigkeit wählen“, der Balken beginnt von vorn, und das Ziel wird größer. Beispiel aus einem Run:
+    - Welle 1: 0/13
+    - Welle 2: 5/13
+    - Aufstieg, dann Welle 3: 2/16
+    - Welle 4: 12/16
+    - Aufstieg, dann 2/20
+    - In Welle 15 steht er bei 48/112.
+  - „x1 Tempo“ zum Umschalten der Geschwindigkeit
+- **Gold im Run** am rechten Rand (z. B. 50), zum Beispiel aus „Kopfgeld“
+- **Gegnerfeld:** Ein Pfad, eine Bahn oder eine Brücke, auf der die Gegner von oben nach unten laufen. Jeder hat einen Lebensbalken, Schadenszahlen und Effekte wie „BUMM!“ schweben auf.
   - Bosse tragen eine Krone und haben ein Totenkopf-Symbol mit großem Lebensbalken.
-  - Gegnertypen: Skelette, Zombies, rote Schleimwesen, Roboter, Aliens, Monster. Eine Welt hat ein eigenes Thema, etwa Friedhof oder Strand.
+  - Gegnertypen: Skelette, Zombies, Schildkröten, rote Schleimwesen, Roboter, Aliens, Monster. Jede Welt hat ein eigenes Thema, etwa Friedhof, Strand oder Himmelsschloss.
   - Wetter: Regen
-- **Rechter Rand:** runder Knopf für einen **Booster** (z. B. ein Felsbrocken, der durch die Gegner rollt)
-- **Zaun** quer über den Bildschirm mit gemeinsamen Lebenspunkten (z. B. 639/900). Fällt er, ist der Run verloren (?).
+- **Zaun** quer über den Bildschirm mit gemeinsamen Lebenspunkten (z. B. 1621/1700). Gegner, die ihn erreichen, greifen ihn an. Heilung zeigt grüne Pluszeichen. Fällt der Zaun, ist der Run verloren (?).
+- **Effekte am Zaun:** zum Beispiel eine Feuerwand über die ganze Breite (Boomers Fähigkeit?) und ein Fallschirmspringer-Symbol bei den Gegnern (Luftangriff?)
 - **Geschützreihe:** bis zu 3 (?) Helden an festen Plätzen. Je Held:
-  - darüber ein Magazin (4 Patronen-Symbole) und ein Nachladebalken
+  - darüber ein Magazin (4 Patronen-Symbole, verbrauchte werden dunkel) und ein Nachladebalken
   - darunter seine Stufe im Run (1, 2, …) mit einem Fortschrittsbogen
-- **Unten links:** große **Revolvertrommel**, die „Schneide-Maschine“. Sie stanzt Patronen aus, die zu den Helden fliegen.
-- **Unten rechts:** **Patronen-Ablage** (Raster mit ca. 12 Patronen), der Vorrat
-- **Ganz unten:** eine Stufen-Anzeige (Sechseck mit Zahl und 4 Segmenten), vermutlich die Stufe der Trommel bzw. Munition im Run (?)
+- **Unten links:** große **Revolvertrommel**, die „Schneide-Maschine“. Patronen stecken in den Kammern und fliegen von dort zu den Helden.
+- **Unten rechts:** **Patronen-Ablage** (Raster mit ca. 10–12 Patronen), der Vorrat
+- **Darunter:** Sechseck mit Zahl und 3–4 Segmenten. Die Zahl bleibt im ganzen Run bei 1, die Segmente füllen sich. Vermutlich die Stufe der Trommel (?)
+- **Untere Knopfleiste:**
+  - links und rechts die **2 aktiven Booster** (z. B. Luftangriff, Hyper-Pill), mit Abklingzeit als Kreisbogen
+  - in der Mitte ein großer **Blitz-Knopf**, vermutlich die „Energie-Kugel“ aus dem Tech-Baum. Er **lädt sich im Lauf des Kampfs auf**: Der Kreis füllt sich blau, in Welle 1 zu ¼, in Welle 2 zur Hälfte, in Welle 4 ganz. Dann ist er einsetzbar. Was er auslöst, ist offen.
+  - Im Store-Screenshot gibt es noch einen runden Booster-Knopf am rechten Rand (Felsbrocken).
 
 ### Munition („Bullet Cutting“)
 
-Das ist das Markenzeichen des Spiels. Die Trommel schneidet bzw. stanzt Patronen. Sie
-landen in der Ablage und werden von dort an die Helden verteilt. Ohne Munition schießen
-die Helden nicht. Die Store-Beschreibung nennt „Munition“ als eine von drei
-Upgrade-Säulen (Skills, Feuerkraft, Munition).
+Das ist das Markenzeichen des Spiels:
 
-**Offen:** Tippt oder wischt der Spieler dabei selbst, oder läuft alles automatisch? Mehr dazu in Abschnitt 11.
+- Über der Trommel dreht sich ein Messerarm, auf einem Bild als Kreuz mit mehreren Klingen. Er schneidet aus den Löchern der Trommel Patronen.
+- Die Patronen fliegen einzeln zu den Helden und füllen ihr Magazin.
+- Die Ablage rechts füllt sich im Lauf des Runs: in Welle 1 mit 5, in Welle 2 mit 7, in Welle 4 mit 10 Patronen. Vermutlich landet dort, was die Helden gerade nicht brauchen (?).
+- Ohne Munition schießen die Helden nicht.
+- Mehr Löcher bedeuten mehr Patronen pro Umdrehung:
+  - im Run die Karte „Schneider-Loch: +1 Loch, mehr Munition erhalten“ (bis 4 Sterne)
+  - im Basislager „Loch vergrößern +1“
+- Die Store-Beschreibung nennt „Munition“ als eine von drei Upgrade-Säulen (Skills, Feuerkraft, Munition).
 
-### Aufstieg im Run (Roguelike-Karten)
+**Was der Spieler selbst tut:** Nach den Screenshots läuft der Kampf weitgehend
+automatisch. Der Spieler wählt Karten, setzt die Booster und den Blitz-Knopf ein und
+schaltet das Tempo um. **Offen:** Kann man auch an der Trommel oder den Patronen etwas
+tun, etwa tippen, um schneller zu schneiden? Siehe Abschnitt 11.
 
-- Ein Run startet mit **einem Helden**.
-- Beim Aufstieg erscheinen **3 Karten**. Ein kleines Heldenbild über der Karte zeigt, welchen Helden sie betrifft. Beispiele:
-  - „Damage Boost: Schaden +15 %“
-  - „Freeze Chance +5 %“ mit Sternen für die Ausbaustufe (bis 3 Sterne?)
-  - „Add Hero: Tracer, Fast Shooting Officer, +7 Munition“
+### Aufstieg im Run („Fähigkeit wählen“)
+
+- **Zu Beginn: „Held wählen“.** Das Spiel bietet 3 Helden an, jeder mit einem kurzen Satz:
+  - Boomer: „Schießt Granaten. Stiftet Chaos“
+  - Sparky: „Trifft einen, schockt viele“
+  - Frost: „Verursacht Schaden durch breite Salven“
+
+  Die Kartenfarben sind unterschiedlich (grau, orange, blau), vielleicht nach Seltenheit (?). Ob die 3 Helden zufällig angeboten werden, ist offen.
+- Beim Aufstieg erscheinen **3 Karten**. Ein kleines Bild über der Karte zeigt, ob sie einen Helden oder die Trommel betrifft. Beispiele:
+  - „Held hinzufügen: Tracer, Schnellfeuer-Offizier, +7 Munition erhalten“ (grüne Karte)
+  - „Schaden +15 %“
+  - „Einfrierchance +5 %“
+  - „Schnelles Nachladen: +30 % Nachladegeschwindigkeit“ (höchstens 3 Sterne)
+  - „Explosionsradius +20 %“ (höchstens 3 Sterne)
+  - „Kritische Chance +10 %“ (höchstens 5 Sterne)
+  - „Betäubungsrakete: +10 % Chance auf EMP-Betäubungsraketen“ (höchstens 3 Sterne), mit einem grünen Hinweis „Kette“. Vielleicht gehört die Karte zu einer Kette, die eine stärkere Fähigkeit freischaltet (?).
+  - „Schneider-Loch: +1 Loch, mehr Munition erhalten“ (Trommel, höchstens 4 Sterne)
+- Jede Verbesserung lässt sich mehrfach nehmen. Die Sterne zeigen die Stufe, wie viele es höchstens gibt, hängt von der Karte ab.
+- **„Neu würfeln“:** gegen Werbung 3 neue Karten (1-mal pro Run?)
+- **„Alles nehmen“:** gegen Werbung alle 3 Karten auf einmal
+- **„Röntgen“** (Auge-Symbol): blendet die Karten aus, um aufs Spielfeld zu schauen (?)
+- Der Run pausiert während der Auswahl.
 - Laut Rezensionen teilt das Spiel die angebotenen Helden zufällig zu. Tagesmissionen verlangen manchmal bestimmte Helden-Kombinationen.
 
 ### Ablauf einer Stage
 
 - Eine Stage (z. B. „7. Himmelsschloss“) hat **7 Gebiete**.
 - Die Anzeige „Gebiet 3/7“ zeigt Segmente: geschafft (gelb), aktuell (grün), ein Zwischenboss (Totenkopf) und der Endboss (Totenkopf mit Krone) am Ende.
-- Jedes Gebiet hat mehrere Wellen (z. B. 11 oder 12).
+- Jedes Gebiet hat mehrere Wellen (z. B. 11, 12 oder 15).
+
+### Ende eines Runs („Gewonnen“)
+
+- **Belohnungen**, als Karten nebeneinander:
+  - Gold (z. B. 911)
+  - Totenköpfe (5, Zweck unklar (?), vielleicht Battle Pass oder Rangliste)
+  - Medaillen (2)
+  - Erkennungsmarken (27)
+  - Heldenkarten für **alle** freigeschalteten Helden, auch für die, die nicht mitgespielt haben (z. B. 6, 1, 7, 8, 8), jeweils mit Fortschrittsbalken. Ein gelber Pfeil zeigt an, dass ein Held aufsteigen kann.
+- **Siegesserie** (z. B. 13): Ein Balken von 0 bis MAX. Bei MAX gibt es +10 % Gold. „Gewinne und erhöhe deine Belohnungen“.
+- **„2x Belohnungen“** (Gold) gegen Werbung, 3-mal verfügbar; mit SVIP ohne Werbung
+- „Zum Fortfahren tippen“
 
 ---
 
@@ -123,18 +174,32 @@ Upgrade-Säulen (Skills, Feuerkraft, Munition).
 
 ### Helden
 
-Jeder Held wird mit **Heldenkarten** aufgewertet, manche Helden mit **Medaillen**.
-Warum der Unterschied, ist offen: vielleicht ab einer bestimmten Stufe, vielleicht je nach Seltenheit.
-In der Detailansicht hat jeder Held **4 Fähigkeiten**, die mit seiner Stufe nach und nach freigeschaltet werden.
+Ein Held wächst auf drei Wegen:
+
+1. **Level** mit **Heldenkarten**, z. B. Level 4 bei 6/20 Karten. Jedes Level erhöht seine Werte.
+2. **Rang** mit **Medaillen**: Rekrut (1) → Kadett (2) → … Der erste Aufstieg kostet 5 Medaillen. Jeder Rang bringt eine **Belohnung**, z. B. „Kopfgeld: 15 % der Feinde werfen 10 Gold ab, wenn sie besiegt werden“. In der Sammlung zeigen manche Helden statt Karten einen Medaillen-Balken (17/50). Vermutlich hängt das Level am Rang: Erst nach dem Rang-Aufstieg geht es weiter (?).
+3. **Fähigkeiten** mit **Erkennungsmarken**: 4 Plätze pro Held. Sie werden mit dem Level freigeschaltet (z. B. ab Level 7 und ab Level 12) und lassen sich auf je 3 Sterne ausbauen (z. B. für 250 oder 300 Marken).
+
+**Detailansicht eines Helden** (Beispiel Boomer):
+- großes Bild und Rang-Abzeichen
+- je 2 Fähigkeiten links und rechts
+- darunter 3 gesperrte Sechseck-Plätze, vermutlich Ausrüstung oder Rang-Sterne (?)
+- Pfeile, um zwischen den Helden zu blättern
+- Werte als „jetzt → nach dem nächsten Level“:
+  - Schaden 295 → 313
+  - Nachladezeit 2,16 → 2,06 s
+  - Magazin 1
+- Knopf „Rang-Aufstieg“ für 5 Medaillen
+
 Laut einer Rezension endet ein Held bei Level 14.
 
 | Held | Typ (laut Bild/Text) | Freischaltung | Stand im Gastkonto |
 |---|---|---|---|
 | Tracer | Soldat, Schnellfeuer („Fast Shooting Officer“) | Start-Held | Level 9, Karten 50/200 |
-| Frost | Scharfschütze, Einfrieren | früh im Spiel | Level 8, Medaillen 17/50 |
+| Frost | „Schaden durch breite Salven“, Einfrieren | früh im Spiel | Level 8, Medaillen 17/50 |
 | Nova | Laser. Fähigkeiten: „Hen Grenade“ (Gegner wird zum Huhn), „Lava Pool“, Strahlen (?), Kettenblitz (?) | früh im Spiel | Level 8, Medaillen 17/50 |
-| Sparky | Blitz, Kanone | Spielfortschritt (?) | Level 7, Karten 56/100 |
-| Boomer | Bazooka bzw. Raketen | Spielfortschritt (?) | Level 3, Karten 8/10 |
+| Sparky | Kettenblitz: „Trifft einen, schockt viele“ | Spielfortschritt (?) | Level 7, Karten 56/100 |
+| Boomer | „Schießt Granaten. Stiftet Chaos“: Raketen, Explosionen, Feuerwand am Zaun, Betäubungsraketen. Fähigkeiten: Raketen-Explosion, Feuersäule, 2 noch gesperrt. Magazin 1, langsam, viel Schaden | Spielfortschritt (?) | Level 4, Karten 6/20, Rang Rekrut |
 | Drako | Drache | Event: 1000 Event-Münzen sammeln (Shop-Reiter „Drako“) | 1/1000 |
 | Mr. Bluff | Kartenspieler, Joker | nur über Kaufangebot | gesperrt |
 | Brambo | Kämpfer mit Stirnband | nur über Kaufangebot | gesperrt |
@@ -227,7 +292,7 @@ Ein zweites Spiel neben den Kämpfen, ähnlich wie „Coin Master“.
 - **Battle Pass**, **Glücksrad**, **Tägliche Belohnung**
 - **Werbung:**
   - Pflichtwerbung nach jedem Level und mehrmals im Level (laut Rezensionen)
-  - freiwillig für: Upgrade kostenlos, Talent ziehen, sofort abholen, 2x Produktion
+  - freiwillig für: Upgrade kostenlos, Talent ziehen, sofort abholen, 2x Produktion, doppelte Belohnung nach dem Sieg (3-mal), „Alles nehmen“ und „Neu würfeln“ bei der Kartenauswahl
 - **2x Kampftempo** kostet laut Rezension rund 15 €.
 
 ---
@@ -237,10 +302,12 @@ Ein zweites Spiel neben den Kämpfen, ähnlich wie „Coin Master“.
 | Ressource | Wofür | Woher |
 |---|---|---|
 | Energie (max. 30) | einen Kampf starten (5 pro Kampf) | lädt mit der Zeit auf, kaufbar |
-| Gold | Aufwerten (Tech-Baum? Helden?) | Kämpfe, Pakete |
+| Gold | Aufwerten (Tech-Baum? Helden?) | Kämpfe, Kopfgeld, Pakete |
 | Diamanten | Premium-Währung | Kauf, Pakete, Belohnungen |
-| Heldenkarten (je Held) | Helden aufwerten | Basislager-Gebäude, Truhen, Kämpfe (?) |
-| Medaillen | Helden aufwerten (höhere Stufen oder bestimmte Helden?) | (?) |
+| Heldenkarten (je Held) | Helden-Level | Kämpfe (für alle Helden), Basislager-Gebäude, Truhen |
+| Medaillen | Rang-Aufstieg eines Helden | Kämpfe |
+| Erkennungsmarken | Fähigkeiten der Helden ausbauen | Kämpfe |
+| Totenköpfe | (?) | Kämpfe |
 | Booster-Karten | Booster aufwerten | (?) |
 | Sterne | Talente ziehen (1 Stern = 1 Talent) | (?) vermutlich Stage-Abschluss |
 | Stadtmünzen | Basislager ausbauen | Stadtmünzen-Schneider, Überfälle |
@@ -250,7 +317,7 @@ Ein zweites Spiel neben den Kämpfen, ähnlich wie „Coin Master“.
 | Schilde (max. 3) | Schutz vor Überfällen | (?), kaufbar |
 | Battle-Pass-Punkte | Battle-Pass-Stufen | (?) |
 
-Das sind **über 12 Ressourcen**. Für ein Hobby- bzw. Erstprojekt sind das deutlich zu viele, siehe Abschnitt 10.
+Das sind **rund 15 Ressourcen**. Für ein Hobby- bzw. Erstprojekt sind das deutlich zu viele, siehe Abschnitt 10.
 
 ---
 
@@ -281,13 +348,20 @@ Vorschlag: erst ohne Überfälle starten oder mit Computer-Basen, die gar keinen
 
 ## 11. Noch offen (diese Screenshots fehlen noch)
 
-1. **Der Kampf selbst:** Was macht der Finger? Tippt oder wischt man an der Trommel, verteilt man Patronen, platziert man Helden? Am besten 3–4 Bilder direkt hintereinander und ein Satz dazu.
+1. **Kampf:**
+   - Was löst der große Blitz-Knopf aus, wenn er voll ist?
+   - Kann man an der Trommel oder den Patronen selbst etwas tun, etwa tippen?
+   - Werden die 3 Start-Helden zufällig angeboten?
+   - Was bedeutet der Hinweis „Kette“ auf einer Karte?
 2. **„Spielmodus“:** Boss Rush und Survival
-3. **Ende eines Runs:** Sieg, Niederlage, Belohnungen
-4. **Detailansicht eines Helden:** Kosten fürs Aufwerten, Werte, alle 4 Fähigkeiten
+3. **Niederlage:** Was passiert, wenn der Zaun fällt? Gibt es eine zweite Chance gegen Werbung?
+4. **Helden:**
+   - Wie viele Ränge gibt es?
+   - Was sind die 3 Sechseck-Plätze?
+   - Wie hängen Level und Rang zusammen?
 5. **Überfall:** wie er abläuft
-6. Battle Pass, Glücksrad, Truhen, Tagesmissionen
-7. Einstellungen (Tempo, Ton, Vibration)
+6. Battle Pass, Glücksrad, Truhen, Tagesmissionen, Ranglisten; wofür die Totenköpfe sind
+7. Einstellungen (Ton, Vibration)
 
 ---
 
