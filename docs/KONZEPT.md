@@ -85,7 +85,7 @@ Unten auf dem Bildschirm liegt eine kleine **Flipper- bzw. Murmelbahn** für Ene
 - Aufwerten: mehr Formen, Legierungen für Spezialmunition
 - Risiko: Geht die Munition aus, fällt auch kein Schrott mehr. Es braucht also eine Grundproduktion.
 
-**Entscheidung offen:** A, B oder C? Möglich wäre auch A als Grundlage, dazu ab und zu Bonus-Kugeln von Gegnern wie bei C.
+**Entschieden (30.10.2026):** A, die Kugelbahn. Im Piloten umgesetzt, mit Hebel als freiwilligem Bonus.
 
 ---
 
@@ -196,6 +196,8 @@ Das Verhalten programmieren wir einmal, das Aussehen wechselt je Motiv.
 ---
 
 ## 7. Erster Pilot (Umfang)
+
+**Stand 30.10.2026:** gebaut, siehe [`game/README.md`](../game/README.md). Spielbar im Browser unter `docs/pilot/`.
 
 Ziel: herausfinden, **ob sich Kampf und Munitions-Mechanik gut anfühlen**.
 

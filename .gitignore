@@ -1,0 +1,6 @@
+# Godot
+game/.godot/
+*.import.tmp
+
+# Builds entstehen lokal
+build/
