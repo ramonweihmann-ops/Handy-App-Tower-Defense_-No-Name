@@ -12,7 +12,14 @@ GODOT="${GODOT:-godot}"
 # Versionsnummer muss bei jedem Build steigen, sonst installiert Android kein Update
 CODE=$(( ($(date -u +%s) - 1767225600) / 60 ))
 STAMP="$(date -u +%Y%m%d-%H%M)"
+SHOWN_STAMP="$(TZ=Europe/Berlin date +'%d.%m. %H:%M')"
+VNAME="${VNAME:-0.2.0}"
+# Kurzer Text für den Update-Hinweis in der App (sonst die letzte Commit-Überschrift)
+NOTES="${NOTES:-$(git log -1 --pretty=%s)}"
 sed -i "s/^version\/code=.*/version\/code=$CODE/" game/export_presets.cfg
+sed -i "s/^version\/name=.*/version\/name=\"$VNAME\"/" game/export_presets.cfg
+# Versionsinfo für die App selbst (der Updater vergleicht damit)
+printf '{"code": %d, "name": "%s", "stamp": "%s"}\n' "$CODE" "$VNAME" "$SHOWN_STAMP" > game/build_info.json
 
 export GODOT_ANDROID_KEYSTORE_RELEASE_PATH="$PWD/android/pilot-test.keystore"
 export GODOT_ANDROID_KEYSTORE_RELEASE_USER="pilot"
@@ -54,5 +61,11 @@ cat > docs/pilot/index.html <<HTML
 </body>
 </html>
 HTML
+# Versionsinfo für den Updater in der App
+python3 - "$CODE" "$VNAME" "$SHOWN_STAMP" "$APK" "$NOTES" > docs/pilot/version.json <<'PY'
+import json, sys
+code, name, stamp, apk, notes = sys.argv[1:6]
+print(json.dumps({"code": int(code), "name": name, "stamp": stamp, "apk": apk, "notes": notes}, ensure_ascii=False))
+PY
 touch docs/.nojekyll
 echo "Fertig: docs/pilot/$APK (Version $CODE)"

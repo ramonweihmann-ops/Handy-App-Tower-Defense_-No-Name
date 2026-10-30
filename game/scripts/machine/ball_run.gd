@@ -5,6 +5,7 @@ extends Control
 ## Der Hebel schießt von selbst; wer ihn zieht, bekommt eine Extra-Ladung (Abklingzeit).
 
 signal ball_collected(type: String)
+signal manual_pulled
 
 const PANEL_H := 470.0
 const DESIGN_W := 720.0
@@ -34,6 +35,9 @@ var active := false
 var launch_interval := BASE_INTERVAL
 var balls_per_launch := BASE_COUNT
 var rate_level := 0
+## Boni aus dem Spielstand: Chance auf doppelte Kugel, schnellerer Hebel (Sekunden)
+var lucky := 0.0
+var manual_cd_bonus := 0.0
 ## Für Auswertungen: gesammelte Kugeln im aktuellen Level.
 var collected_total := 0
 var stats := {"launched": 0, "recycled": 0, "lost": 0, "aged": 0, "full": 0}
@@ -96,6 +100,8 @@ func reset() -> void:
 	_pulling = false
 	_pops.clear()
 	collected_total = 0
+	lucky = 0.0
+	manual_cd_bonus = 0.0
 	stats = {"launched": 0, "recycled": 0, "lost": 0, "aged": 0, "full": 0}
 
 
@@ -236,7 +242,7 @@ func _collect(ball: AmmoBall) -> void:
 	collected_total += 1
 	var added := 0
 	if ammo:
-		added = ammo.add(ball.type, 1)
+		added = ammo.add(ball.type, 2 if randf() < lucky else 1)
 	if added == 0:
 		stats["full"] += 1
 		_full_flash = 1.0
@@ -268,7 +274,8 @@ func _gui_input(event: InputEvent) -> void:
 func _release_pull() -> void:
 	if active and _manual_cd <= 0.0:
 		_pending += balls_per_launch + int(round(_pull * 4.0))
-		_manual_cd = MANUAL_CD
+		_manual_cd = maxf(1.0, MANUAL_CD - manual_cd_bonus)
+		manual_pulled.emit()
 	_pull = 0.0
 
 

@@ -46,7 +46,8 @@ func setup(id_: String, battle_: Battle) -> void:
 # --- Werte (Grundwert plus Karten) -----------------------------------------
 
 func damage() -> float:
-	return float(data["damage"]) * (1.0 + 0.2 * mods["damage"])
+	var meta: float = battle.hero_damage.get(id, 1.0) if battle else 1.0
+	return float(data["damage"]) * (1.0 + 0.2 * mods["damage"]) * meta
 
 
 func interval() -> float:
@@ -54,7 +55,8 @@ func interval() -> float:
 
 
 func reload_time() -> float:
-	return float(data["reload"]) / (1.0 + 0.25 * mods["reload"])
+	var extra: float = battle.bonus_reload if battle else 0.0
+	return float(data["reload"]) / (1.0 + 0.25 * mods["reload"] + extra)
 
 
 func mag_size() -> int:
@@ -66,7 +68,8 @@ func ammo_cost() -> int:
 
 
 func crit_chance() -> float:
-	return 0.05 + 0.1 * mods["crit"]
+	var extra: float = battle.bonus_crit if battle else 0.0
+	return 0.05 + 0.1 * mods["crit"] + extra
 
 
 func family() -> String:

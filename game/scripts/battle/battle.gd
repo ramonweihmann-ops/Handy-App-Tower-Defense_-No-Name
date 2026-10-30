@@ -27,6 +27,11 @@ var wave := 0
 var total_waves := 0
 var kills := 0
 var elapsed := 0.0
+## Boni aus Spielstand und Schwierigkeit (setzt main.gd beim Levelstart)
+var hp_scale := 1.0
+var bonus_crit := 0.0
+var bonus_reload := 0.0
+var hero_damage := {}
 ## Für Auswertungen: Heldensekunden ohne Munition und Heldensekunden insgesamt.
 var hero_wait_time := 0.0
 var hero_time := 0.0
@@ -187,7 +192,7 @@ func spawn_enemy(kind: String, pos := Vector3.INF) -> Enemy:
 	if pos == Vector3.INF:
 		pos = Vector3(randf_range(-3.6, 3.6), 0, SPAWN_Z + randf_range(-1.0, 1.0))
 	e.position = pos
-	e.setup(kind, self, GameData.hp_mult(level, maxi(wave, 1)))
+	e.setup(kind, self, GameData.hp_mult(level, maxi(wave, 1)) * hp_scale)
 	enemies.append(e)
 	if pos.z < SPAWN_Z + 3.0:
 		# Auftauchen aus dem Wurmloch

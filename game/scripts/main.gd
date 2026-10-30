@@ -29,6 +29,12 @@ var cards_taken: Array[String] = []
 var state := "menu"
 var tempo := 1
 
+var hard := false
+var bonus := {}
+var updater: Updater
+var menu: MainMenu
+var _xp_carry := 0.0
+
 var _overlay: Control
 var _column: VBoxContainer
 var _screen: Control
@@ -41,7 +47,9 @@ func _ready() -> void:
 	# Hängt das Handy kurz, lieber kurz langsamer werden als viele Schritte nachholen
 	Engine.max_physics_steps_per_frame = 3
 	_parse_args()
-	_load_progress()
+	Save.test_mode = _autotest
+	if _autotest:
+		Save.data = Save.default_data()
 	_build_layout()
 	if _autotest:
 		start_level(level)
@@ -115,6 +123,10 @@ func _parse_args() -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg == "--autotest":
 			_autotest = true
+		elif arg == "--smoke":
+			var smoke: Node = load("res://tests/menu_smoke.gd").new()
+			smoke.set("main", self)
+			add_child.call_deferred(smoke)
 		elif arg == "--pull":
 			_auto_pull = true
 		elif arg.begins_with("--level="):
@@ -175,6 +187,14 @@ func _build_layout() -> void:
 	_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	layer.add_child(_overlay)
 
+	updater = Updater.new()
+	add_child(updater)
+	menu = MainMenu.new()
+	menu.updater = updater
+	menu.visible = false
+	_overlay.add_child(menu)
+	menu.play_requested.connect(start_level)
+
 	get_viewport().size_changed.connect(_fit_column)
 	_fit_column()
 
@@ -182,7 +202,13 @@ func _build_layout() -> void:
 	battle.wave_started.connect(func(w: int, total: int) -> void:
 		hud.set_wave(level, w, total)
 		hud.set_next_wave(battle.next_wave_text())
+		if w > 1:
+			Save.track("waves")
+			var heal := float(bonus.get("heal", 0.0))
+			if heal > 0.0:
+				battle.repair_fence(heal, 0.0)
 	)
+	ball_run.manual_pulled.connect(func() -> void: Save.track("pulls"))
 	battle.fence_changed.connect(hud.set_fence)
 	battle.damage_dealt.connect(hud.add_floater)
 	battle.level_won.connect(_on_level_won)
@@ -262,6 +288,14 @@ func show_menu() -> void:
 	battle.clear()
 	ball_run.reset()
 	hud.visible = false
+	_set_screen(null)
+	_column.visible = false
+	menu.visible = true
+	menu.refresh()
+
+
+## Alter Startbildschirm (nicht mehr verwendet).
+func _old_menu() -> void:
 	var s := _full_screen()
 	s.add_child(UiKit.dim(0.55))
 	var v := _centered(s, 16)
@@ -291,7 +325,7 @@ func show_menu() -> void:
 		if n == GameData.LEVEL_COUNT:
 			text += " · Boss"
 		var b := UiKit.button(text, func() -> void: start_level(lvl), 290)
-		if n > max_unlocked:
+		if n > Save.max_level():
 			b.disabled = true
 			b.text = "Level %d · gesperrt" % n
 		grid.add_child(b)
@@ -299,13 +333,21 @@ func show_menu() -> void:
 	_set_screen(s)
 
 
-func start_level(n: int) -> void:
+func start_level(n: int, hard_mode := false) -> void:
+	if not _autotest and not Save.use_energy(MetaData.ENERGY_COST):
+		show_menu()
+		return
 	level = n
+	hard = hard_mode
 	state = "hero_select"
+	menu.visible = false
+	_column.visible = true
 	get_tree().paused = false
 	tempo = 1
 	_apply_speed(1)
-	ammo.reset(START_CAP, START_AMMO)
+	bonus = Save.battle_bonus()
+	ammo.reset(START_CAP + int(bonus["cap"]), START_AMMO + int(bonus["start_ammo"]))
+	_xp_carry = 0.0
 	xp = 0
 	levelups = 0
 	xp_needed = GameData.xp_needed(0)
@@ -313,15 +355,30 @@ func start_level(n: int) -> void:
 	card_levels.clear()
 	cards_taken.clear()
 	battle.setup(n, ammo)
+	battle.hp_scale = 1.5 if hard else 1.0
+	battle.bonus_crit = float(bonus["crit"])
+	battle.bonus_reload = float(bonus["reload"])
+	battle.hero_damage = {}
+	for id in GameData.HERO_IDS:
+		battle.hero_damage[id] = MetaData.hero_damage_mult(Save.hero_level(id)) * (1.0 + float(bonus["damage"]))
+	battle.fence_max *= 1.0 + float(bonus["shield"])
+	battle.fence_hp = battle.fence_max
 	ball_run.reset()
+	ball_run.lucky = float(bonus["lucky"])
+	ball_run.manual_cd_bonus = float(bonus["lever"])
+	if int(bonus["count"]) > 0:
+		ball_run.balls_per_launch += int(bonus["count"])
+	if bonus["gate"] != "":
+		ball_run.add_gate(bonus["gate"])
 	hud.visible = true
 	hud.reset(level, GameData.waves_in_level(level))
 	hud.set_next_wave(battle.next_wave_text())
 	hud.set_xp(0, xp_needed)
 	hud.set_fence(battle.fence_hp, battle.fence_max)
-	var options: Array = GameData.HERO_IDS.duplicate()
+	var options: Array = Save.unlocked_heroes()
 	options.shuffle()
-	options.resize(3)
+	if options.size() > 3:
+		options.resize(3)
 	if _autotest:
 		_set_screen(null)
 		_on_hero_picked(options[0])
@@ -362,8 +419,14 @@ func _on_hero_picked(id: String) -> void:
 
 # --- Erfahrung und Karten ---------------------------------------------------
 
-func _on_enemy_killed(_e: Enemy, gained: int) -> void:
-	xp += gained
+func _on_enemy_killed(e: Enemy, gained: int) -> void:
+	Save.track("kills")
+	if e.is_boss():
+		Save.track("boss")
+	_xp_carry += gained * (1.0 + float(bonus.get("xp", 0.0)))
+	var whole := int(floor(_xp_carry))
+	_xp_carry -= whole
+	xp += whole
 	while xp >= xp_needed:
 		xp -= xp_needed
 		levelups += 1
@@ -428,6 +491,7 @@ func _on_card_picked(card: Dictionary) -> void:
 	var apply: Callable = card["apply"]
 	apply.call()
 	card_levels[card["key"]] = int(card_levels.get(card["key"], 0)) + 1
+	Save.track("cards")
 	cards_taken.append(card["key"])
 	pending_levelups -= 1
 	get_tree().paused = false
@@ -439,7 +503,7 @@ func _on_card_picked(card: Dictionary) -> void:
 func _roll_cards(n: int) -> Array:
 	var pool: Array = []
 	if battle.heroes.size() < Battle.MAX_HEROES:
-		for id in GameData.HERO_IDS:
+		for id in Save.unlocked_heroes():
 			if not battle.has_hero(id):
 				pool.append(_card_add_hero(id))
 	for h in battle.heroes:
@@ -639,7 +703,8 @@ class Emblem extends Control:
 # --- Pause, Tempo, Ende ---------------------------------------------------
 
 func _toggle_tempo() -> void:
-	tempo = 2 if tempo == 1 else 1
+	# x3 nur für die Testphase
+	tempo = tempo % 3 + 1
 	_apply_speed(tempo)
 	hud.set_tempo(tempo)
 
@@ -654,7 +719,7 @@ func _on_pause() -> void:
 	var v := _centered(s, 18)
 	v.add_child(UiKit.label("Pause", 48, UiKit.C_GOLD))
 	v.add_child(UiKit.button("Weiter", _resume))
-	v.add_child(UiKit.secondary(UiKit.button("Level neu starten", func() -> void: start_level(level))))
+	v.add_child(UiKit.secondary(UiKit.button("Level neu starten", func() -> void: start_level(level, hard))))
 	v.add_child(UiKit.secondary(UiKit.button("Zum Menü", show_menu)))
 	_set_screen(s)
 
@@ -667,9 +732,6 @@ func _resume() -> void:
 
 func _on_level_won() -> void:
 	ball_run.active = false
-	if level >= max_unlocked and level < GameData.LEVEL_COUNT:
-		max_unlocked = level + 1
-		_save_progress()
 	if _autotest:
 		_finish_autotest("win")
 		return
@@ -679,8 +741,8 @@ func _on_level_won() -> void:
 	var text := "Die Station hält. Level %d ist geschafft." % level
 	if level == GameData.LEVEL_COUNT:
 		title = "Die Schleimmutter ist besiegt!"
-		text = "Alle Level des Piloten sind geschafft. Danke fürs Testen!"
-	_show_result(title, text, true)
+		text = "Alle Level des Piloten sind geschafft. Jetzt wartet der Schwer-Modus!"
+	_show_result(title, text, true, _grant_rewards(true))
 
 
 func _on_level_lost() -> void:
@@ -690,10 +752,10 @@ func _on_level_lost() -> void:
 		return
 	state = "result"
 	_apply_speed(1)
-	_show_result("Der Schild ist gefallen", "Versuch eine andere Kartenwahl. Oft hilft mehr Munition aus der Kugelbahn.", false)
+	_show_result("Der Schild ist gefallen", "Versuch eine andere Kartenwahl. Oft hilft mehr Munition aus der Kugelbahn.", false, _grant_rewards(false))
 
 
-func _show_result(title: String, text: String, won: bool) -> void:
+func _show_result(title: String, text: String, won: bool, rewards: Array = []) -> void:
 	var s := _full_screen()
 	s.add_child(UiKit.dim(0.65))
 	var v := _centered(s, 18)
@@ -704,10 +766,25 @@ func _show_result(title: String, text: String, won: bool) -> void:
 	v.add_child(t)
 	var secs := int(battle.elapsed)
 	v.add_child(UiKit.label("Besiegt: %d  ·  Zeit: %d:%02d  ·  Welle %d/%d" % [battle.kills, secs / 60, secs % 60, battle.wave, battle.total_waves], 22, UiKit.C_MUTED))
+	if not rewards.is_empty():
+		var grid := GridContainer.new()
+		grid.columns = 2
+		grid.add_theme_constant_override("h_separation", 24)
+		grid.add_theme_constant_override("v_separation", 6)
+		for r in rewards:
+			var row := HBoxContainer.new()
+			var kind: String = {"gold": "gold", "gems": "gem", "stars": "star", "pass": "pass"}.get(r["type"], "cards")
+			row.add_child(Icon.make(kind, 34))
+			row.add_child(UiKit.label(str(r["text"]), 21, UiKit.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT))
+			grid.add_child(row)
+		var gc := CenterContainer.new()
+		gc.add_child(grid)
+		v.add_child(gc)
+	var cost := " · %d Energie" % MetaData.ENERGY_COST
 	if won and level < GameData.LEVEL_COUNT:
-		v.add_child(UiKit.button("Weiter zu Level %d" % (level + 1), func() -> void: start_level(level + 1), 400))
-	v.add_child(UiKit.secondary(UiKit.button("Nochmal", func() -> void: start_level(level), 400)))
-	v.add_child(UiKit.secondary(UiKit.button("Zum Menü", show_menu, 400)))
+		v.add_child(UiKit.button("Weiter zu Level %d%s" % [level + 1, cost], func() -> void: start_level(level + 1, hard), 460))
+	v.add_child(UiKit.secondary(UiKit.button("Nochmal" + cost, func() -> void: start_level(level, hard), 460)))
+	v.add_child(UiKit.secondary(UiKit.button("Zum Menü", show_menu, 460)))
 	_set_screen(s)
 
 
@@ -742,3 +819,29 @@ func _exit_tree() -> void:
 	# Gemeinsame Formen vor dem Herunterfahren der Grafik freigeben
 	if Engine.has_meta("fx_cache"):
 		Engine.remove_meta("fx_cache")
+
+
+
+# --- Belohnungen nach dem Kampf ------------------------------------------------
+
+## Vergibt Belohnungen und gibt sie als Liste für die Anzeige zurück.
+func _grant_rewards(won: bool) -> Array:
+	var mult := (1.5 if hard else 1.0) * (1.0 + float(bonus.get("gold", 0.0)))
+	var out: Array = []
+	var gold := int(round((battle.kills * 2 + (50 * level if won else 0)) * mult))
+	Save.data["gold"] = Save.gold() + gold
+	out.append({"type": "gold", "text": "+%d Gold" % gold})
+	for h in battle.heroes:
+		var n := 3 + level if won else 1 + level / 2
+		Save.add_hero_cards(h.id, n)
+		out.append({"type": "cards", "text": "+%d %s" % [n, h.data["name"]]})
+	if won:
+		var first := Save.level_won(level, hard)
+		var stars := 3 if first else 1
+		Save.data["stars"] = Save.stars() + stars
+		out.append({"type": "stars", "text": "+%d %s" % [stars, "Sterne" if stars > 1 else "Stern"]})
+		Save.track("wins")
+		Save.add_pass_points(MetaData.PASS_WIN_POINTS)
+		out.append({"type": "pass", "text": "+%d Pass-Punkte" % MetaData.PASS_WIN_POINTS})
+	Save.save_game()
+	return out
