@@ -149,7 +149,19 @@ func _fit_column() -> void:
 	_column.offset_bottom = 0.0
 
 
+var _perf_t := 0.0
+
+
 func _process(delta: float) -> void:
+	# Leistungsmessung für Tests im Browser (erscheint in der Browser-Konsole)
+	_perf_t += delta / maxf(0.01, Engine.time_scale)
+	if _perf_t >= 2.0 and state == "battle":
+		_perf_t = 0.0
+		print("PERF fps=%d tempo=%d gegner=%d kugeln=%d knoten=%d physik_ms=%.1f bild_ms=%.1f" % [
+			Engine.get_frames_per_second(), tempo, battle.enemies.size(), ball_run.ball_count(),
+			Performance.get_monitor(Performance.OBJECT_NODE_COUNT),
+			Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0,
+			Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0])
 	if _autotest and state == "battle":
 		if battle.elapsed > 900.0:
 			_finish_autotest("timeout")
@@ -668,3 +680,9 @@ func _save_progress() -> void:
 	var cfg := ConfigFile.new()
 	cfg.set_value("progress", "max_level", max_unlocked)
 	cfg.save(SAVE_PATH)
+
+
+func _exit_tree() -> void:
+	# Gemeinsame Formen vor dem Herunterfahren der Grafik freigeben
+	if Engine.has_meta("fx_cache"):
+		Engine.remove_meta("fx_cache")

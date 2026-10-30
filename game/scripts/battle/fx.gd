@@ -15,6 +15,43 @@ static func mat(color: Color, emission := 0.0, metallic := 0.0, roughness := 0.6
 	return m
 
 
+## Gemeinsame Formen und Materialien, die sich nie ändern. Neue Formen pro Schuss
+## anzulegen kostet im Browser am Handy spürbar Zeit.
+static func _cache() -> Dictionary:
+	if not Engine.has_meta("fx_cache"):
+		Engine.set_meta("fx_cache", {})
+	return Engine.get_meta("fx_cache")
+
+
+static func shared_mesh(key: String, make: Callable) -> Mesh:
+	var c := _cache()
+	if not c.has(key):
+		c[key] = make.call()
+	return c[key]
+
+
+static func shared_glow(color: Color) -> StandardMaterial3D:
+	var c := _cache()
+	var key := "glow:" + color.to_html()
+	if not c.has(key):
+		c[key] = glow_mat(color)
+	return c[key]
+
+
+static func unit_sphere() -> Mesh:
+	return shared_mesh("sphere1", func() -> Mesh:
+		var m := SphereMesh.new()
+		m.radius = 1.0
+		m.height = 2.0
+		m.radial_segments = 12
+		m.rings = 6
+		return m)
+
+
+static func unit_box() -> Mesh:
+	return shared_mesh("box1", func() -> Mesh: return BoxMesh.new())
+
+
 static func glow_mat(color: Color, alpha := 1.0) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -112,7 +149,7 @@ static func burst(parent: Node, pos: Vector3, color: Color, amount := 12, speed 
 ## Aufblähende, verblassende Kugel (Explosion, Mündungsblitz, Auftauchen).
 static func flash(parent: Node, pos: Vector3, color: Color, radius: float, duration := 0.25) -> void:
 	var m := glow_mat(color, 0.9)
-	var s := sphere(1.0, m, 12, 6)
+	var s := inst(unit_sphere(), m)
 	parent.add_child(s)
 	s.global_position = pos
 	s.scale = Vector3.ONE * radius * 0.2
@@ -154,7 +191,8 @@ static func _segment(parent: Node3D, a: Vector3, b: Vector3, thickness: float, m
 	var length := a.distance_to(b)
 	if length < 0.001:
 		return
-	var seg := box(Vector3(thickness, thickness, length), material)
+	var seg := inst(unit_box(), material)
 	parent.add_child(seg)
 	seg.global_position = (a + b) * 0.5
 	seg.look_at(b, Vector3.UP if absf((b - a).normalized().y) < 0.95 else Vector3.RIGHT)
+	seg.scale = Vector3(thickness, thickness, length)

@@ -368,8 +368,7 @@ func explode(pos: Vector3, radius: float, dmg: float, crit: bool, ammo_type: Str
 	if ammo_type == "normal":
 		col = Color(1.0, 0.6, 0.2)
 	Fx.flash(self, pos, col, radius, 0.28)
-	Fx.burst(self, pos, col, 22, 6.0, 0.12, 0.6)
-	Fx.burst(self, pos, Color(0.35, 0.35, 0.4), 10, 2.0, 0.2, 0.9)
+	Fx.burst(self, pos, col, 14, 6.0, 0.12, 0.5)
 	add_shake(0.22)
 
 

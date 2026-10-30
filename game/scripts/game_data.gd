@@ -34,7 +34,7 @@ const HEROES := {
 		"family": "rocket",
 		"color": Color(0.88, 0.3, 0.22),
 		"skin": Color(0.96, 0.8, 0.66),
-		"damage": 70.0, "interval": 0.9, "mag": 2, "reload": 2.4, "cost": 4, "splash": 2.2,
+		"damage": 70.0, "interval": 0.9, "mag": 2, "reload": 2.0, "cost": 4, "splash": 2.2,
 	},
 	"volta": {
 		"name": "Volta",
