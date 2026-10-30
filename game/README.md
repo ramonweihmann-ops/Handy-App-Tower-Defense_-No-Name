@@ -1,7 +1,9 @@
 # Pilot: Station am Wurmloch (Godot 4.7)
 
-Erster spielbarer Pilot: 5 Level im Motiv „Schleim-Welt“, 4 Helden, Kugelbahn als
-Munitions-Maschine, Kartenauswahl im Run. Grafik aus einfachen Formen (Platzhalter).
+Spielbarer Pilot: 5 Level im Motiv „Schleim-Welt“, 8 Helden, Kugelbahn als
+Munitions-Maschine, Kartenauswahl im Run, Hauptmenü mit Shop, Sammlung (Aufstellung bis 10
+Helden), Upgrades (Tech-Baum, Munition, Talente), Basislager und Battle Pass, Spielstand und
+Selbst-Update für die Testphase. Grafik aus einfachen Formen (Platzhalter).
 
 ## Spielen
 
@@ -36,20 +38,32 @@ Einzelner automatischer Lauf mit Ausgabe der Werte:
 godot --headless --fixed-fps 60 --path game -- --autotest --level=4 --seed=3 --pull
 ```
 
-## Balance (Stand 30.10.2026, automatischer Test, 10 Läufe je Level, ohne Hebel)
+## Balance (Stand 0.2.1, automatischer Test, 8 Läufe je Level, ohne Hebel, ohne Aufwertungen)
 
-| Level | gewonnen | Karten pro Level |
-|---|---|---|
-| 1–3 | 10/10 | 3–6 |
-| 4 | 6/10 | 7–8 |
-| 5 (Boss) | 2/10 | 7–9 |
+| Level | gewonnen | Munitionsspeicher im Mittel | Helden warten auf Munition |
+|---|---|---|---|
+| 1 | 8/8 | 67 % | 0 % |
+| 2 | 8/8 | 56 % | 3 % |
+| 3 | 7/8 | 39 % | 18 % |
+| 4 | 4/8 | 40 % | 16 % |
+| 5 (Boss) | 2/8 | 36 % | 19 % |
 
-Mit Hebel wird es deutlich leichter. Der Test wählt Karten nach einfachen Regeln.
+Munition soll knapp, aber kein Dauer-Engpass sein; dauerhafte Munitions-Upgrades, Heldenstufen
+und der Hebel gleichen das aus. Messen mit `--autotest` (Ausgabe `fill`, `full`, `wait`).
+
+## Selbst-Update (Testphase)
+
+`scripts/build-android.sh` schreibt `game/build_info.json` (eigene Version) und
+`docs/pilot/version.json` (neueste Version, APK-Name, Hinweistext). Die App prüft beim Start und
+im Menü, zeigt „Jetzt aktualisieren“, lädt die APK in ihren Speicher und öffnet die
+Android-Installation; beim nächsten Start wird die Datei gelöscht. Hinweistext über `NOTES=…`,
+Versionsname über `VNAME=…`. Später ersetzt Google Play diesen Weg.
 
 ## Tempo und Leistung
 
 - Grundtempo 60 % (`BASE_SPEED` in `main.gd`), Knopf x1/x2. x3 soll erst viel später kommen (etwa ab Level 100).
-- Ausgelegt aufs Handy: keine Schatten, keine Kantenglättung, kein Glow, Treffer-Funken nur bei kritischen Treffern, höchstens 55 Kugeln gleichzeitig.
+- Grafik „Hoch“ (Leuchten, Schatten) oder „Sparsam“, umschaltbar in den Einstellungen. Treffer-Funken nur bei kritischen Treffern, höchstens 55 Kugeln gleichzeitig, Formen und Materialien von Geschossen werden wiederverwendet.
+- Die Kugelbahn läuft in einer eigenen Ansicht in voller Größe und wird auf 78 % verkleinert angezeigt; darunter bleibt Abstand zur Gestenleiste des Handys.
 - Im breiten Fenster bleibt das Spiel eine Hochformat-Spalte in der Mitte.
 
 ## Android-Build

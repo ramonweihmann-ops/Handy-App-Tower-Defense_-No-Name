@@ -10,7 +10,11 @@ const ENERGY_REGEN := 240
 const HERO_MAX_LEVEL := 10
 
 ## Welches Level gewonnen sein muss, damit ein Held freigeschaltet ist (0 = von Anfang an).
-const HERO_UNLOCK := {"dusty": 0, "iska": 0, "brocken": 1, "volta": 2}
+const HERO_UNLOCK := {"dusty": 0, "iska": 0, "brocken": 1, "kalle": 2, "volta": 2, "margot": 3, "lynx": 4, "fritzi": 5}
+## Alternativ sofort freischalten mit Edelsteinen
+const HERO_UNLOCK_GEMS := 150
+## Höchstzahl der Helden in der Aufstellung (aus ihnen werden die Karten im Kampf gezogen)
+const SQUAD_MAX := 10
 
 const STAGE_NAME := "Schleim-Welt"
 
@@ -33,16 +37,32 @@ static func hero_damage_mult(level: int) -> float:
 
 const TECH := [
 	{"id": "shield1", "title": "Schildgenerator I", "desc": "Schild +10 %", "cost": 100},
-	{"id": "start_ammo", "title": "Munitionsvorrat", "desc": "+10 Kugeln zu Beginn", "cost": 200},
-	{"id": "lever", "title": "Federhebel", "desc": "Hebel ist 1 s schneller bereit", "cost": 300},
-	{"id": "shield2", "title": "Schildgenerator II", "desc": "Schild +10 %", "cost": 450},
-	{"id": "count", "title": "Zweiter Lauf", "desc": "+1 Kugel pro Abschuss", "cost": 650},
-	{"id": "crit", "title": "Zielhilfe", "desc": "Kritische Treffer +5 %", "cost": 900},
-	{"id": "tank", "title": "Großer Speicher", "desc": "+20 Kugeln Platz", "cost": 1200},
-	{"id": "shield3", "title": "Schildgenerator III", "desc": "Schild +15 %", "cost": 1600},
-	{"id": "xp", "title": "Kampferfahrung", "desc": "Erfahrung +10 %", "cost": 2100},
-	{"id": "gate", "title": "Startausrüstung", "desc": "Kugelbahn startet mit +3-Tor", "cost": 2800},
+	{"id": "crit", "title": "Zielhilfe", "desc": "Kritische Treffer +5 %", "cost": 200},
+	{"id": "shield2", "title": "Schildgenerator II", "desc": "Schild +10 %", "cost": 350},
+	{"id": "xp", "title": "Kampfsimulator", "desc": "Erfahrung +10 %", "cost": 550},
+	{"id": "gold", "title": "Bergungsteam", "desc": "Gold nach dem Kampf +10 %", "cost": 800},
+	{"id": "heal", "title": "Reparaturdrohne", "desc": "Schild heilt 1 % nach jeder Welle", "cost": 1100},
+	{"id": "shield3", "title": "Schildgenerator III", "desc": "Schild +15 %", "cost": 1500},
+	{"id": "crit2", "title": "Zielcomputer", "desc": "Kritische Treffer +5 %", "cost": 2000},
+	{"id": "damage", "title": "Waffenkammer", "desc": "Schaden aller Helden +5 %", "cost": 2600},
+	{"id": "xp2", "title": "Gefechtsübung", "desc": "Erfahrung +10 %", "cost": 3300},
 ]
+
+# --- Munition: dauerhafte Stufen für die Kugelbahn -----------------------------
+
+const AMMO_UPGRADES := [
+	{"id": "rate", "title": "Abschuss-Takt", "desc": "Der Hebel schießt 6 %% öfter (je Stufe)", "max": 10, "cost": 80},
+	{"id": "cap", "title": "Speicher", "desc": "+8 Kugeln Platz (je Stufe)", "max": 10, "cost": 60},
+	{"id": "start", "title": "Startvorrat", "desc": "+5 Kugeln zu Beginn (je Stufe)", "max": 10, "cost": 50},
+	{"id": "lever", "title": "Federhebel", "desc": "Hebel 0,4 s schneller bereit und +1 Extra-Kugel (je Stufe)", "max": 5, "cost": 150},
+	{"id": "count", "title": "Zweiter Lauf", "desc": "+1 Kugel pro Abschuss (je Stufe)", "max": 3, "cost": 500},
+	{"id": "gate", "title": "Start-Tore", "desc": "Stufe 1: +3-Tor, Stufe 2: zweites ×2-Tor von Anfang an", "max": 2, "cost": 1200},
+]
+
+
+## Goldpreis für die nächste Stufe einer Munitionsverbesserung.
+static func ammo_cost(upgrade: Dictionary, level: int) -> int:
+	return int(upgrade["cost"]) * (level + 1)
 
 # --- Talente: mit Sternen ziehen, gleiche Talente steigen auf ----------------
 
@@ -66,6 +86,10 @@ const BUILDINGS := {
 	"iska": "Iskas Wachturm",
 	"brocken": "Brockens Bohrturm",
 	"volta": "Voltas Labor",
+	"kalle": "Kalles Kühlhaus",
+	"margot": "Margots Kapitänskajüte",
+	"lynx": "Lynx' Ausguck",
+	"fritzi": "Fritzis Feuerwache",
 }
 const BUILDING_MAX_LEVEL := 10
 

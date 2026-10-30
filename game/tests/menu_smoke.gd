@@ -51,6 +51,10 @@ func _run() -> bool:
 			print("SMOKE pass stufe ", save.pass_level(), " holbar ", save.pass_claimable())
 			print("SMOKE pass holen: ", save.claim_pass(1))
 			print("SMOKE missionen: ", save.missions()["ids"])
+			print("SMOKE munition kaufen: ", save.buy_ammo_upgrade("rate"), " stufe ", save.ammo_level("rate"))
+			print("SMOKE kalle freischalten: ", save.unlock_with_gems("kalle"), " aufstellung ", save.squad())
+			print("SMOKE aufstellung ändern: '", save.toggle_squad("iska"), "' jetzt ", save.squad())
+			print("SMOKE boni: ", save.battle_bonus())
 		3:
 			m.open_battle_pass()
 		4:
@@ -61,6 +65,10 @@ func _run() -> bool:
 			m._open_energy()
 		7:
 			m._open_settings()
+			m._open_hero("kalle")
+			m._open_hero("fritzi")
+			m.sub_tab["upgrades"] = "munition"
+			m.show_tab("upgrades")
 		8:
 			var u: Updater = main.updater
 			u.current_code = 100

@@ -25,6 +25,7 @@ var _muzzle: Node3D
 var _muzzle_flash: MeshInstance3D
 var _flash_t := 0.0
 var _pipe_mat: StandardMaterial3D
+var _pipe: MeshInstance3D
 var _pipe_glow := 0.0
 var _target_x := 0.0
 
@@ -79,6 +80,12 @@ func family() -> String:
 ## Höhe über dem Boden für die Magazinanzeige.
 func top_height() -> float:
 	return 2.0 * VIS_SCALE
+
+
+## Für Porträts: Munitionsleitung ausblenden.
+func hide_pipe() -> void:
+	if _pipe:
+		_pipe.visible = false
 
 
 func slide_to(x: float) -> void:
@@ -148,6 +155,19 @@ func _fire(target: Enemy) -> void:
 			battle.fire_rocket(from, target, dmg, crit, ammo_type, radius)
 		"tesla":
 			battle.fire_chain(from, target, dmg, crit, ammo_type, int(data["chain"]) + int(mods["special"]))
+		"cryo":
+			# Frost-Strahl: immer Eismunition, springt mit der Spezialkarte auf Nachbarn über
+			battle.fire_chain(from, target, dmg, crit, "ice", int(mods["special"]), Color(0.55, 0.95, 1.0))
+		"shotgun":
+			var pellets := int(data["pellets"]) + int(mods["special"])
+			battle.fire_bullet(from, target, dmg, crit, ammo_type, 0, 32.0, 0.7)
+			for other in battle.spread_targets(pellets - 1, target):
+				battle.fire_bullet(from, other, dmg, false, ammo_type, 0, 30.0, 0.7)
+		"sniper":
+			battle.fire_bullet(from, target, dmg, crit, ammo_type, int(data["pierce"]) + int(mods["special"]), 60.0, 1.3)
+		"flamer":
+			var cone: float = float(data["cone"]) * (1.0 + 0.2 * int(mods["special"]))
+			battle.flame(from, target, dmg, crit, ammo_type, cone)
 	_recoil = 1.0
 	_flash_t = 0.06
 
@@ -193,6 +213,7 @@ func _build_visual() -> void:
 	# Munitionsleitung zur Kugelbahn
 	_pipe_mat = Fx.mat(Color(0.2, 0.8, 1.0), 0.4, 0.3, 0.3)
 	var pipe := Fx.cylinder(0.08, 0.08, 6.0, _pipe_mat, 8)
+	_pipe = pipe
 	pipe.rotation.x = PI * 0.5
 	pipe.position = Vector3(0, 0.08, 3.2)
 	add_child(pipe)
@@ -280,6 +301,54 @@ func _build_visual() -> void:
 				ring.position = Vector3(0, 1.0 + k * 0.13, 0.28)
 				_body.add_child(ring)
 
+	match family():
+		"cryo":
+			var beanie := Fx.sphere(0.23, Fx.mat(Color(0.2, 0.55, 0.85)), 12, 6)
+			beanie.scale = Vector3(1.0, 0.7, 1.0)
+			beanie.position.y = 1.33
+			_body.add_child(beanie)
+			var pom := Fx.sphere(0.07, Fx.mat(Color(1, 1, 1)), 8, 4)
+			pom.position.y = 1.5
+			_body.add_child(pom)
+			var tank := Fx.cylinder(0.11, 0.11, 0.4, Fx.mat(Color(0.6, 0.85, 1.0), 1.5), 10)
+			tank.position = Vector3(0, 0.85, 0.3)
+			_body.add_child(tank)
+		"shotgun":
+			var cap := Fx.cylinder(0.2, 0.22, 0.14, Fx.mat(Color(0.12, 0.15, 0.3)), 14)
+			cap.position.y = 1.4
+			_body.add_child(cap)
+			var peak := Fx.box(Vector3(0.3, 0.03, 0.16), Fx.mat(Color(0.08, 0.08, 0.1)))
+			peak.position = Vector3(0, 1.34, -0.2)
+			_body.add_child(peak)
+			var badge := Fx.sphere(0.04, Fx.mat(Color(1.0, 0.85, 0.3), 2.0), 6, 3)
+			badge.position = Vector3(0, 1.42, -0.2)
+			_body.add_child(badge)
+			var hair := Fx.sphere(0.2, Fx.mat(Color(0.92, 0.92, 0.95)), 10, 5)
+			hair.scale = Vector3(1.1, 0.6, 1.0)
+			hair.position = Vector3(0, 1.2, 0.06)
+			_body.add_child(hair)
+		"sniper":
+			var hood := Fx.sphere(0.25, Fx.mat(Color(0.25, 0.35, 0.2)), 12, 6)
+			hood.scale = Vector3(1.0, 0.9, 1.05)
+			hood.position = Vector3(0, 1.28, 0.03)
+			_body.add_child(hood)
+			var scope_eye := Fx.cylinder(0.04, 0.04, 0.08, Fx.mat(Color(1.0, 0.25, 0.2), 3.0))
+			scope_eye.rotation.x = PI * 0.5
+			scope_eye.position = Vector3(0.08, 1.27, -0.22)
+			_body.add_child(scope_eye)
+		"flamer":
+			var helmet := Fx.sphere(0.25, Fx.mat(Color(0.9, 0.15, 0.1), 0.1, 0.3, 0.4), 14, 8)
+			helmet.scale = Vector3(1.05, 0.75, 1.15)
+			helmet.position.y = 1.33
+			_body.add_child(helmet)
+			var brim := Fx.cylinder(0.32, 0.32, 0.03, Fx.mat(Color(0.8, 0.12, 0.08)), 14)
+			brim.position.y = 1.27
+			_body.add_child(brim)
+			for sx in [-0.1, 0.1]:
+				var tank := Fx.cylinder(0.09, 0.09, 0.5, Fx.mat(Color(0.85, 0.85, 0.2), 0.0, 0.6, 0.3), 10)
+				tank.position = Vector3(sx, 0.85, 0.3)
+				_body.add_child(tank)
+
 	# Waffe
 	_weapon = Node3D.new()
 	_body.add_child(_weapon)
@@ -340,6 +409,51 @@ func _build_visual() -> void:
 				ring.position.z = -0.05 - k * 0.1
 				_weapon.add_child(ring)
 			_muzzle.position = Vector3(0, 0, -0.36)
+	match family():
+		"cryo":
+			_weapon_base = Vector3(0.18, 0.9, -0.4)
+			var body := Fx.cylinder(0.08, 0.1, 0.45, Fx.mat(Color(0.75, 0.85, 0.95), 0.0, 0.6, 0.3), 10)
+			body.rotation.x = PI * 0.5
+			_weapon.add_child(body)
+			var crystal := Fx.sphere(0.1, Fx.mat(Color(0.6, 0.95, 1.0), 3.0), 6, 3)
+			crystal.position.z = -0.3
+			_weapon.add_child(crystal)
+			_muzzle.position = Vector3(0, 0, -0.38)
+		"shotgun":
+			_weapon_base = Vector3(0.16, 0.88, -0.4)
+			for sx in [-0.035, 0.035]:
+				var barrel := Fx.cylinder(0.035, 0.035, 0.62, metal, 8)
+				barrel.rotation.x = PI * 0.5
+				barrel.position = Vector3(sx, 0, -0.2)
+				_weapon.add_child(barrel)
+			var stock := Fx.box(Vector3(0.1, 0.12, 0.3), Fx.mat(Color(0.45, 0.25, 0.1)))
+			stock.position.z = 0.15
+			_weapon.add_child(stock)
+			_muzzle.position = Vector3(0, 0, -0.52)
+		"sniper":
+			_weapon_base = Vector3(0.14, 0.92, -0.45)
+			var barrel := Fx.cylinder(0.03, 0.035, 1.0, metal, 8)
+			barrel.rotation.x = PI * 0.5
+			barrel.position.z = -0.35
+			_weapon.add_child(barrel)
+			var stock := Fx.box(Vector3(0.09, 0.13, 0.4), Fx.mat(Color(0.3, 0.35, 0.25)))
+			stock.position.z = 0.12
+			_weapon.add_child(stock)
+			var scope := Fx.cylinder(0.045, 0.045, 0.3, metal, 8)
+			scope.rotation.x = PI * 0.5
+			scope.position = Vector3(0, 0.09, -0.05)
+			_weapon.add_child(scope)
+			_muzzle.position = Vector3(0, 0, -0.86)
+		"flamer":
+			_weapon_base = Vector3(0.16, 0.86, -0.4)
+			var nozzle := Fx.cylinder(0.06, 0.08, 0.55, metal, 10)
+			nozzle.rotation.x = PI * 0.5
+			nozzle.position.z = -0.12
+			_weapon.add_child(nozzle)
+			var pilot := Fx.sphere(0.05, Fx.mat(Color(0.4, 0.7, 1.0), 4.0), 6, 3)
+			pilot.position = Vector3(0, -0.06, -0.4)
+			_weapon.add_child(pilot)
+			_muzzle.position = Vector3(0, 0, -0.42)
 	_weapon.position = _weapon_base
 	_muzzle_flash = Fx.sphere(0.11, Fx.glow_mat(Color(1.0, 0.9, 0.5)), 8, 4)
 	_muzzle.add_child(_muzzle_flash)

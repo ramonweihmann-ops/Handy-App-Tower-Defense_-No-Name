@@ -35,6 +35,9 @@ var hero_damage := {}
 ## Für Auswertungen: Heldensekunden ohne Munition und Heldensekunden insgesamt.
 var hero_wait_time := 0.0
 var hero_time := 0.0
+## Für Auswertungen: mittlere Füllung des Munitionsspeichers und Zeit mit vollem Speicher
+var fill_sum := 0.0
+var full_time := 0.0
 
 var _spawn_queue: Array[String] = []
 ## Alle Wellen des Levels, im Voraus gewürfelt (für die Vorschau).
@@ -50,11 +53,24 @@ var _pulse := 0.0
 var _wormhole_ring: Node3D
 var _asteroids: Array[Node3D] = []
 var _target_cache: Enemy
+var _flame_tick := 0
+var _env: Environment
+var _sun: DirectionalLight3D
 var _target_frame := -1
 
 
 func _ready() -> void:
 	_build_world()
+	apply_quality()
+
+
+## Grafikstufe aus den Einstellungen: Hoch = Leuchten und Schatten, Sparsam = ohne.
+func apply_quality() -> void:
+	var high: bool = Save.data.get("quality", "hoch") == "hoch"
+	if _env:
+		_env.glow_enabled = high
+	if _sun:
+		_sun.shadow_enabled = high
 
 
 # --- Ablauf ----------------------------------------------------------------
@@ -74,6 +90,8 @@ func setup(level_: int, ammo_: AmmoStore) -> void:
 	elapsed = 0.0
 	hero_wait_time = 0.0
 	hero_time = 0.0
+	fill_sum = 0.0
+	full_time = 0.0
 	running = false
 	fence_changed.emit(fence_hp, fence_max)
 
@@ -133,6 +151,11 @@ func _process(delta: float) -> void:
 	if not running:
 		return
 	elapsed += delta
+	if ammo:
+		var ratio := float(ammo.total()) / maxf(1.0, ammo.cap)
+		fill_sum += ratio * delta
+		if ratio >= 0.95:
+			full_time += delta
 	for h in heroes:
 		hero_time += delta
 		if h.waiting_for_ammo:
@@ -301,7 +324,7 @@ func fire_rocket(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type
 	p.launch(self, "rocket", from, target, dmg, crit, ammo_type, 11.0, 1.0)
 
 
-func fire_chain(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type: String, jumps: int) -> void:
+func fire_chain(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type: String, jumps: int, color := Color(0, 0, 0, 0)) -> void:
 	var hit: Array[Enemy] = [target]
 	var points: Array[Vector3] = [from, target.aim_point()]
 	var current := target
@@ -321,7 +344,25 @@ func fire_chain(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type:
 		col = Color(1.0, 0.5, 0.2)
 	elif ammo_type == "ice":
 		col = Color(0.5, 0.9, 1.0)
+	if color.a > 0.0:
+		col = color
 	Fx.lightning(self, points, col)
+
+
+## Flammenwerfer: trifft alle Gegner im Umkreis des Ziels und setzt sie in Brand.
+func flame(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type: String, radius: float) -> void:
+	var center := target.global_position
+	for e in enemies.duplicate():
+		if not is_instance_valid(e) or not e.alive:
+			continue
+		if Vector2(e.position.x - center.x, e.position.z - center.z).length() <= radius + e.radius():
+			apply_hit(e, dmg, crit, ammo_type)
+			e.apply_burn(dmg * 0.6, 2.5)
+	_flame_tick += 1
+	if _flame_tick % 3 == 0:
+		var mid := from.lerp(target.aim_point(), 0.7)
+		Fx.flash(self, mid, Color(1.0, 0.55, 0.15), 0.9, 0.2)
+		Fx.flash(self, target.aim_point(), Color(1.0, 0.35, 0.1), radius * 0.8, 0.25)
 
 
 func _nearest_enemy(pos: Vector3, max_dist: float, exclude: Array[Enemy]) -> Enemy:
@@ -413,18 +454,21 @@ func _build_world() -> void:
 	e.ambient_light_color = Color(0.55, 0.6, 0.85)
 	e.ambient_light_energy = 0.75
 	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	e.glow_enabled = false
+	e.glow_enabled = true
 	e.glow_intensity = 0.7
 	e.glow_bloom = 0.05
 	e.glow_hdr_threshold = 0.9
 	env.environment = e
 	add_child(env)
+	_env = e
 
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-58, -35, 0)
 	sun.light_energy = 1.15
 	sun.light_color = Color(1.0, 0.95, 0.9)
-	sun.shadow_enabled = false
+	sun.shadow_enabled = true
+	sun.directional_shadow_max_distance = 40.0
+	_sun = sun
 	add_child(sun)
 
 	var rim := OmniLight3D.new()

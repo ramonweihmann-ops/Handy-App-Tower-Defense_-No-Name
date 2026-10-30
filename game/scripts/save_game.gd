@@ -45,6 +45,10 @@ func default_data() -> Dictionary:
 		"wheel_date": "",
 		"shop_free_date": "",
 		"tutorial_seen": false,
+		"unlocked": [],
+		"squad": [],
+		"ammo_up": {},
+		"quality": "hoch",
 	}
 
 
@@ -201,7 +205,7 @@ func hero_unlocked(id: String) -> bool:
 	if test_mode:
 		return true
 	var need: int = MetaData.HERO_UNLOCK.get(id, 0)
-	if need == 0:
+	if need == 0 or data["unlocked"].has(id):
 		return true
 	return data["won_levels"].has("N" + str(need)) or data["won_levels"].has("S" + str(need))
 
@@ -212,6 +216,44 @@ func unlocked_heroes() -> Array[String]:
 		if hero_unlocked(id):
 			out.append(id)
 	return out
+
+
+func unlock_with_gems(id: String) -> bool:
+	if hero_unlocked(id) or not spend("gems", MetaData.HERO_UNLOCK_GEMS):
+		return false
+	data["unlocked"].append(id)
+	save_game()
+	return true
+
+
+## Helden in der Aufstellung (nur freigeschaltete). Leer gespeichert heißt: alle freigeschalteten.
+func squad() -> Array[String]:
+	var out: Array[String] = []
+	var chosen: Array = data["squad"]
+	for id in unlocked_heroes():
+		if test_mode or chosen.is_empty() or chosen.has(id):
+			out.append(id)
+	return out
+
+
+func in_squad(id: String) -> bool:
+	return squad().has(id)
+
+
+## Nimmt einen Helden in die Aufstellung auf oder heraus. Mindestens 1 bleibt drin.
+func toggle_squad(id: String) -> String:
+	var current := squad()
+	if current.has(id):
+		if current.size() <= 1:
+			return "Mindestens ein Held muss in der Aufstellung bleiben."
+		current.erase(id)
+	else:
+		if current.size() >= MetaData.SQUAD_MAX:
+			return "Die Aufstellung ist voll (höchstens %d Helden)." % MetaData.SQUAD_MAX
+		current.append(id)
+	data["squad"] = current
+	save_game()
+	return ""
 
 
 func hero_level(id: String) -> int:
@@ -253,6 +295,26 @@ func tech_count() -> int:
 func has_tech(id: String) -> bool:
 	for i in tech_count():
 		if MetaData.TECH[i]["id"] == id:
+			return true
+	return false
+
+
+# --- Munition ----------------------------------------------------------------
+
+func ammo_level(id: String) -> int:
+	if test_mode:
+		return 0
+	return int(data["ammo_up"].get(id, 0))
+
+
+func buy_ammo_upgrade(id: String) -> bool:
+	for u in MetaData.AMMO_UPGRADES:
+		if u["id"] == id:
+			var lvl := ammo_level(id)
+			if lvl >= int(u["max"]) or not spend("gold", MetaData.ammo_cost(u, lvl)):
+				return false
+			data["ammo_up"][id] = lvl + 1
+			save_game()
 			return true
 	return false
 
@@ -427,18 +489,30 @@ func battle_bonus() -> Dictionary:
 		shield += 0.1
 	if has_tech("shield3"):
 		shield += 0.15
+	var crit := 0.02 * talent_level("scharfschuetze")
+	if has_tech("crit"):
+		crit += 0.05
+	if has_tech("crit2"):
+		crit += 0.05
+	var gates: Array[String] = []
+	if ammo_level("gate") >= 1:
+		gates.append("plus3")
+	if ammo_level("gate") >= 2:
+		gates.append("x2")
 	return {
 		"shield": shield,
-		"start_ammo": 10 if has_tech("start_ammo") else 0,
-		"lever": 1.0 if has_tech("lever") else 0.0,
-		"count": 1 if has_tech("count") else 0,
-		"crit": (0.05 if has_tech("crit") else 0.0) + 0.02 * talent_level("scharfschuetze"),
-		"cap": (20 if has_tech("tank") else 0) + 6 * talent_level("munitionslager"),
-		"xp": (0.1 if has_tech("xp") else 0.0) + 0.05 * talent_level("lernfreude"),
-		"gate": "plus3" if has_tech("gate") else "",
+		"start_ammo": 5 * ammo_level("start"),
+		"lever": 0.4 * ammo_level("lever"),
+		"lever_balls": ammo_level("lever"),
+		"count": ammo_level("count"),
+		"rate": 0.06 * ammo_level("rate"),
+		"crit": crit,
+		"cap": 8 * ammo_level("cap") + 6 * talent_level("munitionslager"),
+		"xp": (0.1 if has_tech("xp") else 0.0) + (0.1 if has_tech("xp2") else 0.0) + 0.05 * talent_level("lernfreude"),
+		"gates": gates,
 		"reload": 0.04 * talent_level("schnelllader"),
-		"heal": 0.02 * talent_level("sanitaet"),
-		"gold": 0.08 * talent_level("kopfgeld"),
-		"damage": 0.03 * talent_level("feuerkraft"),
+		"heal": 0.02 * talent_level("sanitaet") + (0.01 if has_tech("heal") else 0.0),
+		"gold": 0.08 * talent_level("kopfgeld") + (0.1 if has_tech("gold") else 0.0),
+		"damage": 0.03 * talent_level("feuerkraft") + (0.05 if has_tech("damage") else 0.0),
 		"lucky": 0.04 * talent_level("glueckspilz"),
 	}

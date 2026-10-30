@@ -26,8 +26,20 @@ static func box(color: Color, radius := 14, border := 0, border_color := Color.T
 	return sb
 
 
+## Kräftigere Schrift für das ganze Spiel (auch für selbst gezeichnete Texte).
+static func use_bold_font() -> void:
+	if ThemeDB.fallback_font is FontVariation:
+		return
+	var fv := FontVariation.new()
+	fv.base_font = ThemeDB.fallback_font
+	fv.variation_embolden = 0.6
+	ThemeDB.fallback_font = fv
+
+
 static func make_theme() -> Theme:
+	use_bold_font()
 	var t := Theme.new()
+	t.default_font = ThemeDB.fallback_font
 	t.default_font_size = 26
 	t.set_color("font_color", "Label", C_TEXT)
 	t.set_color("font_outline_color", "Label", Color(0, 0, 0, 0.8))
@@ -36,6 +48,9 @@ static func make_theme() -> Theme:
 	var normal := box(C_GOLD, 16)
 	normal.border_width_bottom = 6
 	normal.border_color = Color(0.72, 0.48, 0.08)
+	normal.shadow_size = 6
+	normal.shadow_offset = Vector2(0, 4)
+	normal.shadow_color = Color(0, 0, 0, 0.4)
 	var hover := normal.duplicate() as StyleBoxFlat
 	hover.bg_color = C_GOLD.lightened(0.15)
 	var pressed := normal.duplicate() as StyleBoxFlat
@@ -88,6 +103,9 @@ static func secondary(b: Button) -> Button:
 	var normal := box(Color(0.2, 0.32, 0.55), 16)
 	normal.border_width_bottom = 6
 	normal.border_color = Color(0.1, 0.18, 0.35)
+	normal.shadow_size = 6
+	normal.shadow_offset = Vector2(0, 4)
+	normal.shadow_color = Color(0, 0, 0, 0.4)
 	var hover := normal.duplicate() as StyleBoxFlat
 	hover.bg_color = normal.bg_color.lightened(0.12)
 	var pressed := normal.duplicate() as StyleBoxFlat

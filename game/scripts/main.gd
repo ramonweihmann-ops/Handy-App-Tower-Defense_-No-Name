@@ -5,13 +5,16 @@ extends Node
 ##   godot --headless --fixed-fps 60 --path game -- --autotest --level=1 [--seed=1] [--pull]
 
 const SAVE_PATH := "user://pilot.cfg"
-const START_AMMO := 30
-const START_CAP := 60
+const START_AMMO := 20
+const START_CAP := 50
 ## Grundtempo des Spiels (1.0 wäre die Rechengeschwindigkeit); x2 per Knopf.
 ## Später (etwa ab Level 100) soll x3 dazukommen.
 const BASE_SPEED := 0.6
 ## Breiteste erlaubte Spalte im Verhältnis zur Höhe (Querformat am PC wird zur Hochformat-Spalte).
 const MAX_ASPECT := 0.62
+## Anzeigegröße der Kugelbahn und freier Streifen darunter (Gestenleiste des Handys)
+const MACHINE_SCALE := 0.78
+const MACHINE_BOTTOM := 70.0
 
 var battle: Battle
 var ball_run: BallRun
@@ -172,10 +175,34 @@ func _build_layout() -> void:
 	hud.battle = battle
 	world_holder.add_child(hud)
 
+	# Kugelbahn: läuft in einer eigenen Ansicht in voller Größe (die Physik bleibt unverändert)
+	# und wird verkleinert angezeigt. Darunter bleibt ein freier Streifen, damit man beim
+	# Hebel nicht in die Gestenleiste des Handys greift.
+	var holder := Control.new()
+	holder.custom_minimum_size = Vector2(0, BallRun.PANEL_H * MACHINE_SCALE + MACHINE_BOTTOM)
+	holder.clip_contents = true
+	column.add_child(holder)
+	var holder_bg := ColorRect.new()
+	holder_bg.color = Color(0.03, 0.035, 0.08)
+	holder_bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	holder_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	holder.add_child(holder_bg)
+	var machine_view := SubViewportContainer.new()
+	machine_view.stretch = false
+	machine_view.size = Vector2(BallRun.DESIGN_W, BallRun.PANEL_H)
+	machine_view.scale = Vector2.ONE * MACHINE_SCALE
+	holder.add_child(machine_view)
+	var machine_vp := SubViewport.new()
+	machine_vp.size = Vector2i(int(BallRun.DESIGN_W), int(BallRun.PANEL_H))
+	machine_view.add_child(machine_vp)
 	ball_run = BallRun.new()
-	ball_run.custom_minimum_size = Vector2(0, BallRun.PANEL_H)
+	ball_run.size = Vector2(BallRun.DESIGN_W, BallRun.PANEL_H)
 	ball_run.ammo = ammo
-	column.add_child(ball_run)
+	machine_vp.add_child(ball_run)
+	var place := func() -> void:
+		machine_view.position = Vector2(floorf((holder.size.x - BallRun.DESIGN_W * MACHINE_SCALE) * 0.5), 4.0)
+	holder.resized.connect(place)
+	place.call()
 
 	var layer := CanvasLayer.new()
 	layer.layer = 10
@@ -194,6 +221,7 @@ func _build_layout() -> void:
 	menu.visible = false
 	_overlay.add_child(menu)
 	menu.play_requested.connect(start_level)
+	menu.quality_changed.connect(battle.apply_quality)
 
 	get_viewport().size_changed.connect(_fit_column)
 	_fit_column()
@@ -366,16 +394,19 @@ func start_level(n: int, hard_mode := false) -> void:
 	ball_run.reset()
 	ball_run.lucky = float(bonus["lucky"])
 	ball_run.manual_cd_bonus = float(bonus["lever"])
-	if int(bonus["count"]) > 0:
-		ball_run.balls_per_launch += int(bonus["count"])
-	if bonus["gate"] != "":
-		ball_run.add_gate(bonus["gate"])
+	ball_run.manual_extra = int(bonus["lever_balls"])
+	ball_run.rate_bonus = float(bonus["rate"])
+	ball_run.update_interval()
+	ball_run.base_count_bonus = int(bonus["count"])
+	ball_run.balls_per_launch += int(bonus["count"])
+	for g in bonus["gates"]:
+		ball_run.add_gate(g)
 	hud.visible = true
 	hud.reset(level, GameData.waves_in_level(level))
 	hud.set_next_wave(battle.next_wave_text())
 	hud.set_xp(0, xp_needed)
 	hud.set_fence(battle.fence_hp, battle.fence_max)
-	var options: Array = Save.unlocked_heroes()
+	var options: Array = Save.squad()
 	options.shuffle()
 	if options.size() > 3:
 		options.resize(3)
@@ -400,6 +431,7 @@ func _show_hero_picker(options: Array) -> void:
 		var card := {
 			"kind": "hero_pick", "target": d["weapon"], "color": d["color"], "title": d["name"],
 			"desc": "%s\n\n%s" % [d["role"], d["blurb"]], "stars": 0, "max": 0, "emblem": String(d["name"]).left(1),
+			"hero_id": id,
 		}
 		var hero_id: String = id
 		row.add_child(_card_button(card, func(_c: Dictionary) -> void: _on_hero_picked(hero_id)))
@@ -503,7 +535,7 @@ func _on_card_picked(card: Dictionary) -> void:
 func _roll_cards(n: int) -> Array:
 	var pool: Array = []
 	if battle.heroes.size() < Battle.MAX_HEROES:
-		for id in Save.unlocked_heroes():
+		for id in Save.squad():
 			if not battle.has_hero(id):
 				pool.append(_card_add_hero(id))
 	for h in battle.heroes:
@@ -538,7 +570,7 @@ func _card_add_hero(id: String) -> Dictionary:
 	return {
 		"key": "add:" + id, "kind": "add_hero", "target": "Neu im Team", "color": d["color"],
 		"title": d["name"], "desc": "%s mit %s.\n%s\n+10 Munition" % [d["role"], d["weapon"], d["blurb"]],
-		"stars": 0, "max": 1, "emblem": String(d["name"]).left(1),
+		"stars": 0, "max": 1, "emblem": String(d["name"]).left(1), "hero_id": id,
 		"weight": 4.0 if battle.heroes.size() < 2 else 2.2,
 		"apply": _apply_add_hero.bind(id),
 	}
@@ -564,6 +596,10 @@ func _hero_cards(h: Hero) -> Array:
 		"mg": ["Durchschlag", "Kugeln treffen 1 Gegner mehr", 2],
 		"rocket": ["Größere Explosion", "Explosionsradius +25 %", 3],
 		"tesla": ["Kettenblitz", "Der Blitz springt 1 Gegner weiter", 3],
+		"cryo": ["Frostsplitter", "Der Frost-Strahl springt auf 1 Gegner mehr über", 3],
+		"shotgun": ["Mehr Schrot", "+1 Kugel pro Schuss", 3],
+		"sniper": ["Durchschlag", "Die Kugel durchschlägt 1 Gegner mehr", 3],
+		"flamer": ["Breitere Flamme", "Flammenbereich +20 %", 3],
 	}
 	var sp: Array = special[h.family()]
 	stats.append(["special", sp[0], sp[1], sp[2]])
@@ -612,7 +648,7 @@ func _machine_cards() -> Array:
 	list.append({
 		"key": "machine:count", "kind": "machine", "target": "Kugelbahn", "color": UiKit.C_MACHINE,
 		"title": "Mehr Kugeln", "desc": "+1 Kugel pro Abschuss.",
-		"stars": ball_run.balls_per_launch - BallRun.BASE_COUNT, "max": 3, "emblem": "+1", "weight": 1.2,
+		"stars": ball_run.balls_per_launch - BallRun.BASE_COUNT - ball_run.base_count_bonus, "max": 3, "emblem": "+1", "weight": 1.2,
 		"apply": func() -> void: ball_run.upgrade_count(),
 	})
 	list.append({
@@ -666,8 +702,13 @@ func _card_button(card: Dictionary, on_pick: Callable) -> Button:
 	head.add_child(UiKit.label(card["target"], 18, Color(0.08, 0.08, 0.12)))
 	(head.get_child(0) as Label).add_theme_constant_override("outline_size", 0)
 	v.add_child(head)
-	var emblem := Emblem.new(col, String(card.get("emblem", "")))
-	v.add_child(emblem)
+	if card.has("hero_id"):
+		var portrait := HeroPortrait.make(String(card["hero_id"]), 130)
+		portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		v.add_child(portrait)
+	else:
+		var emblem := Emblem.new(col, String(card.get("emblem", "")))
+		v.add_child(emblem)
 	var title := UiKit.wrap_label(card["title"], 26, UiKit.C_GOLD)
 	v.add_child(title)
 	var desc := UiKit.wrap_label(card["desc"], 19, UiKit.C_TEXT)
@@ -792,9 +833,9 @@ func _finish_autotest(result: String) -> void:
 	var names: Array[String] = []
 	for h in battle.heroes:
 		names.append(h.id)
-	print("AUTOTEST level=%d result=%s time=%.0f wave=%d/%d kills=%d fence=%d/%d wait=%.2f collected=%d heroes=%s balls=%d ammo=%d cards=%s" % [
+	print("AUTOTEST level=%d result=%s time=%.0f wave=%d/%d kills=%d fence=%d/%d wait=%.2f fill=%.2f full=%.2f collected=%d heroes=%s balls=%d ammo=%d cards=%s" % [
 		level, result, battle.elapsed, battle.wave, battle.total_waves, battle.kills,
-		int(battle.fence_hp), int(battle.fence_max), battle.ammo_wait_ratio(), ball_run.collected_total,
+		int(battle.fence_hp), int(battle.fence_max), battle.ammo_wait_ratio(), battle.fill_sum / maxf(1.0, battle.elapsed), battle.full_time / maxf(1.0, battle.elapsed), ball_run.collected_total,
 		",".join(PackedStringArray(names)), ball_run.ball_count(), ammo.total(),
 		",".join(PackedStringArray(cards_taken))])
 	print("   kugelbahn: ", ball_run.stats)

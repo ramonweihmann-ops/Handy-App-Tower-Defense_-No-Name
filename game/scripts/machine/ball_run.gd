@@ -21,8 +21,8 @@ const MANUAL_CD := 6.0
 const WALL_R := 5.0
 ## Abstand zwischen zwei Kugeln einer Ladung.
 const LAUNCH_GAP := 0.16
-const BASE_INTERVAL := 1.4
-const BASE_COUNT := 3
+const BASE_INTERVAL := 1.15
+const BASE_COUNT := 2
 const GATE_INFO := {
 	"x2": {"label": "×2", "color": Color(0.35, 1.0, 0.55)},
 	"plus3": {"label": "+3", "color": Color(1.0, 0.85, 0.25)},
@@ -38,6 +38,11 @@ var rate_level := 0
 ## Boni aus dem Spielstand: Chance auf doppelte Kugel, schnellerer Hebel (Sekunden)
 var lucky := 0.0
 var manual_cd_bonus := 0.0
+var manual_extra := 0
+## Zusätzliche Kugeln pro Abschuss aus den Munitions-Upgrades (zählt nicht als Karten-Stufe)
+var base_count_bonus := 0
+## Dauerhafter Takt-Bonus aus den Munitions-Upgrades (z. B. 0.12 = 12 % öfter)
+var rate_bonus := 0.0
 ## Für Auswertungen: gesammelte Kugeln im aktuellen Level.
 var collected_total := 0
 var stats := {"launched": 0, "recycled": 0, "lost": 0, "aged": 0, "full": 0}
@@ -102,6 +107,9 @@ func reset() -> void:
 	collected_total = 0
 	lucky = 0.0
 	manual_cd_bonus = 0.0
+	manual_extra = 0
+	rate_bonus = 0.0
+	base_count_bonus = 0
 	stats = {"launched": 0, "recycled": 0, "lost": 0, "aged": 0, "full": 0}
 
 
@@ -124,7 +132,11 @@ func add_gate(type: String) -> bool:
 
 func upgrade_rate() -> void:
 	rate_level += 1
-	launch_interval = BASE_INTERVAL / (1.0 + 0.25 * rate_level)
+	update_interval()
+
+
+func update_interval() -> void:
+	launch_interval = BASE_INTERVAL / ((1.0 + 0.25 * rate_level) * (1.0 + rate_bonus))
 
 
 func upgrade_count() -> void:
@@ -273,7 +285,7 @@ func _gui_input(event: InputEvent) -> void:
 
 func _release_pull() -> void:
 	if active and _manual_cd <= 0.0:
-		_pending += balls_per_launch + int(round(_pull * 4.0))
+		_pending += balls_per_launch + int(round(_pull * 4.0)) + manual_extra
 		_manual_cd = maxf(1.0, MANUAL_CD - manual_cd_bonus)
 		manual_pulled.emit()
 	_pull = 0.0

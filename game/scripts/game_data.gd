@@ -3,7 +3,7 @@ extends RefCounted
 ## Feste Spieldaten des Piloten: Helden, Gegner, Wellen.
 ## Namen und Werte sind Arbeitsstände und werden beim Balancing angepasst.
 
-const HERO_IDS := ["dusty", "iska", "brocken", "volta"]
+const HERO_IDS := ["dusty", "iska", "brocken", "volta", "kalle", "margot", "lynx", "fritzi"]
 
 const HEROES := {
 	"dusty": {
@@ -45,6 +45,46 @@ const HEROES := {
 		"color": Color(0.62, 0.36, 0.95),
 		"skin": Color(0.9, 0.72, 0.58),
 		"damage": 16.0, "interval": 0.55, "mag": 8, "reload": 1.6, "cost": 4, "chain": 2,
+	},
+	"kalle": {
+		"name": "Kalle",
+		"role": "Kühltechniker",
+		"weapon": "Eiskanone",
+		"blurb": "Friert ein, was zu schnell ist.",
+		"family": "cryo",
+		"color": Color(0.35, 0.8, 0.95),
+		"skin": Color(0.92, 0.74, 0.6),
+		"damage": 18.0, "interval": 0.6, "mag": 6, "reload": 1.5, "cost": 3,
+	},
+	"margot": {
+		"name": "Käpt'n Margot",
+		"role": "Pensionierte Kapitänin",
+		"weapon": "Schrotflinte",
+		"blurb": "Aus der Nähe trifft sie immer.",
+		"family": "shotgun",
+		"color": Color(0.2, 0.3, 0.55),
+		"skin": Color(0.95, 0.8, 0.68),
+		"damage": 13.0, "interval": 0.85, "mag": 2, "reload": 1.4, "cost": 3, "pellets": 4,
+	},
+	"lynx": {
+		"name": "Lynx",
+		"role": "Scharfschützin",
+		"weapon": "Präzisionsgewehr",
+		"blurb": "Ein Schuss, und drei Gegner wundern sich.",
+		"family": "sniper",
+		"color": Color(0.35, 0.55, 0.3),
+		"skin": Color(0.75, 0.55, 0.42),
+		"damage": 70.0, "interval": 1.3, "mag": 4, "reload": 1.8, "cost": 3, "pierce": 2,
+	},
+	"fritzi": {
+		"name": "Fritzi",
+		"role": "Feuerwehrfrau",
+		"weapon": "Flammenwerfer",
+		"blurb": "Heizt der ersten Reihe richtig ein.",
+		"family": "flamer",
+		"color": Color(0.95, 0.35, 0.15),
+		"skin": Color(0.95, 0.78, 0.64),
+		"damage": 8.0, "interval": 0.2, "mag": 20, "reload": 1.8, "cost": 5, "cone": 1.7,
 	},
 }
 
