@@ -169,8 +169,9 @@ func _animate(delta: float) -> void:
 	_muzzle_flash.visible = _flash_t > 0.0
 	if _muzzle_flash.visible:
 		_muzzle_flash.scale = Vector3.ONE * randf_range(0.8, 1.3)
-	_pipe_glow = maxf(0.0, _pipe_glow - delta * 1.5)
-	_pipe_mat.emission = Color(0.2, 0.8, 1.0) * (0.4 + _pipe_glow * 3.0)
+	if _pipe_glow > 0.0:
+		_pipe_glow = maxf(0.0, _pipe_glow - delta * 1.5)
+		_pipe_mat.emission = Color(0.2, 0.8, 1.0) * (0.4 + _pipe_glow * 3.0)
 
 
 # --- Aussehen --------------------------------------------------------------

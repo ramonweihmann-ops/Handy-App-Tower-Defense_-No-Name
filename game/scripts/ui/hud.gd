@@ -16,6 +16,10 @@ var _fence_bar: ProgressBar
 var _fence_label: Label
 var _tempo_btn: Button
 var _next_label: Label
+var _fence_shown := -1
+var _fence_max_shown := -1
+var _fence_low := false
+var _fence_fill: StyleBoxFlat
 var _floaters: Array = []
 var _banner: Label
 var _banner_t := 0.0
@@ -121,13 +125,19 @@ func set_xp(xp: int, needed: int) -> void:
 
 
 func set_fence(hp: float, max_hp: float) -> void:
+	var shown := int(ceil(hp))
+	if shown == _fence_shown and int(max_hp) == _fence_max_shown:
+		return
+	_fence_shown = shown
+	_fence_max_shown = int(max_hp)
 	_fence_bar.max_value = max_hp
 	_fence_bar.value = hp
-	_fence_label.text = "%d/%d" % [int(ceil(hp)), int(max_hp)]
-	var ratio := hp / maxf(1.0, max_hp)
-	var col := UiKit.C_ACCENT if ratio > 0.35 else Color(1.0, 0.35, 0.3)
-	var sb := UiKit.box(col, 8)
-	_fence_bar.add_theme_stylebox_override("fill", sb)
+	_fence_label.text = "%d/%d" % [shown, int(max_hp)]
+	var low := hp / maxf(1.0, max_hp) <= 0.35
+	if low != _fence_low or _fence_fill == null:
+		_fence_low = low
+		_fence_fill = UiKit.box(Color(1.0, 0.35, 0.3) if low else UiKit.C_ACCENT, 8)
+		_fence_bar.add_theme_stylebox_override("fill", _fence_fill)
 
 
 func set_tempo(tempo: int) -> void:

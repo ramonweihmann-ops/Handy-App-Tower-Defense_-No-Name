@@ -22,6 +22,8 @@ func _physics_process(_delta: float) -> bool:
 	frame += 1
 	if frame == 2:
 		run.active = true
+		if OS.get_environment("PHYS_TICKS") != "":
+			Engine.physics_ticks_per_second = int(OS.get_environment("PHYS_TICKS"))
 		var per_launch := int(OS.get_environment("PER_LAUNCH")) if OS.get_environment("PER_LAUNCH") != "" else BallRun.BASE_COUNT
 		run.balls_per_launch = per_launch
 	for node in run._balls.get_children():

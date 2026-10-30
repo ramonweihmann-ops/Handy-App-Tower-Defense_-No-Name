@@ -33,6 +33,7 @@ var _visual: Node3D
 var _mats: Array[StandardMaterial3D] = []
 var _wiggle: Array[Node3D] = []
 var _ice_tint := 0.0
+var _last_tint_key := 0.0
 
 
 func setup(kind_: String, battle_: Battle, hp_mult: float) -> void:
@@ -148,6 +149,11 @@ func _update_effects(delta: float) -> void:
 			_slow = 0.0
 	_ice_tint = move_toward(_ice_tint, 1.0 if _slow_t > 0.0 else 0.0, delta * 4.0)
 	_flash = maxf(0.0, _flash - delta * 7.0)
+	# Materialien nur anfassen, wenn sich Aufblitzen oder Eis-Färbung geändert haben
+	var key := snappedf(_flash, 0.1) + snappedf(_ice_tint, 0.1) * 10.0
+	if key == _last_tint_key:
+		return
+	_last_tint_key = key
 	for m in _mats:
 		var base: Color = m.get_meta("base_emission")
 		var c := base.lerp(Color(1, 1, 1), _flash * 0.85)

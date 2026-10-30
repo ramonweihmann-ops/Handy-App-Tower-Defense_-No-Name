@@ -38,6 +38,8 @@ var _auto_pull_t := 0.0
 
 
 func _ready() -> void:
+	# Hängt das Handy kurz, lieber kurz langsamer werden als viele Schritte nachholen
+	Engine.max_physics_steps_per_frame = 3
 	_parse_args()
 	_load_progress()
 	_build_layout()
@@ -45,6 +47,12 @@ func _ready() -> void:
 		start_level(level)
 	else:
 		show_menu()
+
+
+## Setzt das Spieltempo (x1 oder x2). Die Physik bleibt bei 60 Schritten pro Spielsekunde,
+## weniger Schritte lassen schnelle Kugeln durch die Wände der Kugelbahn rutschen.
+func _apply_speed(t: int) -> void:
+	Engine.time_scale = BASE_SPEED * float(t)
 
 
 func _parse_args() -> void:
@@ -182,7 +190,7 @@ func _centered(parent: Control, separation := 18) -> VBoxContainer:
 func show_menu() -> void:
 	state = "menu"
 	get_tree().paused = false
-	Engine.time_scale = BASE_SPEED
+	_apply_speed(1)
 	battle.clear()
 	ball_run.reset()
 	hud.visible = false
@@ -228,7 +236,7 @@ func start_level(n: int) -> void:
 	state = "hero_select"
 	get_tree().paused = false
 	tempo = 1
-	Engine.time_scale = BASE_SPEED
+	_apply_speed(1)
 	ammo.reset(START_CAP, START_AMMO)
 	xp = 0
 	levelups = 0
@@ -279,7 +287,7 @@ func _on_hero_picked(id: String) -> void:
 	cards_taken.append("start:" + id)
 	state = "battle"
 	if _autotest:
-		Engine.time_scale = BASE_SPEED
+		_apply_speed(1)
 	battle.start()
 	ball_run.active = true
 
@@ -564,7 +572,7 @@ class Emblem extends Control:
 
 func _toggle_tempo() -> void:
 	tempo = 2 if tempo == 1 else 1
-	Engine.time_scale = BASE_SPEED * float(tempo)
+	_apply_speed(tempo)
 	hud.set_tempo(tempo)
 
 
@@ -598,7 +606,7 @@ func _on_level_won() -> void:
 		_finish_autotest("win")
 		return
 	state = "result"
-	Engine.time_scale = BASE_SPEED
+	_apply_speed(1)
 	var title := "Geschafft!"
 	var text := "Die Station hält. Level %d ist geschafft." % level
 	if level == GameData.LEVEL_COUNT:
@@ -613,7 +621,7 @@ func _on_level_lost() -> void:
 		_finish_autotest("lost")
 		return
 	state = "result"
-	Engine.time_scale = BASE_SPEED
+	_apply_speed(1)
 	_show_result("Der Schild ist gefallen", "Versuch eine andere Kartenwahl. Oft hilft mehr Munition aus der Kugelbahn.", false)
 
 
