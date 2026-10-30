@@ -46,13 +46,69 @@ func _ready() -> void:
 	if _autotest:
 		start_level(level)
 	else:
-		show_menu()
+		_warm_up()
 
 
 ## Setzt das Spieltempo (x1 oder x2). Die Physik bleibt bei 60 Schritten pro Spielsekunde,
 ## weniger Schritte lassen schnelle Kugeln durch die Wände der Kugelbahn rutschen.
 func _apply_speed(t: int) -> void:
 	Engine.time_scale = BASE_SPEED * float(t)
+
+
+## Ladebildschirm: Jede Figur und jeder Effekt wird einmal unsichtbar dahinter gezeigt,
+## damit das Handy die Grafik vorbereitet, bevor gespielt wird (verhindert Ruckler beim
+## ersten Schuss, der ersten Explosion usw.).
+func _warm_up() -> void:
+	state = "loading"
+	hud.visible = false
+	var screen := LoadingScreen.new()
+	_set_screen(screen)
+	var steps := [
+		[0.1, "Wurmloch wird geöffnet …"],
+		[0.35, "Crew bezieht Stellung …"],
+		[0.55, "Schleimwesen werden gezählt …"],
+		[0.75, "Energiezaun lädt …"],
+		[0.9, "Kugelbahn wird geölt …"],
+	]
+	screen.set_progress(steps[0][0], steps[0][1])
+	await _frames(20)
+	battle.setup(1, ammo)
+	screen.set_progress(steps[1][0], steps[1][1])
+	for id in GameData.HERO_IDS:
+		battle.add_hero(id)
+		await _frames(4)
+	screen.set_progress(steps[2][0], steps[2][1])
+	var targets: Array[Enemy] = []
+	var x := -3.0
+	for kind in GameData.ENEMIES.keys():
+		targets.append(battle.spawn_enemy(kind, Vector3(x, 0, -8.0)))
+		x += 2.0
+		await _frames(4)
+	await _frames(15)
+	screen.set_progress(steps[3][0], steps[3][1])
+	var from := Vector3(0, 1.5, 1.5)
+	for type in ["normal", "fire", "ice"]:
+		battle.fire_bullet(from, targets[0], 0.0, true, type, 0, 30.0, 1.0)
+		battle.fire_bullet(from, targets[1], 0.0, false, type, 0, 34.0, 0.75)
+		battle.fire_rocket(from, targets[2], 0.0, false, type, 2.0)
+		battle.fire_chain(from, targets[1], 0.0, false, type, 2)
+		await _frames(6)
+	Fx.flash(battle, Vector3(0, 1, -6), Color(1.0, 0.3, 0.9), 3.0, 0.4)
+	Fx.burst(battle, Vector3(0, 1, -6), Color(0.4, 1.0, 0.5), 12, 4.0, 0.1)
+	await _frames(40)
+	screen.set_progress(steps[4][0], steps[4][1])
+	ball_run.active = true
+	await _frames(40)
+	screen.set_progress(1.0, "Bereit!")
+	await _frames(25)
+	ball_run.reset()
+	show_menu()
+	print("LADEN_FERTIG")
+
+
+func _frames(n: int) -> void:
+	for i in n:
+		await get_tree().process_frame
 
 
 func _parse_args() -> void:

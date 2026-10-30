@@ -183,7 +183,39 @@ Das Verhalten programmieren wir einmal, das Aussehen wechselt je Motiv.
 
 ---
 
-## 6. Rechtliches (Grundsätze, keine Rechtsberatung)
+## 6. Battle Pass (später, nach dem Piloten)
+
+Wunsch vom 30.10.2026: Ein Battle Pass im Hauptmenü als dauerhafte Einnahmequelle.
+Aufbau angelehnt an das Genre (im Vorbild: „Saison 1“, 50 Stufen):
+
+- **Saison** von etwa 4 Wochen mit eigenem Thema, Countdown „Endet in …“
+- **Fortschritt** über tägliche und wöchentliche Missionen (z. B. „Besiege 200 Gegner“, „Nutze 10-mal den Hebel“), die Abzeichen bzw. Pass-Punkte geben
+- **Zwei Spuren pro Stufe:**
+  - eine kostenlose für alle
+  - eine Premium-Spur mit mehr und besseren Belohnungen (Freischaltung per Kauf, „Upgrade“)
+- **Belohnungen:** Münzen, Edelsteine, Heldenkarten, Schlüssel bzw. Truhen, kosmetische Dinge (Skins, Kugel-Farben, Zaun-Designs), bei höheren Stufen auch ein Saison-Held
+- **„Alles beanspruchen“** holt alle erreichten Belohnungen auf einmal ab
+- **Stufen kaufen** mit Edelsteinen, wenn man kurz vor dem Ziel ist
+
+**Damit er fair bleibt** (siehe Kritik am Vorbild, Abschnitt 10 der Analyse):
+
+- Die kostenlose Spur muss sich lohnen.
+- Saison-Helden sind auch ohne Kauf erspielbar, wenn auch später.
+- Missionen sind immer lösbar.
+
+**Technik und Recht:**
+
+- Käufe laufen über Google Play Billing bzw. Apple In-App-Käufe und werden auf einem Server geprüft.
+- Missionen und Saisons brauchen einen Server; das bringt laufende Kosten.
+- Rechtlich zu prüfen sind:
+  - Verbraucherschutz in der EU
+  - Jugendschutz und USK
+  - Pflichtangaben im Store
+  - Truhen mit Zufallsinhalt: Wahrscheinlichkeiten offenlegen
+
+---
+
+## 7. Rechtliches (Grundsätze, keine Rechtsberatung)
 
 - Allgemeine Motive wie Zombies, Weltraum-Monster, Wald oder Ratten gehören niemandem. Geschützt sind konkrete Figuren, Namen, Logos, Grafiken, Texte, Musik und Code.
 - Wir übernehmen keine Figuren, Namen oder Optik aus anderen Spielen, auch keine Doppelgänger.
@@ -195,9 +227,9 @@ Das Verhalten programmieren wir einmal, das Aussehen wechselt je Motiv.
 
 ---
 
-## 7. Erster Pilot (Umfang)
+## 8. Erster Pilot (Umfang)
 
-**Stand 30.10.2026:** gebaut, siehe [`game/README.md`](../game/README.md). Spielbar im Browser unter `docs/pilot/`.
+**Stand 30.10.2026:** gebaut, siehe [`game/README.md`](../game/README.md). Als Android-App (APK) zum Herunterladen unter `docs/pilot/` (GitHub Pages). iOS wird mitgedacht (gleiches Godot-Projekt), gebaut wird es später auf einem Mac.
 
 Ziel: herausfinden, **ob sich Kampf und Munitions-Mechanik gut anfühlen**.
 

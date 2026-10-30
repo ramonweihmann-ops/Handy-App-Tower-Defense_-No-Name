@@ -5,8 +5,9 @@ Munitions-Maschine, Kartenauswahl im Run. Grafik aus einfachen Formen (Platzhalt
 
 ## Spielen
 
-- Im Browser (Handy): über GitHub Pages, `docs/pilot/index.html`
-- Am PC: Projektordner `game/` in Godot 4.7 öffnen und starten
+- **Android:** https://ramonweihmann-ops.github.io/Handy-App-Tower-Defense_-No-Name/pilot/ öffnen, App herunterladen, installieren. Neue Versionen werden drüber installiert.
+- **iOS:** gleiches Projekt, wird später auf einem Mac gebaut (Xcode, Apple-Entwicklerkonto).
+- **Am PC:** Projektordner `game/` in Godot 4.7 öffnen und starten.
 
 ## Aufbau
 
@@ -25,7 +26,8 @@ Munitions-Maschine, Kartenauswahl im Run. Grafik aus einfachen Formen (Platzhalt
 
 ```bash
 GODOT=/pfad/zu/godot scripts/test.sh        # Kugelbahn-Test und Level 1–5 automatisch
-GODOT=/pfad/zu/godot scripts/build-web.sh   # Browser-Version nach docs/pilot/
+GODOT=/pfad/zu/godot scripts/build-android.sh   # Android-App (APK) mit Download-Seite nach docs/pilot/
+GODOT=/pfad/zu/godot scripts/build-web.sh       # Browser-Version (nur noch für Tests am PC)
 ```
 
 Einzelner automatischer Lauf mit Ausgabe der Werte:
@@ -49,3 +51,17 @@ Mit Hebel wird es deutlich leichter. Der Test wählt Karten nach einfachen Regel
 - Grundtempo 60 % (`BASE_SPEED` in `main.gd`), Knopf x1/x2. x3 soll erst viel später kommen (etwa ab Level 100).
 - Ausgelegt aufs Handy: keine Schatten, keine Kantenglättung, kein Glow, Treffer-Funken nur bei kritischen Treffern, höchstens 55 Kugeln gleichzeitig.
 - Im breiten Fenster bleibt das Spiel eine Hochformat-Spalte in der Mitte.
+
+## Android-Build
+
+- Paketname des Piloten: `com.homipoint.wurmloch.pilot` (die endgültige Play-Store-App bekommt einen eigenen Namen)
+- nur 64-Bit (`arm64-v8a`), etwa 27 MB
+- signiert mit dem **Pilot-Testschlüssel** `android/pilot-test.keystore` (Passwort `android`). Er liegt absichtlich im Repo, damit jede Sitzung Updates bauen kann, die sich über die alte App installieren lassen. **Nur für Testversionen.** Für Google Play kommt ein eigener, geheimer Upload-Schlüssel, der nie ins Repo gehört.
+- Versionsnummer zählt bei jedem Build automatisch hoch.
+- Benötigt: Godot-Android-Exportvorlagen, Java, `apksigner` und `zipalign` (Ubuntu-Pakete).
+
+## Ladebildschirm
+
+Beim Start zeigt die App einen Ladebildschirm. Währenddessen wird jeder Held, jeder Gegner und
+jeder Effekt einmal unsichtbar dargestellt, damit das Handy die Grafik vorbereitet und es beim
+ersten Schuss nicht ruckelt (`_warm_up` in `main.gd`).
