@@ -92,6 +92,7 @@ Das ist das Markenzeichen des Spiels:
 - Die Patronen fliegen einzeln zu den Helden und füllen ihr Magazin.
 - Die Ablage rechts füllt sich im Lauf des Runs: in Welle 1 mit 5, in Welle 2 mit 7, in Welle 4 mit 10 Patronen. Vermutlich landet dort, was die Helden gerade nicht brauchen (?).
 - Ohne Munition schießen die Helden nicht.
+- **Aufwerten:** Die Trommel läuft von selbst. Schneller und ergiebiger wird sie über die Karten beim Aufstieg im Run, z. B. „Schneider-Loch“. Ein direktes Eingreifen an der Trommel ist nicht bekannt.
 - Mehr Löcher bedeuten mehr Patronen pro Umdrehung:
   - im Run die Karte „Schneider-Loch: +1 Loch, mehr Munition erhalten“ (bis 4 Sterne)
   - im Basislager „Loch vergrößern +1“
@@ -350,7 +351,6 @@ Vorschlag: erst ohne Überfälle starten oder mit Computer-Basen, die gar keinen
 
 1. **Kampf:**
    - Was löst der große Blitz-Knopf aus, wenn er voll ist?
-   - Kann man an der Trommel oder den Patronen selbst etwas tun, etwa tippen?
    - Werden die 3 Start-Helden zufällig angeboten?
    - Was bedeutet der Hinweis „Kette“ auf einer Karte?
 2. **„Spielmodus“:** Boss Rush und Survival
