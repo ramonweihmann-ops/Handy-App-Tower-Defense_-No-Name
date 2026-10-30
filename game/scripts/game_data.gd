@@ -51,20 +51,20 @@ const HEROES := {
 ## Gegner des ersten Motivs „Schleim-Welt“: leicht, mittel, stark, Boss.
 const ENEMIES := {
 	"schleimling": {
-		"name": "Schleimling", "tier": "leicht",
+		"name": "Schleimling", "plural": "Schleimlinge", "tier": "leicht",
 		"hp": 28.0, "speed": 2.3, "xp": 1, "dps": 8.0, "size": 0.55, "armor": 0.0,
 	},
 	"tentakler": {
-		"name": "Tentakler", "tier": "mittel",
+		"name": "Tentakler", "plural": "Tentakler", "tier": "mittel",
 		"hp": 95.0, "speed": 1.45, "xp": 3, "dps": 18.0, "size": 0.8, "armor": 0.0,
 	},
 	"panzerkaefer": {
-		"name": "Panzerkäfer", "tier": "stark",
+		"name": "Panzerkäfer", "plural": "Panzerkäfer", "tier": "stark",
 		"hp": 320.0, "speed": 0.85, "xp": 8, "dps": 40.0, "size": 1.0, "armor": 0.35,
 	},
 	"schleimmutter": {
-		"name": "Schleimmutter", "tier": "boss",
-		"hp": 2400.0, "speed": 0.45, "xp": 0, "dps": 90.0, "size": 2.0, "armor": 0.1,
+		"name": "Schleimmutter", "plural": "Schleimmütter", "tier": "boss",
+		"hp": 2000.0, "speed": 0.45, "xp": 0, "dps": 90.0, "size": 2.0, "armor": 0.1,
 	},
 }
 
@@ -76,14 +76,14 @@ static func waves_in_level(level: int) -> int:
 
 
 static func hp_mult(level: int, wave: int) -> float:
-	return 1.0 + 0.3 * (level - 1) + 0.05 * (wave - 1)
+	return 1.0 + 0.2 * (level - 1) + 0.04 * (wave - 1)
 
 
 ## Stellt die Gegner einer Welle zusammen.
 static func wave_spawns(level: int, wave: int) -> Array[String]:
 	var list: Array[String] = []
 	var total := waves_in_level(level)
-	var light := 2 + wave + level
+	var light := 2 + int(wave * 0.7) + level
 	var mid := 0
 	if wave >= 2:
 		mid = int((wave - 1) * 0.55 + (level - 1) * 0.6)
@@ -108,4 +108,4 @@ static func wave_spawns(level: int, wave: int) -> Array[String]:
 
 ## Erfahrung, die für den nächsten Aufstieg nötig ist.
 static func xp_needed(levelups_so_far: int) -> int:
-	return 6 + levelups_so_far * 3
+	return 10 + levelups_so_far * 6

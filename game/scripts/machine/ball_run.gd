@@ -8,7 +8,7 @@ signal ball_collected(type: String)
 
 const PANEL_H := 470.0
 const DESIGN_W := 720.0
-const MAX_BALLS := 90
+const MAX_BALLS := 55
 const LAUNCH_POS := Vector2(668, 436)
 const PULL_RECT := Rect2(600, 300, 120, 170)
 const COLLECT_RECT := Rect2(300, 424, 120, 34)

@@ -7,6 +7,11 @@ extends Node
 const SAVE_PATH := "user://pilot.cfg"
 const START_AMMO := 30
 const START_CAP := 60
+## Grundtempo des Spiels (1.0 wäre die Rechengeschwindigkeit); x2 per Knopf.
+## Später (etwa ab Level 100) soll x3 dazukommen.
+const BASE_SPEED := 0.6
+## Breiteste erlaubte Spalte im Verhältnis zur Höhe (Querformat am PC wird zur Hochformat-Spalte).
+const MAX_ASPECT := 0.62
 
 var battle: Battle
 var ball_run: BallRun
@@ -25,6 +30,7 @@ var state := "menu"
 var tempo := 1
 
 var _overlay: Control
+var _column: VBoxContainer
 var _screen: Control
 var _autotest := false
 var _auto_pull := false
@@ -60,8 +66,13 @@ func _build_layout() -> void:
 	root.theme = theme
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
+	var side_bg := ColorRect.new()
+	side_bg.color = Color(0.02, 0.02, 0.05)
+	side_bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	side_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(side_bg)
 	var column := VBoxContainer.new()
-	column.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_column = column
 	column.add_theme_constant_override("separation", 0)
 	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(column)
@@ -77,7 +88,6 @@ func _build_layout() -> void:
 	world_holder.add_child(container)
 	var viewport := SubViewport.new()
 	viewport.own_world_3d = true
-	viewport.msaa_3d = Viewport.MSAA_2X
 	container.add_child(viewport)
 	battle = Battle.new()
 	viewport.add_child(battle)
@@ -101,14 +111,34 @@ func _build_layout() -> void:
 	_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	layer.add_child(_overlay)
 
+	get_viewport().size_changed.connect(_fit_column)
+	_fit_column()
+
 	battle.enemy_killed.connect(_on_enemy_killed)
-	battle.wave_started.connect(func(w: int, total: int) -> void: hud.set_wave(level, w, total))
+	battle.wave_started.connect(func(w: int, total: int) -> void:
+		hud.set_wave(level, w, total)
+		hud.set_next_wave(battle.next_wave_text())
+	)
 	battle.fence_changed.connect(hud.set_fence)
 	battle.damage_dealt.connect(hud.add_floater)
 	battle.level_won.connect(_on_level_won)
 	battle.level_lost.connect(_on_level_lost)
 	hud.pause_pressed.connect(_on_pause)
 	hud.tempo_pressed.connect(_toggle_tempo)
+
+
+## Hält das Spiel als Hochformat-Spalte in der Mitte, auch im breiten Fenster.
+func _fit_column() -> void:
+	var vp := get_viewport().get_visible_rect().size
+	var w := minf(vp.x, vp.y * MAX_ASPECT)
+	_column.anchor_left = 0.5
+	_column.anchor_right = 0.5
+	_column.anchor_top = 0.0
+	_column.anchor_bottom = 1.0
+	_column.offset_left = -w * 0.5
+	_column.offset_right = w * 0.5
+	_column.offset_top = 0.0
+	_column.offset_bottom = 0.0
 
 
 func _process(delta: float) -> void:
@@ -152,7 +182,7 @@ func _centered(parent: Control, separation := 18) -> VBoxContainer:
 func show_menu() -> void:
 	state = "menu"
 	get_tree().paused = false
-	Engine.time_scale = 1.0
+	Engine.time_scale = BASE_SPEED
 	battle.clear()
 	ball_run.reset()
 	hud.visible = false
@@ -198,7 +228,7 @@ func start_level(n: int) -> void:
 	state = "hero_select"
 	get_tree().paused = false
 	tempo = 1
-	Engine.time_scale = 1.0
+	Engine.time_scale = BASE_SPEED
 	ammo.reset(START_CAP, START_AMMO)
 	xp = 0
 	levelups = 0
@@ -210,6 +240,7 @@ func start_level(n: int) -> void:
 	ball_run.reset()
 	hud.visible = true
 	hud.reset(level, GameData.waves_in_level(level))
+	hud.set_next_wave(battle.next_wave_text())
 	hud.set_xp(0, xp_needed)
 	hud.set_fence(battle.fence_hp, battle.fence_max)
 	var options: Array = GameData.HERO_IDS.duplicate()
@@ -248,7 +279,7 @@ func _on_hero_picked(id: String) -> void:
 	cards_taken.append("start:" + id)
 	state = "battle"
 	if _autotest:
-		Engine.time_scale = 1.0
+		Engine.time_scale = BASE_SPEED
 	battle.start()
 	ball_run.active = true
 
@@ -533,7 +564,7 @@ class Emblem extends Control:
 
 func _toggle_tempo() -> void:
 	tempo = 2 if tempo == 1 else 1
-	Engine.time_scale = float(tempo)
+	Engine.time_scale = BASE_SPEED * float(tempo)
 	hud.set_tempo(tempo)
 
 
@@ -567,7 +598,7 @@ func _on_level_won() -> void:
 		_finish_autotest("win")
 		return
 	state = "result"
-	Engine.time_scale = 1.0
+	Engine.time_scale = BASE_SPEED
 	var title := "Geschafft!"
 	var text := "Die Station hält. Level %d ist geschafft." % level
 	if level == GameData.LEVEL_COUNT:
@@ -582,7 +613,7 @@ func _on_level_lost() -> void:
 		_finish_autotest("lost")
 		return
 	state = "result"
-	Engine.time_scale = 1.0
+	Engine.time_scale = BASE_SPEED
 	_show_result("Der Schild ist gefallen", "Versuch eine andere Kartenwahl. Oft hilft mehr Munition aus der Kugelbahn.", false)
 
 

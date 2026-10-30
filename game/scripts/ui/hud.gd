@@ -15,6 +15,7 @@ var _xp_label: Label
 var _fence_bar: ProgressBar
 var _fence_label: Label
 var _tempo_btn: Button
+var _next_label: Label
 var _floaters: Array = []
 var _banner: Label
 var _banner_t := 0.0
@@ -60,6 +61,8 @@ func _build() -> void:
 	_xp_label.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_xp_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_xp_bar.add_child(_xp_label)
+	_next_label = UiKit.wrap_label("", 18, Color(0.85, 0.75, 1.0))
+	mid.add_child(_next_label)
 
 	_tempo_btn = UiKit.button("x1", func() -> void: tempo_pressed.emit(), 72)
 	_tempo_btn.custom_minimum_size = Vector2(72, 72)
@@ -129,6 +132,10 @@ func set_fence(hp: float, max_hp: float) -> void:
 
 func set_tempo(tempo: int) -> void:
 	_tempo_btn.text = "x%d" % tempo
+
+
+func set_next_wave(text: String) -> void:
+	_next_label.text = text
 
 
 func show_banner(text: String) -> void:

@@ -34,12 +34,18 @@ Einzelner automatischer Lauf mit Ausgabe der Werte:
 godot --headless --fixed-fps 60 --path game -- --autotest --level=4 --seed=3 --pull
 ```
 
-## Balance (Stand 30.10.2026, automatischer Test, 10 Läufe je Level)
+## Balance (Stand 30.10.2026, automatischer Test, 10 Läufe je Level, ohne Hebel)
 
-| Level | ohne Hebel | mit Hebel |
+| Level | gewonnen | Karten pro Level |
 |---|---|---|
-| 1–3 | 10/10 | 10/10 |
-| 4 | 8/10 | 10/10 |
-| 5 (Boss) | 2/10 | 9/10 |
+| 1–3 | 10/10 | 3–6 |
+| 4 | 6/10 | 7–8 |
+| 5 (Boss) | 2/10 | 7–9 |
 
-Der Test wählt Karten nach einfachen Regeln; echte Spieler wählen anders.
+Mit Hebel wird es deutlich leichter. Der Test wählt Karten nach einfachen Regeln.
+
+## Tempo und Leistung
+
+- Grundtempo 60 % (`BASE_SPEED` in `main.gd`), Knopf x1/x2. x3 soll erst viel später kommen (etwa ab Level 100).
+- Ausgelegt aufs Handy: keine Schatten, keine Kantenglättung, kein Glow, Treffer-Funken nur bei kritischen Treffern, höchstens 55 Kugeln gleichzeitig.
+- Im breiten Fenster bleibt das Spiel eine Hochformat-Spalte in der Mitte.

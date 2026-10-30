@@ -32,6 +32,8 @@ var hero_wait_time := 0.0
 var hero_time := 0.0
 
 var _spawn_queue: Array[String] = []
+## Alle Wellen des Levels, im Voraus gewürfelt (für die Vorschau).
+var _plan: Array = []
 var _spawn_timer := 0.0
 var _wave_timer := 0.0
 var _shake := 0.0
@@ -59,6 +61,9 @@ func setup(level_: int, ammo_: AmmoStore) -> void:
 	fence_max = 1000.0 + 300.0 * (level - 1)
 	fence_hp = fence_max
 	total_waves = GameData.waves_in_level(level)
+	_plan.clear()
+	for w in range(1, total_waves + 1):
+		_plan.append(GameData.wave_spawns(level, w))
 	wave = 0
 	kills = 0
 	elapsed = 0.0
@@ -149,11 +154,31 @@ func _update_spawning(delta: float) -> void:
 
 func _next_wave() -> void:
 	wave += 1
-	_spawn_queue = GameData.wave_spawns(level, wave)
+	_spawn_queue.assign(_plan[wave - 1])
 	_spawn_timer = 0.6
 	_wave_timer = 0.0
 	wave_started.emit(wave, total_waves)
 	_pulse = 1.0
+
+
+## Text für die Vorschau: welche Gegner in der nächsten Welle kommen.
+func next_wave_text() -> String:
+	if wave >= total_waves:
+		return "Letzte Welle – halte durch!"
+	var counts := {}
+	var order: Array[String] = []
+	for kind in _plan[wave]:
+		if not counts.has(kind):
+			order.append(kind)
+		counts[kind] = int(counts.get(kind, 0)) + 1
+	var parts: Array[String] = []
+	for kind in ["schleimmutter", "panzerkaefer", "tentakler", "schleimling"]:
+		if counts.has(kind):
+			var d: Dictionary = GameData.ENEMIES[kind]
+			var n: int = counts[kind]
+			parts.append("%d %s" % [n, d["name"] if n == 1 else d["plural"]])
+	var prefix := "Erste Welle: " if wave == 0 else "Als Nächstes: "
+	return prefix + " · ".join(PackedStringArray(parts))
 
 
 func spawn_enemy(kind: String, pos := Vector3.INF) -> Enemy:
@@ -164,6 +189,9 @@ func spawn_enemy(kind: String, pos := Vector3.INF) -> Enemy:
 	e.position = pos
 	e.setup(kind, self, GameData.hp_mult(level, maxi(wave, 1)))
 	enemies.append(e)
+	if pos.z < SPAWN_Z + 3.0:
+		# Auftauchen aus dem Wurmloch
+		Fx.flash(self, pos + Vector3(0, 0.8, 0), Color(0.75, 0.35, 1.0), 1.6, 0.4)
 	if kind == "schleimmutter":
 		Fx.flash(self, pos + Vector3(0, 1.5, 0), Color(1.0, 0.3, 0.9), 5.0, 0.6)
 		add_shake(0.5)
@@ -265,7 +293,7 @@ func fire_rocket(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type
 	var p := Projectile.new()
 	add_child(p)
 	p.splash = radius
-	p.launch(self, "rocket", from, target, dmg, crit, ammo_type, 16.0, 1.0)
+	p.launch(self, "rocket", from, target, dmg, crit, ammo_type, 11.0, 1.0)
 
 
 func fire_chain(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type: String, jumps: int) -> void:
@@ -314,7 +342,8 @@ func apply_hit(e: Enemy, dmg: float, crit: bool, ammo_type: String) -> void:
 	elif ammo_type == "ice":
 		e.apply_slow(0.45, 2.0)
 	damage_dealt.emit(at, dealt, crit)
-	Fx.burst(self, at, Projectile.AMMO_COLORS.get(ammo_type, Color.WHITE), 4, 2.5, 0.05, 0.3)
+	if crit:
+		Fx.burst(self, at, Projectile.AMMO_COLORS.get(ammo_type, Color.WHITE), 5, 2.5, 0.06, 0.3)
 
 
 func pierce_behind(main: Enemy, count: int, dmg: float, ammo_type: String) -> void:
@@ -380,7 +409,7 @@ func _build_world() -> void:
 	e.ambient_light_color = Color(0.55, 0.6, 0.85)
 	e.ambient_light_energy = 0.75
 	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	e.glow_enabled = true
+	e.glow_enabled = false
 	e.glow_intensity = 0.7
 	e.glow_bloom = 0.05
 	e.glow_hdr_threshold = 0.9
@@ -391,8 +420,7 @@ func _build_world() -> void:
 	sun.rotation_degrees = Vector3(-58, -35, 0)
 	sun.light_energy = 1.15
 	sun.light_color = Color(1.0, 0.95, 0.9)
-	sun.shadow_enabled = true
-	sun.directional_shadow_max_distance = 45.0
+	sun.shadow_enabled = false
 	add_child(sun)
 
 	var rim := OmniLight3D.new()

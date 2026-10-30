@@ -137,7 +137,7 @@ func _update_effects(delta: float) -> void:
 		hp -= dmg * (1.0 - armor)
 		_burn_tick -= delta
 		if _burn_tick <= 0.0:
-			_burn_tick = 0.35
+			_burn_tick = 0.6
 			Fx.burst(battle, aim_point(), Color(1.0, 0.5, 0.1), 4, 1.8, 0.07, 0.35)
 		if hp <= 0.0:
 			_die()

@@ -133,13 +133,13 @@ func _fire(target: Enemy) -> void:
 	var from := _muzzle.global_position
 	match family():
 		"revolver":
-			battle.fire_bullet(from, target, dmg, crit, ammo_type, 0, 48.0, 1.0)
+			battle.fire_bullet(from, target, dmg, crit, ammo_type, 0, 30.0, 1.0)
 			if magazine.is_empty():
 				var extra := 2 + 2 * int(mods["special"])
 				for other in battle.spread_targets(extra, target):
-					battle.fire_bullet(from, other, dmg * 0.8, false, ammo_type, 0, 44.0, 0.9)
+					battle.fire_bullet(from, other, dmg * 0.8, false, ammo_type, 0, 28.0, 0.9)
 		"mg":
-			battle.fire_bullet(from, target, dmg, crit, ammo_type, int(mods["special"]), 55.0, 0.75)
+			battle.fire_bullet(from, target, dmg, crit, ammo_type, int(mods["special"]), 34.0, 0.75)
 		"rocket":
 			var radius: float = float(data["splash"]) * (1.0 + 0.25 * int(mods["special"]))
 			battle.fire_rocket(from, target, dmg, crit, ammo_type, radius)
