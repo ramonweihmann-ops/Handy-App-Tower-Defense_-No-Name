@@ -99,6 +99,31 @@ static func recolor(model: Node, material_name: String, color: Color) -> void:
 				(mi as MeshInstance3D).set_surface_override_material(i, m)
 
 
+## Alle Farben eines Modells mit einer Weltfarbe multiplizieren (z. B. Frost = bläulich).
+## Eingefärbte Materialien werden geteilt, damit nicht jeder Gegner eigene braucht.
+static var _tinted := {}
+
+
+static func tint_all(model: Node, tint: Color) -> void:
+	for mi in model.find_children("*", "MeshInstance3D", true, false):
+		var m3 := mi as MeshInstance3D
+		for i in m3.mesh.get_surface_count():
+			var base := m3.get_surface_override_material(i)
+			if base == null:
+				base = m3.mesh.surface_get_material(i)
+			if not (base is StandardMaterial3D):
+				continue
+			# Schlüssel aus Aussehen statt Objekt: umgefärbte Haut (Zombies) teilt sich so ein Material
+			var sm := base as StandardMaterial3D
+			var tex_id := sm.albedo_texture.get_instance_id() if sm.albedo_texture else 0
+			var key := "%s|%s|%d|%s" % [sm.resource_name, sm.albedo_color.to_html(), tex_id, tint.to_html()]
+			if not _tinted.has(key):
+				var m: StandardMaterial3D = base.duplicate()
+				m.albedo_color = (base as StandardMaterial3D).albedo_color * tint
+				_tinted[key] = m
+			m3.set_surface_override_material(i, _tinted[key])
+
+
 static func player(model: Node) -> AnimationPlayer:
 	var list := model.find_children("*", "AnimationPlayer", true, false)
 	return list[0] if not list.is_empty() else null

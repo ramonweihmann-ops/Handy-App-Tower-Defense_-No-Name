@@ -13,6 +13,9 @@ var test_mode := false
 ## Balance-Labor: Im Test wird ein Spielerprofil (Stufen, Upgrades, Helden) nachgestellt.
 ## Dann gelten die Werte aus data statt der neutralen Testwerte; gespeichert wird trotzdem nichts.
 var sim := false
+## Testkonto für die Testphase: "normal" (ohne Käufe) oder "voll" (alles freigeschaltet).
+## Beide haben einen eigenen Spielstand in derselben Datei.
+var account := "normal"
 var data := {}
 
 
@@ -56,6 +59,8 @@ func default_data() -> Dictionary:
 		"music": true,
 		"boosters": {},
 		"booster_slots": ["luftangriff", "medipack"],
+		"prime": false,
+		"pass_premium": false,
 	}
 
 
@@ -63,11 +68,70 @@ func load_game() -> void:
 	data = default_data()
 	var cfg := ConfigFile.new()
 	if cfg.load(PATH) == OK:
-		var stored = cfg.get_value("spiel", "data", {})
-		if stored is Dictionary:
+		account = String(cfg.get_value("meta", "account", "normal"))
+		var stored = cfg.get_value(_section(), "data", {})
+		if stored is Dictionary and not stored.is_empty():
 			for k in stored.keys():
 				data[k] = stored[k]
+		elif account == "voll":
+			data = full_data()
 	_ensure_heroes()
+
+
+func _section() -> String:
+	return "spiel" if account == "normal" else "spiel_" + account
+
+
+## Zwischen den Testkonten wechseln; der Stand des bisherigen Kontos bleibt erhalten.
+func switch_account(kind: String) -> void:
+	if kind == account:
+		return
+	save_game()
+	account = kind
+	var cfg := ConfigFile.new()
+	cfg.load(PATH)
+	cfg.set_value("meta", "account", account)
+	cfg.save(PATH)
+	load_game()
+	save_game()
+
+
+## Konto „Alles freigeschaltet“: so, als hätte jemand alles gekauft und lange gespielt.
+func full_data() -> Dictionary:
+	var d := default_data()
+	d["gold"] = 250000
+	d["gems"] = 25000
+	d["stars"] = 40
+	d["energy"] = MetaData.ENERGY_MAX
+	d["max_level"] = GameData.LEVEL_COUNT
+	d["hard_unlocked"] = true
+	d["prime"] = true
+	d["pass_premium"] = true
+	d["unlocked"] = GameData.HERO_IDS.duplicate()
+	for id in GameData.HERO_IDS:
+		d["heroes"][id] = {"level": 15, "cards": 40}
+	d["tech"] = MetaData.TECH.size()
+	var ups := {}
+	for u in MetaData.AMMO_UPGRADES:
+		ups[u["id"]] = int(u["max"])
+	d["ammo_up"] = ups
+	var tal := {}
+	for id in MetaData.TALENTS.keys():
+		tal[id] = MetaData.TALENT_MAX
+	d["talents"] = tal
+	var bl := {}
+	for id in MetaData.BOOSTERS.keys():
+		bl[id] = MetaData.BOOSTER_MAX
+	d["boosters"] = bl
+	var won := []
+	for n in range(1, GameData.LEVEL_COUNT):
+		won.append("N" + str(n))
+	d["won_levels"] = won
+	return d
+
+
+func has_prime() -> bool:
+	return bool(data.get("prime", false))
 
 
 ## Neutrale Testwerte (alles frei, keine Boni) – nur im Test ohne Spielerprofil.
@@ -79,13 +143,15 @@ func save_game() -> void:
 	if test_mode:
 		return
 	var cfg := ConfigFile.new()
-	cfg.set_value("spiel", "data", data)
+	cfg.load(PATH)  # das andere Testkonto nicht überschreiben
+	cfg.set_value("meta", "account", account)
+	cfg.set_value(_section(), "data", data)
 	cfg.save(PATH)
 	changed.emit()
 
 
 func reset() -> void:
-	data = default_data()
+	data = full_data() if account == "voll" else default_data()
 	save_game()
 
 
@@ -374,6 +440,74 @@ func buy_ammo_upgrade(id: String) -> bool:
 	return false
 
 
+# --- Hinweise fürs Menü: Wo kann gerade etwas aufgewertet oder abgeholt werden? ---
+
+func can_buy_tech() -> bool:
+	var i := tech_count()
+	return i < MetaData.TECH.size() and gold() >= int(MetaData.TECH[i]["cost"])
+
+
+func can_buy_ammo(id: String) -> bool:
+	for u in MetaData.AMMO_UPGRADES:
+		if u["id"] == id:
+			var lvl := ammo_level(id)
+			return lvl < int(u["max"]) and gold() >= MetaData.ammo_cost(u, lvl)
+	return false
+
+
+func any_ammo_upgrade() -> bool:
+	for u in MetaData.AMMO_UPGRADES:
+		if can_buy_ammo(String(u["id"])):
+			return true
+	return false
+
+
+func can_draw_talent() -> bool:
+	if stars() <= 0:
+		return false
+	for id in MetaData.TALENTS.keys():
+		if talent_level(id) < MetaData.TALENT_MAX:
+			return true
+	return false
+
+
+func can_upgrade_booster(id: String) -> bool:
+	var lvl := booster_level(id)
+	return booster_unlocked(id) and lvl < MetaData.BOOSTER_MAX and gold() >= MetaData.booster_cost(lvl)
+
+
+func any_booster_upgrade() -> bool:
+	for id in MetaData.BOOSTERS.keys():
+		if can_upgrade_booster(id):
+			return true
+	return false
+
+
+func any_hero_ready() -> bool:
+	for id in unlocked_heroes():
+		if can_level_hero(id):
+			return true
+	return false
+
+
+func any_building_ready() -> bool:
+	for id in unlocked_heroes():
+		if float(building(id)["stock"]) >= 1.0:
+			return true
+	return false
+
+
+## Mehrere Talente auf einmal ziehen (z. B. 5 Sterne). Gibt die gezogenen IDs zurück.
+func draw_talents(n: int) -> Array[String]:
+	var out: Array[String] = []
+	for i in n:
+		var id := draw_talent()
+		if id == "":
+			break
+		out.append(id)
+	return out
+
+
 func buy_next_tech() -> bool:
 	var i := tech_count()
 	if i >= MetaData.TECH.size():
@@ -519,6 +653,9 @@ func claim_pass(level: int) -> Dictionary:
 	var r := MetaData.pass_reward(level, false)
 	data["pass_claimed"].append(level)
 	add(r["type"], int(r["amount"]))
+	if bool(data.get("pass_premium", false)):
+		var pr := MetaData.pass_reward(level, true)
+		add(pr["type"], int(pr["amount"]))
 	return r
 
 

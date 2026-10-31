@@ -91,10 +91,10 @@ func _build_view() -> void:
 	# Breite festhalten: die Karte ist hochkant, alle Figuren sollen nebeneinander passen
 	cam.keep_aspect = Camera3D.KEEP_WIDTH
 	cam.fov = 44.0
-	cam.position = Vector3(0, 2.6, 9.0)
+	cam.position = Vector3(0, 2.4, 9.0)
 	vp.add_child(cam)
-	# Blick über die Figuren hinweg, damit sie unten auf dem Boden stehen
-	cam.look_at(Vector3(0, 3.6, 0), Vector3.UP)
+	# Blick leicht über die Figuren, damit sie im unteren Drittel auf dem Boden stehen
+	cam.look_at(Vector3(0, 2.2, 0), Vector3.UP)
 	# Aufstellung: leichte Gegner vorne, stärkere dahinter, der Boss in der Mitte
 	var kinds: Array = GameData.WORLDS[GameData.world_of(level)]["kinds"]
 	var in_world := (level - 1) % GameData.LEVELS_PER_WORLD
@@ -111,6 +111,7 @@ func _build_view() -> void:
 		var en := Enemy.new()
 		en.process_mode = Node.PROCESS_MODE_DISABLED
 		en.position = s[1]
+		en.tint = GameData.world_tint(level)
 		vp.add_child(en)
 		en.setup(String(s[0]), null, 1.0)
 		en.rotation.y = randf_range(-0.25, 0.25)

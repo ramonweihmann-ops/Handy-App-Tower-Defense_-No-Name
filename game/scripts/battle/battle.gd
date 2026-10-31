@@ -218,9 +218,8 @@ func next_wave_text() -> String:
 	kinds.reverse()
 	for kind in kinds:
 		if counts.has(kind):
-			var d: Dictionary = GameData.ENEMIES[kind]
 			var n: int = counts[kind]
-			parts.append("%d %s" % [n, d["name"] if n == 1 else d["plural"]])
+			parts.append("%d %s" % [n, GameData.enemy_name(kind, level, n != 1)])
 	var prefix := "Erste Welle: " if wave == 0 else "Als Nächstes: "
 	return prefix + " · ".join(PackedStringArray(parts))
 
@@ -231,7 +230,11 @@ func spawn_enemy(kind: String, pos := Vector3.INF) -> Enemy:
 	if pos == Vector3.INF:
 		pos = Vector3(randf_range(-3.6, 3.6), 0, SPAWN_Z + randf_range(-1.0, 1.0))
 	e.position = pos
-	e.setup(kind, self, GameData.hp_mult(level, maxi(wave, 1)) * hp_scale)
+	e.tint = GameData.world_tint(level)
+	var hp := GameData.hp_mult(level, maxi(wave, 1)) * hp_scale
+	if GameData.ENEMIES[kind]["tier"] == "boss":
+		hp *= GameData.boss_hp(level)
+	e.setup(kind, self, hp)
 	enemies.append(e)
 	if pos.z < SPAWN_Z + 3.0:
 		# Auftauchen aus dem Wurmloch

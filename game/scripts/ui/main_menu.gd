@@ -30,6 +30,7 @@ var _banner: PanelContainer
 var _banner_label: Label
 var _banner_button: Button
 var _nav: Dictionary = {}
+var _nav_icons: Dictionary = {}
 var _modal: Control
 var _toast: Label
 var _toast_t := 0.0
@@ -204,9 +205,58 @@ func _pill(row: HBoxContainer, icon: String, on_plus: Callable) -> Label:
 func _refresh_top() -> void:
 	if _energy_label == null:
 		return
+	_update_badges()
 	_energy_label.text = "%d/%d" % [Save.energy(), MetaData.ENERGY_MAX]
 	_gold_label.text = _short(Save.gold())
 	_gems_label.text = _short(Save.gems())
+
+
+## Rote Punkte an den Reitern unten: Dort wartet etwas (aufwerten, abholen, ziehen).
+func _update_badges() -> void:
+	var want := {
+		"shop": Save.daily_ready("shop_free_date"),
+		"sammlung": Save.any_hero_ready() or Save.any_booster_upgrade(),
+		"kampf": not Save.pass_claimable().is_empty() or _mission_ready() or Save.daily_ready("daily_date") or Save.daily_ready("wheel_date"),
+		"upgrades": Save.can_buy_tech() or Save.any_ammo_upgrade() or Save.can_draw_talent(),
+		"basis": Save.any_building_ready(),
+	}
+	for id in _nav_icons.keys():
+		var ic: Icon = _nav_icons[id]
+		ic.badge = bool(want.get(id, false))
+		ic.queue_redraw()
+
+
+## Pulsierender grüner Pfeil oben rechts an einem Knopf: „Hier kann aufgewertet werden.“
+func _mark(b: Control) -> void:
+	var dot := Panel.new()
+	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dot.add_theme_stylebox_override("panel", UiKit.candy(Color(0.3, 0.85, 0.35), 15, "bar"))
+	dot.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	dot.offset_left = -24
+	dot.offset_right = 8
+	dot.offset_top = -10
+	dot.offset_bottom = 22
+	dot.pivot_offset = Vector2(16, 16)
+	var arrow := Icon.make("up", 22, Color(1, 1, 1))
+	arrow.position = Vector2(5, 5)
+	dot.add_child(arrow)
+	b.add_child(dot)
+	var tw := dot.create_tween().set_loops()
+	tw.tween_property(dot, "scale", Vector2(1.18, 1.18), 0.45).set_trans(Tween.TRANS_SINE)
+	tw.tween_property(dot, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_SINE)
+
+
+## Roter Punkt oben rechts an einem Knopf (z. B. an Unterreitern).
+func _dot(b: Control) -> void:
+	var dot := Panel.new()
+	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dot.add_theme_stylebox_override("panel", UiKit.candy(Color(0.95, 0.25, 0.25), 11, "bar"))
+	dot.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	dot.offset_left = -18
+	dot.offset_right = 4
+	dot.offset_top = -6
+	dot.offset_bottom = 16
+	b.add_child(dot)
 
 
 static func _short(n: int) -> String:
@@ -301,6 +351,7 @@ func _build_nav() -> Control:
 		v.add_child(l)
 		row.add_child(b)
 		_nav[id] = b
+		_nav_icons[id] = ic
 	return panel
 
 
@@ -380,8 +431,10 @@ func _toggle(options: Array, current: String, cb: Callable) -> HBoxContainer:
 	row.add_theme_constant_override("separation", 8)
 	for o in options:
 		var key: String = o[0]
-		var b := _small_button(o[1], func() -> void: cb.call(key), 200, key == current)
+		var b := _small_button(o[1], func() -> void: cb.call(key), 0, key == current)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		if o.size() > 2 and bool(o[2]):
+			_dot(b)
 		row.add_child(b)
 	return row
 
@@ -411,7 +464,7 @@ func _tab_kampf() -> Control:
 
 	# Battle Pass
 	var pass_btn := Button.new()
-	pass_btn.custom_minimum_size = Vector2(0, 100)
+	pass_btn.custom_minimum_size = Vector2(0, 84)
 	var gold_box := UiKit.candy(Color(1.0, 0.7, 0.2), 26, "button")
 	pass_btn.add_theme_stylebox_override("normal", gold_box)
 	pass_btn.add_theme_stylebox_override("hover", gold_box)
@@ -452,97 +505,163 @@ func _tab_kampf() -> Control:
 	ph.add_child(lvl)
 	v.add_child(pass_btn)
 
-	# Mitte: linke Spalte, Level-Auswahl, rechte Spalte
-	var mid := HBoxContainer.new()
-	mid.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	mid.add_theme_constant_override("separation", 10)
-	v.add_child(mid)
-	var left := VBoxContainer.new()
-	left.add_theme_constant_override("separation", 10)
-	mid.add_child(left)
-	left.add_child(_side_button("shop", "Angebote", false, func() -> void: show_tab("shop")))
-	left.add_child(_side_button("check", "Missionen", _mission_ready(), open_battle_pass))
-	left.add_child(_side_button("skull", "Gegner", false, _open_bestiary))
-
-	var center := VBoxContainer.new()
-	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	center.add_theme_constant_override("separation", 10)
-	mid.add_child(center)
-	center.add_child(_toggle([["normal", "Normal"], ["schwer", "Schwer"]], "schwer" if hard else "normal", _set_difficulty))
+	# Levelbild links (kompakt), rechts daneben Welt, Level, Abschnitte und Auswahl
+	var stage_row := HBoxContainer.new()
+	stage_row.add_theme_constant_override("separation", 12)
+	v.add_child(stage_row)
 	var card := StageScene.new()
 	card.level = selected_level
 	card.hard = hard
-	card.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	card.custom_minimum_size = Vector2(0, 300)
-	center.add_child(card)
+	card.custom_minimum_size = Vector2(330, 330)
+	stage_row.add_child(card)
+	var info := VBoxContainer.new()
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	info.add_theme_constant_override("separation", 8)
+	info.alignment = BoxContainer.ALIGNMENT_CENTER
+	stage_row.add_child(info)
+	var wl := UiKit.label("Welt %d von %d" % [GameData.world_of(selected_level) + 1, GameData.WORLDS.size()], 17, UiKit.C_MUTED, HORIZONTAL_ALIGNMENT_LEFT)
+	info.add_child(wl)
+	var lt := UiKit.label("Level %d" % selected_level, 38, UiKit.C_GOLD, HORIZONTAL_ALIGNMENT_LEFT)
+	info.add_child(lt)
+	if GameData.is_boss_level(selected_level):
+		var boss_kind: String = GameData.WORLDS[GameData.world_of(selected_level)]["kinds"][3]
+		info.add_child(_wrap_left("Boss: %s" % GameData.enemy_name(boss_kind, selected_level), 19, Color(1.0, 0.55, 0.5)))
+	else:
+		info.add_child(_wrap_left("%d Wellen" % GameData.waves_in_level(selected_level), 19, UiKit.C_TEXT))
+	info.add_child(_segments())
 	var sel := HBoxContainer.new()
 	sel.add_theme_constant_override("separation", 8)
-	center.add_child(sel)
-	var prev := _small_button("‹", func() -> void: _change_level(-1), 70, false)
+	info.add_child(sel)
+	var prev := _small_button("‹", func() -> void: _change_level(-1), 0, false)
+	prev.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sel.add_child(prev)
-	var name_l := UiKit.label("Level %d" % selected_level + (" · Boss" if GameData.is_boss_level(selected_level) else ""), 26, UiKit.C_GOLD)
-	name_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	sel.add_child(name_l)
-	var next := _small_button("›", func() -> void: _change_level(1), 70, false)
+	var next := _small_button("›", func() -> void: _change_level(1), 0, false)
+	next.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sel.add_child(next)
 	prev.disabled = selected_level <= 1
 	next.disabled = selected_level >= Save.max_level()
-	center.add_child(_segments())
+	info.add_child(_toggle([["normal", "Normal"], ["schwer", "Schwer"]], "schwer" if hard else "normal", _set_difficulty))
 
-	var right := VBoxContainer.new()
-	right.add_theme_constant_override("separation", 10)
-	mid.add_child(right)
-	right.add_child(_side_button("gift", "Täglich", Save.daily_ready("daily_date"), _open_daily))
-	right.add_child(_side_button("wheel", "Glücksrad", Save.daily_ready("wheel_date"), _open_wheel))
-	right.add_child(_side_button("trophy", "Ranglisten", false, func() -> void:
+	# Zusatzfunktionen als ruhige Kacheln
+	var tiles := GridContainer.new()
+	tiles.columns = 4
+	tiles.add_theme_constant_override("h_separation", 10)
+	tiles.add_theme_constant_override("v_separation", 10)
+	v.add_child(tiles)
+	tiles.add_child(_side_button("gift", "Täglich", Save.daily_ready("daily_date"), _open_daily))
+	tiles.add_child(_side_button("check", "Missionen", _mission_ready(), open_battle_pass))
+	tiles.add_child(_side_button("wheel", "Glücksrad", Save.daily_ready("wheel_date"), _open_wheel))
+	tiles.add_child(_side_button("shop", "Angebote", false, func() -> void: show_tab("shop")))
+	tiles.add_child(_side_button("skull", "Gegner", false, _open_bestiary))
+	tiles.add_child(_side_button("trophy", "Ranglisten", false, func() -> void:
 		_info("Ranglisten", "Ranglisten kommen, sobald es einen Spielserver gibt. Dann misst du dich mit anderen Kommandanten.")
 	))
-	right.add_child(_side_button("noads", "Keine\nWerbung", false, func() -> void:
+	tiles.add_child(_side_button("noads", "Werbefrei", false, func() -> void:
 		_info("Keine Werbung", "In der Testphase gibt es keine Werbung. Später soll Werbung nur freiwillig sein – gegen eine Belohnung, nie erzwungen.")
 	))
-
-	# Unten: Kampf
-	var bottom := HBoxContainer.new()
-	bottom.add_theme_constant_override("separation", 12)
-	bottom.alignment = BoxContainer.ALIGNMENT_CENTER
-	v.add_child(bottom)
-	var fight := VBoxContainer.new()
-	fight.add_theme_constant_override("separation", 2)
-	bottom.add_child(fight)
-	var cost := HBoxContainer.new()
-	cost.alignment = BoxContainer.ALIGNMENT_CENTER
-	cost.add_child(Icon.make("energy", 30))
-	cost.add_child(UiKit.label(str(MetaData.ENERGY_COST), 24))
-	fight.add_child(cost)
-	var fight_btn := UiKit.button("KAMPF", _on_fight, 330)
-	fight_btn.custom_minimum_size = Vector2(330, 92)
-	fight_btn.add_theme_font_size_override("font_size", 40)
-	fight.add_child(fight_btn)
-	var mode := _small_button("Spielmodus", func() -> void:
+	tiles.add_child(_side_button("swords", "Spielmodi", false, func() -> void:
 		_info("Spielmodus", "Weitere Modi folgen:\n\n• Boss-Ansturm: ein Boss nach dem anderen\n• Überleben: endlose Wellen – wie lange hältst du durch?")
-	, 170, false)
-	mode.custom_minimum_size = Vector2(170, 92)
-	bottom.add_child(mode)
+	))
+
+	# Dein Team: die ersten Helden der Aufstellung, mit Hinweis, wer aufgewertet werden kann
+	var th := HBoxContainer.new()
+	var tl := UiKit.label("Dein Team", 22, UiKit.C_GOLD, HORIZONTAL_ALIGNMENT_LEFT)
+	tl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	th.add_child(tl)
+	th.add_child(_small_button("Aufstellung", func() -> void: show_tab("sammlung"), 170, false))
+	v.add_child(th)
+	var team := HBoxContainer.new()
+	team.add_theme_constant_override("separation", 8)
+	team.custom_minimum_size = Vector2(0, 200)
+	v.add_child(team)
+	var squad := Save.squad()
+	for i in mini(squad.size(), 5):
+		team.add_child(_team_card(squad[i]))
+	for i in range(squad.size(), 5):
+		var empty := Panel.new()
+		empty.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		empty.add_theme_stylebox_override("panel", UiKit.box(Color(0.1, 0.08, 0.2, 0.5), 14, 2, Color(1, 1, 1, 0.08)))
+		var plus := UiKit.label("+", 40, Color(1, 1, 1, 0.25))
+		plus.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		plus.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		empty.add_child(plus)
+		team.add_child(empty)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	v.add_child(spacer)
+
+	# Unten: Kampf mit Energiekosten im Knopf
+	var fight_btn := UiKit.button("KAMPF", _on_fight, 0)
+	fight_btn.custom_minimum_size = Vector2(0, 104)
+	fight_btn.add_theme_font_size_override("font_size", 42)
+	var cost := HBoxContainer.new()
+	cost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cost.set_anchors_preset(Control.PRESET_CENTER_RIGHT)
+	cost.offset_left = -110
+	cost.offset_right = -24
+	cost.offset_top = -22
+	cost.offset_bottom = 22
+	cost.add_child(Icon.make("energy", 34))
+	var cl := UiKit.label(str(MetaData.ENERGY_COST), 26, Color(0.25, 0.12, 0.02))
+	cl.add_theme_constant_override("outline_size", 0)
+	cost.add_child(cl)
+	fight_btn.add_child(cost)
+	v.add_child(fight_btn)
 	return root
+
+
+## Kleine Heldenkarte für „Dein Team“ im Kampf-Reiter.
+func _team_card(id: String) -> Button:
+	var d: Dictionary = GameData.HEROES[id]
+	var b := Button.new()
+	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	b.custom_minimum_size = Vector2(0, 170)
+	var sb := UiKit.candy(Color(0.17, 0.15, 0.3), 14, "panel")
+	for st in ["normal", "hover", "pressed"]:
+		b.add_theme_stylebox_override(st, sb)
+	b.pressed.connect(func() -> void: _open_hero(id))
+	UiKit.add_pop(b)
+	var v := VBoxContainer.new()
+	v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	v.offset_top = 6
+	v.offset_bottom = -6
+	v.add_theme_constant_override("separation", 2)
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	b.add_child(v)
+	var portrait := HeroPortrait.make(id, 100)
+	portrait.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	portrait.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	v.add_child(portrait)
+	var nl := UiKit.label(String(d["name"]).split(" ")[0], 15, Color(1, 1, 1))
+	nl.clip_text = true
+	v.add_child(nl)
+	v.add_child(UiKit.label("Stufe %d" % Save.hero_level(id), 14, UiKit.C_GOLD))
+	if Save.can_level_hero(id):
+		_mark(b)
+	return b
 
 
 func _side_button(icon: String, text: String, badge: bool, cb: Callable) -> Button:
 	var b := Button.new()
-	b.custom_minimum_size = Vector2(112, 118)
+	b.custom_minimum_size = Vector2(0, 104)
+	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var sb := UiKit.candy(Color(0.17, 0.15, 0.3), 14, "panel")
 	for st in ["normal", "hover", "pressed"]:
-		b.add_theme_stylebox_override(st, UiKit.candy(Color(0.36, 0.22, 0.7), 24, "button"))
+		b.add_theme_stylebox_override(st, sb)
 	b.pressed.connect(cb)
 	UiKit.add_pop(b)
 	var v := VBoxContainer.new()
 	v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	v.alignment = BoxContainer.ALIGNMENT_CENTER
+	v.add_theme_constant_override("separation", 4)
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.add_child(v)
-	var ic := Icon.make(icon, 54)
+	var ic := Icon.make(icon, 44)
 	ic.badge = badge
 	ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	v.add_child(ic)
-	var l := UiKit.label(text, 16)
+	var l := UiKit.label(text, 16, Color(0.86, 0.85, 0.95))
+	l.add_theme_constant_override("outline_size", 0)
 	v.add_child(l)
 	return b
 
@@ -601,7 +720,7 @@ func _tab_sammlung() -> Control:
 	var page := _scroll_page()
 	var v: VBoxContainer = page[1]
 	var current: String = sub_tab["sammlung"]
-	v.add_child(_toggle([["helden", "Helden"], ["booster", "Booster"]], current, func(k: String) -> void:
+	v.add_child(_toggle([["helden", "Helden", Save.any_hero_ready()], ["booster", "Booster", Save.any_booster_upgrade()]], current, func(k: String) -> void:
 		sub_tab["sammlung"] = k
 		show_tab("sammlung")
 	))
@@ -669,6 +788,8 @@ func _booster_list(v: VBoxContainer) -> void:
 				show_tab("sammlung")
 			, 150, false)
 			up.disabled = lvl >= MetaData.BOOSTER_MAX or Save.gold() < MetaData.booster_cost(lvl)
+			if not up.disabled:
+				_mark(up)
 			btns.add_child(up)
 		v.add_child(p)
 
@@ -722,6 +843,24 @@ func _hero_card(id: String) -> Control:
 		fl = UiKit.label("Level %d gewinnen" % int(MetaData.HERO_UNLOCK[id]), 15, UiKit.C_MUTED)
 	foot.add_child(fl)
 	v.add_child(foot)
+	if unlocked and Save.hero_level(id) < MetaData.HERO_MAX_LEVEL:
+		# Kartenfortschritt zur nächsten Stufe; grün, wenn genug Karten da sind
+		var need := MetaData.hero_cards_needed(Save.hero_level(id))
+		var have := Save.hero_cards(id)
+		var bar := ProgressBar.new()
+		bar.show_percentage = false
+		bar.custom_minimum_size = Vector2(0, 22)
+		bar.max_value = need
+		bar.value = mini(have, need)
+		bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		bar.add_theme_stylebox_override("fill", UiKit.box(Color(0.35, 0.85, 0.4) if have >= need else Color(0.3, 0.55, 1.0), 6))
+		var bl := UiKit.label("%d/%d" % [have, need], 15, Color(1, 1, 1))
+		bl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		bl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		bar.add_child(bl)
+		v.add_child(bar)
+	if unlocked and Save.can_level_hero(id):
+		_mark(b)
 	if unlocked:
 		var in_team := UiKit.label("Im Team" if Save.in_squad(id) else "Reserve", 15, Color(0.45, 1.0, 0.55) if Save.in_squad(id) else UiKit.C_MUTED)
 		v.add_child(in_team)
@@ -856,7 +995,7 @@ func _tab_upgrades() -> Control:
 	var page := _scroll_page(10)
 	var v: VBoxContainer = page[1]
 	var current: String = sub_tab["upgrades"]
-	v.add_child(_toggle([["tech", "Tech-Baum"], ["munition", "Munition"], ["talente", "Talente"]], current, func(k: String) -> void:
+	v.add_child(_toggle([["tech", "Tech-Baum", Save.can_buy_tech()], ["munition", "Munition", Save.any_ammo_upgrade()], ["talente", "Talente", Save.can_draw_talent()]], current, func(k: String) -> void:
 		sub_tab["upgrades"] = k
 		show_tab("upgrades")
 	))
@@ -891,6 +1030,8 @@ func _tab_upgrades() -> Control:
 				show_tab("upgrades")
 			, 150)
 			b.disabled = Save.gold() < int(t["cost"])
+			if not b.disabled:
+				_mark(b)
 			h.add_child(b)
 		v.add_child(p)
 	return page[0]
@@ -929,6 +1070,8 @@ func _ammo_upgrades(v: VBoxContainer) -> void:
 				show_tab("upgrades")
 			, 150)
 			b.disabled = Save.gold() < cost
+			if not b.disabled:
+				_mark(b)
 			h.add_child(b)
 		v.add_child(p)
 
@@ -950,9 +1093,22 @@ func _talents(v: VBoxContainer) -> void:
 		show_tab("upgrades")
 	, 210)
 	draw.custom_minimum_size = Vector2(210, 80)
-	draw.disabled = Save.stars() <= 0
+	draw.disabled = not Save.can_draw_talent()
+	if not draw.disabled:
+		_mark(draw)
 	head.add_child(draw)
 	v.add_child(head)
+	if Save.stars() >= 5:
+		var five := UiKit.button("5 Sterne auf einmal ziehen", func() -> void:
+			var got := Save.draw_talents(5)
+			var lines := []
+			for id in got:
+				var t: Dictionary = MetaData.TALENTS[id]
+				lines.append("• %s – jetzt Stufe %d" % [t["title"], Save.talent_level(id)])
+			_info("%d Talente erhalten" % got.size(), "\n".join(PackedStringArray(lines)))
+			show_tab_keep_modal("upgrades")
+		, 400)
+		v.add_child(five)
 	v.add_child(_wrap_left("Talente sind dauerhafte Boni. Zieht man ein Talent erneut, steigt es eine Stufe (bis 5).", 19, UiKit.C_MUTED))
 	var grid := GridContainer.new()
 	grid.columns = 3
@@ -1096,6 +1252,8 @@ func _building_row(id: String) -> Control:
 		show_tab("basis")
 	, 150)
 	collect.disabled = stock <= 0
+	if not collect.disabled:
+		_dot(collect)
 	btns.add_child(collect)
 	var up_text := "Max." if lvl >= MetaData.BUILDING_MAX_LEVEL else "Ausbauen\n%d Gold" % MetaData.building_cost(lvl)
 	var up := _small_button(up_text, func() -> void:
@@ -1105,6 +1263,8 @@ func _building_row(id: String) -> Control:
 	, 150, false)
 	up.custom_minimum_size = Vector2(150, 70)
 	up.disabled = lvl >= MetaData.BUILDING_MAX_LEVEL or Save.gold() < MetaData.building_cost(lvl)
+	if not up.disabled:
+		_mark(up)
 	btns.add_child(up)
 	return p
 
@@ -1216,11 +1376,12 @@ func _open_energy() -> void:
 
 func _open_bestiary() -> void:
 	var lines := []
-	for w in GameData.WORLDS:
-		lines.append(String(w["name"]) + ":")
+	for wi in GameData.WORLDS.size():
+		var w: Dictionary = GameData.WORLDS[wi]
+		var first := wi * GameData.LEVELS_PER_WORLD + 1
+		lines.append("%s (Level %d–%d):" % [w["name"], first, first + GameData.LEVELS_PER_WORLD - 1])
 		for kind in w["kinds"]:
-			var d: Dictionary = GameData.ENEMIES[kind]
-			lines.append("   • %s (%s)" % [d["name"], d["tier"]])
+			lines.append("   • %s (%s)" % [GameData.enemy_name(kind, first), GameData.ENEMIES[kind]["tier"]])
 	_info("Gegner hinter dem Wurmloch", "\n".join(PackedStringArray(lines)) + "\n\nAlle 5 Level wechselt die Welt hinter dem Wurmloch.")
 
 
@@ -1237,6 +1398,16 @@ func _open_settings() -> void:
 		quality_changed.emit()
 		_open_settings()
 	, 420)))
+	# Testphase: zwischen zwei Spielständen wechseln
+	var full := Save.account == "voll"
+	v.add_child(UiKit.label("Testkonto: %s" % ("Alles freigeschaltet" if full else "Ohne Käufe"), 22, UiKit.C_GOLD))
+	v.add_child(UiKit.button("Wechseln zu: %s" % ("Ohne Käufe" if full else "Alles freigeschaltet"), func() -> void:
+		Save.switch_account("normal" if full else "voll")
+		selected_level = Save.max_level()
+		_close_modal()
+		show_tab("kampf")
+		toast("Testkonto: %s" % ("Alles freigeschaltet" if Save.account == "voll" else "Ohne Käufe"))
+	, 420))
 	var snd: bool = Save.data.get("sound", true)
 	var mus: bool = Save.data.get("music", true)
 	var row := HBoxContainer.new()

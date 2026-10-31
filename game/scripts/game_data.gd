@@ -128,13 +128,52 @@ const ENEMIES := {
 }
 
 ## Welten hinter dem Wurmloch: je 5 Level, Gegner nach Stärke (leicht, mittel, stark, Boss).
+## Ab Welt 3 vorerst eingefärbte Varianten und neue Mischungen der vorhandenen Figuren, bis die
+## Figuren aus dem Katalog ausgewählt sind. „prefix“ steht vor dem Gegnernamen, „tint“ färbt ein.
 const WORLDS := [
 	{"name": "Schleim-Welt", "kinds": ["schleimling", "tentakler", "panzerkaefer", "schleimmutter"],
 		"c1": Color(0.62, 0.22, 1.0), "c2": Color(0.1, 0.9, 0.85), "rim": Color(0.7, 0.35, 1.0)},
 	{"name": "Zombie-Kolonie", "kinds": ["krabbler", "zombie", "brecher", "koloss"],
 		"c1": Color(0.35, 0.85, 0.2), "c2": Color(0.95, 0.85, 0.2), "rim": Color(0.5, 1.0, 0.3)},
+	{"name": "Frostmond", "kinds": ["schleimling", "tentakler", "panzerkaefer", "schleimmutter"],
+		"prefix": "Frost-", "tint": Color(0.6, 0.85, 1.25),
+		"c1": Color(0.3, 0.6, 1.0), "c2": Color(0.85, 0.95, 1.0), "rim": Color(0.6, 0.85, 1.0)},
+	{"name": "Lava-Kolonie", "kinds": ["krabbler", "zombie", "brecher", "koloss"],
+		"prefix": "Lava-", "tint": Color(1.3, 0.65, 0.45),
+		"c1": Color(1.0, 0.35, 0.1), "c2": Color(1.0, 0.8, 0.2), "rim": Color(1.0, 0.5, 0.2)},
+	{"name": "Giftsumpf", "kinds": ["schleimling", "zombie", "panzerkaefer", "schleimmutter"],
+		"prefix": "Gift-", "tint": Color(0.75, 1.25, 0.5),
+		"c1": Color(0.4, 0.9, 0.2), "c2": Color(0.8, 0.3, 0.9), "rim": Color(0.6, 1.0, 0.3)},
+	{"name": "Kristallhöhlen", "kinds": ["krabbler", "tentakler", "brecher", "koloss"],
+		"prefix": "Kristall-", "tint": Color(1.05, 0.8, 1.35),
+		"c1": Color(0.95, 0.4, 1.0), "c2": Color(0.4, 1.0, 1.0), "rim": Color(0.9, 0.6, 1.0)},
+	{"name": "Sternenwüste", "kinds": ["krabbler", "zombie", "panzerkaefer", "koloss"],
+		"prefix": "Sand-", "tint": Color(1.25, 1.05, 0.7),
+		"c1": Color(1.0, 0.75, 0.3), "c2": Color(0.5, 0.8, 1.0), "rim": Color(1.0, 0.85, 0.5)},
+	{"name": "Nebelfelder", "kinds": ["schleimling", "tentakler", "brecher", "schleimmutter"],
+		"prefix": "Nebel-", "tint": Color(0.8, 0.85, 0.95),
+		"c1": Color(0.6, 0.65, 0.8), "c2": Color(0.95, 0.95, 1.0), "rim": Color(0.75, 0.8, 1.0)},
+	{"name": "Schattenreich", "kinds": ["krabbler", "zombie", "brecher", "koloss"],
+		"prefix": "Schatten-", "tint": Color(0.7, 0.55, 1.1),
+		"c1": Color(0.45, 0.2, 0.8), "c2": Color(0.9, 0.3, 0.6), "rim": Color(0.7, 0.4, 1.0)},
+	{"name": "Herz des Wurmlochs", "kinds": ["tentakler", "zombie", "panzerkaefer", "koloss"],
+		"prefix": "Wurmloch-", "tint": Color(1.25, 0.55, 1.2),
+		"c1": Color(1.0, 0.2, 0.6), "c2": Color(0.3, 0.9, 1.0), "rim": Color(1.0, 0.4, 0.9)},
 ]
 const LEVELS_PER_WORLD := 5
+## Anzahl der Level (Welten × 5). Wächst mit jeder neuen Welt.
+const LEVEL_COUNT := 50
+
+# --- Level-Baukasten -------------------------------------------------------------
+# Jedes Level entsteht aus wenigen Werten: Lebenskurve (level_hp), Wellenzahl und Mischung
+# nach Position in der Welt. Die Gegnerzahl wächst nur mäßig (Handy-Leistung), schwerer wird es
+# vor allem über die Lebenspunkte. Level 1–10 behalten ihre abgestimmten Werte.
+
+## Ab hier wächst das Gegnerleben je Level um diesen Faktor (vorher linear).
+const HP_GROWTH := 1.08
+## Ab diesem Level brauchen Bosse ohne Käufe in der Regel einen Versuch mehr (Konzept, Abschnitt 9).
+const HARD_BOSS_FROM := 21
+const HARD_BOSS_HP := 1.3
 
 
 static func world_of(level: int) -> int:
@@ -148,15 +187,38 @@ static func world_name(level: int) -> String:
 static func is_boss_level(level: int) -> bool:
 	return level % LEVELS_PER_WORLD == 0
 
-const LEVEL_COUNT := 10
+
+## Färbung der Gegner dieser Welt (Weiß = Originalfarben).
+static func world_tint(level: int) -> Color:
+	return WORLDS[world_of(level)].get("tint", Color(1, 1, 1))
+
+
+## Name eines Gegners in der Welt dieses Levels (mit Vorsilbe der Welt).
+static func enemy_name(kind: String, level: int, plural := false) -> String:
+	var d: Dictionary = ENEMIES[kind]
+	var n: String = d["plural"] if plural else d["name"]
+	var prefix: String = WORLDS[world_of(level)].get("prefix", "")
+	return prefix + n if prefix == "" else prefix + n.substr(0, 1).to_upper() + n.substr(1)
 
 
 static func waves_in_level(level: int) -> int:
-	return 5 + (level - 1) % LEVELS_PER_WORLD + 1 + world_of(level)
+	return 5 + (level - 1) % LEVELS_PER_WORLD + 1 + mini(world_of(level), 3)
+
+
+## Grundleben der Gegner in diesem Level (1 = Level 1).
+static func level_hp(level: int) -> float:
+	if level <= 10:
+		return 1.0 + 0.2 * (level - 1)
+	return 2.8 * pow(HP_GROWTH, level - 10)
 
 
 static func hp_mult(level: int, wave: int) -> float:
-	return 1.0 + 0.2 * (level - 1) + 0.04 * (wave - 1)
+	return level_hp(level) * (1.0 + 0.04 * (wave - 1))
+
+
+## Zusätzlicher Lebensfaktor für den Boss dieses Levels.
+static func boss_hp(level: int) -> float:
+	return HARD_BOSS_HP if level >= HARD_BOSS_FROM else 1.0
 
 
 ## Stellt die Gegner einer Welle zusammen (Art nach Welt, Menge nach Level in der Welt).
@@ -164,7 +226,7 @@ static func wave_spawns(level: int, wave: int) -> Array[String]:
 	var list: Array[String] = []
 	var kinds: Array = WORLDS[world_of(level)]["kinds"]
 	var lw := (level - 1) % LEVELS_PER_WORLD + 1
-	var extra := world_of(level)
+	var extra := mini(world_of(level), 2)
 	var total := waves_in_level(level)
 	var light := 2 + int(wave * 0.7) + lw + extra
 	var mid := 0

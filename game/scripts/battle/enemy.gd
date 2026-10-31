@@ -40,6 +40,8 @@ var _anim: AnimationPlayer
 var _overlay: StandardMaterial3D
 var _overlay_on := false
 var _anim_name := ""
+## Färbung der Welt (Weiß = Originalfarben), vor setup() setzen.
+var tint := Color(1, 1, 1)
 
 
 func setup(kind_: String, battle_: Battle, hp_mult: float) -> void:
@@ -394,6 +396,8 @@ func _build_model() -> void:
 	_visual.add_child(_model)
 	if kind == "krabbler" or kind == "zombie":
 		Models.recolor(_model, "Skin", Color(0.52, 0.66, 0.42))
+	if tint != Color(1, 1, 1):
+		Models.tint_all(_model, tint)
 	_anim = Models.player(_model)
 	_overlay = Models.add_overlay(_model)
 	_play(String(d["walk"]))

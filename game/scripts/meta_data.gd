@@ -7,7 +7,7 @@ const ENERGY_MAX := 30
 const ENERGY_COST := 5
 ## Sekunden pro Energiepunkt
 const ENERGY_REGEN := 240
-const HERO_MAX_LEVEL := 10
+const HERO_MAX_LEVEL := 30
 
 ## Welches Level gewonnen sein muss, damit ein Held freigeschaltet ist (0 = von Anfang an).
 const HERO_UNLOCK := {"dusty": 0, "iska": 0, "brocken": 1, "kalle": 2, "volta": 2, "margot": 3, "lynx": 4, "fritzi": 5}

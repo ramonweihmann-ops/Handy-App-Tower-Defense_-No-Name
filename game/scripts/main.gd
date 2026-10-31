@@ -53,6 +53,9 @@ var _auto_pull_t := 0.0
 var _profile := ""
 ## Nur für Tests mit Fenster: nach 8 Sekunden Kampf ein Bild speichern und beenden (--shot=pfad.png).
 var _shot_path := ""
+## Nur für Tests mit Fenster: Menübild speichern (--menushot=pfad.png[,reiter]) und beenden.
+var _menu_shot := ""
+var _menu_shot_t := 0
 
 
 func _ready() -> void:
@@ -69,6 +72,8 @@ func _ready() -> void:
 	_build_layout()
 	if _autotest:
 		start_level(level)
+	elif _menu_shot != "":
+		show_menu()
 	else:
 		_warm_up()
 
@@ -154,6 +159,8 @@ func _parse_args() -> void:
 			seed(int(arg.get_slice("=", 1)))
 		elif arg.begins_with("--profile="):
 			_profile = arg.get_slice("=", 1)
+		elif arg.begins_with("--menushot="):
+			_menu_shot = arg.get_slice("=", 1)
 		elif arg.begins_with("--shot="):
 			_shot_path = arg.get_slice("=", 1)
 
@@ -325,6 +332,15 @@ func _process(delta: float) -> void:
 			Performance.get_monitor(Performance.OBJECT_NODE_COUNT),
 			Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0,
 			Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0])
+	if _menu_shot != "" and state == "menu":
+		_menu_shot_t += 1
+		var parts := _menu_shot.split(",")
+		if _menu_shot_t == 5 and parts.size() > 1:
+			menu.show_tab(parts[1])
+		if _menu_shot_t == 90:
+			get_viewport().get_texture().get_image().save_png(parts[0])
+			print("BILD gespeichert: ", parts[0])
+			get_tree().quit()
 	if _shot_path != "" and state == "battle" and battle.elapsed > 8.0:
 		get_viewport().get_texture().get_image().save_png(_shot_path)
 		print("BILD gespeichert: ", _shot_path)
@@ -538,7 +554,8 @@ func _on_enemy_killed(e: Enemy, gained: int) -> void:
 func _open_card_pick() -> void:
 	if state != "battle" or pending_levelups <= 0 or not battle.running:
 		return
-	var cards := _roll_cards(3)
+	# Prime: 4 statt 3 Karten zur Auswahl
+	var cards := _roll_cards(4 if Save.has_prime() else 3)
 	if cards.is_empty():
 		pending_levelups = 0
 		return
@@ -848,7 +865,7 @@ func _on_level_won() -> void:
 	var title := "Geschafft!"
 	var text := "Die Station hält. Level %d ist geschafft." % level
 	if GameData.is_boss_level(level):
-		var boss: String = GameData.ENEMIES[GameData.WORLDS[GameData.world_of(level)]["kinds"][3]]["name"]
+		var boss: String = GameData.enemy_name(GameData.WORLDS[GameData.world_of(level)]["kinds"][3], level)
 		title = "%s ist besiegt!" % boss
 		text = "Die %s ist befreit." % GameData.world_name(level)
 		if level == GameData.LEVEL_COUNT:
