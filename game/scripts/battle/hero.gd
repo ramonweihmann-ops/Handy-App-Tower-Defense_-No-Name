@@ -228,6 +228,126 @@ func _build_visual() -> void:
 	add_child(_body)
 	var big := 1.12 if family() == "rocket" else 1.0
 	_body.scale = Vector3.ONE * big
+	if Models.has_hero(id):
+		_build_model()
+	else:
+		_build_simple_body(col, skin, dark)
+
+	# Waffe
+	_weapon = Node3D.new()
+	_body.add_child(_weapon)
+	_muzzle = Node3D.new()
+	_weapon.add_child(_muzzle)
+	var metal := Fx.mat(Color(0.3, 0.32, 0.36), 0.0, 0.85, 0.3)
+	match family():
+		"revolver":
+			_weapon_base = Vector3(0.24, 0.92, -0.42)
+			var grip := Fx.box(Vector3(0.07, 0.16, 0.08), Fx.mat(Color(0.45, 0.25, 0.1)))
+			grip.position = Vector3(0, -0.08, 0.06)
+			grip.rotation.x = 0.3
+			_weapon.add_child(grip)
+			var drum := Fx.cylinder(0.065, 0.065, 0.11, metal, 8)
+			drum.rotation.x = PI * 0.5
+			_weapon.add_child(drum)
+			var barrel := Fx.cylinder(0.03, 0.035, 0.32, metal, 8)
+			barrel.rotation.x = PI * 0.5
+			barrel.position.z = -0.2
+			_weapon.add_child(barrel)
+			_muzzle.position = Vector3(0, 0, -0.38)
+		"mg":
+			_weapon_base = Vector3(0.1, 0.86, -0.4)
+			var body := Fx.box(Vector3(0.14, 0.16, 0.62), metal)
+			_weapon.add_child(body)
+			var mag := Fx.box(Vector3(0.1, 0.18, 0.14), Fx.mat(Color(0.95, 0.75, 0.2)))
+			mag.position = Vector3(0, -0.14, -0.05)
+			_weapon.add_child(mag)
+			var barrel := Fx.cylinder(0.035, 0.04, 0.5, metal, 8)
+			barrel.rotation.x = PI * 0.5
+			barrel.position.z = -0.52
+			_weapon.add_child(barrel)
+			_muzzle.position = Vector3(0, 0, -0.8)
+		"rocket":
+			_weapon_base = Vector3(0.3, 1.15, -0.15)
+			var tube := Fx.cylinder(0.13, 0.13, 1.1, Fx.mat(Color(0.3, 0.42, 0.25), 0.0, 0.3, 0.5), 12)
+			tube.rotation.x = PI * 0.5
+			_weapon.add_child(tube)
+			for z in [-0.42, 0.42]:
+				var band := Fx.cylinder(0.145, 0.145, 0.08, Fx.mat(Color(0.9, 0.25, 0.15)), 12)
+				band.rotation.x = PI * 0.5
+				band.position.z = z
+				_weapon.add_child(band)
+			var sight := Fx.box(Vector3(0.05, 0.1, 0.12), metal)
+			sight.position = Vector3(-0.12, 0.08, -0.2)
+			_weapon.add_child(sight)
+			_muzzle.position = Vector3(0, 0, -0.6)
+		"tesla":
+			_weapon_base = Vector3(0.18, 0.9, -0.4)
+			var body := Fx.box(Vector3(0.12, 0.14, 0.4), metal)
+			_weapon.add_child(body)
+			var orb := Fx.sphere(0.1, Fx.mat(Color(0.8, 0.5, 1.0), 4.0), 10, 6)
+			orb.position.z = -0.28
+			_weapon.add_child(orb)
+			for k in 2:
+				var ring := Fx.torus(0.06, 0.1, Fx.mat(Color(0.75, 0.4, 1.0), 2.0))
+				ring.rotation.x = PI * 0.5
+				ring.position.z = -0.05 - k * 0.1
+				_weapon.add_child(ring)
+			_muzzle.position = Vector3(0, 0, -0.36)
+	match family():
+		"cryo":
+			_weapon_base = Vector3(0.18, 0.9, -0.4)
+			var body := Fx.cylinder(0.08, 0.1, 0.45, Fx.mat(Color(0.75, 0.85, 0.95), 0.0, 0.6, 0.3), 10)
+			body.rotation.x = PI * 0.5
+			_weapon.add_child(body)
+			var crystal := Fx.sphere(0.1, Fx.mat(Color(0.6, 0.95, 1.0), 3.0), 6, 3)
+			crystal.position.z = -0.3
+			_weapon.add_child(crystal)
+			_muzzle.position = Vector3(0, 0, -0.38)
+		"shotgun":
+			_weapon_base = Vector3(0.16, 0.88, -0.4)
+			for sx in [-0.035, 0.035]:
+				var barrel := Fx.cylinder(0.035, 0.035, 0.62, metal, 8)
+				barrel.rotation.x = PI * 0.5
+				barrel.position = Vector3(sx, 0, -0.2)
+				_weapon.add_child(barrel)
+			var stock := Fx.box(Vector3(0.1, 0.12, 0.3), Fx.mat(Color(0.45, 0.25, 0.1)))
+			stock.position.z = 0.15
+			_weapon.add_child(stock)
+			_muzzle.position = Vector3(0, 0, -0.52)
+		"sniper":
+			_weapon_base = Vector3(0.14, 0.92, -0.45)
+			var barrel := Fx.cylinder(0.03, 0.035, 1.0, metal, 8)
+			barrel.rotation.x = PI * 0.5
+			barrel.position.z = -0.35
+			_weapon.add_child(barrel)
+			var stock := Fx.box(Vector3(0.09, 0.13, 0.4), Fx.mat(Color(0.3, 0.35, 0.25)))
+			stock.position.z = 0.12
+			_weapon.add_child(stock)
+			var scope := Fx.cylinder(0.045, 0.045, 0.3, metal, 8)
+			scope.rotation.x = PI * 0.5
+			scope.position = Vector3(0, 0.09, -0.05)
+			_weapon.add_child(scope)
+			_muzzle.position = Vector3(0, 0, -0.86)
+		"flamer":
+			_weapon_base = Vector3(0.16, 0.86, -0.4)
+			var nozzle := Fx.cylinder(0.06, 0.08, 0.55, metal, 10)
+			nozzle.rotation.x = PI * 0.5
+			nozzle.position.z = -0.12
+			_weapon.add_child(nozzle)
+			var pilot := Fx.sphere(0.05, Fx.mat(Color(0.4, 0.7, 1.0), 4.0), 6, 3)
+			pilot.position = Vector3(0, -0.06, -0.4)
+			_weapon.add_child(pilot)
+			_muzzle.position = Vector3(0, 0, -0.42)
+	if _model:
+		_fit_weapon_to_model()
+	_weapon.position = _weapon_base
+	_muzzle_flash = Fx.sphere(0.11, Fx.glow_mat(Color(1.0, 0.9, 0.5)), 8, 4)
+	_muzzle.add_child(_muzzle_flash)
+	_muzzle_flash.visible = false
+
+
+## Einfache Figur aus Grundformen (wenn kein fertiges Modell da ist).
+func _build_simple_body(col: Color, skin: Color, dark: Color) -> void:
 	for sx in [-0.12, 0.12]:
 		var leg := Fx.capsule(0.1, 0.46, Fx.mat(dark))
 		leg.position = Vector3(sx, 0.23, 0)
@@ -355,112 +475,44 @@ func _build_visual() -> void:
 				tank.position = Vector3(sx, 0.85, 0.3)
 				_body.add_child(tank)
 
-	# Waffe
-	_weapon = Node3D.new()
-	_body.add_child(_weapon)
-	_muzzle = Node3D.new()
-	_weapon.add_child(_muzzle)
-	var metal := Fx.mat(Color(0.3, 0.32, 0.36), 0.0, 0.85, 0.3)
-	match family():
-		"revolver":
-			_weapon_base = Vector3(0.24, 0.92, -0.42)
-			var grip := Fx.box(Vector3(0.07, 0.16, 0.08), Fx.mat(Color(0.45, 0.25, 0.1)))
-			grip.position = Vector3(0, -0.08, 0.06)
-			grip.rotation.x = 0.3
-			_weapon.add_child(grip)
-			var drum := Fx.cylinder(0.065, 0.065, 0.11, metal, 8)
-			drum.rotation.x = PI * 0.5
-			_weapon.add_child(drum)
-			var barrel := Fx.cylinder(0.03, 0.035, 0.32, metal, 8)
-			barrel.rotation.x = PI * 0.5
-			barrel.position.z = -0.2
-			_weapon.add_child(barrel)
-			_muzzle.position = Vector3(0, 0, -0.38)
-		"mg":
-			_weapon_base = Vector3(0.1, 0.86, -0.4)
-			var body := Fx.box(Vector3(0.14, 0.16, 0.62), metal)
-			_weapon.add_child(body)
-			var mag := Fx.box(Vector3(0.1, 0.18, 0.14), Fx.mat(Color(0.95, 0.75, 0.2)))
-			mag.position = Vector3(0, -0.14, -0.05)
-			_weapon.add_child(mag)
-			var barrel := Fx.cylinder(0.035, 0.04, 0.5, metal, 8)
-			barrel.rotation.x = PI * 0.5
-			barrel.position.z = -0.52
-			_weapon.add_child(barrel)
-			_muzzle.position = Vector3(0, 0, -0.8)
-		"rocket":
-			_weapon_base = Vector3(0.3, 1.15, -0.15)
-			var tube := Fx.cylinder(0.13, 0.13, 1.1, Fx.mat(Color(0.3, 0.42, 0.25), 0.0, 0.3, 0.5), 12)
-			tube.rotation.x = PI * 0.5
-			_weapon.add_child(tube)
-			for z in [-0.42, 0.42]:
-				var band := Fx.cylinder(0.145, 0.145, 0.08, Fx.mat(Color(0.9, 0.25, 0.15)), 12)
-				band.rotation.x = PI * 0.5
-				band.position.z = z
-				_weapon.add_child(band)
-			var sight := Fx.box(Vector3(0.05, 0.1, 0.12), metal)
-			sight.position = Vector3(-0.12, 0.08, -0.2)
-			_weapon.add_child(sight)
-			_muzzle.position = Vector3(0, 0, -0.6)
-		"tesla":
-			_weapon_base = Vector3(0.18, 0.9, -0.4)
-			var body := Fx.box(Vector3(0.12, 0.14, 0.4), metal)
-			_weapon.add_child(body)
-			var orb := Fx.sphere(0.1, Fx.mat(Color(0.8, 0.5, 1.0), 4.0), 10, 6)
-			orb.position.z = -0.28
-			_weapon.add_child(orb)
-			for k in 2:
-				var ring := Fx.torus(0.06, 0.1, Fx.mat(Color(0.75, 0.4, 1.0), 2.0))
-				ring.rotation.x = PI * 0.5
-				ring.position.z = -0.05 - k * 0.1
-				_weapon.add_child(ring)
-			_muzzle.position = Vector3(0, 0, -0.36)
-	match family():
-		"cryo":
-			_weapon_base = Vector3(0.18, 0.9, -0.4)
-			var body := Fx.cylinder(0.08, 0.1, 0.45, Fx.mat(Color(0.75, 0.85, 0.95), 0.0, 0.6, 0.3), 10)
-			body.rotation.x = PI * 0.5
-			_weapon.add_child(body)
-			var crystal := Fx.sphere(0.1, Fx.mat(Color(0.6, 0.95, 1.0), 3.0), 6, 3)
-			crystal.position.z = -0.3
-			_weapon.add_child(crystal)
-			_muzzle.position = Vector3(0, 0, -0.38)
-		"shotgun":
-			_weapon_base = Vector3(0.16, 0.88, -0.4)
-			for sx in [-0.035, 0.035]:
-				var barrel := Fx.cylinder(0.035, 0.035, 0.62, metal, 8)
-				barrel.rotation.x = PI * 0.5
-				barrel.position = Vector3(sx, 0, -0.2)
-				_weapon.add_child(barrel)
-			var stock := Fx.box(Vector3(0.1, 0.12, 0.3), Fx.mat(Color(0.45, 0.25, 0.1)))
-			stock.position.z = 0.15
-			_weapon.add_child(stock)
-			_muzzle.position = Vector3(0, 0, -0.52)
-		"sniper":
-			_weapon_base = Vector3(0.14, 0.92, -0.45)
-			var barrel := Fx.cylinder(0.03, 0.035, 1.0, metal, 8)
-			barrel.rotation.x = PI * 0.5
-			barrel.position.z = -0.35
-			_weapon.add_child(barrel)
-			var stock := Fx.box(Vector3(0.09, 0.13, 0.4), Fx.mat(Color(0.3, 0.35, 0.25)))
-			stock.position.z = 0.12
-			_weapon.add_child(stock)
-			var scope := Fx.cylinder(0.045, 0.045, 0.3, metal, 8)
-			scope.rotation.x = PI * 0.5
-			scope.position = Vector3(0, 0.09, -0.05)
-			_weapon.add_child(scope)
-			_muzzle.position = Vector3(0, 0, -0.86)
-		"flamer":
-			_weapon_base = Vector3(0.16, 0.86, -0.4)
-			var nozzle := Fx.cylinder(0.06, 0.08, 0.55, metal, 10)
-			nozzle.rotation.x = PI * 0.5
-			nozzle.position.z = -0.12
-			_weapon.add_child(nozzle)
-			var pilot := Fx.sphere(0.05, Fx.mat(Color(0.4, 0.7, 1.0), 4.0), 6, 3)
-			pilot.position = Vector3(0, -0.06, -0.4)
-			_weapon.add_child(pilot)
-			_muzzle.position = Vector3(0, 0, -0.42)
-	_weapon.position = _weapon_base
-	_muzzle_flash = Fx.sphere(0.11, Fx.glow_mat(Color(1.0, 0.9, 0.5)), 8, 4)
-	_muzzle.add_child(_muzzle_flash)
-	_muzzle_flash.visible = false
+
+# --- Fertiges 3D-Modell ------------------------------------------------------
+
+## Höhe der Figur in Körper-Einheiten (die einfache Figur ist ebenso groß).
+const MODEL_HEIGHT := 1.55
+## Zeitpunkt in der Schuss-Animation, an dem der Arm nach vorn zeigt (Zielhaltung).
+const AIM_TIME := 0.6
+
+var _model: Node3D
+var _anim: AnimationPlayer
+
+
+func _build_model() -> void:
+	_model = Models.make(String(Models.HEROES[id]["file"]), MODEL_HEIGHT)
+	_body.add_child(_model)
+	_model.position.y = 0.0
+	Models.recolor(_model, "Skin", data["skin"])
+	_anim = Models.player(_model)
+	_pose_aim()
+
+
+## Zielhaltung: Schuss-Animation an der Stelle mit ausgestrecktem Arm anhalten.
+func _pose_aim() -> void:
+	if _anim == null:
+		return
+	_anim.play("Shoot_OneHanded")
+	_anim.seek(AIM_TIME, true)
+	_anim.pause()
+
+
+## Waffe an die Figur anpassen: fertiges Waffenmodell statt der einfachen Form, wo vorhanden.
+func _fit_weapon_to_model() -> void:
+	var gun_file: String = Models.HEROES[id]["gun"]
+	if gun_file != "":
+		var gun := Models.make_gun(gun_file)
+		if gun:
+			for c in _weapon.get_children():
+				if c != _muzzle:
+					c.queue_free()
+			_weapon.add_child(gun)
+			_muzzle.position = Vector3(0, 0.03, -float(gun.get_meta("front")))

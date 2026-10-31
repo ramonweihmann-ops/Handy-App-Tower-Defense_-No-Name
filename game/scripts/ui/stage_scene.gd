@@ -114,6 +114,9 @@ func _build_view() -> void:
 		vp.add_child(en)
 		en.setup(String(s[0]), null, 1.0)
 		en.rotation.y = randf_range(-0.25, 0.25)
+		# Die Figur selbst steht still (kein Kampf), ihre Animation soll trotzdem laufen
+		if en._anim:
+			en._anim.process_mode = Node.PROCESS_MODE_ALWAYS
 		_enemies.append(en)
 
 

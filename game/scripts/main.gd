@@ -46,6 +46,8 @@ var _screen: Control
 var _autotest := false
 var _auto_pull := false
 var _auto_pull_t := 0.0
+## Nur für Tests mit Fenster: nach 8 Sekunden Kampf ein Bild speichern und beenden (--shot=pfad.png).
+var _shot_path := ""
 
 
 func _ready() -> void:
@@ -142,6 +144,8 @@ func _parse_args() -> void:
 			level = clampi(int(arg.get_slice("=", 1)), 1, GameData.LEVEL_COUNT)
 		elif arg.begins_with("--seed="):
 			seed(int(arg.get_slice("=", 1)))
+		elif arg.begins_with("--shot="):
+			_shot_path = arg.get_slice("=", 1)
 
 
 func _build_layout() -> void:
@@ -311,6 +315,10 @@ func _process(delta: float) -> void:
 			Performance.get_monitor(Performance.OBJECT_NODE_COUNT),
 			Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0,
 			Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0])
+	if _shot_path != "" and state == "battle" and battle.elapsed > 8.0:
+		get_viewport().get_texture().get_image().save_png(_shot_path)
+		print("BILD gespeichert: ", _shot_path)
+		get_tree().quit()
 	if _autotest and state == "battle":
 		if battle.elapsed > 900.0:
 			_finish_autotest("timeout")

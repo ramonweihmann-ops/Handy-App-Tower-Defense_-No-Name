@@ -3,8 +3,8 @@
 Spielbarer Pilot: 10 Level in zwei Welten (Schleim-Welt, Zombie-Kolonie), 8 Helden, Kugelbahn als
 Munitions-Maschine, Kartenauswahl im Run, Booster im Kampf, Hauptmenü mit Shop, Sammlung
 (Aufstellung bis 10 Helden, Booster), Upgrades (Tech-Baum, Munition, Talente), Basislager und
-Battle Pass, Töne und Musik, Spielstand und Selbst-Update für die Testphase. Figuren aus
-einfachen 3D-Formen (Platzhalter bis zu den fertigen Modellen).
+Battle Pass, Töne und Musik, Spielstand und Selbst-Update für die Testphase. Helden und Gegner
+sind fertige, animierte 3D-Modelle (CC0 von Quaternius, Quellen in `models/QUELLEN.md`).
 
 ## Spielen
 
@@ -25,6 +25,7 @@ einfachen 3D-Formen (Platzhalter bis zu den fertigen Modellen).
 | `scripts/sfx.gd` | Töne und Musik (Autoload „Sfx“) |
 | `scripts/ui/` | Menü, Anzeige im Kampf, Theme (weiche „Candy“-Flächen), Levelbild, Porträts |
 | `shaders/` | Deck, Energiezaun, Wurmloch, Sternenhimmel, Menü- und Levelbild-Hintergrund |
+| `models/` | 3D-Modelle (glTF) für Helden, Gegner und Waffen, Zuordnung in `scripts/battle/models.gd` |
 | `audio/` | Töne und Musik, selbst erzeugt mit `scripts/make_sounds.py` (keine fremden Rechte) |
 | `tests/` | Tests ohne Fenster: Kugelbahn und Menü-Rundgang |
 
@@ -98,3 +99,19 @@ automatischen Tests und hinter dem Ladebildschirm ist alles stumm.
 Bis zu zwei Booster pro Kampf (Sammlung → Booster): Luftangriff, Medipack, Zeitlupe, Kuppel,
 Munitionskiste. Sie werden mit Gold aufgewertet (mehr Wirkung, kürzere Abklingzeit) und im Kampf
 über die runden Knöpfe am linken Rand ausgelöst.
+
+## 3D-Modelle
+
+`scripts/battle/models.gd` legt fest, welcher Held und welcher Gegner welches Modell bekommt
+(Datei, Höhe, Animationen). Helden stehen in einer Zielhaltung (Schuss-Animation angehalten) und
+halten ein Waffenmodell, wo es eins gibt; Tesla, Eiskanone und Flammenwerfer behalten ihre
+eigene Form. Gegner laufen mit ihrer Lauf-Animation und wechseln am Zaun in den Angriff; Treffer
+und Frost färben sie über eine Überlagerung, die nur eingeschaltet ist, solange sie wirkt. Fehlt
+eine Modelldatei, baut die Figur ihre einfache Form wie früher.
+
+Bilder zum Ansehen am PC (braucht ein Fenster, z. B. `xvfb-run`):
+
+```bash
+godot --path game res://tests/render_models.tscn -- --out=/tmp/helden.png --mode=front    # oder enemies, times
+godot --path game -- --autotest --level=7 --shot=/tmp/kampf.png                          # Kampfbild nach 8 s
+```

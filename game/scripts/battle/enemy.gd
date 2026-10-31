@@ -34,6 +34,12 @@ var _mats: Array[StandardMaterial3D] = []
 var _wiggle: Array[Node3D] = []
 var _ice_tint := 0.0
 var _last_tint_key := 0.0
+## Fertiges 3D-Modell (wenn vorhanden) mit Animationen und Aufblitz-Überlagerung.
+var _model: Node3D
+var _anim: AnimationPlayer
+var _overlay: StandardMaterial3D
+var _overlay_on := false
+var _anim_name := ""
 
 
 func setup(kind_: String, battle_: Battle, hp_mult: float) -> void:
@@ -154,6 +160,13 @@ func _update_effects(delta: float) -> void:
 	if key == _last_tint_key:
 		return
 	_last_tint_key = key
+	if _overlay:
+		var c := Color(1, 1, 1) * (_flash * 0.75) + Color(0.15, 0.4, 0.75) * (_ice_tint * 0.6)
+		_overlay.albedo_color = Color(c.r, c.g, c.b, 1.0)
+		var on := key > 0.0
+		if on != _overlay_on:
+			_overlay_on = on
+			Models.set_overlay(_model, _overlay if on else null)
 	for m in _mats:
 		var base: Color = m.get_meta("base_emission")
 		var c := base.lerp(Color(1, 1, 1), _flash * 0.85)
@@ -162,6 +175,12 @@ func _update_effects(delta: float) -> void:
 
 
 func _animate(_delta: float, moving: bool) -> void:
+	if _model:
+		var d: Dictionary = Models.ENEMIES[kind]
+		_play(String(d["attack"]) if attacking else String(d["walk"]))
+		if _anim:
+			_anim.speed_scale = (1.0 - _slow) * (1.0 if moving else 0.6)
+		return
 	var t := _t
 	match kind:
 		"schleimling":
@@ -271,6 +290,9 @@ func _zombie(s: float, skin: Color, shirt: Color, armored: bool, crawl: bool) ->
 func _build_visual() -> void:
 	_visual = Node3D.new()
 	add_child(_visual)
+	if Models.has_enemy(kind):
+		_build_model()
+		return
 	match kind:
 		"schleimling":
 			var body := Fx.sphere(0.5, _m(Color(0.32, 0.92, 0.42), 0.25, 0.0, 0.2), 14, 8)
@@ -362,3 +384,25 @@ func _build_visual() -> void:
 	_visual.scale = Vector3.ONE
 	if kind == "schleimmutter":
 		_visual.scale = Vector3.ONE
+
+
+## Fertiges Modell statt einfacher Formen. Zombies bekommen grünliche Haut.
+func _build_model() -> void:
+	var d: Dictionary = Models.ENEMIES[kind]
+	_model = Models.make(String(d["file"]), float(d["height"]), false)
+	_model.position.y = float(d.get("lift", 0.0))
+	_visual.add_child(_model)
+	if kind == "krabbler" or kind == "zombie":
+		Models.recolor(_model, "Skin", Color(0.52, 0.66, 0.42))
+	_anim = Models.player(_model)
+	_overlay = Models.add_overlay(_model)
+	_play(String(d["walk"]))
+	if _anim:
+		_anim.seek(randf() * 0.8, true)
+
+
+func _play(anim_name: String) -> void:
+	if _anim == null or anim_name == _anim_name or not _anim.has_animation(anim_name):
+		return
+	_anim_name = anim_name
+	_anim.play(anim_name, 0.15)
