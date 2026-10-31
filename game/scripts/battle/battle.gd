@@ -90,7 +90,7 @@ func setup(level_: int, ammo_: AmmoStore) -> void:
 	clear()
 	level = level_
 	ammo = ammo_
-	fence_max = 1000.0 + 300.0 * (level - 1)
+	fence_max = GameData.fence_base(level)
 	fence_hp = fence_max
 	total_waves = GameData.waves_in_level(level)
 	_apply_world()
@@ -231,6 +231,7 @@ func spawn_enemy(kind: String, pos := Vector3.INF) -> Enemy:
 		pos = Vector3(randf_range(-3.6, 3.6), 0, SPAWN_Z + randf_range(-1.0, 1.0))
 	e.position = pos
 	e.tint = GameData.world_tint(level)
+	e.dps_scale = GameData.dps_mult(level)
 	var hp := GameData.hp_mult(level, maxi(wave, 1)) * hp_scale
 	if GameData.ENEMIES[kind]["tier"] == "boss":
 		hp *= GameData.boss_hp(level)

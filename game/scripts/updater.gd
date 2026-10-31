@@ -119,7 +119,9 @@ func _process(_delta: float) -> void:
 func _on_download_done(result: int, code: int, _headers: PackedStringArray, _body: PackedByteArray) -> void:
 	downloading = false
 	if result != HTTPRequest.RESULT_SUCCESS or code != 200:
-		download_failed.emit("Download fehlgeschlagen. Bitte später noch einmal versuchen.")
+		download_failed.emit("Download hat nicht geklappt – die Download-Seite öffnet sich im Browser.")
+		# Ausweg: Download-Seite im Browser öffnen, dort liegt immer die neueste Version
+		OS.shell_open(BASE_URL)
 		return
 	download_done.emit()
 	install()

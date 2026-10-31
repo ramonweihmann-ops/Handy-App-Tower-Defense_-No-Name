@@ -520,6 +520,7 @@ func start_level(n: int, hard_mode := false) -> void:
 		# Zu Beginn sind Booster halb geladen
 		_booster_cd.append(MetaData.booster_cd(id, Save.booster_level(id)) * 0.5)
 	hud.reset(level, GameData.waves_in_level(level))
+	hud.show_banner("%d · %s" % [level, GameData.level_name(level)])
 	hud.set_boosters(_boosters)
 	hud.set_next_wave(battle.next_wave_text())
 	hud.set_xp(0, xp_needed)

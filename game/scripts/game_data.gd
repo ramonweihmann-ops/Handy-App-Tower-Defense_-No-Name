@@ -161,6 +161,19 @@ const WORLDS := [
 		"c1": Color(1.0, 0.2, 0.6), "c2": Color(0.3, 0.9, 1.0), "rim": Color(1.0, 0.4, 0.9)},
 ]
 const LEVELS_PER_WORLD := 5
+## Namen der Level, je Welt fünf (das fünfte ist der Boss).
+const LEVEL_NAMES := [
+	["Erster Kontakt", "Glibber im Gang", "Tentakel-Alarm", "Panzer im Schleim", "Die Schleimmutter"],
+	["Stille Kolonie", "Schlurfende Schatten", "Krabbelnde Flut", "Die Brecher kommen", "Der Koloss erwacht"],
+	["Eisiger Empfang", "Frostnebel", "Gefrorene Tentakel", "Kristallpanzer", "Die Frostmutter"],
+	["Glühender Boden", "Ascheregen", "Feuerläufer", "Magmabrecher", "Der Lava-Koloss"],
+	["Blubbernde Tümpel", "Sumpfgas", "Moorzombies", "Giftpanzer", "Die Sumpfmutter"],
+	["Funkelnder Eingang", "Spiegelgänge", "Schwebende Tentakel", "Kristallbrecher", "Der Kristallkoloss"],
+	["Sandsturm", "Dünenläufer", "Glühende Mittagssonne", "Panzer im Sand", "Der Wüstenkoloss"],
+	["Dichter Nebel", "Stimmen im Dunst", "Nebeltentakel", "Unsichtbare Brecher", "Mutter des Nebels"],
+	["Lichtloses Tor", "Schattenläufer", "Flüsternde Horde", "Brecher der Dunkelheit", "Der Schattenkoloss"],
+	["Am Ereignishorizont", "Verzerrte Zeit", "Sturm der Tentakel", "Letzte Verteidigung", "Das Herz des Wurmlochs"],
+]
 ## Anzahl der Level (Welten × 5). Wächst mit jeder neuen Welt.
 const LEVEL_COUNT := 50
 
@@ -170,7 +183,9 @@ const LEVEL_COUNT := 50
 # vor allem über die Lebenspunkte. Level 1–10 behalten ihre abgestimmten Werte.
 
 ## Ab hier wächst das Gegnerleben je Level um diesen Faktor (vorher linear).
-const HP_GROWTH := 1.08
+const HP_GROWTH := 1.06
+## Ab Level 11 wächst der Schaden der Gegner mit dem Schild der Station mit, dazu dieser Druck je Level.
+const DPS_GROWTH := 1.06
 ## Ab diesem Level brauchen Bosse ohne Käufe in der Regel einen Versuch mehr (Konzept, Abschnitt 9).
 const HARD_BOSS_FROM := 21
 const HARD_BOSS_HP := 1.3
@@ -178,6 +193,13 @@ const HARD_BOSS_HP := 1.3
 
 static func world_of(level: int) -> int:
 	return clampi((level - 1) / LEVELS_PER_WORLD, 0, WORLDS.size() - 1)
+
+
+static func level_name(level: int) -> String:
+	var w := world_of(level)
+	if w >= LEVEL_NAMES.size():
+		return ""
+	return LEVEL_NAMES[w][(level - 1) % LEVELS_PER_WORLD]
 
 
 static func world_name(level: int) -> String:
@@ -210,6 +232,19 @@ static func level_hp(level: int) -> float:
 	if level <= 10:
 		return 1.0 + 0.2 * (level - 1)
 	return 2.8 * pow(HP_GROWTH, level - 10)
+
+
+## Schild der Station in diesem Level (vor Boni).
+static func fence_base(level: int) -> float:
+	return 1000.0 + 300.0 * (level - 1)
+
+
+## Schadensfaktor der Gegner: bis Level 10 unverändert, danach wächst er mit dem Schild mit,
+## damit Gegner den Schild auch in hohen Leveln gefährden.
+static func dps_mult(level: int) -> float:
+	if level <= 10:
+		return 1.0
+	return fence_base(level) / fence_base(10) * pow(DPS_GROWTH, level - 10)
 
 
 static func hp_mult(level: int, wave: int) -> float:

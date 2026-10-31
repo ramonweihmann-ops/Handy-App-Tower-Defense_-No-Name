@@ -42,6 +42,8 @@ var _overlay_on := false
 var _anim_name := ""
 ## Färbung der Welt (Weiß = Originalfarben), vor setup() setzen.
 var tint := Color(1, 1, 1)
+## Schadensfaktor des Levels (GameData.dps_mult), vor setup() setzen.
+var dps_scale := 1.0
 
 
 func setup(kind_: String, battle_: Battle, hp_mult: float) -> void:
@@ -52,7 +54,7 @@ func setup(kind_: String, battle_: Battle, hp_mult: float) -> void:
 	hp = max_hp
 	speed = float(data["speed"]) * randf_range(0.92, 1.08)
 	armor = float(data["armor"])
-	dps = float(data["dps"])
+	dps = float(data["dps"]) * dps_scale
 	xp = int(data["xp"])
 	size = float(data["size"])
 	_phase = randf() * TAU

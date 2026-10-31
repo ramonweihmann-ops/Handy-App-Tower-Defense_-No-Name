@@ -543,6 +543,7 @@ func _tab_kampf() -> Control:
 	info.add_child(wl)
 	var lt := UiKit.label("Level %d" % selected_level, 38, UiKit.C_GOLD, HORIZONTAL_ALIGNMENT_LEFT)
 	info.add_child(lt)
+	info.add_child(_wrap_left(GameData.level_name(selected_level), 21, UiKit.C_TEXT))
 	if GameData.is_boss_level(selected_level):
 		var boss_kind: String = GameData.WORLDS[GameData.world_of(selected_level)]["kinds"][3]
 		info.add_child(_wrap_left("Boss: %s" % GameData.enemy_name(boss_kind, selected_level), 19, Color(1.0, 0.55, 0.5)))
