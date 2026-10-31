@@ -1,6 +1,10 @@
 #!/bin/bash
-# Baut die Android-App (APK) des Piloten und legt sie mit einer Download-Seite nach docs/pilot/.
+# Baut die Android-App (APK) des Piloten und schreibt die Download-Seite nach docs/pilot/.
 # Die Seite wird über GitHub Pages ausgeliefert; am Handy Link öffnen, APK laden, installieren.
+#
+# Normalfall (GitHub Actions, .github/workflows/android-release.yml): RELEASE_URL ist gesetzt,
+# die APK kommt als GitHub-Release hoch und landet nicht im Projektverlauf.
+# Ohne RELEASE_URL (Notfall, lokal): die APK wird wie früher nach docs/pilot/ kopiert.
 #
 # Voraussetzungen: Godot 4.7.2 mit Android-Exportvorlagen, Java, apksigner.
 #   GODOT=/pfad/zu/godot  (sonst „godot“)
@@ -32,8 +36,14 @@ mkdir -p build/android docs/pilot
 
 APK="station-pilot-$STAMP.apk"
 rm -rf docs/pilot/*
-cp build/android/station-pilot.apk "docs/pilot/$APK"
-SIZE=$(du -m "docs/pilot/$APK" | cut -f1)
+cp build/android/station-pilot.apk "build/android/$APK"
+SIZE=$(du -m "build/android/$APK" | cut -f1)
+if [ -n "${RELEASE_URL:-}" ]; then
+  APK_HREF="$RELEASE_URL$APK"
+else
+  cp "build/android/$APK" "docs/pilot/$APK"
+  APK_HREF="$APK"
+fi
 cat > docs/pilot/index.html <<HTML
 <!doctype html>
 <html lang="de">
@@ -52,7 +62,7 @@ cat > docs/pilot/index.html <<HTML
 <body>
 <h1>Station am Wurmloch</h1>
 <p style="text-align:center">Pilot · Android · Stand $STAMP UTC · etwa $SIZE MB</p>
-<a class="btn" href="$APK">App herunterladen</a>
+<a class="btn" href="$APK_HREF">App herunterladen</a>
 <ol>
   <li>Auf „App herunterladen“ tippen und die Datei öffnen.</li>
   <li>Beim ersten Mal fragt Android, ob der Browser Apps installieren darf: erlauben.</li>
@@ -62,10 +72,15 @@ cat > docs/pilot/index.html <<HTML
 </html>
 HTML
 # Versionsinfo für den Updater in der App
-python3 - "$CODE" "$VNAME" "$SHOWN_STAMP" "$APK" "$NOTES" > docs/pilot/version.json <<'PY'
+# „apk_url“ (volle Adresse) lesen Apps ab 0.3.4; „apk“ (Dateiname neben version.json) ältere.
+python3 - "$CODE" "$VNAME" "$SHOWN_STAMP" "$APK" "$NOTES" "${RELEASE_URL:-}" > docs/pilot/version.json <<'PY'
 import json, sys
-code, name, stamp, apk, notes = sys.argv[1:6]
-print(json.dumps({"code": int(code), "name": name, "stamp": stamp, "apk": apk, "notes": notes}, ensure_ascii=False))
+code, name, stamp, apk, notes, release = sys.argv[1:7]
+info = {"code": int(code), "name": name, "stamp": stamp, "apk": apk, "notes": notes}
+if release:
+    info["apk_url"] = release + apk
+print(json.dumps(info, ensure_ascii=False))
 PY
 touch docs/.nojekyll
-echo "Fertig: docs/pilot/$APK (Version $CODE)"
+echo "Fertig: build/android/$APK (Version $CODE)"
+echo "APK_FILE=build/android/$APK" >> "${GITHUB_OUTPUT:-/dev/null}"

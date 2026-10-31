@@ -86,6 +86,15 @@ func _on_check_done(result: int, code: int, _headers: PackedStringArray, body: P
 		update_available.emit(latest)
 
 
+## Adresse der neuen APK: seit 0.3.4 eine volle Adresse (GitHub Releases, „apk_url“),
+## davor ein Dateiname neben version.json („apk“).
+func download_url() -> String:
+	var full := str(latest.get("apk_url", ""))
+	if full.begins_with("https://"):
+		return full
+	return BASE_URL + str(latest.get("apk", ""))
+
+
 func start_download() -> void:
 	if downloading or not has_update():
 		return
@@ -94,7 +103,7 @@ func start_download() -> void:
 	if FileAccess.file_exists(path):
 		DirAccess.remove_absolute(path)
 	_dl_req.download_file = path
-	var err := _dl_req.request(BASE_URL + str(latest.get("apk", "")))
+	var err := _dl_req.request(download_url())
 	if err != OK:
 		downloading = false
 		download_failed.emit("Download konnte nicht starten.")
