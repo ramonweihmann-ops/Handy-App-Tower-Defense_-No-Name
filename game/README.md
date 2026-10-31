@@ -67,7 +67,7 @@ Versionsname über `VNAME=…`. Später ersetzt Google Play diesen Weg.
 
 ## Tempo und Leistung
 
-- Grundtempo 60 % (`BASE_SPEED` in `main.gd`), Knopf x1/x2. x3 soll erst viel später kommen (etwa ab Level 100).
+- Tempo je Stufe in `TEMPO_SCALE` (`main.gd`): x1 = 68 %, x2 = 120 %, x3 = 180 % der Rechengeschwindigkeit. x3 gibt es nur in der Testphase; später erst etwa ab Level 100.
 - Grafik „Hoch“ (Leuchten, Schatten) oder „Sparsam“, umschaltbar in den Einstellungen. Treffer-Funken nur bei kritischen Treffern, höchstens 55 Kugeln gleichzeitig, Formen und Materialien von Geschossen werden wiederverwendet.
 - Die Kugelbahn läuft in einer eigenen Ansicht in voller Größe und wird auf 78 % verkleinert angezeigt; darunter bleibt Abstand zur Gestenleiste des Handys.
 - Im breiten Fenster bleibt das Spiel eine Hochformat-Spalte in der Mitte.

@@ -10,6 +10,9 @@ const START_CAP := 50
 ## Grundtempo des Spiels (1.0 wäre die Rechengeschwindigkeit); x2 per Knopf.
 ## Später (etwa ab Level 100) soll x3 dazukommen.
 const BASE_SPEED := 0.6
+## Tatsächliches Tempo je Stufe: x1 etwas flotter als das Grundtempo (Wunsch aus dem Test),
+## x2 und x3 bleiben beim Doppelten und Dreifachen des Grundtempos, damit der Abstand klar bleibt.
+const TEMPO_SCALE := {1: 0.68, 2: 1.2, 3: 1.8}
 ## Breiteste erlaubte Spalte im Verhältnis zur Höhe (Querformat am PC wird zur Hochformat-Spalte).
 const MAX_ASPECT := 0.62
 ## Anzeigegröße der Kugelbahn und freier Streifen darunter (Gestenleiste des Handys)
@@ -68,7 +71,7 @@ func _ready() -> void:
 ## Setzt das Spieltempo (x1 oder x2). Die Physik bleibt bei 60 Schritten pro Spielsekunde,
 ## weniger Schritte lassen schnelle Kugeln durch die Wände der Kugelbahn rutschen.
 func _apply_speed(t: int) -> void:
-	Engine.time_scale = BASE_SPEED * float(t)
+	Engine.time_scale = float(TEMPO_SCALE.get(t, BASE_SPEED * float(t)))
 
 
 ## Ladebildschirm: Jede Figur und jeder Effekt wird einmal unsichtbar dahinter gezeigt,
