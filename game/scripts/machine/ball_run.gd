@@ -197,6 +197,13 @@ func _launch_velocity() -> Vector2:
 	return Vector2(randf_range(-3.0, 3.0), -randf_range(1160.0, 1240.0))
 
 
+## Ton über den Autoload „Sfx“; im Einzeltest der Kugelbahn gibt es ihn nicht.
+func _sound(n: String, pitch_var: float) -> void:
+	var sfx := get_node_or_null("/root/Sfx")
+	if sfx:
+		sfx.play(n, pitch_var)
+
+
 func _launch_one() -> void:
 	if _spawn_ball("normal", LAUNCH_POS + Vector2(randf_range(-1.0, 1.0), 0), _launch_velocity(), {}):
 		stats["launched"] += 1
@@ -224,6 +231,7 @@ func _on_gate(body: Node, idx: int) -> void:
 		return
 	ball.passed[idx] = true
 	_gate_pulse[idx] = 1.0
+	_sound("ding", 0.1)
 	match type:
 		"x2":
 			_clone(ball, 1)
@@ -252,6 +260,7 @@ func _on_collect(body: Node) -> void:
 func _collect(ball: AmmoBall) -> void:
 	ball.collected = true
 	collected_total += 1
+	_sound("clack", 0.15)
 	var added := 0
 	if ammo:
 		added = ammo.add(ball.type, 2 if randf() < lucky else 1)
@@ -287,6 +296,7 @@ func _release_pull() -> void:
 	if active and _manual_cd <= 0.0:
 		_pending += balls_per_launch + int(round(_pull * 4.0)) + manual_extra
 		_manual_cd = maxf(1.0, MANUAL_CD - manual_cd_bonus)
+		_sound("spring", 0.05)
 		manual_pulled.emit()
 	_pull = 0.0
 

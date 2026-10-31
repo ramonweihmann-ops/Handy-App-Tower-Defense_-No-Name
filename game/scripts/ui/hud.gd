@@ -5,6 +5,7 @@ extends Control
 
 signal pause_pressed
 signal tempo_pressed
+signal booster_pressed(index: int)
 
 const MAX_FLOATERS := 40
 
@@ -16,6 +17,7 @@ var _fence_bar: ProgressBar
 var _fence_label: Label
 var _tempo_btn: Button
 var _next_label: Label
+var _booster_buttons: Array[BoosterButton] = []
 var _fence_shown := -1
 var _fence_max_shown := -1
 var _fence_low := false
@@ -93,6 +95,25 @@ func _build() -> void:
 	_fence_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_fence_bar.add_child(_fence_label)
 
+	# Booster-Knöpfe links und rechts über dem Schild
+	for i in MetaData.BOOSTER_SLOTS:
+		var b := BoosterButton.new()
+		b.custom_minimum_size = Vector2(96, 96)
+		b.size = Vector2(96, 96)
+		b.anchor_top = 1.0
+		b.anchor_bottom = 1.0
+		b.anchor_left = 0.0 if i == 0 else 1.0
+		b.anchor_right = b.anchor_left
+		b.offset_left = 16.0 if i == 0 else -112.0
+		b.offset_right = b.offset_left + 96.0
+		b.offset_top = -160.0
+		b.offset_bottom = -64.0
+		var idx := i
+		b.pressed.connect(func() -> void: booster_pressed.emit(idx))
+		UiKit.add_pop(b)
+		add_child(b)
+		_booster_buttons.append(b)
+
 	_banner = UiKit.label("", 56, UiKit.C_GOLD)
 	_banner.set_anchors_preset(Control.PRESET_CENTER)
 	_banner.grow_horizontal = Control.GROW_DIRECTION_BOTH
@@ -138,6 +159,21 @@ func set_fence(hp: float, max_hp: float) -> void:
 		_fence_low = low
 		_fence_fill = UiKit.box(Color(1.0, 0.35, 0.3) if low else UiKit.C_ACCENT, 8)
 		_fence_bar.add_theme_stylebox_override("fill", _fence_fill)
+
+
+## Zeigt die ausgerüsteten Booster (leer = Knopf ausblenden).
+func set_boosters(ids: Array[String]) -> void:
+	for i in _booster_buttons.size():
+		var b := _booster_buttons[i]
+		b.visible = i < ids.size()
+		if b.visible:
+			b.kind = String(MetaData.BOOSTERS[ids[i]]["icon"])
+			b.title = String(MetaData.BOOSTERS[ids[i]]["title"])
+
+
+func set_booster_ready(i: int, ratio: float) -> void:
+	if i < _booster_buttons.size():
+		_booster_buttons[i].ready_ratio = ratio
 
 
 func set_tempo(tempo: int) -> void:
@@ -252,3 +288,49 @@ func _text(center: Vector2, text: String, font_size: int, color: Color) -> void:
 	var pos := Vector2(center.x - w * 0.5, center.y)
 	draw_string_outline(_font, pos, text, HORIZONTAL_ALIGNMENT_CENTER, w, font_size, 6, Color(0, 0, 0, color.a * 0.85))
 	draw_string(_font, pos, text, HORIZONTAL_ALIGNMENT_CENTER, w, font_size, color)
+
+
+
+## Runder Booster-Knopf mit Symbol und Abklingzeit als Kreisbogen.
+class BoosterButton extends Button:
+	var kind := "":
+		set(v):
+			kind = v
+			if _icon:
+				_icon.kind = v
+	var title := ""
+	var ready_ratio := 1.0
+	var _t := 0.0
+	var _icon: Icon
+
+	func _init() -> void:
+		flat = true
+		focus_mode = Control.FOCUS_NONE
+		_icon = Icon.make(kind, 52)
+		_icon.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+		_icon.offset_left = -26
+		_icon.offset_right = 26
+		_icon.offset_top = -26
+		_icon.offset_bottom = 26
+		add_child(_icon)
+
+	func _process(delta: float) -> void:
+		_t += delta
+		_icon.modulate = Color(1, 1, 1) if ready_ratio >= 1.0 else Color(0.55, 0.55, 0.65)
+		queue_redraw()
+
+	func _draw() -> void:
+		var c := size * 0.5
+		var r := minf(size.x, size.y) * 0.46
+		var ready := ready_ratio >= 1.0
+		if ready:
+			draw_circle(c, r + 5.0 + 3.0 * sin(_t * 4.0), Color(1.0, 0.75, 0.3, 0.28))
+		draw_circle(c, r, Color(0.36, 0.2, 0.62) if ready else Color(0.17, 0.13, 0.28))
+		draw_circle(c + Vector2(0, -r * 0.35), r * 0.62, Color(1, 1, 1, 0.1))
+		if ready:
+			draw_arc(c, r - 3.0, 0.0, TAU, 48, Color(1.0, 0.8, 0.3), 5.0)
+		else:
+			draw_arc(c, r - 3.0, -PI * 0.5, -PI * 0.5 + TAU * ready_ratio, 48, Color(0.4, 0.8, 1.0), 6.0)
+		var font := ThemeDB.fallback_font
+		draw_string_outline(font, Vector2(-20, size.y + 6), title, HORIZONTAL_ALIGNMENT_CENTER, size.x + 40, 16, 5, Color(0, 0, 0, 0.8))
+		draw_string(font, Vector2(-20, size.y + 6), title, HORIZONTAL_ALIGNMENT_CENTER, size.x + 40, 16, Color(1, 1, 1))

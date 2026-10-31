@@ -34,6 +34,7 @@ func _run() -> bool:
 			save.add_hero_cards("dusty", 20)
 			print("SMOKE menü da, Reiter: ", m.current_tab)
 		1:
+			_report(m._content, 0)
 			for t in ["shop", "sammlung", "upgrades", "basis", "kampf"]:
 				m.show_tab(t)
 			m.sub_tab["sammlung"] = "booster"
@@ -55,7 +56,10 @@ func _run() -> bool:
 			print("SMOKE kalle freischalten: ", save.unlock_with_gems("kalle"), " aufstellung ", save.squad())
 			print("SMOKE aufstellung ändern: '", save.toggle_squad("iska"), "' jetzt ", save.squad())
 			print("SMOKE boni: ", save.battle_bonus())
+			print("SMOKE booster: ", save.booster_slots(), " aufwerten ", save.upgrade_booster("medipack"), " tauschen '", save.toggle_booster("zeitlupe"), "'")
 		3:
+			var page: Control = m._content.get_child(m._content.get_child_count() - 1)
+			print("SMOKE reiter breite ", page.size.x, " inhalt ", m._content.size.x)
 			m.open_battle_pass()
 		4:
 			m._open_daily()
@@ -83,6 +87,12 @@ func _run() -> bool:
 			print("SMOKE level gestartet, zustand ", main.state, " energie ", save.energy())
 		10:
 			main._on_hero_picked("dusty")
+		200:
+			main._booster_cd[0] = 0.0
+			main._booster_cd[1] = 0.0
+			main._use_booster(0)
+			main._use_booster(1)
+			print("SMOKE booster eingesetzt: ", main._boosters, " cd ", main._booster_cd)
 		_:
 			if step > 10 and step < 600:
 				pass
@@ -98,3 +108,26 @@ func _run() -> bool:
 				return true
 	step += 1
 	return false
+
+
+
+## Meldet Elemente, die breiter als der Bildschirm sein wollen.
+func _report(n: Node, depth: int) -> void:
+	if n is Control:
+		var c := n as Control
+		var w := c.get_combined_minimum_size().x
+		if w > 700.0 and depth < 12:
+			print("SMOKE breit: ", "  ".repeat(depth), c.get_class(), " ", c.name, " min=", w)
+	for ch in n.get_children():
+		_report(ch, depth + 1)
+
+
+
+func _sizes(n: Node, depth: int) -> void:
+	if depth > 6:
+		return
+	if n is Control:
+		var c := n as Control
+		print("SMOKE größe: ", "  ".repeat(depth), c.get_class(), " pos=", c.position, " size=", c.size, " min=", c.get_combined_minimum_size())
+	for ch in n.get_children():
+		_sizes(ch, depth + 1)

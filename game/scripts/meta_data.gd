@@ -33,6 +33,32 @@ static func hero_damage_mult(level: int) -> float:
 	return 1.0 + 0.08 * (level - 1)
 
 
+# --- Booster: Einsätze im Kampf, 2 davon gleichzeitig ausgerüstet --------------
+
+const BOOSTER_SLOTS := 2
+const BOOSTER_MAX := 5
+const BOOSTERS := {
+	"luftangriff": {"title": "Luftangriff", "desc": "Bomben treffen fünf Stellen der Bahn", "cd": 22.0, "unlock": 0, "icon": "plane"},
+	"medipack": {"title": "Medipack", "desc": "Repariert 25 %% des Schilds", "cd": 30.0, "unlock": 0, "icon": "medic"},
+	"zeitlupe": {"title": "Zeitlupe", "desc": "Alle Gegner 5 s lang 60 %% langsamer", "cd": 26.0, "unlock": 2, "icon": "clock"},
+	"kuppel": {"title": "Schutzkuppel", "desc": "Der Schild nimmt 4 s lang keinen Schaden", "cd": 34.0, "unlock": 3, "icon": "dome"},
+	"munition": {"title": "Munitionskiste", "desc": "Sofort 25 Kugeln in den Speicher", "cd": 24.0, "unlock": 1, "icon": "crate"},
+}
+
+
+## Wirkung eines Boosters je Stufe (+15 %) und Abklingzeit (−5 % je Stufe).
+static func booster_power(level: int) -> float:
+	return 1.0 + 0.15 * (level - 1)
+
+
+static func booster_cd(id: String, level: int) -> float:
+	return float(BOOSTERS[id]["cd"]) * (1.0 - 0.05 * (level - 1))
+
+
+static func booster_cost(level: int) -> int:
+	return 200 * level
+
+
 # --- Tech-Baum: Knoten werden nacheinander gekauft ---------------------------
 
 const TECH := [

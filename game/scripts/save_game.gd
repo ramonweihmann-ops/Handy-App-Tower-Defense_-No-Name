@@ -49,6 +49,10 @@ func default_data() -> Dictionary:
 		"squad": [],
 		"ammo_up": {},
 		"quality": "hoch",
+		"sound": true,
+		"music": true,
+		"boosters": {},
+		"booster_slots": ["luftangriff", "medipack"],
 	}
 
 
@@ -189,7 +193,7 @@ func level_won(level: int, hard: bool) -> bool:
 		data["won_levels"].append(key)
 	if level >= int(data["max_level"]) and level < GameData.LEVEL_COUNT:
 		data["max_level"] = level + 1
-	if level == GameData.LEVEL_COUNT:
+	if level >= GameData.LEVELS_PER_WORLD:
 		data["hard_unlocked"] = true
 	save_game()
 	return first
@@ -297,6 +301,49 @@ func has_tech(id: String) -> bool:
 		if MetaData.TECH[i]["id"] == id:
 			return true
 	return false
+
+
+# --- Booster ---------------------------------------------------------------------
+
+func booster_unlocked(id: String) -> bool:
+	var need: int = MetaData.BOOSTERS[id]["unlock"]
+	if test_mode or need == 0:
+		return true
+	return data["won_levels"].has("N" + str(need)) or data["won_levels"].has("S" + str(need))
+
+
+func booster_level(id: String) -> int:
+	return int(data["boosters"].get(id, 1))
+
+
+func booster_slots() -> Array[String]:
+	var out: Array[String] = []
+	for id in data["booster_slots"]:
+		if MetaData.BOOSTERS.has(id) and booster_unlocked(id):
+			out.append(id)
+	return out
+
+
+## Rüstet einen Booster aus oder ab (höchstens 2).
+func toggle_booster(id: String) -> String:
+	var slots: Array = data["booster_slots"]
+	if slots.has(id):
+		slots.erase(id)
+	else:
+		if slots.size() >= MetaData.BOOSTER_SLOTS:
+			return "Es passen nur %d Booster in einen Kampf. Nimm zuerst einen heraus." % MetaData.BOOSTER_SLOTS
+		slots.append(id)
+	save_game()
+	return ""
+
+
+func upgrade_booster(id: String) -> bool:
+	var lvl := booster_level(id)
+	if lvl >= MetaData.BOOSTER_MAX or not spend("gold", MetaData.booster_cost(lvl)):
+		return false
+	data["boosters"][id] = lvl + 1
+	save_game()
+	return true
 
 
 # --- Munition ----------------------------------------------------------------

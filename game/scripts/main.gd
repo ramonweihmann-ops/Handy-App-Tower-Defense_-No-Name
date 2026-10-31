@@ -37,6 +37,8 @@ var bonus := {}
 var updater: Updater
 var menu: MainMenu
 var _xp_carry := 0.0
+var _boosters: Array[String] = []
+var _booster_cd: Array[float] = []
 
 var _overlay: Control
 var _column: VBoxContainer
@@ -51,6 +53,7 @@ func _ready() -> void:
 	Engine.max_physics_steps_per_frame = 3
 	_parse_args()
 	Save.test_mode = _autotest
+	Sfx.muted = _autotest
 	if _autotest:
 		Save.data = Save.default_data()
 	_build_layout()
@@ -72,6 +75,7 @@ func _apply_speed(t: int) -> void:
 func _warm_up() -> void:
 	state = "loading"
 	hud.visible = false
+	Sfx.muted = true  # die Probeschüsse hinter dem Ladebildschirm bleiben still
 	var screen := LoadingScreen.new()
 	_set_screen(screen)
 	var steps := [
@@ -90,10 +94,10 @@ func _warm_up() -> void:
 		await _frames(4)
 	screen.set_progress(steps[2][0], steps[2][1])
 	var targets: Array[Enemy] = []
-	var x := -3.0
+	var x := -3.5
 	for kind in GameData.ENEMIES.keys():
 		targets.append(battle.spawn_enemy(kind, Vector3(x, 0, -8.0)))
-		x += 2.0
+		x += 1.0
 		await _frames(4)
 	await _frames(15)
 	screen.set_progress(steps[3][0], steps[3][1])
@@ -113,6 +117,8 @@ func _warm_up() -> void:
 	screen.set_progress(1.0, "Bereit!")
 	await _frames(25)
 	ball_run.reset()
+	Sfx.muted = false
+	Sfx.start_music()
 	show_menu()
 	print("LADEN_FERTIG")
 
@@ -242,6 +248,7 @@ func _build_layout() -> void:
 	battle.level_won.connect(_on_level_won)
 	battle.level_lost.connect(_on_level_lost)
 	hud.pause_pressed.connect(_on_pause)
+	hud.booster_pressed.connect(_use_booster)
 	hud.tempo_pressed.connect(_toggle_tempo)
 
 
@@ -262,7 +269,39 @@ func _fit_column() -> void:
 var _perf_t := 0.0
 
 
+func _update_boosters(delta: float) -> void:
+	for i in _boosters.size():
+		var id := _boosters[i]
+		var full := MetaData.booster_cd(id, Save.booster_level(id))
+		_booster_cd[i] = maxf(0.0, _booster_cd[i] - delta)
+		hud.set_booster_ready(i, 1.0 - _booster_cd[i] / full)
+
+
+func _use_booster(i: int) -> void:
+	if state != "battle" or i >= _boosters.size() or _booster_cd[i] > 0.0 or not battle.running:
+		return
+	var id := _boosters[i]
+	var lvl := Save.booster_level(id)
+	var power := MetaData.booster_power(lvl)
+	match id:
+		"luftangriff":
+			battle.booster_air_strike(power)
+		"medipack":
+			battle.repair_fence(0.25 * power, 0.0)
+		"zeitlupe":
+			battle.booster_slow(power)
+		"kuppel":
+			battle.booster_dome(power)
+		"munition":
+			ammo.add("normal", int(25 * power))
+	_booster_cd[i] = MetaData.booster_cd(id, lvl)
+	Sfx.play("whoosh", 0.05)
+	hud.show_banner(String(MetaData.BOOSTERS[id]["title"]) + "!")
+
+
 func _process(delta: float) -> void:
+	if state == "battle":
+		_update_boosters(delta)
 	# Leistungsmessung für Tests im Browser (erscheint in der Browser-Konsole)
 	_perf_t += delta / maxf(0.01, Engine.time_scale)
 	if _perf_t >= 2.0 and state == "battle":
@@ -280,6 +319,8 @@ func _process(delta: float) -> void:
 			if _auto_pull_t <= 0.0:
 				_auto_pull_t = 1.0
 				ball_run.try_manual_pull()
+				for i in _boosters.size():
+					_use_booster(i)
 
 
 # --- Bildschirme ----------------------------------------------------------
@@ -402,7 +443,13 @@ func start_level(n: int, hard_mode := false) -> void:
 	for g in bonus["gates"]:
 		ball_run.add_gate(g)
 	hud.visible = true
+	_boosters = Save.booster_slots()
+	_booster_cd.clear()
+	for id in _boosters:
+		# Zu Beginn sind Booster halb geladen
+		_booster_cd.append(MetaData.booster_cd(id, Save.booster_level(id)) * 0.5)
 	hud.reset(level, GameData.waves_in_level(level))
+	hud.set_boosters(_boosters)
 	hud.set_next_wave(battle.next_wave_text())
 	hud.set_xp(0, xp_needed)
 	hud.set_fence(battle.fence_hp, battle.fence_max)
@@ -481,6 +528,7 @@ func _open_card_pick() -> void:
 	if _autotest:
 		_on_card_picked(_auto_choose(cards))
 		return
+	Sfx.play("levelup", 0.0)
 	var s := _full_screen()
 	s.add_child(UiKit.dim(0.6))
 	var v := _centered(s, 22)
@@ -780,9 +828,14 @@ func _on_level_won() -> void:
 	_apply_speed(1)
 	var title := "Geschafft!"
 	var text := "Die Station hält. Level %d ist geschafft." % level
-	if level == GameData.LEVEL_COUNT:
-		title = "Die Schleimmutter ist besiegt!"
-		text = "Alle Level des Piloten sind geschafft. Jetzt wartet der Schwer-Modus!"
+	if GameData.is_boss_level(level):
+		var boss: String = GameData.ENEMIES[GameData.WORLDS[GameData.world_of(level)]["kinds"][3]]["name"]
+		title = "%s ist besiegt!" % boss
+		text = "Die %s ist befreit." % GameData.world_name(level)
+		if level == GameData.LEVEL_COUNT:
+			text += " Alle Level des Piloten sind geschafft – jetzt wartet der Schwer-Modus!"
+		elif level == GameData.LEVELS_PER_WORLD:
+			text += " Das Wurmloch öffnet sich zur nächsten Welt, und der Schwer-Modus ist frei."
 	_show_result(title, text, true, _grant_rewards(true))
 
 
@@ -797,6 +850,7 @@ func _on_level_lost() -> void:
 
 
 func _show_result(title: String, text: String, won: bool, rewards: Array = []) -> void:
+	Sfx.play("win" if won else "lose", 0.0)
 	var s := _full_screen()
 	s.add_child(UiKit.dim(0.65))
 	var v := _centered(s, 18)

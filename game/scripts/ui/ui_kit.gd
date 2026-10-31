@@ -26,6 +26,96 @@ static func box(color: Color, radius := 14, border := 0, border_color := Color.T
 	return sb
 
 
+## Weiche „Bonbon“-Fläche: abgerundet, Farbverlauf, Glanzkante oben, dunkler Rand, weicher
+## Schatten. Wird einmal als kleines Bild erzeugt und dann als 9-Slice gestreckt.
+## style: "button" (mit 3D-Kante unten), "panel" (ruhiger) oder "bar" (für Balken).
+static var _candy_cache := {}
+
+
+static func candy(color: Color, radius := 22, style := "button") -> StyleBoxTexture:
+	var key := "%s|%d|%s" % [color.to_html(), radius, style]
+	if _candy_cache.has(key):
+		return _candy_cache[key]
+	var pad := 10 if style != "bar" else 2
+	var inner := radius * 2 + 12
+	var size := inner + pad * 2
+	var img := Image.create(size, size, false, Image.FORMAT_RGBA8)
+	var r := float(radius)
+	var top := color.lightened(0.22)
+	var bottom := color.darkened(0.14)
+	var bevel := color.darkened(0.38)
+	var edge := color.darkened(0.5)
+	var bevel_h := 7.0 if style == "button" else 0.0
+	var gloss := 0.32 if style == "button" else (0.16 if style == "panel" else 0.4)
+	var c0 := Vector2(size * 0.5, size * 0.5)
+	var half := inner * 0.5
+	for y in size:
+		for x in size:
+			var p := Vector2(x + 0.5, y + 0.5)
+			var d := _rr_sdf(p - c0, half, r)
+			var col := Color(0, 0, 0, 0)
+			# weicher Schatten unter der Fläche
+			if style != "bar":
+				var ds := _rr_sdf(p - c0 - Vector2(0, 5), half, r)
+				var sa := clampf(1.0 - (ds + 1.0) / 9.0, 0.0, 1.0)
+				col = Color(0.02, 0.0, 0.08, 0.42 * sa * sa)
+			var a := clampf(0.5 - d, 0.0, 1.0)
+			if a > 0.0:
+				var t := clampf((p.y - (c0.y - half)) / inner, 0.0, 1.0)
+				var c := top.lerp(bottom, t)
+				if bevel_h > 0.0 and p.y > c0.y + half - bevel_h:
+					c = bevel
+				# Glanz in der oberen Hälfte
+				var inner_d := _rr_sdf(p - c0 - Vector2(0, 1), half - 4.0, maxf(2.0, r - 4.0))
+				if inner_d < 0.0 and t < 0.48:
+					c = c.lerp(Color(1, 1, 1), gloss * (1.0 - t / 0.48))
+				# dunkler Rand und helle Innenkante
+				if d > -2.2:
+					c = c.lerp(edge, 0.85)
+				elif d > -4.0 and t < 0.6:
+					c = c.lerp(Color(1, 1, 1), 0.28)
+				c.a = color.a
+				col = col.blend(Color(c.r, c.g, c.b, c.a * a)) if col.a > 0.0 else Color(c.r, c.g, c.b, c.a * a)
+			img.set_pixel(x, y, col)
+	var sb := StyleBoxTexture.new()
+	sb.texture = ImageTexture.create_from_image(img)
+	var m := float(radius + pad + 4)
+	sb.texture_margin_left = m
+	sb.texture_margin_right = m
+	sb.texture_margin_top = m
+	sb.texture_margin_bottom = m
+	sb.expand_margin_left = pad
+	sb.expand_margin_right = pad
+	sb.expand_margin_top = pad
+	sb.expand_margin_bottom = pad
+	sb.content_margin_left = 16
+	sb.content_margin_right = 16
+	sb.content_margin_top = 10
+	sb.content_margin_bottom = 10 + bevel_h * 0.6
+	_candy_cache[key] = sb
+	return sb
+
+
+## Abstand eines Punkts zu einem abgerundeten Quadrat (negativ = innen).
+static func _rr_sdf(p: Vector2, half: float, r: float) -> float:
+	var q := Vector2(absf(p.x), absf(p.y)) - Vector2(half - r, half - r)
+	return Vector2(maxf(q.x, 0.0), maxf(q.y, 0.0)).length() + minf(maxf(q.x, q.y), 0.0) - r
+
+
+## Knöpfe federn beim Drücken leicht nach.
+static func add_pop(b: Control) -> void:
+	b.resized.connect(func() -> void: b.pivot_offset = b.size * 0.5)
+	b.gui_input.connect(func(e: InputEvent) -> void:
+		if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT:
+			var tw := b.create_tween()
+			if e.pressed:
+				tw.tween_property(b, "scale", Vector2(0.93, 0.93), 0.06)
+			else:
+				tw.tween_property(b, "scale", Vector2(1.04, 1.04), 0.08)
+				tw.tween_property(b, "scale", Vector2.ONE, 0.1)
+	)
+
+
 ## Kräftigere Schrift für das ganze Spiel (auch für selbst gezeichnete Texte).
 static func use_bold_font() -> void:
 	if ThemeDB.fallback_font is FontVariation:
@@ -45,20 +135,10 @@ static func make_theme() -> Theme:
 	t.set_color("font_outline_color", "Label", Color(0, 0, 0, 0.8))
 	t.set_constant("outline_size", "Label", 6)
 
-	var normal := box(C_GOLD, 16)
-	normal.border_width_bottom = 6
-	normal.border_color = Color(0.72, 0.48, 0.08)
-	normal.shadow_size = 6
-	normal.shadow_offset = Vector2(0, 4)
-	normal.shadow_color = Color(0, 0, 0, 0.4)
-	var hover := normal.duplicate() as StyleBoxFlat
-	hover.bg_color = C_GOLD.lightened(0.15)
-	var pressed := normal.duplicate() as StyleBoxFlat
-	pressed.bg_color = C_GOLD.darkened(0.1)
-	pressed.border_width_bottom = 2
-	var disabled := normal.duplicate() as StyleBoxFlat
-	disabled.bg_color = Color(0.35, 0.37, 0.45)
-	disabled.border_color = Color(0.25, 0.27, 0.33)
+	var normal := candy(C_GOLD, 22, "button")
+	var hover := candy(C_GOLD.lightened(0.08), 22, "button")
+	var pressed := candy(C_GOLD.darkened(0.06), 22, "button")
+	var disabled := candy(Color(0.42, 0.44, 0.55), 22, "button")
 	t.set_stylebox("normal", "Button", normal)
 	t.set_stylebox("hover", "Button", hover)
 	t.set_stylebox("pressed", "Button", pressed)
@@ -69,9 +149,9 @@ static func make_theme() -> Theme:
 	t.set_color("font_disabled_color", "Button", Color(0.75, 0.78, 0.85))
 	t.set_font_size("font_size", "Button", 28)
 
-	t.set_stylebox("background", "ProgressBar", box(Color(0, 0, 0, 0.55), 8))
-	t.set_stylebox("fill", "ProgressBar", box(C_ACCENT, 8))
-	t.set_stylebox("panel", "PanelContainer", box(C_PANEL, 18, 2, Color(0.25, 0.4, 0.6)))
+	t.set_stylebox("background", "ProgressBar", box(Color(0.02, 0.0, 0.08, 0.6), 12))
+	t.set_stylebox("fill", "ProgressBar", candy(C_ACCENT, 10, "bar"))
+	t.set_stylebox("panel", "PanelContainer", candy(Color(0.2, 0.16, 0.42), 24, "panel"))
 	return t
 
 
@@ -95,26 +175,21 @@ static func button(text: String, on_press: Callable, min_width := 280.0) -> Butt
 	b.text = text
 	b.custom_minimum_size = Vector2(min_width, 72)
 	b.pressed.connect(on_press)
+	add_pop(b)
 	return b
 
 
 ## Blauer Nebenknopf (z. B. „Menü“).
 static func secondary(b: Button) -> Button:
-	var normal := box(Color(0.2, 0.32, 0.55), 16)
-	normal.border_width_bottom = 6
-	normal.border_color = Color(0.1, 0.18, 0.35)
-	normal.shadow_size = 6
-	normal.shadow_offset = Vector2(0, 4)
-	normal.shadow_color = Color(0, 0, 0, 0.4)
-	var hover := normal.duplicate() as StyleBoxFlat
-	hover.bg_color = normal.bg_color.lightened(0.12)
-	var pressed := normal.duplicate() as StyleBoxFlat
-	pressed.border_width_bottom = 2
-	b.add_theme_stylebox_override("normal", normal)
-	b.add_theme_stylebox_override("hover", hover)
-	b.add_theme_stylebox_override("pressed", pressed)
+	var base := Color(0.3, 0.42, 0.95)
+	b.add_theme_stylebox_override("normal", candy(base, 22, "button"))
+	b.add_theme_stylebox_override("hover", candy(base.lightened(0.08), 22, "button"))
+	b.add_theme_stylebox_override("pressed", candy(base.darkened(0.06), 22, "button"))
+	b.add_theme_stylebox_override("disabled", candy(Color(0.35, 0.37, 0.5), 22, "button"))
 	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
 		b.add_theme_color_override(state, C_TEXT)
+	b.add_theme_color_override("font_outline_color", Color(0.05, 0.05, 0.2, 0.8))
+	b.add_theme_constant_override("outline_size", 5)
 	return b
 
 

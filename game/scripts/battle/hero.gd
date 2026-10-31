@@ -33,6 +33,11 @@ var _target_x := 0.0
 const VIS_SCALE := 1.4
 
 
+## Ton beim Schuss je Waffenfamilie.
+const SHOT_SOUND := {"revolver": "shot", "mg": "shot_light", "rocket": "launch", "tesla": "zap",
+	"cryo": "frost", "shotgun": "shot_heavy", "sniper": "shot_heavy", "flamer": "flame"}
+
+
 func setup(id_: String, battle_: Battle) -> void:
 	id = id_
 	battle = battle_
@@ -141,6 +146,7 @@ func _fire(target: Enemy) -> void:
 	var crit := randf() < crit_chance()
 	var dmg := damage() * (2.0 if crit else 1.0)
 	var from := _muzzle.global_position
+	Sfx.play(SHOT_SOUND.get(family(), "shot"))
 	match family():
 		"revolver":
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, 0, 30.0, 1.0)

@@ -55,6 +55,7 @@ var _asteroids: Array[Node3D] = []
 var _target_cache: Enemy
 var _flame_tick := 0
 var _env: Environment
+var _rim: OmniLight3D
 var _sun: DirectionalLight3D
 var _target_frame := -1
 
@@ -62,6 +63,16 @@ var _target_frame := -1
 func _ready() -> void:
 	_build_world()
 	apply_quality()
+
+
+## Farben des Wurmlochs und Licht passend zur Welt.
+func _apply_world() -> void:
+	var w: Dictionary = GameData.WORLDS[GameData.world_of(level)]
+	if _wormhole_mat:
+		_wormhole_mat.set_shader_parameter("c1", w["c1"])
+		_wormhole_mat.set_shader_parameter("c2", w["c2"])
+	if _rim:
+		_rim.light_color = w["rim"]
 
 
 ## Grafikstufe aus den Einstellungen: Hoch = Leuchten und Schatten, Sparsam = ohne.
@@ -82,6 +93,7 @@ func setup(level_: int, ammo_: AmmoStore) -> void:
 	fence_max = 1000.0 + 300.0 * (level - 1)
 	fence_hp = fence_max
 	total_waves = GameData.waves_in_level(level)
+	_apply_world()
 	_plan.clear()
 	for w in range(1, total_waves + 1):
 		_plan.append(GameData.wave_spawns(level, w))
@@ -151,6 +163,7 @@ func _process(delta: float) -> void:
 	if not running:
 		return
 	elapsed += delta
+	shield_guard = maxf(0.0, shield_guard - delta)
 	if ammo:
 		var ratio := float(ammo.total()) / maxf(1.0, ammo.cap)
 		fill_sum += ratio * delta
@@ -169,7 +182,8 @@ func _update_spawning(delta: float) -> void:
 		if _spawn_timer <= 0.0:
 			var kind: String = _spawn_queue.pop_front()
 			spawn_enemy(kind)
-			_spawn_timer = randf_range(0.45, 0.95) * (1.8 if kind == "panzerkaefer" else 1.0)
+			var tier: String = GameData.ENEMIES[kind]["tier"]
+			_spawn_timer = randf_range(0.45, 0.95) * (1.8 if tier == "stark" else 1.0)
 		return
 	_wave_timer += delta
 	if wave < total_waves:
@@ -200,7 +214,9 @@ func next_wave_text() -> String:
 			order.append(kind)
 		counts[kind] = int(counts.get(kind, 0)) + 1
 	var parts: Array[String] = []
-	for kind in ["schleimmutter", "panzerkaefer", "tentakler", "schleimling"]:
+	var kinds: Array = GameData.WORLDS[GameData.world_of(level)]["kinds"].duplicate()
+	kinds.reverse()
+	for kind in kinds:
 		if counts.has(kind):
 			var d: Dictionary = GameData.ENEMIES[kind]
 			var n: int = counts[kind]
@@ -220,7 +236,7 @@ func spawn_enemy(kind: String, pos := Vector3.INF) -> Enemy:
 	if pos.z < SPAWN_Z + 3.0:
 		# Auftauchen aus dem Wurmloch
 		Fx.flash(self, pos + Vector3(0, 0.8, 0), Color(0.75, 0.35, 1.0), 1.6, 0.4)
-	if kind == "schleimmutter":
+	if GameData.ENEMIES[kind]["tier"] == "boss":
 		Fx.flash(self, pos + Vector3(0, 1.5, 0), Color(1.0, 0.3, 0.9), 5.0, 0.6)
 		add_shake(0.5)
 	return e
@@ -237,6 +253,12 @@ func on_enemy_died(e: Enemy) -> void:
 			col = Color(0.3, 0.95, 0.9)
 		"schleimmutter":
 			col = Color(1.0, 0.35, 0.85)
+		"krabbler", "zombie":
+			col = Color(0.55, 0.75, 0.35)
+		"brecher":
+			col = Color(0.6, 0.6, 0.55)
+		"koloss":
+			col = Color(0.7, 1.0, 0.3)
 	Fx.burst(self, e.aim_point(), col, 10 + int(e.size * 10), 4.0 + e.size * 2.0, 0.08 + e.size * 0.05)
 	if e.is_boss():
 		Fx.flash(self, e.aim_point(), col, 6.0, 0.5)
@@ -245,7 +267,7 @@ func on_enemy_died(e: Enemy) -> void:
 
 
 func damage_fence(amount: float) -> void:
-	if not running:
+	if not running or shield_guard > 0.0:
 		return
 	fence_hp -= amount
 	_fence_flash = minf(1.0, _fence_flash + amount * 0.02)
@@ -256,6 +278,39 @@ func damage_fence(amount: float) -> void:
 		level_lost.emit()
 		return
 	fence_changed.emit(fence_hp, fence_max)
+
+
+## Booster: Bomben auf fünf Stellen der Bahn
+func booster_air_strike(power: float) -> void:
+	var spots: Array[Vector3] = []
+	# Zuerst dort, wo Gegner stehen
+	for e in enemies:
+		if spots.size() >= 5:
+			break
+		if e.ready_as_target():
+			spots.append(e.global_position)
+	while spots.size() < 5:
+		spots.append(Vector3(randf_range(-3.5, 3.5), 0, randf_range(-20.0, -4.0)))
+	for i in spots.size():
+		var p := spots[i]
+		get_tree().create_timer(0.15 * i).timeout.connect(func() -> void:
+			explode(p, 2.3, 140.0 * power * GameData.hp_mult(level, maxi(wave, 1)), false, "fire"))
+
+
+## Booster: alle Gegner verlangsamen
+func booster_slow(power: float) -> void:
+	for e in enemies:
+		e.apply_slow(clampf(0.6 * power, 0.0, 0.85), 5.0)
+	Fx.flash(self, Vector3(0, 1, -12), Color(0.5, 0.85, 1.0), 12.0, 0.5)
+
+
+## Booster: Schild kurz unverwundbar
+var shield_guard := 0.0
+
+
+func booster_dome(power: float) -> void:
+	shield_guard = 4.0 * power
+	_fence_flash = 1.0
 
 
 func repair_fence(fraction: float, raise_max: float) -> void:
@@ -413,6 +468,7 @@ func explode(pos: Vector3, radius: float, dmg: float, crit: bool, ammo_type: Str
 	var col: Color = Projectile.AMMO_COLORS.get(ammo_type, Color.WHITE)
 	if ammo_type == "normal":
 		col = Color(1.0, 0.6, 0.2)
+	Sfx.play("boom", 0.12, -3.0)
 	Fx.flash(self, pos, col, radius, 0.28)
 	Fx.burst(self, pos, col, 14, 6.0, 0.12, 0.5)
 	add_shake(0.22)
@@ -427,6 +483,8 @@ func _animate_world(delta: float) -> void:
 		var offset := Vector3(randf_range(-s, s), randf_range(-s, s), 0)
 		camera.transform = _cam_base.translated_local(offset)
 	_fence_flash = maxf(0.0, _fence_flash - delta * 3.0)
+	if shield_guard > 0.0:
+		_fence_flash = maxf(_fence_flash, 0.6 + 0.3 * sin(Time.get_ticks_msec() * 0.01))
 	if _fence_mat:
 		_fence_mat.set_shader_parameter("hit", _fence_flash)
 		_fence_mat.set_shader_parameter("health", fence_hp / maxf(1.0, fence_max))
@@ -477,6 +535,7 @@ func _build_world() -> void:
 	rim.light_energy = 2.5
 	rim.omni_range = 22.0
 	add_child(rim)
+	_rim = rim
 
 	camera = Camera3D.new()
 	camera.keep_aspect = Camera3D.KEEP_WIDTH

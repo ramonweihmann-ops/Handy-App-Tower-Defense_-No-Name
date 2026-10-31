@@ -15,6 +15,7 @@ boot_splash/show_image=false
 [autoload]
 
 Save="*res://scripts/save_game.gd"
+Sfx="*res://scripts/sfx.gd"
 
 [display]
 

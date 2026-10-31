@@ -109,6 +109,28 @@ func _draw() -> void:
 			draw_rect(Rect2(c + Vector2(-r * 0.35, r * 0.4), Vector2(r * 0.7, r * 0.4)), Color(0.9, 0.9, 0.95))
 			draw_circle(c + Vector2(-r * 0.28, -r * 0.1), r * 0.18, Color(0.2, 0.15, 0.3))
 			draw_circle(c + Vector2(r * 0.28, -r * 0.1), r * 0.18, Color(0.2, 0.15, 0.3))
+		"plane":
+			draw_colored_polygon(PackedVector2Array([c + Vector2(0, -r * 0.9), c + Vector2(r * 0.15, -r * 0.2), c + Vector2(r * 0.9, r * 0.15),
+				c + Vector2(r * 0.9, r * 0.35), c + Vector2(r * 0.15, r * 0.2), c + Vector2(r * 0.12, r * 0.6), c + Vector2(r * 0.4, r * 0.85),
+				c + Vector2(-r * 0.4, r * 0.85), c + Vector2(-r * 0.12, r * 0.6), c + Vector2(-r * 0.15, r * 0.2), c + Vector2(-r * 0.9, r * 0.35),
+				c + Vector2(-r * 0.9, r * 0.15), c + Vector2(-r * 0.15, -r * 0.2)]), Color(0.75, 0.85, 1.0))
+		"medic":
+			draw_rect(Rect2(c + Vector2(-r * 0.75, -r * 0.55), Vector2(r * 1.5, r * 1.2)), Color(0.95, 0.95, 1.0))
+			draw_rect(Rect2(c + Vector2(-r * 0.15, -r * 0.4), Vector2(r * 0.3, r * 0.9)), Color(0.95, 0.25, 0.3))
+			draw_rect(Rect2(c + Vector2(-r * 0.45, -r * 0.1), Vector2(r * 0.9, r * 0.3)), Color(0.95, 0.25, 0.3))
+		"clock":
+			draw_circle(c, r * 0.85, Color(0.55, 0.85, 1.0))
+			draw_circle(c, r * 0.68, Color(0.12, 0.2, 0.35))
+			draw_line(c, c + Vector2(0, -r * 0.5), Color(1, 1, 1), r * 0.12)
+			draw_line(c, c + Vector2(r * 0.38, 0), Color(1, 1, 1), r * 0.12)
+		"dome":
+			draw_arc(c + Vector2(0, r * 0.4), r * 0.85, PI, TAU, 24, Color(0.4, 0.9, 1.0), r * 0.2)
+			draw_rect(Rect2(c + Vector2(-r * 0.9, r * 0.35), Vector2(r * 1.8, r * 0.18)), Color(0.75, 0.8, 0.9))
+		"crate":
+			draw_rect(Rect2(c + Vector2(-r * 0.75, -r * 0.6), Vector2(r * 1.5, r * 1.3)), Color(0.75, 0.5, 0.25))
+			draw_rect(Rect2(c + Vector2(-r * 0.75, -r * 0.6), Vector2(r * 1.5, r * 1.3)), Color(0.45, 0.28, 0.12), false, r * 0.12)
+			for k in 3:
+				draw_circle(c + Vector2(-r * 0.35 + k * r * 0.35, -r * 0.05), r * 0.14, Color(1.0, 0.82, 0.28))
 	if badge:
 		var bc := Vector2(size.x - 6.0, 6.0)
 		draw_circle(bc, 10.0 + sin(_t * 5.0), Color(0.95, 0.2, 0.25))

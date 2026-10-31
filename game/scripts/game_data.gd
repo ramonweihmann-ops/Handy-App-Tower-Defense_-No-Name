@@ -105,44 +105,87 @@ const ENEMIES := {
 	"schleimmutter": {
 		"name": "Schleimmutter", "plural": "Schleimmütter", "tier": "boss",
 		"hp": 2000.0, "speed": 0.45, "xp": 0, "dps": 90.0, "size": 2.0, "armor": 0.1,
+		"minion": "schleimling",
+	},
+	# Welt 2: Zombie-Kolonie
+	"krabbler": {
+		"name": "Krabbler", "plural": "Krabbler", "tier": "leicht",
+		"hp": 34.0, "speed": 2.6, "xp": 1, "dps": 10.0, "size": 0.6, "armor": 0.0,
+	},
+	"zombie": {
+		"name": "Zombie", "plural": "Zombies", "tier": "mittel",
+		"hp": 120.0, "speed": 1.2, "xp": 3, "dps": 22.0, "size": 0.85, "armor": 0.0,
+	},
+	"brecher": {
+		"name": "Brecher", "plural": "Brecher", "tier": "stark",
+		"hp": 420.0, "speed": 0.75, "xp": 9, "dps": 50.0, "size": 1.1, "armor": 0.35,
+	},
+	"koloss": {
+		"name": "Zombie-Koloss", "plural": "Zombie-Kolosse", "tier": "boss",
+		"hp": 3400.0, "speed": 0.4, "xp": 0, "dps": 120.0, "size": 2.2, "armor": 0.15,
+		"minion": "krabbler",
 	},
 }
 
-const LEVEL_COUNT := 5
+## Welten hinter dem Wurmloch: je 5 Level, Gegner nach Stärke (leicht, mittel, stark, Boss).
+const WORLDS := [
+	{"name": "Schleim-Welt", "kinds": ["schleimling", "tentakler", "panzerkaefer", "schleimmutter"],
+		"c1": Color(0.62, 0.22, 1.0), "c2": Color(0.1, 0.9, 0.85), "rim": Color(0.7, 0.35, 1.0)},
+	{"name": "Zombie-Kolonie", "kinds": ["krabbler", "zombie", "brecher", "koloss"],
+		"c1": Color(0.35, 0.85, 0.2), "c2": Color(0.95, 0.85, 0.2), "rim": Color(0.5, 1.0, 0.3)},
+]
+const LEVELS_PER_WORLD := 5
+
+
+static func world_of(level: int) -> int:
+	return clampi((level - 1) / LEVELS_PER_WORLD, 0, WORLDS.size() - 1)
+
+
+static func world_name(level: int) -> String:
+	return WORLDS[world_of(level)]["name"]
+
+
+static func is_boss_level(level: int) -> bool:
+	return level % LEVELS_PER_WORLD == 0
+
+const LEVEL_COUNT := 10
 
 
 static func waves_in_level(level: int) -> int:
-	return 5 + level
+	return 5 + (level - 1) % LEVELS_PER_WORLD + 1 + world_of(level)
 
 
 static func hp_mult(level: int, wave: int) -> float:
 	return 1.0 + 0.2 * (level - 1) + 0.04 * (wave - 1)
 
 
-## Stellt die Gegner einer Welle zusammen.
+## Stellt die Gegner einer Welle zusammen (Art nach Welt, Menge nach Level in der Welt).
 static func wave_spawns(level: int, wave: int) -> Array[String]:
 	var list: Array[String] = []
+	var kinds: Array = WORLDS[world_of(level)]["kinds"]
+	var lw := (level - 1) % LEVELS_PER_WORLD + 1
+	var extra := world_of(level)
 	var total := waves_in_level(level)
-	var light := 2 + int(wave * 0.7) + level
+	var light := 2 + int(wave * 0.7) + lw + extra
 	var mid := 0
 	if wave >= 2:
-		mid = int((wave - 1) * 0.55 + (level - 1) * 0.6)
+		mid = int((wave - 1) * 0.55 + (lw - 1) * 0.6) + extra
 	var heavy := 0
-	if level >= 2 and wave >= 3:
+	if (lw >= 2 or extra > 0) and wave >= 3:
 		heavy = int((wave - 2) / 3.0)
-		if level >= 4 and wave % 2 == 0:
+		if lw >= 4 and wave % 2 == 0:
 			heavy += 1
-	if wave == total and level < LEVEL_COUNT:
+	if wave == total and not is_boss_level(level):
 		heavy += 1
 	for i in light:
-		list.append("schleimling")
+		list.append(kinds[0])
 	for i in mid:
-		list.append("tentakler")
+		list.append(kinds[1])
 	for i in heavy:
-		list.append("panzerkaefer")
+		list.append(kinds[2])
 	list.shuffle()
-	if level == LEVEL_COUNT and wave == total:
-		list.append("schleimmutter")
+	if is_boss_level(level) and wave == total:
+		list.append(kinds[3])
 	return list
 
 

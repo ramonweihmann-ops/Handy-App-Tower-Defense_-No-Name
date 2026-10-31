@@ -34,6 +34,7 @@ var _modal: Control
 var _toast: Label
 var _toast_t := 0.0
 var _tick := 0.0
+var _bg_mat: ShaderMaterial
 
 
 func _ready() -> void:
@@ -42,13 +43,13 @@ func _ready() -> void:
 	var bg := ColorRect.new()
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var mat := ShaderMaterial.new()
-	mat.shader = preload("res://shaders/loading_bg.gdshader")
-	mat.set_shader_parameter("hole_center", Vector2(0.5, 0.42))
+	mat.shader = preload("res://shaders/menu_bg.gdshader")
 	bg.material = mat
+	_bg_mat = mat
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
 	var shade := ColorRect.new()
-	shade.color = Color(0.03, 0.03, 0.09, 0.55)
+	shade.color = Color(0.03, 0.02, 0.09, 0.15)
 	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(shade)
@@ -112,6 +113,8 @@ func _process(delta: float) -> void:
 	if _tick >= 1.0:
 		_tick = 0.0
 		_refresh_top()
+	if _bg_mat and size.y > 0.0:
+		_bg_mat.set_shader_parameter("aspect", Vector2(size.x / size.y, 1.0))
 	if _toast_t > 0.0:
 		_toast_t -= delta
 		_toast.modulate.a = clampf(_toast_t * 2.0, 0.0, 1.0)
@@ -121,13 +124,17 @@ func _process(delta: float) -> void:
 
 func _build_top_bar() -> Control:
 	var panel := PanelContainer.new()
-	var sb := UiKit.box(Color(0.08, 0.07, 0.2, 0.95), 0)
-	sb.border_width_bottom = 3
-	sb.border_color = Color(0.45, 0.3, 0.8)
+	var sb := UiKit.box(Color(0.12, 0.07, 0.3, 0.85), 0)
+	sb.border_width_bottom = 2
+	sb.border_color = Color(1.0, 0.75, 0.4, 0.5)
+	sb.corner_radius_bottom_left = 28
+	sb.corner_radius_bottom_right = 28
+	sb.shadow_size = 12
+	sb.shadow_color = Color(0, 0, 0, 0.35)
 	sb.content_margin_top = 14
 	sb.content_margin_bottom = 12
-	sb.content_margin_left = 8
-	sb.content_margin_right = 8
+	sb.content_margin_left = 10
+	sb.content_margin_right = 10
 	panel.add_theme_stylebox_override("panel", sb)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 5)
@@ -135,9 +142,9 @@ func _build_top_bar() -> Control:
 	var avatar := Button.new()
 	avatar.custom_minimum_size = Vector2(58, 58)
 	avatar.text = String(Save.data["name"]).left(1)
-	avatar.add_theme_stylebox_override("normal", UiKit.box(Color(0.2, 0.5, 0.95), 32, 3, Color(0.6, 0.85, 1.0)))
-	avatar.add_theme_stylebox_override("hover", UiKit.box(Color(0.25, 0.55, 1.0), 32, 3, Color(0.6, 0.85, 1.0)))
-	avatar.add_theme_stylebox_override("pressed", UiKit.box(Color(0.25, 0.55, 1.0), 32, 3, Color(0.6, 0.85, 1.0)))
+	for st in ["normal", "hover", "pressed"]:
+		avatar.add_theme_stylebox_override(st, UiKit.candy(Color(0.3, 0.55, 1.0), 26, "button"))
+	UiKit.add_pop(avatar)
 	avatar.add_theme_color_override("font_color", Color(1, 1, 1))
 	avatar.pressed.connect(_open_settings)
 	row.add_child(avatar)
@@ -157,11 +164,11 @@ func _build_top_bar() -> Control:
 
 func _pill(row: HBoxContainer, icon: String, on_plus: Callable) -> Label:
 	var pill := PanelContainer.new()
-	var sb := UiKit.box(Color(0.03, 0.03, 0.1, 0.9), 14)
+	var sb := UiKit.box(Color(0.05, 0.02, 0.14, 0.75), 20, 2, Color(1, 1, 1, 0.12))
 	sb.content_margin_left = 4
 	sb.content_margin_right = 3
-	sb.content_margin_top = 6
-	sb.content_margin_bottom = 6
+	sb.content_margin_top = 5
+	sb.content_margin_bottom = 5
 	pill.add_theme_stylebox_override("panel", sb)
 	pill.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(pill)
@@ -177,9 +184,11 @@ func _pill(row: HBoxContainer, icon: String, on_plus: Callable) -> Label:
 	plus.text = "+"
 	plus.custom_minimum_size = Vector2(30, 34)
 	plus.add_theme_font_size_override("font_size", 24)
-	plus.add_theme_stylebox_override("normal", UiKit.box(Color(0.3, 0.8, 0.3), 8))
-	plus.add_theme_stylebox_override("hover", UiKit.box(Color(0.35, 0.9, 0.35), 8))
-	plus.add_theme_stylebox_override("pressed", UiKit.box(Color(0.25, 0.7, 0.25), 8))
+	for st in ["normal", "hover", "pressed"]:
+		plus.add_theme_stylebox_override(st, UiKit.candy(Color(0.35, 0.85, 0.3), 12, "bar"))
+	plus.add_theme_color_override("font_outline_color", Color(0, 0.2, 0, 0.8))
+	plus.add_theme_constant_override("outline_size", 4)
+	UiKit.add_pop(plus)
 	plus.add_theme_color_override("font_color", Color(1, 1, 1))
 	plus.pressed.connect(on_plus)
 	h.add_child(plus)
@@ -204,9 +213,7 @@ static func _short(n: int) -> String:
 
 func _build_banner() -> Control:
 	_banner = PanelContainer.new()
-	var sb := UiKit.box(Color(1.0, 0.6, 0.15), 0)
-	sb.content_margin_top = 8
-	sb.content_margin_bottom = 8
+	var sb := UiKit.candy(Color(1.0, 0.62, 0.2), 20, "panel")
 	_banner.add_theme_stylebox_override("panel", sb)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 10)
@@ -214,6 +221,7 @@ func _build_banner() -> Control:
 	_banner_label = UiKit.label("Neue Version verfügbar", 21, Color(0.12, 0.06, 0.0), HORIZONTAL_ALIGNMENT_LEFT)
 	_banner_label.add_theme_constant_override("outline_size", 0)
 	_banner_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_banner_label.custom_minimum_size = Vector2(360, 0)
 	_banner_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	row.add_child(_banner_label)
 	_banner_button = UiKit.secondary(UiKit.button("Jetzt aktualisieren", _on_update_pressed, 220))
@@ -253,13 +261,17 @@ func _on_download_failed(message: String) -> void:
 
 func _build_nav() -> Control:
 	var panel := PanelContainer.new()
-	var sb := UiKit.box(Color(0.12, 0.2, 0.55), 0)
-	sb.content_margin_left = 0
-	sb.content_margin_right = 0
-	sb.content_margin_top = 0
-	sb.content_margin_bottom = 0
-	sb.border_width_top = 3
-	sb.border_color = Color(0.35, 0.55, 1.0)
+	var sb := UiKit.box(Color(0.14, 0.08, 0.34, 0.95), 0)
+	sb.corner_radius_top_left = 30
+	sb.corner_radius_top_right = 30
+	sb.content_margin_left = 8
+	sb.content_margin_right = 8
+	sb.content_margin_top = 8
+	sb.content_margin_bottom = 10
+	sb.border_width_top = 2
+	sb.border_color = Color(1.0, 0.75, 0.4, 0.45)
+	sb.shadow_size = 14
+	sb.shadow_color = Color(0, 0, 0, 0.4)
 	panel.add_theme_stylebox_override("panel", sb)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 2)
@@ -270,6 +282,7 @@ func _build_nav() -> Control:
 		b.custom_minimum_size = Vector2(0, 118)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.pressed.connect(func() -> void: show_tab(id))
+		UiKit.add_pop(b)
 		var v := VBoxContainer.new()
 		v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		v.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -290,9 +303,11 @@ func show_tab(id: String) -> void:
 	for k in _nav.keys():
 		var b: Button = _nav[k]
 		var active: bool = k == id
-		var col := Color(0.35, 0.85, 0.3) if active else Color(0.14, 0.25, 0.62)
 		for state in ["normal", "hover", "pressed"]:
-			b.add_theme_stylebox_override(state, UiKit.box(col, 0))
+			if active:
+				b.add_theme_stylebox_override(state, UiKit.candy(Color(1.0, 0.62, 0.25), 24, "button"))
+			else:
+				b.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	for c in _content.get_children():
 		c.queue_free()
 	var page: Control
@@ -309,6 +324,15 @@ func show_tab(id: String) -> void:
 			page = _tab_kampf()
 	page.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_content.add_child(page)
+	# Weich einblenden: nur Ränder oben/unten verschieben, nie die Breite anfassen
+	page.modulate.a = 0.0
+	page.offset_top = 18.0
+	page.offset_bottom = 18.0
+	var tw := page.create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(page, "modulate:a", 1.0, 0.18)
+	tw.tween_property(page, "offset_top", 0.0, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(page, "offset_bottom", 0.0, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_refresh_top()
 
 
@@ -316,11 +340,9 @@ func show_tab(id: String) -> void:
 
 func _panel(color := Color(0.1, 0.12, 0.25, 0.92), border := Color(0.3, 0.4, 0.7)) -> PanelContainer:
 	var p := PanelContainer.new()
-	var sb := UiKit.box(color, 16, 2, border)
-	sb.shadow_size = 8
-	sb.shadow_offset = Vector2(0, 4)
-	sb.shadow_color = Color(0, 0, 0, 0.45)
-	p.add_theme_stylebox_override("panel", sb)
+	# Kühle Grundfarben werden zu warmem Violett aufgehellt, damit alles freundlicher wirkt
+	var warm := Color(color.r * 0.8 + 0.12, color.g * 0.7 + 0.05, color.b * 0.8 + 0.18, maxf(0.9, color.a))
+	p.add_theme_stylebox_override("panel", UiKit.candy(warm, 24, "panel"))
 	return p
 
 
@@ -384,11 +406,12 @@ func _tab_kampf() -> Control:
 	# Battle Pass
 	var pass_btn := Button.new()
 	pass_btn.custom_minimum_size = Vector2(0, 100)
-	var gold_box := UiKit.box(Color(1.0, 0.72, 0.15), 16, 3, Color(1.0, 0.9, 0.55))
+	var gold_box := UiKit.candy(Color(1.0, 0.7, 0.2), 26, "button")
 	pass_btn.add_theme_stylebox_override("normal", gold_box)
 	pass_btn.add_theme_stylebox_override("hover", gold_box)
 	pass_btn.add_theme_stylebox_override("pressed", gold_box)
 	pass_btn.pressed.connect(open_battle_pass)
+	UiKit.add_pop(pass_btn)
 	var ph := HBoxContainer.new()
 	ph.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	ph.offset_left = 14
@@ -451,7 +474,7 @@ func _tab_kampf() -> Control:
 	center.add_child(sel)
 	var prev := _small_button("‹", func() -> void: _change_level(-1), 70, false)
 	sel.add_child(prev)
-	var name_l := UiKit.label("Level %d" % selected_level + (" · Boss" if selected_level == GameData.LEVEL_COUNT else ""), 26, UiKit.C_GOLD)
+	var name_l := UiKit.label("Level %d" % selected_level + (" · Boss" if GameData.is_boss_level(selected_level) else ""), 26, UiKit.C_GOLD)
 	name_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sel.add_child(name_l)
 	var next := _small_button("›", func() -> void: _change_level(1), 70, false)
@@ -500,11 +523,10 @@ func _tab_kampf() -> Control:
 func _side_button(icon: String, text: String, badge: bool, cb: Callable) -> Button:
 	var b := Button.new()
 	b.custom_minimum_size = Vector2(112, 118)
-	var sb := UiKit.box(Color(0.1, 0.12, 0.3, 0.9), 16, 2, Color(0.35, 0.45, 0.85))
-	b.add_theme_stylebox_override("normal", sb)
-	b.add_theme_stylebox_override("hover", UiKit.box(Color(0.15, 0.18, 0.4, 0.95), 16, 2, Color(0.5, 0.6, 1.0)))
-	b.add_theme_stylebox_override("pressed", sb)
+	for st in ["normal", "hover", "pressed"]:
+		b.add_theme_stylebox_override(st, UiKit.candy(Color(0.36, 0.22, 0.7), 24, "button"))
 	b.pressed.connect(cb)
+	UiKit.add_pop(b)
 	var v := VBoxContainer.new()
 	v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	v.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -523,10 +545,11 @@ func _segments() -> Control:
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", 6)
-	for n in range(1, GameData.LEVEL_COUNT + 1):
+	var first := GameData.world_of(selected_level) * GameData.LEVELS_PER_WORLD + 1
+	for n in range(first, first + GameData.LEVELS_PER_WORLD):
 		var won: bool = Save.data["won_levels"].has(("S" if hard else "N") + str(n))
 		var col := Color(1.0, 0.8, 0.25) if won else (Color(0.35, 0.9, 0.35) if n == selected_level else Color(0.3, 0.32, 0.42))
-		if n == GameData.LEVEL_COUNT:
+		if GameData.is_boss_level(n):
 			var ic := Icon.make("skull", 34)
 			row.add_child(ic)
 		else:
@@ -544,7 +567,7 @@ func _change_level(d: int) -> void:
 
 func _set_difficulty(key: String) -> void:
 	if key == "schwer" and not Save.hard_unlocked():
-		_info("Schwer", "Schwer wird freigeschaltet, wenn du die Schleimmutter in Level %d besiegt hast. Dann gibt es mehr Gegnerleben und 50 %% mehr Belohnung." % GameData.LEVEL_COUNT)
+		_info("Schwer", "Schwer wird freigeschaltet, wenn du die Schleimmutter in Level %d besiegt hast. Dann gibt es mehr Gegnerleben und 50 %% mehr Belohnung." % GameData.LEVELS_PER_WORLD)
 		return
 	hard = key == "schwer"
 	show_tab("kampf")
@@ -577,19 +600,7 @@ func _tab_sammlung() -> Control:
 		show_tab("sammlung")
 	))
 	if current == "booster":
-		v.add_child(_wrap_left("Booster sind Einsätze, die du im Kampf auslöst. Sie kommen in einer der nächsten Versionen.", 21, UiKit.C_MUTED))
-		for b in [["Luftangriff", "Ein Schiff bombardiert die ganze Bahn."], ["Medipack", "Repariert den Schild sofort."], ["Zeitlupe", "Alle Gegner werden kurz langsamer."], ["Schutzkuppel", "Der Zaun nimmt kurz keinen Schaden."]]:
-			var p := _panel(Color(0.1, 0.1, 0.18, 0.9), Color(0.25, 0.27, 0.35))
-			var h := HBoxContainer.new()
-			h.add_theme_constant_override("separation", 12)
-			p.add_child(h)
-			h.add_child(Icon.make("lock", 48))
-			var tv := VBoxContainer.new()
-			tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			tv.add_child(UiKit.label(b[0], 24, UiKit.C_MUTED, HORIZONTAL_ALIGNMENT_LEFT))
-			tv.add_child(_wrap_left(b[1], 18, UiKit.C_MUTED))
-			h.add_child(tv)
-			v.add_child(p)
+		_booster_list(v)
 		return page[0]
 	var head := HBoxContainer.new()
 	var hl := UiKit.label("Aufstellung %d/%d" % [Save.squad().size(), MetaData.SQUAD_MAX], 24, UiKit.C_GOLD, HORIZONTAL_ALIGNMENT_LEFT)
@@ -607,6 +618,55 @@ func _tab_sammlung() -> Control:
 	return page[0]
 
 
+func _booster_list(v: VBoxContainer) -> void:
+	var slots := Save.booster_slots()
+	v.add_child(UiKit.label("Ausgerüstet %d/%d" % [slots.size(), MetaData.BOOSTER_SLOTS], 24, UiKit.C_GOLD, HORIZONTAL_ALIGNMENT_LEFT))
+	v.add_child(_wrap_left("Booster löst du im Kampf mit den runden Knöpfen aus. Danach brauchen sie eine Weile zum Aufladen.", 18, UiKit.C_MUTED))
+	for id in MetaData.BOOSTERS.keys():
+		var d: Dictionary = MetaData.BOOSTERS[id]
+		var unlocked := Save.booster_unlocked(id)
+		var equipped := slots.has(id)
+		var lvl := Save.booster_level(id)
+		var p := _panel(Color(0.3, 0.2, 0.55, 0.95) if equipped else Color(0.14, 0.12, 0.28, 0.92))
+		var h := HBoxContainer.new()
+		h.add_theme_constant_override("separation", 12)
+		p.add_child(h)
+		var ic := Icon.make(String(d["icon"]), 60)
+		if not unlocked:
+			ic.modulate = Color(0.4, 0.4, 0.5)
+		h.add_child(ic)
+		var tv := VBoxContainer.new()
+		tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var title := "%s · Stufe %d" % [d["title"], lvl] if unlocked else String(d["title"])
+		tv.add_child(UiKit.label(title, 22, UiKit.C_GOLD if equipped else UiKit.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT))
+		tv.add_child(_wrap_left(String(d["desc"]).replace("%%", "%"), 17, UiKit.C_MUTED))
+		if unlocked:
+			tv.add_child(_wrap_left("Aufladen: %d s · Wirkung %d %%" % [int(MetaData.booster_cd(id, lvl)), int(MetaData.booster_power(lvl) * 100)], 16, UiKit.C_MUTED))
+		else:
+			tv.add_child(_wrap_left("Freischaltung: Level %d gewinnen" % int(d["unlock"]), 16, UiKit.C_MUTED))
+		h.add_child(tv)
+		if unlocked:
+			var btns := VBoxContainer.new()
+			btns.add_theme_constant_override("separation", 6)
+			h.add_child(btns)
+			var booster_id: String = id
+			var eq := _small_button("Abnehmen" if equipped else "Ausrüsten", func() -> void:
+				var msg := Save.toggle_booster(booster_id)
+				if msg != "":
+					toast(msg)
+				show_tab("sammlung")
+			, 150, not equipped)
+			btns.add_child(eq)
+			var up := _small_button("Max." if lvl >= MetaData.BOOSTER_MAX else "%d Gold" % MetaData.booster_cost(lvl), func() -> void:
+				if Save.upgrade_booster(booster_id):
+					toast("%s: Stufe %d" % [d["title"], Save.booster_level(booster_id)])
+				show_tab("sammlung")
+			, 150, false)
+			up.disabled = lvl >= MetaData.BOOSTER_MAX or Save.gold() < MetaData.booster_cost(lvl)
+			btns.add_child(up)
+		v.add_child(p)
+
+
 ## Heldenkarte im Raster: Name, 3D-Porträt, Stufe oder Freischaltbedingung.
 func _hero_card(id: String) -> Control:
 	var d: Dictionary = GameData.HEROES[id]
@@ -616,10 +676,8 @@ func _hero_card(id: String) -> Control:
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	b.custom_minimum_size = Vector2(0, 300)
 	var border := col if unlocked else Color(0.3, 0.32, 0.42)
-	var sb := UiKit.box(Color(0.12, 0.14, 0.3) if unlocked else Color(0.09, 0.09, 0.16), 14, 3, border)
-	sb.shadow_size = 6
-	sb.shadow_color = Color(0, 0, 0, 0.45)
-	sb.shadow_offset = Vector2(0, 4)
+	var sb := UiKit.candy(Color(0.32, 0.2, 0.62) if unlocked else Color(0.2, 0.17, 0.3), 22, "panel")
+	UiKit.add_pop(b)
 	b.add_theme_stylebox_override("normal", sb)
 	b.add_theme_stylebox_override("hover", sb)
 	b.add_theme_stylebox_override("pressed", sb)
@@ -1152,10 +1210,12 @@ func _open_energy() -> void:
 
 func _open_bestiary() -> void:
 	var lines := []
-	for kind in ["schleimling", "tentakler", "panzerkaefer", "schleimmutter"]:
-		var d: Dictionary = GameData.ENEMIES[kind]
-		lines.append("• %s (%s)" % [d["name"], d["tier"]])
-	_info("Gegner der Schleim-Welt", "\n".join(PackedStringArray(lines)) + "\n\nAlle 5 Level wechselt später die Welt hinter dem Wurmloch.")
+	for w in GameData.WORLDS:
+		lines.append(String(w["name"]) + ":")
+		for kind in w["kinds"]:
+			var d: Dictionary = GameData.ENEMIES[kind]
+			lines.append("   • %s (%s)" % [d["name"], d["tier"]])
+	_info("Gegner hinter dem Wurmloch", "\n".join(PackedStringArray(lines)) + "\n\nAlle 5 Level wechselt die Welt hinter dem Wurmloch.")
 
 
 func _open_settings() -> void:
@@ -1171,6 +1231,20 @@ func _open_settings() -> void:
 		quality_changed.emit()
 		_open_settings()
 	, 420)))
+	var snd: bool = Save.data.get("sound", true)
+	var mus: bool = Save.data.get("music", true)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_child(UiKit.secondary(UiKit.button("Töne: %s" % ("an" if snd else "aus"), func() -> void:
+		Sfx.set_sound(not snd)
+		_open_settings()
+	, 204)))
+	row.add_child(UiKit.secondary(UiKit.button("Musik: %s" % ("an" if mus else "aus"), func() -> void:
+		Sfx.set_music(not mus)
+		_open_settings()
+	, 204)))
+	v.add_child(row)
 	v.add_child(UiKit.button("Nach Updates suchen", func() -> void:
 		_close_modal()
 		if updater:
@@ -1417,18 +1491,19 @@ class StageCard extends Control:
 		for i in n:
 			var x := size.x * (0.15 + 0.7 * float(i) / maxf(1.0, n - 1))
 			var y := size.y * 0.78 + sin(_t * 4.0 + i) * 4.0
-			var col := Color(0.35, 0.95, 0.45) if i % 3 != 2 else Color(0.65, 0.3, 0.9)
+			var zombies := GameData.world_of(level) == 1
+			var col := (Color(0.35, 0.95, 0.45) if i % 3 != 2 else Color(0.65, 0.3, 0.9)) if not zombies else (Color(0.5, 0.65, 0.4) if i % 3 != 2 else Color(0.45, 0.47, 0.5))
 			draw_circle(Vector2(x, y), 28.0, col)
 			draw_circle(Vector2(x - 9, y - 8), 8.0, Color(1, 1, 1))
 			draw_circle(Vector2(x + 9, y - 8), 8.0, Color(1, 1, 1))
 			draw_circle(Vector2(x - 9, y - 6), 4.0, Color(0, 0, 0))
 			draw_circle(Vector2(x + 9, y - 6), 4.0, Color(0, 0, 0))
-		if level == GameData.LEVEL_COUNT:
-			draw_circle(Vector2(size.x * 0.5, size.y * 0.6), 34.0, Color(0.95, 0.25, 0.75))
+		if GameData.is_boss_level(level):
+			draw_circle(Vector2(size.x * 0.5, size.y * 0.6), 34.0, Color(0.95, 0.25, 0.75) if GameData.world_of(level) == 0 else Color(0.55, 0.8, 0.3))
 			for k in 3:
 				draw_circle(Vector2(size.x * 0.5 - 14 + k * 14, size.y * 0.57), 6.0, Color(1, 1, 1))
 		var font := ThemeDB.fallback_font
-		var title := "%s%s" % [MetaData.STAGE_NAME, " · Schwer" if hard else ""]
+		var title := "%s%s" % [GameData.world_name(level), " · Schwer" if hard else ""]
 		draw_string_outline(font, Vector2(0, size.y - 16), title, HORIZONTAL_ALIGNMENT_CENTER, size.x, 26, 8, Color(0, 0, 0, 0.8))
 		draw_string(font, Vector2(0, size.y - 16), title, HORIZONTAL_ALIGNMENT_CENTER, size.x, 26, Color(1, 0.85, 0.3))
 

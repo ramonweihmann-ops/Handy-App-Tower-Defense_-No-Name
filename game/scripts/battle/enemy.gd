@@ -113,7 +113,7 @@ func _process(delta: float) -> void:
 	var spd := speed * (1.0 - _slow)
 	if not attacking:
 		position.z += spd * delta
-		if kind == "schleimling" or kind == "tentakler":
+		if data["tier"] == "leicht" or data["tier"] == "mittel":
 			position.x = clampf(_base_x + sin(_t * 1.4 + _phase) * 0.25, -3.9, 3.9)
 		if position.z >= Battle.FENCE_Z - (0.3 + radius()):
 			attacking = true
@@ -126,7 +126,7 @@ func _process(delta: float) -> void:
 			for i in 3:
 				var p := position + Vector3(randf_range(-1.6, 1.6), 0, randf_range(0.6, 1.4))
 				p.x = clampf(p.x, -3.8, 3.8)
-				battle.spawn_enemy("schleimling", p)
+				battle.spawn_enemy(String(data.get("minion", "schleimling")), p)
 			Fx.burst(battle, aim_point(), Color(0.95, 0.3, 0.85), 18, 5.0, 0.14)
 	_animate(delta, true)
 
@@ -181,6 +181,13 @@ func _animate(_delta: float, moving: bool) -> void:
 			_visual.scale *= Vector3(1.0 + breathe * 0.04, 1.0 - breathe * 0.05, 1.0 + breathe * 0.04)
 			for i in _wiggle.size():
 				_wiggle[i].rotation.z = sin(t * 3.0 + i) * 0.15
+		"krabbler", "zombie", "brecher", "koloss":
+			# Schlurfen: Beine und Arme schwingen gegenläufig
+			var spd := 9.0 if kind == "krabbler" else (5.0 if kind != "koloss" else 3.0)
+			_visual.rotation.z = sin(t * spd * 0.5 + _phase) * 0.06
+			for i in _wiggle.size():
+				var sgn := 1.0 if i % 2 == 0 else -1.0
+				_wiggle[i].rotation.x = sin(t * spd + _phase) * 0.5 * sgn if moving else 0.0
 	if attacking:
 		_visual.position.z = absf(sin(t * 6.0)) * 0.18
 
@@ -189,6 +196,7 @@ func _die() -> void:
 	if not alive:
 		return
 	alive = false
+	Sfx.play("boom" if is_boss() else "pop", 0.15)
 	battle.on_enemy_died(self)
 	var tw := create_tween()
 	tw.tween_property(_visual, "scale", _visual.scale * 1.35, 0.06)
@@ -211,6 +219,53 @@ func _eye(parent: Node3D, pos: Vector3, r: float, pupil_color := Color(0.05, 0.0
 	var pupil := Fx.sphere(r * 0.5, _m(pupil_color), 8, 4)
 	pupil.position = pos + Vector3(0, 0, r * 0.7)
 	parent.add_child(pupil)
+
+
+## Zombie aus einfachen Formen: hängende Haltung, Arme nach vorn, gelbe Augen.
+func _zombie(s: float, skin: Color, shirt: Color, armored: bool, crawl: bool) -> void:
+	var body := Node3D.new()
+	_visual.add_child(body)
+	body.scale = Vector3.ONE * s
+	if crawl:
+		body.rotation.x = 0.7
+		body.position.y = -0.25 * s
+	for sx in [-0.13, 0.13]:
+		var pivot := Node3D.new()
+		pivot.position = Vector3(sx, 0.48, 0)
+		body.add_child(pivot)
+		var leg := Fx.capsule(0.1, 0.5, _m(Color(0.25, 0.25, 0.3)))
+		leg.position.y = -0.24
+		pivot.add_child(leg)
+		_wiggle.append(pivot)
+	var torso := Fx.capsule(0.26, 0.72, _m(shirt))
+	torso.position.y = 0.82
+	torso.rotation.x = 0.25
+	body.add_child(torso)
+	var head := Fx.sphere(0.22, _m(skin, 0.05), 12, 6)
+	head.position = Vector3(0.03, 1.3, 0.12)
+	body.add_child(head)
+	for ex in [-0.08, 0.08]:
+		var eye := Fx.sphere(0.045, _m(Color(1.0, 0.9, 0.2), 3.0), 6, 3)
+		eye.position = Vector3(ex + 0.03, 1.33, 0.31)
+		body.add_child(eye)
+	for sx in [-0.28, 0.28]:
+		var pivot := Node3D.new()
+		pivot.position = Vector3(sx, 1.05, 0.05)
+		body.add_child(pivot)
+		var arm := Fx.capsule(0.07, 0.5, _m(skin))
+		arm.rotation.x = 1.35
+		arm.position = Vector3(0, -0.05, 0.25)
+		pivot.add_child(arm)
+		_wiggle.append(pivot)
+	if armored:
+		var plate := Fx.box(Vector3(0.6, 0.45, 0.15), _m(Color(0.5, 0.52, 0.55), 0.0, 0.8, 0.35))
+		plate.position = Vector3(0, 0.9, 0.24)
+		plate.rotation.x = 0.25
+		body.add_child(plate)
+		var helmet := Fx.sphere(0.24, _m(Color(0.45, 0.47, 0.5), 0.0, 0.8, 0.35), 12, 6)
+		helmet.scale = Vector3(1.0, 0.6, 1.0)
+		helmet.position = Vector3(0.03, 1.42, 0.12)
+		body.add_child(helmet)
 
 
 func _build_visual() -> void:
@@ -293,6 +348,17 @@ func _build_visual() -> void:
 			var aura := Fx.torus(1.5, 1.65, Fx.glow_mat(Color(1.0, 0.3, 0.9), 0.5))
 			aura.position.y = 0.05
 			_visual.add_child(aura)
+		"krabbler":
+			_zombie(0.62, Color(0.55, 0.7, 0.45), Color(0.45, 0.35, 0.3), false, true)
+		"zombie":
+			_zombie(0.95, Color(0.5, 0.65, 0.4), Color(0.3, 0.4, 0.6), false, false)
+		"brecher":
+			_zombie(1.25, Color(0.45, 0.58, 0.35), Color(0.35, 0.3, 0.28), true, false)
+		"koloss":
+			_zombie(2.1, Color(0.55, 0.75, 0.3), Color(0.4, 0.2, 0.3), true, false)
+			var tank := Fx.cylinder(0.45, 0.45, 1.3, _m(Color(0.6, 1.0, 0.3), 1.5, 0.3, 0.3), 12)
+			tank.position = Vector3(0, 2.6, -0.7)
+			_visual.add_child(tank)
 	_visual.scale = Vector3.ONE
 	if kind == "schleimmutter":
 		_visual.scale = Vector3.ONE
