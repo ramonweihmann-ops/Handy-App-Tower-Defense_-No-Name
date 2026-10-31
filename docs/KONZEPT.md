@@ -281,3 +281,17 @@ eine Zielkurve.
   83–100 %, Bosse ab 21 etwa 33–67 % / 67–100 %. Werte in `game/scripts/game_data.gd`.
 - Offen: Wirtschaft (Gold, Karten) so abstimmen, dass ein Spieler ohne Käufe wirklich so schnell
   aufsteigt, wie das Profil „Durchschnitt“ annimmt; schwächster Starthelden derzeit Lynx.
+
+### 9.2 Wirtschaft (Stand 31.10.2026, abgestimmt mit `scripts/economy-sim.py`)
+
+- **Gold pro Kampf:** 2 je besiegtem Gegner, dazu bei Sieg 800 + 80 × Level, bei Niederlage 400
+  (Trostpreis). **Karten je Held im Kampf:** bei Sieg 5 + 0,55 × Level, bei Niederlage die Hälfte.
+- **Basislager:** Ergänzung, keine Hauptquelle (0,5 × Stufe Karten pro Stunde, Speicher 4 + 3 × Stufe).
+- Ergebnis der Simulation: Ein Spieler ohne Käufe (10 Kämpfe am Tag, ab Level 21 im Schnitt 1,6
+  Versuche, bei Bossen 2,2) erreicht in jedem Level die Heldenstufe, von der die Schwierigkeitskurve
+  ausgeht (höchstens eine Stufe darüber). Gold sammelt sich ab Level 30 an: Platz für spätere
+  Goldsenken (Gebäude, Booster, neue Upgrades).
+- **Vorteil durch Käufe ist verhältnismäßig, nicht wachsend:** Zahlende sind in jedem Level etwa
+  gleich viel stärker (rund 25 %, entspricht 3 Heldenstufen, dazu Prime). Kaufangebote wachsen mit
+  dem Fortschritt (z. B. Heldentruhe: 10 + 1,5 × höchstes Level Karten), damit ein Kauf immer
+  ungefähr gleich viel bringt.

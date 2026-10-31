@@ -1022,11 +1022,13 @@ func _exit_tree() -> void:
 func _grant_rewards(won: bool) -> Array:
 	var mult := (1.5 if hard else 1.0) * (1.0 + float(bonus.get("gold", 0.0)))
 	var out: Array = []
-	var gold := int(round((battle.kills * 2 + (50 * level if won else 0)) * mult))
+	# Abgestimmt mit scripts/economy-sim.py: ohne Käufe reicht das Gold für die Heldenstufen,
+	# von denen die Schwierigkeitskurve ausgeht. Bei Niederlage gibt es einen Trostpreis.
+	var gold := int(round((battle.kills * 2 + (MetaData.win_gold(level) if won else MetaData.LOSS_GOLD)) * mult))
 	Save.data["gold"] = Save.gold() + gold
 	out.append({"type": "gold", "text": "+%d Gold" % gold})
 	for h in battle.heroes:
-		var n := 3 + level if won else 1 + level / 2
+		var n := MetaData.win_cards(level) if won else MetaData.win_cards(level) / 2
 		Save.add_hero_cards(h.id, n)
 		out.append({"type": "cards", "text": "+%d %s" % [n, h.data["name"]]})
 	if won:

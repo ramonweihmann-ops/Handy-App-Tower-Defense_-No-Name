@@ -4,3 +4,4 @@ game/.godot/
 
 # Builds entstehen lokal
 build/
+__pycache__/

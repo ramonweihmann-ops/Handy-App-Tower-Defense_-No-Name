@@ -1168,11 +1168,13 @@ func _tab_shop() -> Control:
 			Save.mark_daily("shop_free_date")
 			celebrate("gold", "+100 Gold")
 			show_tab("shop")))
-	v.add_child(_shop_item("cards", "Heldentruhe", "8 zufällige Heldenkarten", "%d Edelsteine" % MetaData.SHOP_CHEST_COST,
+	var chest := MetaData.chest_cards(Save.max_level())
+	v.add_child(_shop_item("cards", "Heldentruhe", "%d zufällige Heldenkarten (wächst mit deinem Fortschritt)" % chest, "%d Edelsteine" % MetaData.SHOP_CHEST_COST,
 		Save.gems() >= MetaData.SHOP_CHEST_COST, func() -> void:
 			if Save.spend("gems", MetaData.SHOP_CHEST_COST):
-				Save.add("cards", 8)
-				_info("Heldentruhe", "8 Heldenkarten erhalten. Schau in der Sammlung nach, wer aufsteigen kann!")
+				Save.add("cards", chest)
+				celebrate("cards", "+%d Heldenkarten" % chest)
+				_info("Heldentruhe", "%d Heldenkarten erhalten. Schau in der Sammlung nach, wer aufsteigen kann!" % chest)
 			show_tab("shop")))
 	v.add_child(_shop_item("energy", "Energie auffüllen", "Energie sofort auf %d" % MetaData.ENERGY_MAX, "%d Edelsteine" % MetaData.SHOP_ENERGY_COST,
 		Save.gems() >= MetaData.SHOP_ENERGY_COST, _buy_energy))

@@ -126,11 +126,11 @@ const BUILDING_MAX_LEVEL := 10
 
 ## Karten pro Stunde (in der Testphase bewusst schnell)
 static func building_rate(level: int) -> float:
-	return 2.0 * level
+	return 0.5 * level
 
 
 static func building_cap(level: int) -> int:
-	return 6 + level * 4
+	return 4 + level * 3
 
 
 static func building_cost(level: int) -> int:
@@ -185,6 +185,24 @@ const WHEEL := [
 # --- Shop ------------------------------------------------------------------
 
 const SHOP_CHEST_COST := 100
+
+
+# --- Belohnungen pro Kampf (abgestimmt mit scripts/economy-sim.py) ----------------
+const LOSS_GOLD := 400
+
+
+static func win_gold(level: int) -> int:
+	return 800 + 80 * level
+
+
+## Karten je Held im Kampf bei einem Sieg (Niederlage: die Hälfte).
+static func win_cards(level: int) -> int:
+	return int(5 + 0.55 * level)
+
+
+## Heldentruhe im Shop: wächst mit dem Fortschritt, damit ein Kauf immer gleich viel bringt.
+static func chest_cards(max_level: int) -> int:
+	return 10 + int(1.5 * max_level)
 const SHOP_ENERGY_COST := 20
 const GEM_PACKS := [
 	{"gems": 80, "price": "1,99 €"},
