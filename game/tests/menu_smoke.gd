@@ -61,6 +61,9 @@ func _run() -> bool:
 			print("SMOKE testkonto voll: prime ", save.has_prime(), " level ", save.max_level(), " helden ", save.unlocked_heroes().size())
 			save.switch_account("normal")
 			print("SMOKE testkonto zurück: gold gleich ", save.gold() == gold_normal, " prime ", save.has_prime())
+			m.celebrate("gold", "+100 Gold")
+			m.show_rewards("Test", "Belohnungen", [{"type": "gold", "text": "+10 Gold"}, {"type": "stars", "text": "+1 Stern"}])
+			m._close_modal()
 			print("SMOKE 5 talente: ", save.draw_talents(5).size(), " sterne übrig ", save.stars(), " hinweise: tech ", save.can_buy_tech(), " held ", save.any_hero_ready())
 			save.data["buildings"]["dusty"]["time"] = int(Time.get_unix_time_from_system()) - 7200
 			print("SMOKE gebäude sammeln: ", save.collect_building("dusty"), " ausbauen: ", save.upgrade_building("dusty"))

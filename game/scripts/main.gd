@@ -336,8 +336,11 @@ func _process(delta: float) -> void:
 		_menu_shot_t += 1
 		var parts := _menu_shot.split(",")
 		if _menu_shot_t == 5 and parts.size() > 1:
-			menu.show_tab(parts[1])
-		if _menu_shot_t == 90:
+			if parts[1] == "feier":
+				menu.celebrate("gold", "+150 Gold")
+			else:
+				menu.show_tab(parts[1])
+		if _menu_shot_t == (25 if parts.size() > 1 and parts[1] == "feier" else 90):
 			get_viewport().get_texture().get_image().save_png(parts[0])
 			print("BILD gespeichert: ", parts[0])
 			get_tree().quit()

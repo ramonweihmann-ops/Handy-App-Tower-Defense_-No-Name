@@ -110,6 +110,10 @@ static func add_pop(b: Control) -> void:
 			var tw := b.create_tween()
 			if e.pressed:
 				tw.tween_property(b, "scale", Vector2(0.93, 0.93), 0.06)
+				# kleiner Lichtring an der Fingerposition
+				var r := Ripple.new()
+				r.position = (e as InputEventMouseButton).position
+				b.add_child(r)
 			else:
 				tw.tween_property(b, "scale", Vector2(1.04, 1.04), 0.08)
 				tw.tween_property(b, "scale", Vector2.ONE, 0.1)
@@ -226,3 +230,26 @@ class StarRow extends Control:
 				pts.append(c + Vector2(cos(a), sin(a)) * r)
 			var col := UiKit.C_GOLD if i < filled else Color(0.3, 0.32, 0.4)
 			draw_colored_polygon(pts, col)
+
+
+## Lichtring beim Antippen: wächst und verblasst in einer knappen halben Sekunde.
+class Ripple extends Control:
+	var _t := 0.0
+
+	func _ready() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _process(delta: float) -> void:
+		_t += delta
+		queue_redraw()
+		if _t > 0.4:
+			queue_free()
+
+	func _draw() -> void:
+		var k := _t / 0.4
+		var a := 1.0 - k
+		draw_circle(Vector2.ZERO, 10.0 + 50.0 * k, Color(1, 1, 1, 0.12 * a))
+		draw_arc(Vector2.ZERO, 10.0 + 60.0 * k, 0.0, TAU, 32, Color(1.0, 0.95, 0.75, 0.6 * a), 3.0)
+		for i in 6:
+			var ang := i * TAU / 6.0 + 0.3
+			draw_circle(Vector2(cos(ang), sin(ang)) * (14.0 + 70.0 * k), 3.0 * a, Color(1.0, 0.9, 0.5, a))

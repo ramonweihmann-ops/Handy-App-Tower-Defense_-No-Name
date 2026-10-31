@@ -31,6 +31,7 @@ var _banner_label: Label
 var _banner_button: Button
 var _nav: Dictionary = {}
 var _nav_icons: Dictionary = {}
+var _pill_icons: Dictionary = {}
 var _modal: Control
 var _toast: Label
 var _toast_t := 0.0
@@ -180,7 +181,9 @@ func _pill(row: HBoxContainer, icon: String, on_plus: Callable) -> Label:
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", 4)
 	pill.add_child(h)
-	h.add_child(Icon.make(icon, 28))
+	var pic := Icon.make(icon, 28)
+	_pill_icons[icon] = pic
+	h.add_child(pic)
 	var l := UiKit.label("0", 21, UiKit.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT)
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	l.clip_text = true
@@ -443,6 +446,23 @@ func _wrap_left(text: String, font_size := 20, color := UiKit.C_TEXT) -> Label:
 	var l := UiKit.wrap_label(text, font_size, color)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	return l
+
+
+## Belohnungs-Feier: Symbol, Funken, Text. Bei Gold/Edelsteinen/Energie fliegen kleine
+## Symbole in die Kopfleiste.
+func celebrate(kind: String, text: String, color := Color(1.0, 0.82, 0.3)) -> void:
+	var c := Celebration.make(kind, text, color)
+	var target_kind: String = {"gold": "gold", "gem": "gem", "gems": "gem", "energy": "energy"}.get(kind, "")
+	if target_kind != "" and _pill_icons.has(target_kind):
+		var ic: Control = _pill_icons[target_kind]
+		c.fly_to = ic.global_position + ic.size * 0.5 - global_position
+		c.fly_count = 8
+	add_child(c)
+
+
+## Passendes Symbol zu einer Belohnung ({type, amount}).
+static func reward_icon(r: Dictionary) -> String:
+	return {"gold": "gold", "gems": "gem", "stars": "star", "energy": "energy"}.get(r.get("type", ""), "cards")
 
 
 func toast(text: String) -> void:
@@ -784,7 +804,7 @@ func _booster_list(v: VBoxContainer) -> void:
 			btns.add_child(eq)
 			var up := _small_button("Max." if lvl >= MetaData.BOOSTER_MAX else "%d Gold" % MetaData.booster_cost(lvl), func() -> void:
 				if Save.upgrade_booster(booster_id):
-					toast("%s: Stufe %d" % [d["title"], Save.booster_level(booster_id)])
+					celebrate("up", "%s: Stufe %d" % [d["title"], Save.booster_level(booster_id)])
 				show_tab("sammlung")
 			, 150, false)
 			up.disabled = lvl >= MetaData.BOOSTER_MAX or Save.gold() < MetaData.booster_cost(lvl)
@@ -907,7 +927,7 @@ func _open_hero(id: String) -> void:
 	var up_text := "Höchste Stufe erreicht" if lvl >= MetaData.HERO_MAX_LEVEL else "Aufwerten · %d Gold · %d Karten" % [MetaData.hero_gold_needed(lvl), need]
 	var up := UiKit.button(up_text, func() -> void:
 		if Save.level_hero(id):
-			toast("%s ist jetzt Stufe %d!" % [d["name"], Save.hero_level(id)])
+			celebrate("up", "%s ist jetzt Stufe %d!" % [d["name"], Save.hero_level(id)], d["color"])
 		_open_hero(id)
 		show_tab_keep_modal("sammlung")
 	, 460)
@@ -980,7 +1000,7 @@ func _hero_row(id: String) -> Control:
 	var btn_text := "Max." if lvl >= MetaData.HERO_MAX_LEVEL else "Aufwerten\n%d Gold" % MetaData.hero_gold_needed(lvl)
 	var b := _small_button(btn_text, func() -> void:
 		if Save.level_hero(id):
-			toast("%s ist jetzt Stufe %d!" % [d["name"], Save.hero_level(id)])
+			celebrate("up", "%s ist jetzt Stufe %d!" % [d["name"], Save.hero_level(id)], d["color"])
 		show_tab("sammlung")
 	, 150)
 	b.custom_minimum_size = Vector2(150, 84)
@@ -1024,7 +1044,7 @@ func _tab_upgrades() -> Control:
 		if state == "next":
 			var b := _small_button("%d Gold" % int(t["cost"]), func() -> void:
 				if Save.buy_next_tech():
-					toast("%s gebaut!" % t["title"])
+					celebrate("check", "%s gebaut!" % t["title"], Color(0.45, 1.0, 0.55))
 				else:
 					toast("Nicht genug Gold.")
 				show_tab("upgrades")
@@ -1066,7 +1086,7 @@ func _ammo_upgrades(v: VBoxContainer) -> void:
 			var cost := MetaData.ammo_cost(u, lvl)
 			var b := _small_button("%d Gold" % cost, func() -> void:
 				if Save.buy_ammo_upgrade(id):
-					toast("%s: Stufe %d" % [u["title"], Save.ammo_level(id)])
+					celebrate("up", "%s: Stufe %d" % [u["title"], Save.ammo_level(id)])
 				show_tab("upgrades")
 			, 150)
 			b.disabled = Save.gold() < cost
@@ -1090,6 +1110,7 @@ func _talents(v: VBoxContainer) -> void:
 		else:
 			var t: Dictionary = MetaData.TALENTS[id]
 			_info("Talent erhalten", "%s – Stufe %d\n\n%s" % [t["title"], Save.talent_level(id), t["desc"]])
+			celebrate("star", t["title"], t["color"])
 		show_tab("upgrades")
 	, 210)
 	draw.custom_minimum_size = Vector2(210, 80)
@@ -1106,6 +1127,7 @@ func _talents(v: VBoxContainer) -> void:
 				var t: Dictionary = MetaData.TALENTS[id]
 				lines.append("• %s – jetzt Stufe %d" % [t["title"], Save.talent_level(id)])
 			_info("%d Talente erhalten" % got.size(), "\n".join(PackedStringArray(lines)))
+			celebrate("star", "%d Talente!" % got.size())
 			show_tab_keep_modal("upgrades")
 		, 400)
 		v.add_child(five)
@@ -1143,7 +1165,7 @@ func _tab_shop() -> Control:
 		Save.daily_ready("shop_free_date"), func() -> void:
 			Save.add("gold", 100)
 			Save.mark_daily("shop_free_date")
-			toast("+100 Gold")
+			celebrate("gold", "+100 Gold")
 			show_tab("shop")))
 	v.add_child(_shop_item("cards", "Heldentruhe", "8 zufällige Heldenkarten", "%d Edelsteine" % MetaData.SHOP_CHEST_COST,
 		Save.gems() >= MetaData.SHOP_CHEST_COST, func() -> void:
@@ -1182,7 +1204,7 @@ func _buy_energy() -> void:
 	if Save.spend("gems", MetaData.SHOP_ENERGY_COST):
 		Save.data["energy"] = MetaData.ENERGY_MAX
 		Save.save_game()
-		toast("Energie aufgefüllt!")
+		celebrate("energy", "Energie aufgefüllt!", Color(0.5, 1.0, 0.5))
 	show_tab(current_tab)
 
 
@@ -1248,7 +1270,10 @@ func _building_row(id: String) -> Control:
 	h.add_child(btns)
 	var collect := _small_button("Sammeln", func() -> void:
 		var n := Save.collect_building(id)
-		toast("+%d %s-Karten" % [n, d["name"]] if n > 0 else "Noch nichts bereit.")
+		if n > 0:
+			celebrate("cards", "+%d %s-Karten" % [n, d["name"]], d["color"])
+		else:
+			toast("Noch nichts bereit.")
 		show_tab("basis")
 	, 150)
 	collect.disabled = stock <= 0
@@ -1258,7 +1283,7 @@ func _building_row(id: String) -> Control:
 	var up_text := "Max." if lvl >= MetaData.BUILDING_MAX_LEVEL else "Ausbauen\n%d Gold" % MetaData.building_cost(lvl)
 	var up := _small_button(up_text, func() -> void:
 		if Save.upgrade_building(id):
-			toast("Ausgebaut auf Stufe %d!" % (lvl + 1))
+			celebrate("camp", "Ausgebaut auf Stufe %d!" % (lvl + 1))
 		show_tab("basis")
 	, 150, false)
 	up.custom_minimum_size = Vector2(150, 70)
@@ -1317,7 +1342,7 @@ func _open_daily() -> void:
 			Save.add("gems", 10)
 			Save.mark_daily("daily_date")
 			_close_modal()
-			toast("+150 Gold · +10 Edelsteine")
+			celebrate("gold", "+150 Gold · +10 Edelsteine")
 			show_tab(current_tab)
 		, 260))
 	else:
@@ -1345,6 +1370,7 @@ func _open_wheel() -> void:
 			Save.add(r["type"], int(r["amount"]))
 			_close_modal()
 			_info("Glückwunsch!", _reward_text(r))
+			celebrate(reward_icon(r), _reward_text(r))
 			show_tab(current_tab)
 		)
 	)
@@ -1453,13 +1479,31 @@ func show_rewards(title: String, text: String, rewards: Array) -> void:
 	grid.columns = 2
 	grid.add_theme_constant_override("h_separation", 20)
 	grid.add_theme_constant_override("v_separation", 8)
+	var i := 0
+	var gold := false
 	for r in rewards:
 		var row := HBoxContainer.new()
 		var icon_kind: String = {"gold": "gold", "gems": "gem", "stars": "star", "pass": "pass"}.get(r["type"], "cards")
+		gold = gold or r["type"] == "gold"
 		row.add_child(Icon.make(icon_kind, 36))
 		row.add_child(UiKit.label(str(r["text"]), 21, UiKit.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT))
 		grid.add_child(row)
+		# Belohnungen erscheinen nacheinander mit kleinem Sprung
+		row.modulate.a = 0.0
+		row.scale = Vector2(0.6, 0.6)
+		var tw := row.create_tween()
+		tw.tween_interval(0.25 + i * 0.18)
+		tw.tween_property(row, "modulate:a", 1.0, 0.12)
+		tw.parallel().tween_property(row, "scale", Vector2(1.1, 1.1), 0.14).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tw.tween_property(row, "scale", Vector2.ONE, 0.1)
+		tw.tween_callback(func() -> void:
+			var sfx := get_node_or_null("/root/Sfx")
+			if sfx:
+				sfx.play("ding", 0.1))
+		i += 1
 	v.add_child(grid)
+	if gold:
+		celebrate("gold", "")
 	v.add_child(UiKit.button("Weiter", _close_modal, 260))
 
 
@@ -1536,7 +1580,7 @@ func open_battle_pass() -> void:
 		var mission_id: String = id
 		var b := _small_button("Erledigt" if done else "Abholen", func() -> void:
 			if Save.claim_mission(mission_id):
-				toast("+%d Pass-Punkte" % int(d["points"]))
+				celebrate("star", "+%d Pass-Punkte" % int(d["points"]))
 			open_battle_pass()
 		, 140)
 		b.disabled = done or prog < int(d["goal"])
@@ -1560,12 +1604,17 @@ func open_battle_pass() -> void:
 	frame.add_child(bottom)
 	var all_btn := _small_button("Alles beanspruchen", func() -> void:
 		var got := []
+		var last := {}
 		for l in Save.pass_claimable():
 			var r := Save.claim_pass(l)
 			if not r.is_empty():
 				got.append(_reward_text(r))
-		toast(", ".join(PackedStringArray(got)) if not got.is_empty() else "Noch nichts abzuholen.")
+				last = r
 		open_battle_pass()
+		if got.is_empty():
+			toast("Noch nichts abzuholen.")
+		else:
+			celebrate(reward_icon(last), "%d Belohnungen abgeholt!" % got.size())
 	, 260)
 	all_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	all_btn.disabled = Save.pass_claimable().is_empty()
@@ -1598,9 +1647,9 @@ func _pass_row(lvl: int) -> Control:
 	if reached and not claimed:
 		var btn := _small_button("Holen", func() -> void:
 			var r := Save.claim_pass(lvl)
-			if not r.is_empty():
-				toast(_reward_text(r))
 			open_battle_pass()
+			if not r.is_empty():
+				celebrate(reward_icon(r), _reward_text(r))
 		, 100)
 		btn.custom_minimum_size = Vector2(100, 56)
 		fp.get_child(0).add_child(btn)
