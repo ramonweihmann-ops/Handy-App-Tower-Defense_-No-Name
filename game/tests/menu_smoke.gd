@@ -37,12 +37,19 @@ func _run() -> bool:
 			_report(m._content, 0)
 			for t in ["shop", "sammlung", "upgrades", "basis", "kampf"]:
 				m.show_tab(t)
+			# Levelbilder: Boss der ersten Welt, Zombie-Welt, Boss der zweiten Welt
+			for lvl in [5, 7, 10, 1]:
+				m.selected_level = lvl
+				m.show_tab("kampf")
 			m.sub_tab["sammlung"] = "booster"
 			m.show_tab("sammlung")
 			m.sub_tab["upgrades"] = "talente"
 			m.show_tab("upgrades")
 			print("SMOKE alle Reiter gebaut")
 		2:
+			# Handybreite nachstellen (720 Pixel), damit nichts über den Rand ragt
+			m._frame.offset_left = -360.0
+			m._frame.offset_right = 360.0
 			print("SMOKE held aufwerten: ", save.level_hero("dusty"), " stufe ", save.hero_level("dusty"))
 			print("SMOKE tech kaufen: ", save.buy_next_tech(), " anzahl ", save.tech_count())
 			print("SMOKE talent: ", save.draw_talent())
@@ -60,6 +67,12 @@ func _run() -> bool:
 		3:
 			var page: Control = m._content.get_child(m._content.get_child_count() - 1)
 			print("SMOKE reiter breite ", page.size.x, " inhalt ", m._content.size.x)
+			var top: Control = m._frame.get_child(0)
+			var parts := []
+			for c in top.get_child(0).get_children():
+				parts.append("%d-%d" % [c.position.x, c.position.x + c.size.x])
+			print("SMOKE kopfleiste breite ", top.size.x, " rahmen ", m._frame.size.x, " teile ", parts)
+			m._fit()
 			m.open_battle_pass()
 		4:
 			m._open_daily()

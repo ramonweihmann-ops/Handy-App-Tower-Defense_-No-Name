@@ -155,7 +155,11 @@ func _build_top_bar() -> Control:
 	gear.custom_minimum_size = Vector2(44, 64)
 	gear.flat = true
 	var gi := Icon.make("gear", 38)
-	gi.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	gi.set_anchors_preset(Control.PRESET_CENTER)
+	gi.offset_left = -19
+	gi.offset_right = 19
+	gi.offset_top = -19
+	gi.offset_bottom = 19
 	gear.add_child(gi)
 	gear.pressed.connect(_open_settings)
 	row.add_child(gear)
@@ -178,6 +182,8 @@ func _pill(row: HBoxContainer, icon: String, on_plus: Callable) -> Label:
 	h.add_child(Icon.make(icon, 28))
 	var l := UiKit.label("0", 21, UiKit.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT)
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	l.clip_text = true
+	l.custom_minimum_size = Vector2(40, 0)
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	h.add_child(l)
 	var plus := Button.new()
@@ -463,7 +469,7 @@ func _tab_kampf() -> Control:
 	center.add_theme_constant_override("separation", 10)
 	mid.add_child(center)
 	center.add_child(_toggle([["normal", "Normal"], ["schwer", "Schwer"]], "schwer" if hard else "normal", _set_difficulty))
-	var card := StageCard.new()
+	var card := StageScene.new()
 	card.level = selected_level
 	card.hard = hard
 	card.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -553,9 +559,9 @@ func _segments() -> Control:
 			var ic := Icon.make("skull", 34)
 			row.add_child(ic)
 		else:
-			var r := ColorRect.new()
-			r.color = col
-			r.custom_minimum_size = Vector2(46, 18)
+			var r := Panel.new()
+			r.add_theme_stylebox_override("panel", UiKit.candy(col, 11, "bar"))
+			r.custom_minimum_size = Vector2(48, 24)
 			row.add_child(r)
 	return row
 
@@ -1464,48 +1470,6 @@ class HeroBadge extends Control:
 		var fs := int(r * 1.1)
 		draw_string_outline(font, Vector2(0, c.y + fs * 0.36), text, HORIZONTAL_ALIGNMENT_CENTER, size.x, fs, 6, Color(0, 0, 0, 0.6))
 		draw_string(font, Vector2(0, c.y + fs * 0.36), text, HORIZONTAL_ALIGNMENT_CENTER, size.x, fs, Color(1, 1, 1))
-
-
-## Bild des gewählten Levels: Wurmloch und Schleimwesen.
-class StageCard extends Control:
-	var level := 1
-	var hard := false
-	var _t := 0.0
-
-	func _process(delta: float) -> void:
-		_t += delta
-		queue_redraw()
-
-	func _draw() -> void:
-		var r := Rect2(Vector2.ZERO, size)
-		var sb := UiKit.box(Color(0.25, 0.1, 0.4) if not hard else Color(0.4, 0.08, 0.15), 18, 4, Color(0.6, 0.5, 1.0) if not hard else Color(1.0, 0.4, 0.4))
-		draw_style_box(sb, r)
-		var c := Vector2(size.x * 0.5, size.y * 0.38)
-		var rad := minf(size.x, size.y) * 0.3
-		for k in 6:
-			var a := _t * 0.8 + k * TAU / 6.0
-			draw_arc(c, rad * (0.4 + k * 0.1), a, a + 2.0, 24, Color(0.4 + k * 0.08, 0.3, 1.0, 0.7), 6.0)
-		draw_circle(c, rad * 0.25, Color(0.95, 0.85, 1.0))
-		# Schleimwesen vor dem Wurmloch
-		var n := mini(2 + level, 6)
-		for i in n:
-			var x := size.x * (0.15 + 0.7 * float(i) / maxf(1.0, n - 1))
-			var y := size.y * 0.78 + sin(_t * 4.0 + i) * 4.0
-			var zombies := GameData.world_of(level) == 1
-			var col := (Color(0.35, 0.95, 0.45) if i % 3 != 2 else Color(0.65, 0.3, 0.9)) if not zombies else (Color(0.5, 0.65, 0.4) if i % 3 != 2 else Color(0.45, 0.47, 0.5))
-			draw_circle(Vector2(x, y), 28.0, col)
-			draw_circle(Vector2(x - 9, y - 8), 8.0, Color(1, 1, 1))
-			draw_circle(Vector2(x + 9, y - 8), 8.0, Color(1, 1, 1))
-			draw_circle(Vector2(x - 9, y - 6), 4.0, Color(0, 0, 0))
-			draw_circle(Vector2(x + 9, y - 6), 4.0, Color(0, 0, 0))
-		if GameData.is_boss_level(level):
-			draw_circle(Vector2(size.x * 0.5, size.y * 0.6), 34.0, Color(0.95, 0.25, 0.75) if GameData.world_of(level) == 0 else Color(0.55, 0.8, 0.3))
-			for k in 3:
-				draw_circle(Vector2(size.x * 0.5 - 14 + k * 14, size.y * 0.57), 6.0, Color(1, 1, 1))
-		var font := ThemeDB.fallback_font
-		var title := "%s%s" % [GameData.world_name(level), " · Schwer" if hard else ""]
-		draw_string_outline(font, Vector2(0, size.y - 16), title, HORIZONTAL_ALIGNMENT_CENTER, size.x, 26, 8, Color(0, 0, 0, 0.8))
-		draw_string(font, Vector2(0, size.y - 16), title, HORIZONTAL_ALIGNMENT_CENTER, size.x, 26, Color(1, 0.85, 0.3))
 
 
 ## Glücksrad mit 8 Feldern.
