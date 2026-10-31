@@ -28,9 +28,13 @@ static func hero_gold_needed(level: int) -> int:
 	return 60 * level
 
 
-## Schadensbonus durch die Heldenstufe.
+## Schadensbonus durch die Heldenstufe: +7 % je Stufe, prozentual (wie das Gegnerleben),
+## damit Aufwerten auch in Level 200+ spürbar bleibt.
+static var HERO_GROWTH := 1.07
+
+
 static func hero_damage_mult(level: int) -> float:
-	return 1.0 + 0.08 * (level - 1)
+	return pow(HERO_GROWTH, level - 1)
 
 
 # --- Booster: Einsätze im Kampf, 2 davon gleichzeitig ausgerüstet --------------

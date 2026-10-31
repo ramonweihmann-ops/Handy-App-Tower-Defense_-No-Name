@@ -162,6 +162,22 @@ func _parse_args() -> void:
 			level = clampi(int(arg.get_slice("=", 1)), 1, GameData.LEVEL_COUNT)
 		elif arg.begins_with("--seed="):
 			seed(int(arg.get_slice("=", 1)))
+		elif arg.begins_with("--hpg="):
+			GameData.HP_GROWTH = float(arg.get_slice("=", 1))
+		elif arg.begins_with("--dpsg="):
+			GameData.DPS_GROWTH = float(arg.get_slice("=", 1))
+		elif arg.begins_with("--herog="):
+			MetaData.HERO_GROWTH = float(arg.get_slice("=", 1))
+		elif arg.begins_with("--hpstep="):
+			GameData.HP_STEP = float(arg.get_slice("=", 1))
+		elif arg.begins_with("--hplate="):
+			GameData.HP_GROWTH_LATE = float(arg.get_slice("=", 1))
+		elif arg.begins_with("--dpsstep="):
+			GameData.DPS_STEP = float(arg.get_slice("=", 1))
+		elif arg.begins_with("--dpslate="):
+			GameData.DPS_GROWTH_LATE = float(arg.get_slice("=", 1))
+		elif arg.begins_with("--bosshp="):
+			GameData.HARD_BOSS_HP = float(arg.get_slice("=", 1))
 		elif arg.begins_with("--profile="):
 			_profile = arg.get_slice("=", 1)
 		elif arg.begins_with("--menushot="):

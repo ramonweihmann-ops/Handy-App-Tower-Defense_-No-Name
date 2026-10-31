@@ -5,7 +5,8 @@ extends RefCounted
 ##
 ##   anfaenger    – spielt ohne Käufe, wertet wenig auf
 ##   durchschnitt – spielt ohne Käufe, wertet nach jedem Level auf, was das Gold hergibt
-##   zahlend      – wie durchschnitt, dazu gekaufte Helden (alle frei), +2 Heldenstufen, Booster +1
+##   zahlend      – wie durchschnitt, dazu gekaufte Helden (alle frei), +2 Heldenstufen, Booster +1,
+##                  Prime (4 statt 3 Karten bei der Kartenwahl)
 
 const PROFILES := ["anfaenger", "durchschnitt", "zahlend"]
 
@@ -39,6 +40,7 @@ static func apply(save: Node, profile: String, level: int) -> void:
 		hero_lvl += 2
 		booster_lvl += 1
 		d["unlocked"] = GameData.HERO_IDS.duplicate()
+		d["prime"] = true
 	for id in GameData.HERO_IDS:
 		d["heroes"][id]["level"] = clampi(hero_lvl, 1, MetaData.HERO_MAX_LEVEL)
 	d["tech"] = clampi(tech, 0, MetaData.TECH.size())

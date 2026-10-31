@@ -183,12 +183,20 @@ const LEVEL_COUNT := 50
 # vor allem über die Lebenspunkte. Level 1–10 behalten ihre abgestimmten Werte.
 
 ## Ab hier wächst das Gegnerleben je Level um diesen Faktor (vorher linear).
-const HP_GROWTH := 1.06
+## (static var statt const, damit das Balance-Labor Werte per --hpg= / --dpsg= ausprobieren kann)
+static var HP_GROWTH := 1.055
 ## Ab Level 11 wächst der Schaden der Gegner mit dem Schild der Station mit, dazu dieser Druck je Level.
-const DPS_GROWTH := 1.06
+static var DPS_GROWTH := 1.035
+## Ab Level 21 (Spiel-Phase 2) ein spürbarer Sprung, danach wächst es im Gleichschritt mit
+## einem Spieler, der regelmäßig aufwertet (abgestimmt mit dem Balance-Labor, docs/BALANCE.md).
+const PHASE2_FROM := 21
+static var HP_STEP := 2.0
+static var HP_GROWTH_LATE := 1.045
+static var DPS_STEP := 1.5
+static var DPS_GROWTH_LATE := 1.03
 ## Ab diesem Level brauchen Bosse ohne Käufe in der Regel einen Versuch mehr (Konzept, Abschnitt 9).
 const HARD_BOSS_FROM := 21
-const HARD_BOSS_HP := 1.3
+static var HARD_BOSS_HP := 1.3
 
 
 static func world_of(level: int) -> int:
@@ -231,7 +239,9 @@ static func waves_in_level(level: int) -> int:
 static func level_hp(level: int) -> float:
 	if level <= 10:
 		return 1.0 + 0.2 * (level - 1)
-	return 2.8 * pow(HP_GROWTH, level - 10)
+	if level < PHASE2_FROM:
+		return 2.8 * pow(HP_GROWTH, level - 10)
+	return 2.8 * pow(HP_GROWTH, PHASE2_FROM - 11) * HP_STEP * pow(HP_GROWTH_LATE, level - PHASE2_FROM)
 
 
 ## Schild der Station in diesem Level (vor Boni).
@@ -244,7 +254,10 @@ static func fence_base(level: int) -> float:
 static func dps_mult(level: int) -> float:
 	if level <= 10:
 		return 1.0
-	return fence_base(level) / fence_base(10) * pow(DPS_GROWTH, level - 10)
+	var fence := fence_base(level) / fence_base(10)
+	if level < PHASE2_FROM:
+		return fence * pow(DPS_GROWTH, level - 10)
+	return fence * pow(DPS_GROWTH, PHASE2_FROM - 11) * DPS_STEP * pow(DPS_GROWTH_LATE, level - PHASE2_FROM)
 
 
 static func hp_mult(level: int, wave: int) -> float:

@@ -29,6 +29,7 @@ def run(godot, level, profile, seed):
     game = os.environ.get("GAME_DIR", os.path.join(ROOT, "game"))
     cmd = [godot, "--headless", "--fixed-fps", "60", "--path", game, "--",
            "--autotest", f"--level={level}", f"--seed={seed}", "--pull", f"--profile={profile}"]
+    cmd += os.environ.get("LAB_ARGS", "").split()
     try:
         out = subprocess.run(cmd, capture_output=True, text=True, timeout=900).stdout
     except subprocess.TimeoutExpired:
