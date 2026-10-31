@@ -269,3 +269,15 @@ nie ein Muss.
 Das **Balance-Labor** (geplant) prüft diese Regeln automatisch: alle Level, viele Durchläufe, drei
 Spielertypen (ohne Käufe/Anfänger, ohne Käufe/Durchschnitt, zahlend), Siegquote je Level gegen
 eine Zielkurve.
+
+### 9.1 Schwierigkeitskurve (Stand 31.10.2026, abgestimmt mit dem Balance-Labor)
+
+- **Level 1–10:** Gegnerleben steigt gleichmäßig (+20 % je Level), Gegnerschaden gleich.
+- **Level 11–20:** Leben +5,5 % je Level, Schaden wächst mit dem Schild der Station mit (+3,5 % Druck).
+- **Ab Level 21 (Phase 2):** einmaliger Sprung (Leben ×3,8, Schaden ×1,6), danach Leben +2,5 % je
+  Level – im Gleichschritt mit einem Spieler, der regelmäßig aufwertet. Bosse ab Level 21: Leben ×1,4.
+- **Helden:** jede Heldenstufe +7 % Schaden (prozentual), Stufe bis 30.
+- Ergebnis im Labor (Durchschnitt ohne Käufe / Zahlend): normale Level ab 21 meist 50–100 % /
+  83–100 %, Bosse ab 21 etwa 33–67 % / 67–100 %. Werte in `game/scripts/game_data.gd`.
+- Offen: Wirtschaft (Gold, Karten) so abstimmen, dass ein Spieler ohne Käufe wirklich so schnell
+  aufsteigt, wie das Profil „Durchschnitt“ annimmt; schwächster Starthelden derzeit Lynx.

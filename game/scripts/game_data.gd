@@ -190,13 +190,13 @@ static var DPS_GROWTH := 1.035
 ## Ab Level 21 (Spiel-Phase 2) ein spürbarer Sprung, danach wächst es im Gleichschritt mit
 ## einem Spieler, der regelmäßig aufwertet (abgestimmt mit dem Balance-Labor, docs/BALANCE.md).
 const PHASE2_FROM := 21
-static var HP_STEP := 2.0
-static var HP_GROWTH_LATE := 1.045
-static var DPS_STEP := 1.5
-static var DPS_GROWTH_LATE := 1.03
+static var HP_STEP := 3.8
+static var HP_GROWTH_LATE := 1.025
+static var DPS_STEP := 1.6
+static var DPS_GROWTH_LATE := 1.0
 ## Ab diesem Level brauchen Bosse ohne Käufe in der Regel einen Versuch mehr (Konzept, Abschnitt 9).
 const HARD_BOSS_FROM := 21
-static var HARD_BOSS_HP := 1.3
+static var HARD_BOSS_HP := 1.4
 
 
 static func world_of(level: int) -> int:
