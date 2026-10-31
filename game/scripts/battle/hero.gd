@@ -7,7 +7,7 @@ var id := ""
 var data: Dictionary
 var battle: Battle
 ## Stufen der Verbesserungen aus der Kartenauswahl.
-var mods := {"damage": 0, "rate": 0, "reload": 0, "mag": 0, "crit": 0, "special": 0}
+var mods := {"damage": 0, "rate": 0, "reload": 0, "mag": 0, "crit": 0, "special": 0, "ult": 0}
 
 var magazine: Array[String] = []
 var reloading := false
@@ -29,6 +29,111 @@ var _pipe: MeshInstance3D
 var _pipe_glow := 0.0
 var _target_x := 0.0
 
+# --- Superfähigkeit ------------------------------------------------------------
+## Je Waffenfamilie: Name, Beschreibung (für die Karte), Dauer in Sekunden (0 = sofort).
+const ULTS := {
+	"revolver": ["Kugelhagel", "Dreifach schnell, jeder Schuss fächert auf 2 weitere Gegner. Kein Nachladen.", 6.0],
+	"mg": ["Dauerfeuer", "Dreifach schnelles Feuer mit hellen Kugeln, ohne Nachladen.", 7.0],
+	"rocket": ["Raketensalve", "Feuert sofort einen Schwarm Raketen auf die Gegner.", 0.0],
+	"tesla": ["Gewittersturm", "Ein Blitz trifft alle Gegner auf dem Feld.", 0.0],
+	"cryo": ["Eiszeit", "Friert alle Gegner fast ganz ein und macht Frostschaden.", 0.0],
+	"shotgun": ["Breitseite", "Drei mächtige Schrotsalven, die alle Gegner vorne treffen.", 0.0],
+	"sniper": ["Kopfgeldjagd", "Durchschlagende Volltreffer auf die stärksten Gegner.", 0.0],
+	"flamer": ["Feuerwalze", "Flammen erfassen alle Gegner in Reichweite und setzen sie in Brand.", 6.0],
+}
+const ULT_CD := 30.0
+const ULT_MAX := 3
+
+var _ult_cd := 0.0
+var _ult_t := 0.0
+var _ult_ring: MeshInstance3D
+var _ult_mat: StandardMaterial3D
+
+
+func ult_level() -> int:
+	return int(mods["ult"])
+
+
+func ult_ready() -> bool:
+	return ult_level() > 0 and _ult_cd <= 0.0 and _ult_t <= 0.0
+
+
+func ult_active() -> bool:
+	return _ult_t > 0.0
+
+
+## Superfähigkeit auslösen (Antippen des Helden). Gibt false zurück, wenn sie nicht bereit ist.
+func activate_ult() -> bool:
+	if not ult_ready() or battle == null or not battle.running:
+		return false
+	var lvl := ult_level()
+	var power := 1.0 + 0.5 * (lvl - 1)
+	_ult_cd = ULT_CD - 4.0 * (lvl - 1)
+	var dur: float = ULTS[family()][2]
+	if dur > 0.0:
+		_ult_t = dur + 1.0 * (lvl - 1)
+	var from := _muzzle.global_position
+	var dmg := damage() * power
+	match family():
+		"rocket":
+			var targets := battle.spread_targets(5 + 2 * lvl, battle.pick_target())
+			for e in targets:
+				battle.fire_rocket(from, e, dmg * 1.6, true, "fire", float(data["splash"]) * 1.2)
+		"tesla":
+			for e in battle.enemies.duplicate():
+				if is_instance_valid(e) and e.alive:
+					battle.fire_chain(from, e, dmg * 2.5, true, "normal", 0, Color(0.85, 0.6, 1.0))
+		"cryo":
+			for e in battle.enemies.duplicate():
+				if is_instance_valid(e) and e.alive:
+					e.apply_slow(0.9, 3.0 + lvl)
+					battle.apply_hit(e, dmg * 1.5, false, "ice")
+			Fx.flash(battle, Vector3(0, 1, -8), Color(0.6, 0.95, 1.0), 9.0, 0.6)
+		"shotgun":
+			for k in 3:
+				get_tree().create_timer(0.35 * k, false).timeout.connect(func() -> void:
+					if battle == null:
+						return
+					for e in battle.enemies.duplicate():
+						if is_instance_valid(e) and e.alive and e.position.z > -12.0:
+							battle.fire_bullet(_muzzle.global_position, e, dmg * 1.4, false, "normal", 0, 34.0, 0.8))
+		"sniper":
+			var strong: Array = battle.enemies.filter(func(e: Enemy) -> bool: return is_instance_valid(e) and e.alive)
+			strong.sort_custom(func(a: Enemy, b: Enemy) -> bool: return a.hp > b.hp)
+			for k in mini(4 + lvl, strong.size()):
+				var e: Enemy = strong[k]
+				get_tree().create_timer(0.18 * k, false).timeout.connect(func() -> void:
+					if battle and is_instance_valid(e) and e.alive:
+						battle.fire_bullet(_muzzle.global_position, e, dmg * 4.0, true, "normal", 3, 70.0, 1.6))
+	battle.add_shake(0.35)
+	Fx.flash(battle, global_position + Vector3(0, 1.4, 0), Color(1.0, 0.85, 0.3), 2.5, 0.35)
+	var sfx := get_node_or_null("/root/Sfx")
+	if sfx:
+		sfx.play("whoosh", 0.0, 2.0)
+	return true
+
+
+func _update_ult(delta: float) -> void:
+	_ult_cd = maxf(0.0, _ult_cd - delta)
+	_ult_t = maxf(0.0, _ult_t - delta)
+	if _ult_ring == null:
+		return
+	var ready := ult_ready()
+	_ult_ring.visible = ready or ult_active()
+	if _ult_ring.visible:
+		var pulse := 1.0 + 0.12 * sin(_t * 6.0)
+		_ult_ring.scale = Vector3(pulse, 1.0, pulse) * (1.25 if ult_active() else 1.0)
+		_ult_mat.emission_energy_multiplier = 2.5 + (2.0 if ult_active() else sin(_t * 6.0))
+
+
+func _build_ult_ring() -> void:
+	_ult_mat = Fx.mat(Color(1.0, 0.8, 0.25), 3.0)
+	_ult_ring = Fx.torus(0.78, 0.9, _ult_mat)
+	_ult_ring.position.y = 0.26
+	_ult_ring.visible = false
+	add_child(_ult_ring)
+
+
 ## Darstellungsgröße der Helden.
 const VIS_SCALE := 1.4
 
@@ -44,6 +149,7 @@ func setup(id_: String, battle_: Battle) -> void:
 	data = GameData.HEROES[id]
 	scale = Vector3.ONE * VIS_SCALE
 	_build_visual()
+	_build_ult_ring()
 	magazine.clear()
 	for i in mag_size():
 		magazine.append("normal")
@@ -105,6 +211,16 @@ func _process(delta: float) -> void:
 	_animate(delta)
 	if battle == null or not battle.running:
 		return
+	_update_ult(delta)
+	if ult_active():
+		_shot_cd -= delta
+		var t2 := battle.pick_target()
+		if t2:
+			_aim_at(t2.global_position, delta)
+			if _shot_cd <= 0.0:
+				_fire(t2)
+				_shot_cd = interval() / 3.0
+		return
 	if reloading:
 		reload_left -= delta
 		if reload_left <= 0.0:
@@ -142,7 +258,8 @@ func _try_reload() -> void:
 
 
 func _fire(target: Enemy) -> void:
-	var ammo_type: String = magazine.pop_front()
+	# Während einer Daueraktion (Superfähigkeit) wird keine Munition verbraucht
+	var ammo_type: String = "normal" if ult_active() or magazine.is_empty() else magazine.pop_front()
 	var crit := randf() < crit_chance()
 	var dmg := damage() * (2.0 if crit else 1.0)
 	var from := _muzzle.global_position
@@ -150,12 +267,15 @@ func _fire(target: Enemy) -> void:
 	match family():
 		"revolver":
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, 0, 30.0, 1.0)
-			if magazine.is_empty():
+			if magazine.is_empty() or ult_active():
 				var extra := 2 + 2 * int(mods["special"])
 				for other in battle.spread_targets(extra, target):
 					battle.fire_bullet(from, other, dmg * 0.8, false, ammo_type, 0, 28.0, 0.9)
 		"mg":
-			battle.fire_bullet(from, target, dmg, crit, ammo_type, int(mods["special"]), 34.0, 0.75)
+			if ult_active():
+				battle.fire_bullet(from, target, dmg, crit, "normal", int(mods["special"]) + 1, 42.0, 1.1)
+			else:
+				battle.fire_bullet(from, target, dmg, crit, ammo_type, int(mods["special"]), 34.0, 0.75)
 		"rocket":
 			var radius: float = float(data["splash"]) * (1.0 + 0.25 * int(mods["special"]))
 			battle.fire_rocket(from, target, dmg, crit, ammo_type, radius)
@@ -172,10 +292,11 @@ func _fire(target: Enemy) -> void:
 		"sniper":
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, int(data["pierce"]) + int(mods["special"]), 60.0, 1.3)
 		"flamer":
-			var cone: float = float(data["cone"]) * (1.0 + 0.2 * int(mods["special"]))
+			var cone: float = float(data["cone"]) * (1.0 + 0.2 * int(mods["special"])) * (2.2 if ult_active() else 1.0)
 			battle.flame(from, target, dmg, crit, ammo_type, cone)
 	_recoil = 1.0
 	_flash_t = 0.06
+	_shot_anim()
 
 
 func _aim_at(target_pos: Vector3, delta: float) -> void:
@@ -185,6 +306,7 @@ func _aim_at(target_pos: Vector3, delta: float) -> void:
 
 
 func _animate(delta: float) -> void:
+	_settle_anim()
 	_body.position.y = 0.22 + sin(_t * 2.2) * 0.015
 	_recoil = maxf(0.0, _recoil - delta * 9.0)
 	var kick := 0.22 if family() == "rocket" else 0.12
@@ -497,6 +619,22 @@ func _build_model() -> void:
 
 
 ## Zielhaltung: Schuss-Animation an der Stelle mit ausgestrecktem Arm anhalten.
+## Kleine Schussbewegung: ein Stück der Schuss-Animation abspielen, dann zurück in die Zielhaltung.
+func _shot_anim() -> void:
+	if _anim == null:
+		return
+	_anim.play("Shoot_OneHanded")
+	_anim.seek(AIM_TIME - 0.12, true)
+	_anim.speed_scale = 2.5
+
+
+func _settle_anim() -> void:
+	if _anim and _anim.is_playing() and _anim.current_animation_position >= AIM_TIME + 0.12:
+		_anim.seek(AIM_TIME, true)
+		_anim.pause()
+		_anim.speed_scale = 1.0
+
+
 func _pose_aim() -> void:
 	if _anim == null:
 		return

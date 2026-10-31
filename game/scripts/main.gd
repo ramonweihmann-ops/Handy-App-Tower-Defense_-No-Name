@@ -55,6 +55,7 @@ var _profile := ""
 var _shot_path := ""
 ## Nur für Tests mit Fenster: Menübild speichern (--menushot=pfad.png[,reiter]) und beenden.
 var _menu_shot := ""
+var _world_holder: Control
 var _menu_shot_t := 0
 
 
@@ -151,6 +152,10 @@ func _parse_args() -> void:
 			var smoke: Node = load("res://tests/menu_smoke.gd").new()
 			smoke.set("main", self)
 			add_child.call_deferred(smoke)
+		elif arg == "--ultcheck":
+			var uc: Node = load("res://tests/ult_check.gd").new()
+			uc.set("main", self)
+			add_child.call_deferred(uc)
 		elif arg == "--pull":
 			_auto_pull = true
 		elif arg.begins_with("--level="):
@@ -184,6 +189,7 @@ func _build_layout() -> void:
 	root.add_child(column)
 
 	var world_holder := Control.new()
+	_world_holder = world_holder
 	world_holder.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	world_holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	column.add_child(world_holder)
@@ -320,6 +326,31 @@ func _use_booster(i: int) -> void:
 	hud.show_banner(String(MetaData.BOOSTERS[id]["title"]) + "!")
 
 
+## Antippen im Kampfbild: nächster Held mit bereiter Superfähigkeit löst sie aus.
+func _unhandled_input(event: InputEvent) -> void:
+	if state != "battle" or not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if not mb.pressed or mb.button_index != MOUSE_BUTTON_LEFT:
+		return
+	var local := mb.position - _world_holder.global_position
+	if not Rect2(Vector2.ZERO, _world_holder.size).has_point(local):
+		return
+	var best: Hero = null
+	var best_d := 110.0
+	for h in battle.heroes:
+		if not h.ult_ready():
+			continue
+		var p := battle.camera.unproject_position(h.global_position + Vector3(0, 1.2, 0))
+		var dist := p.distance_to(local)
+		if dist < best_d:
+			best = h
+			best_d = dist
+	if best and best.activate_ult():
+		hud.show_banner(Hero.ULTS[best.family()][0] + "!")
+		get_viewport().set_input_as_handled()
+
+
 func _process(delta: float) -> void:
 	if state == "battle":
 		_update_boosters(delta)
@@ -359,6 +390,8 @@ func _process(delta: float) -> void:
 				ball_run.try_manual_pull()
 			for i in _boosters.size():
 				_use_booster(i)
+			for h in battle.heroes:
+				h.activate_ult()
 
 
 # --- Bildschirme ----------------------------------------------------------
@@ -594,6 +627,8 @@ func _auto_choose(cards: Array) -> Dictionary:
 			score = 7.0 if starving else 3.5
 		elif c["kind"] == "station":
 			score = 9.0 if battle.fence_hp < battle.fence_max * 0.5 else 1.0
+		elif key.ends_with(":ult"):
+			score = 6.5 if int(c["stars"]) == 0 else 4.0
 		elif key.ends_with(":damage") or key.ends_with(":special"):
 			score = 5.0
 		elif key.ends_with(":rate"):
@@ -690,12 +725,18 @@ func _hero_cards(h: Hero) -> Array:
 	}
 	var sp: Array = special[h.family()]
 	stats.append(["special", sp[0], sp[1], sp[2]])
+	var ult: Array = Hero.ULTS[h.family()]
+	var ult_desc := "SUPERFÄHIGKEIT: %s\nTippe danach auf %s, um sie auszulösen." % [ult[1], String(d["name"]).split(" ")[0]]
+	if h.ult_level() > 0:
+		ult_desc = "%s stärker, länger und schneller wieder bereit." % ult[0]
+	stats.append(["ult", ult[0], ult_desc, Hero.ULT_MAX])
 	for s in stats:
 		var mod: String = s[0]
 		list.append({
 			"key": "%s:%s" % [h.id, mod], "kind": "hero", "target": d["name"], "color": d["color"],
 			"title": s[1], "desc": s[2], "stars": int(h.mods[mod]), "max": s[3],
-			"emblem": String(d["name"]).left(1), "weight": 1.2 if mod == "special" else 1.0,
+			"emblem": "★" if mod == "ult" else String(d["name"]).left(1),
+			"weight": (1.5 if h.ult_level() == 0 else 0.9) if mod == "ult" else (1.2 if mod == "special" else 1.0),
 			"apply": _apply_hero_mod.bind(h, mod),
 		})
 	return list
@@ -703,6 +744,8 @@ func _hero_cards(h: Hero) -> Array:
 
 func _apply_hero_mod(h: Hero, mod: String) -> void:
 	h.mods[mod] = int(h.mods[mod]) + 1
+	if mod == "ult" and h.mods[mod] == 1:
+		hud.show_banner("Tippe auf %s: %s!" % [String(h.data["name"]).split(" ")[0], Hero.ULTS[h.family()][0]])
 
 
 func _machine_cards() -> Array:

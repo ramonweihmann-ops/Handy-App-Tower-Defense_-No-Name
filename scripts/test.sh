@@ -11,6 +11,10 @@ echo "== Menü-Rundgang =="
 out=$("$GODOT" --headless --fixed-fps 60 --path game -- --smoke 2>&1)
 echo "$out" | grep -E "SMOKE"
 if echo "$out" | grep -qE "SCRIPT ERROR|ERROR:"; then echo "$out" | grep -E "ERROR" | head -5; fail=1; fi
+echo "== Superfähigkeiten =="
+out=$("$GODOT" --headless --fixed-fps 60 --path game -- --autotest --level=4 --seed=1 --ultcheck 2>&1)
+echo "$out" | grep -E "ULTCHECK fertig"
+if echo "$out" | grep -qE "SCRIPT ERROR|ERROR:|ausgelöst: false"; then echo "$out" | grep -E "ERROR|false" | head -5; fail=1; fi
 echo "== Level 1 bis 5 (Seed 1, mit Hebel) =="
 for lvl in 1 2 3 4 5; do
   out=$("$GODOT" --headless --fixed-fps 60 --path game -- --autotest --level=$lvl --seed=1 --pull 2>&1)
