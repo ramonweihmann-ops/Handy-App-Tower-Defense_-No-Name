@@ -2,7 +2,8 @@ class_name BallRun
 extends Control
 ## Die Kugelbahn unten am Bildschirm: Ein Federhebel schießt Energiekugeln in die Bahn,
 ## sie klackern durch Stifte und Tore und landen im Sammler. Jede gesammelte Kugel ist Munition.
-## Der Hebel schießt von selbst; wer ihn zieht, bekommt eine Extra-Ladung (Abklingzeit).
+## Der Hebel schießt von selbst. Alle paar Sekunden lädt sich zusätzlich eine Überladung auf:
+## einmal ziehen (oder antippen) schießt einen ganzen Schwall Kugeln. Sie wartet, bis man Zeit hat.
 
 signal ball_collected(type: String)
 signal manual_pulled
@@ -17,7 +18,9 @@ const GATE_SIZE := Vector2(100, 20)
 const GATE_SLOTS := [Vector2(150, 200), Vector2(330, 200), Vector2(510, 200), Vector2(240, 296), Vector2(420, 296)]
 ## Reihenfolge, in der neue Tore eingebaut werden.
 const GATE_ORDER := [1, 3, 4, 0, 2]
-const MANUAL_CD := 6.0
+## Ladezeit der Überladung in Spielsekunden und Kugeln pro Überladung (voll durchgezogen +4).
+const MANUAL_CD := 20.0
+const OVERLOAD_BALLS := 8
 const WALL_R := 5.0
 ## Abstand zwischen zwei Kugeln einer Ladung.
 const LAUNCH_GAP := 0.16
@@ -294,7 +297,7 @@ func _gui_input(event: InputEvent) -> void:
 
 func _release_pull() -> void:
 	if active and _manual_cd <= 0.0:
-		_pending += balls_per_launch + int(round(_pull * 4.0)) + manual_extra
+		_pending += OVERLOAD_BALLS + int(round(_pull * 4.0)) + manual_extra
 		_manual_cd = maxf(1.0, MANUAL_CD - manual_cd_bonus)
 		_sound("spring", 0.05)
 		manual_pulled.emit()
@@ -486,10 +489,14 @@ func _draw_plunger(o: Vector2) -> void:
 	if not active:
 		text = ""
 	elif ready:
-		text = "Hebel ziehen: Extra!"
+		text = "Überladung bereit!"
 		col = Color(1.0, 0.85, 0.3, 0.6 + 0.4 * sin(_hint_t * 6.0))
+		# Hebel leuchtet, solange die Überladung wartet
+		var glow := 0.25 + 0.2 * sin(_hint_t * 5.0)
+		draw_circle(o + Vector2(668, 452), 30.0, Color(1.0, 0.8, 0.25, glow * 0.5))
+		draw_circle(o + Vector2(668, 452), 20.0, Color(1.0, 0.9, 0.4, glow))
 	else:
-		text = "Hebel lädt … %d s" % int(ceil(_manual_cd))
+		text = "Überladung … %d s" % int(ceil(_manual_cd))
 	if text != "":
 		draw_string(_font, o + Vector2(440, 424), text, HORIZONTAL_ALIGNMENT_RIGHT, 190, 16, col)
 	var auto_text := "Auto: %d Kugeln / %s s" % [balls_per_launch, String.num(launch_interval, 1).replace(".", ",")]

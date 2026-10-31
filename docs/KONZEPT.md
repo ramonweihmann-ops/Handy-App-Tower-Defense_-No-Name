@@ -248,3 +248,24 @@ Ziel: herausfinden, **ob sich Kampf und Munitions-Mechanik gut anfühlen**.
 - Grafik: CC0-Platzhalter, eigene Figuren folgen später
 
 **Noch nicht im Piloten:** Sammlung, Helden-Level, Shop, Basislager, Werbung, Speichern, Server.
+
+## 9. Balance-Regeln und Monetarisierung (vom 31.10.2026)
+
+Grundsatz: Man kommt **immer auch ohne Bezahlen** weiter, aber ab einem Punkt braucht man ohne
+Kauf mehr Versuche (und sammelt dabei Karten zum Aufwerten). Kaufen ist eine einfache Abkürzung,
+nie ein Muss.
+
+- **Einstieg (Level 1–20):** gut schaffbar, auch die ersten Bosse. Ziel: Spieler binden.
+- **Normale Level danach:** Spieler ohne Käufe gewinnen beim ersten Versuch seltener als zahlende;
+  mit Aufwertungen aus Wiederholungen wird jedes Level schaffbar.
+- **Bosse ab Level 20:** ohne Kauf in der Regel **ein Versuch mehr** nötig.
+- **Käufe, die helfen:** Helden im Angebot (z. B. 2,99 €), Prime (4 statt 3 Karten bei der
+  Kartenwahl), Battle Pass, Edelsteine. Jeder Kauf ist ein spürbarer Schub, kein Pflichtkauf.
+- **Kein Held darf deutlich stärker sein als die anderen** seiner Seltenheit.
+- **Munition:** knapp genug, dass Aufwertungen zählen, aber kein Dauer-Engpass. Der Hebel ist
+  eine **Überladung** (alle 20 Spielsekunden ein Schwall Kugeln), die hilft, aber keine
+  Daueraufgabe ist – auch nicht bei x2.
+
+Das **Balance-Labor** (geplant) prüft diese Regeln automatisch: alle Level, viele Durchläufe, drei
+Spielertypen (ohne Käufe/Anfänger, ohne Käufe/Durchschnitt, zahlend), Siegquote je Level gegen
+eine Zielkurve.

@@ -325,13 +325,14 @@ func _process(delta: float) -> void:
 	if _autotest and state == "battle":
 		if battle.elapsed > 900.0:
 			_finish_autotest("timeout")
-		if _auto_pull:
-			_auto_pull_t -= delta
-			if _auto_pull_t <= 0.0:
-				_auto_pull_t = 1.0
+		# Booster setzt der Test immer ein, sobald sie bereit sind; den Hebel nur mit --pull
+		_auto_pull_t -= delta
+		if _auto_pull_t <= 0.0:
+			_auto_pull_t = 1.0
+			if _auto_pull:
 				ball_run.try_manual_pull()
-				for i in _boosters.size():
-					_use_booster(i)
+			for i in _boosters.size():
+				_use_booster(i)
 
 
 # --- Bildschirme ----------------------------------------------------------
@@ -387,7 +388,7 @@ func _old_menu() -> void:
 	var how := UiKit.wrap_label(
 		"Aus dem Wurmloch kommen Schleimwesen. Deine Crew hinter dem Energiezaun schießt von selbst.\n\n"
 		+ "Die Munition kommt aus der Kugelbahn unten: Jede Kugel im Sammler ist Munition. "
-		+ "Tore verdoppeln Kugeln oder machen Feuer- und Eismunition. Zieh den Hebel rechts für eine Extra-Ladung.\n\n"
+		+ "Tore verdoppeln Kugeln oder machen Feuer- und Eismunition. Ist die Überladung bereit, zieh den Hebel rechts: Dann kommt ein ganzer Schwall Kugeln.\n\n"
 		+ "Bei jedem Aufstieg wählst du eine von drei Karten.", 22, UiKit.C_TEXT)
 	how.custom_minimum_size = Vector2(600, 0)
 	v.add_child(how)

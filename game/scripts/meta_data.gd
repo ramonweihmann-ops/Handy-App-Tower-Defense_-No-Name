@@ -80,7 +80,7 @@ const AMMO_UPGRADES := [
 	{"id": "rate", "title": "Abschuss-Takt", "desc": "Der Hebel schießt 6 %% öfter (je Stufe)", "max": 10, "cost": 80},
 	{"id": "cap", "title": "Speicher", "desc": "+8 Kugeln Platz (je Stufe)", "max": 10, "cost": 60},
 	{"id": "start", "title": "Startvorrat", "desc": "+5 Kugeln zu Beginn (je Stufe)", "max": 10, "cost": 50},
-	{"id": "lever", "title": "Federhebel", "desc": "Hebel 0,4 s schneller bereit und +1 Extra-Kugel (je Stufe)", "max": 5, "cost": 150},
+	{"id": "lever", "title": "Überladung", "desc": "Überladung 1,5 s schneller bereit und +2 Kugeln (je Stufe)", "max": 5, "cost": 150},
 	{"id": "count", "title": "Zweiter Lauf", "desc": "+1 Kugel pro Abschuss (je Stufe)", "max": 3, "cost": 500},
 	{"id": "gate", "title": "Start-Tore", "desc": "Stufe 1: +3-Tor, Stufe 2: zweites ×2-Tor von Anfang an", "max": 2, "cost": 1200},
 ]
@@ -138,7 +138,7 @@ static func building_cost(level: int) -> int:
 const MISSIONS := [
 	{"id": "kills", "text": "Besiege %d Gegner", "goal": 120, "points": 50},
 	{"id": "wins", "text": "Gewinne %d Level", "goal": 2, "points": 60},
-	{"id": "pulls", "text": "Ziehe %d-mal den Hebel", "goal": 10, "points": 40},
+	{"id": "pulls", "text": "Löse %d-mal die Überladung aus", "goal": 4, "points": 40},
 	{"id": "cards", "text": "Wähle %d Fähigkeitskarten", "goal": 12, "points": 40},
 	{"id": "waves", "text": "Überstehe %d Wellen", "goal": 25, "points": 50},
 	{"id": "boss", "text": "Besiege %d Boss", "goal": 1, "points": 80},

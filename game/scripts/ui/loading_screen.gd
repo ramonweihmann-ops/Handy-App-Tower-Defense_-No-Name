@@ -6,7 +6,7 @@ extends Control
 
 const TIPS := [
 	"Tipp: Tore in der Kugelbahn verdoppeln Kugeln – mehr Kugeln, mehr Munition.",
-	"Tipp: Zieh den Hebel rechts unten für eine Extra-Ladung.",
+	"Tipp: Leuchtet der Hebel, zieh ihn für eine Überladung voller Kugeln.",
 	"Tipp: Feuer-Tore machen Brandmunition, Eis-Tore bremsen Gegner.",
 	"Tipp: Oben siehst du, welche Gegner als Nächstes kommen.",
 ]

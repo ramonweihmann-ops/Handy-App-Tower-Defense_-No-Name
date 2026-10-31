@@ -549,8 +549,8 @@ func battle_bonus() -> Dictionary:
 	return {
 		"shield": shield,
 		"start_ammo": 5 * ammo_level("start"),
-		"lever": 0.4 * ammo_level("lever"),
-		"lever_balls": ammo_level("lever"),
+		"lever": 1.5 * ammo_level("lever"),
+		"lever_balls": 2 * ammo_level("lever"),
 		"count": ammo_level("count"),
 		"rate": 0.06 * ammo_level("rate"),
 		"crit": crit,
