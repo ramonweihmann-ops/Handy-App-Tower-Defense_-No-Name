@@ -1,23 +1,23 @@
 # Balance-Bericht
 
-Stand 31.10.2026 17:31 · 240 Läufe · 8 je Level und Profil · Dauer 10 min
+Stand 31.10.2026 22:32 · 120 Läufe · 4 je Level und Profil · Dauer 12 min
 
 Siegquote beim ersten Versuch je Spielerprofil (✓ im Ziel, ↑ zu leicht, ↓ zu schwer, · ohne Vorgabe). Zielkurve und Profile: `docs/KONZEPT.md` (Abschnitt 9), `game/tests/balance_profiles.gd`.
 
 | Level | anfaenger | durchschnitt | zahlend | Ø Schild übrig (Sieg) | Ø Warten auf Munition |
 |---|---|---|---|---|---|
-| 1 | 100% ✓ | 100% ✓ | 100% ✓ | 100% | 0% |
-| 2 | 100% ✓ | 100% ✓ | 100% ✓ | 100% | 0% |
-| 3 | 100% ✓ | 100% ✓ | 100% ✓ | 100% | 2% |
-| 4 | 100% ✓ | 100% ✓ | 100% ✓ | 100% | 6% |
-| 5 (Boss) | 100% ✓ | 100% ✓ | 100% ✓ | 100% | 5% |
-| 6 | 100% ✓ | 100% ✓ | 100% ✓ | 100% | 0% |
-| 7 | 100% ✓ | 100% ✓ | 100% ✓ | 100% | 1% |
-| 8 | 100% ✓ | 100% ✓ | 100% ✓ | 100% | 3% |
-| 9 | 100% ✓ | 100% ✓ | 100% ✓ | 100% | 1% |
-| 10 (Boss) | 100% ✓ | 100% ✓ | 100% ✓ | 96% | 3% |
+| 11 | 100% ✓ | 100% ✓ | 100% ✓ | 100% | 0% |
+| 15 (Boss) | 100% ✓ | 100% ✓ | 100% ✓ | 99% | 0% |
+| 20 (Boss) | 100% ✓ | 100% ✓ | 100% ✓ | 100% | 0% |
+| 22 | 0% · | 100% ↑ | 100% ✓ | 93% | 0% |
+| 25 (Boss) | 0% · | 100% ↑ | 100% ✓ | 86% | 0% |
+| 30 (Boss) | 0% · | 25% ↓ | 50% ↓ | 56% | 0% |
+| 35 (Boss) | 0% · | 25% ↓ | 50% ↓ | 39% | 0% |
+| 40 (Boss) | 0% · | 50% ✓ | 75% ✓ | 69% | 0% |
+| 45 (Boss) | 0% · | 25% ↓ | 25% ↓ | 66% | 0% |
+| 50 (Boss) | 0% · | 0% ↓ | 50% ↓ | 99% | 0% |
 
-**Abweichungen von der Zielkurve: 0**
+**Abweichungen von der Zielkurve: 10**
 
 ## Starthelden
 
@@ -25,11 +25,10 @@ Siegquote, wenn der Lauf mit diesem Helden begann (alle Level und Profile). Gro�
 
 | Held | Läufe | Siegquote | Ø Schild übrig | Ø Dauer |
 |---|---|---|---|---|
-| iska | 45 | 100% | 100% | 100 s |
-| brocken | 43 | 100% | 100% | 127 s |
-| margot | 17 | 100% | 100% | 119 s |
-| lynx | 19 | 100% | 100% | 109 s |
-| kalle | 41 | 100% | 100% | 164 s |
-| fritzi | 17 | 100% | 100% | 134 s |
-| volta | 24 | 100% | 100% | 130 s |
-| dusty | 34 | 100% | 97% | 126 s |
+| dusty | 3 | 100% | 100% | 95 s |
+| brocken | 3 | 100% | 100% | 106 s |
+| kalle | 9 | 89% | 85% | 228 s |
+| fritzi | 6 | 83% | 82% | 135 s |
+| volta | 27 | 63% | 51% | 260 s |
+| margot | 27 | 48% | 44% | 227 s |
+| lynx | 45 | 40% | 35% | 273 s |
