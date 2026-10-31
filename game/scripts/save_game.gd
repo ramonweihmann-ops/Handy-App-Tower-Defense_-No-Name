@@ -10,6 +10,9 @@ signal changed
 const PATH := "user://spielstand.cfg"
 
 var test_mode := false
+## Balance-Labor: Im Test wird ein Spielerprofil (Stufen, Upgrades, Helden) nachgestellt.
+## Dann gelten die Werte aus data statt der neutralen Testwerte; gespeichert wird trotzdem nichts.
+var sim := false
 var data := {}
 
 
@@ -65,6 +68,11 @@ func load_game() -> void:
 			for k in stored.keys():
 				data[k] = stored[k]
 	_ensure_heroes()
+
+
+## Neutrale Testwerte (alles frei, keine Boni) – nur im Test ohne Spielerprofil.
+func _neutral() -> bool:
+	return test_mode and not sim
 
 
 func save_game() -> void:
@@ -206,7 +214,7 @@ func hard_unlocked() -> bool:
 # --- Helden ------------------------------------------------------------------
 
 func hero_unlocked(id: String) -> bool:
-	if test_mode:
+	if _neutral():
 		return true
 	var need: int = MetaData.HERO_UNLOCK.get(id, 0)
 	if need == 0 or data["unlocked"].has(id):
@@ -235,7 +243,7 @@ func squad() -> Array[String]:
 	var out: Array[String] = []
 	var chosen: Array = data["squad"]
 	for id in unlocked_heroes():
-		if test_mode or chosen.is_empty() or chosen.has(id):
+		if _neutral() or chosen.is_empty() or chosen.has(id):
 			out.append(id)
 	return out
 
@@ -261,7 +269,7 @@ func toggle_squad(id: String) -> String:
 
 
 func hero_level(id: String) -> int:
-	if test_mode:
+	if _neutral():
 		return 1
 	return int(data["heroes"][id]["level"])
 
@@ -293,7 +301,7 @@ func add_hero_cards(id: String, n: int) -> void:
 # --- Tech-Baum ---------------------------------------------------------------
 
 func tech_count() -> int:
-	return 0 if test_mode else int(data["tech"])
+	return 0 if _neutral() else int(data["tech"])
 
 
 func has_tech(id: String) -> bool:
@@ -307,7 +315,7 @@ func has_tech(id: String) -> bool:
 
 func booster_unlocked(id: String) -> bool:
 	var need: int = MetaData.BOOSTERS[id]["unlock"]
-	if test_mode or need == 0:
+	if _neutral() or need == 0:
 		return true
 	return data["won_levels"].has("N" + str(need)) or data["won_levels"].has("S" + str(need))
 
@@ -349,7 +357,7 @@ func upgrade_booster(id: String) -> bool:
 # --- Munition ----------------------------------------------------------------
 
 func ammo_level(id: String) -> int:
-	if test_mode:
+	if _neutral():
 		return 0
 	return int(data["ammo_up"].get(id, 0))
 
@@ -380,7 +388,7 @@ func buy_next_tech() -> bool:
 # --- Talente -------------------------------------------------------------------
 
 func talent_level(id: String) -> int:
-	if test_mode:
+	if _neutral():
 		return 0
 	return int(data["talents"].get(id, 0))
 

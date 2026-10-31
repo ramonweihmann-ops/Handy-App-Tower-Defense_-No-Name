@@ -115,3 +115,16 @@ Bilder zum Ansehen am PC (braucht ein Fenster, z. B. `xvfb-run`):
 godot --path game res://tests/render_models.tscn -- --out=/tmp/helden.png --mode=front    # oder enemies, times
 godot --path game -- --autotest --level=7 --shot=/tmp/kampf.png                          # Kampfbild nach 8 s
 ```
+
+## Balance-Labor
+
+```bash
+GODOT=/pfad/zu/godot python3 scripts/balance-lab.py --levels 1-10 --seeds 12
+```
+
+Spielt jedes Level mit drei Spielerprofilen viele Male automatisch durch (mit Hebel und Boostern)
+und schreibt `docs/BALANCE.md`: Siegquote je Level und Profil, Abgleich mit der Zielkurve
+(`docs/KONZEPT.md`, Abschnitt 9), übrig gebliebener Schild, Wartezeit auf Munition und die
+Siegquote je Starthelden. Die Profile (`tests/balance_profiles.gd`) stellen nach, wie weit ein
+Spieler vor dem Level typischerweise aufgewertet hat: Anfänger und Durchschnitt ohne Käufe,
+Zahlend mit gekauften Helden und höheren Stufen. Läuft lokal, verursacht keine Kosten.

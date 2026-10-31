@@ -49,6 +49,8 @@ var _screen: Control
 var _autotest := false
 var _auto_pull := false
 var _auto_pull_t := 0.0
+## Balance-Labor: Spielerprofil für den automatischen Test (tests/balance_profiles.gd).
+var _profile := ""
 ## Nur für Tests mit Fenster: nach 8 Sekunden Kampf ein Bild speichern und beenden (--shot=pfad.png).
 var _shot_path := ""
 
@@ -61,6 +63,9 @@ func _ready() -> void:
 	Sfx.muted = _autotest
 	if _autotest:
 		Save.data = Save.default_data()
+		if _profile != "":
+			Save.sim = true
+			load("res://tests/balance_profiles.gd").apply(Save, _profile, level)
 	_build_layout()
 	if _autotest:
 		start_level(level)
@@ -147,6 +152,8 @@ func _parse_args() -> void:
 			level = clampi(int(arg.get_slice("=", 1)), 1, GameData.LEVEL_COUNT)
 		elif arg.begins_with("--seed="):
 			seed(int(arg.get_slice("=", 1)))
+		elif arg.begins_with("--profile="):
+			_profile = arg.get_slice("=", 1)
 		elif arg.begins_with("--shot="):
 			_shot_path = arg.get_slice("=", 1)
 
