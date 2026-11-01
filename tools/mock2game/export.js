@@ -1,6 +1,6 @@
 // Mockup -> Spiel: zerlegt einen Mockup-Bildschirm in Hintergrund, Knöpfe und Texte.
 // node export.js <config.json>
-// Config: {board, out, states:[{name, set:{...}}], live:[{sel, id}], scale}
+// Config: {board, out, states:[{name, set:{...}, eval|eval_file}], live:[{sel, id, img, pad}], scale}
 //  - live: Elemente, die das Spiel selbst darstellt (z. B. 3D-Helden); sie fehlen im Hintergrund,
 //    ihr Rechteck steht in der JSON-Datei.
 const fs = require('fs'); const path = require('path');
@@ -41,7 +41,7 @@ const COLLECT = `((liveSel) => {
   Array.from(document.querySelectorAll('#dc-root span[style*="background: #ff3b30"]')).filter(e => visible(e) && inOv(e)).forEach((el, k) => {
     const r = el.getBoundingClientRect(); if (r.width > 20) return; const owner = el.closest('[data-m2g-btn]');
     el.setAttribute('data-m2g-live', 'badge' + k); out.live.push({ id: 'badge' + k, rect: [r.left, r.top, r.width, r.height], rot: 0, badge: true, button: owner ? +owner.getAttribute('data-m2g-btn') : -1 }); });
-  (liveSel || []).forEach(l => { document.querySelectorAll(l.sel).forEach((el, k) => { if (!visible(el) || !inOv(el)) return; el.setAttribute('data-m2g-live', l.id + (k ? '_' + k : '')); const r = el.getBoundingClientRect(); out.live.push({ id: l.id + (k ? '_' + k : ''), rect: [r.left, r.top, r.width, r.height], rot: rot(el), img: !!l.img }); }); });
+  (liveSel || []).forEach(l => { document.querySelectorAll(l.sel).forEach((el, k) => { if (!visible(el) || !inOv(el)) return; el.setAttribute('data-m2g-live', l.id + (k ? '_' + k : '')); const r = el.getBoundingClientRect(); out.live.push({ id: l.id + (k ? '_' + k : ''), rect: [r.left, r.top, r.width, r.height], rot: rot(el), img: !!l.img, pad: l.pad || 8 }); }); });
   document.querySelectorAll('.m2g-t').forEach((s, i) => {
     if (!visible(s) || s.closest('[data-m2g-live]') || !inOv(s)) return;
     const cs = getComputedStyle(s); const range = document.createRange(); range.selectNodeContents(s);
@@ -73,7 +73,7 @@ async function shootLive(p, data, pre) {
       document.querySelectorAll('[data-m2g-ov]').forEach(e => e.style.setProperty('visibility', 'hidden', 'important'));
       document.querySelectorAll('[data-m2g-btn]').forEach(e => e.style.setProperty('visibility', 'hidden', 'important'));
       document.querySelector('[data-m2g-live="' + id + '"]').style.setProperty('visibility', 'visible', 'important'); }, l.id);
-    const [x, y, w, h] = l.rect; const pad = 8;
+    const [x, y, w, h] = l.rect; const pad = l.pad || 8;
     const clip = { x: Math.max(0, x - pad), y: Math.max(0, y - pad), width: Math.min(390, x + w + pad) - Math.max(0, x - pad), height: Math.min(844, y + h + pad) - Math.max(0, y - pad) };
     l.img_rect = [clip.x, clip.y, clip.width, clip.height];
     await p.screenshot({ path: `${pre}_live_${l.id}.png`, clip, omitBackground: true });
@@ -83,6 +83,8 @@ async function shootLive(p, data, pre) {
 
 (async () => {
   const cfg = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+  // eval_file: JavaScript aus einer Datei neben der Konfiguration (statt eval als Zeichenkette)
+  for (const st of [...(cfg.states || []), ...(cfg.overlays || [])]) if (st.eval_file) st.eval = fs.readFileSync(path.join(path.dirname(process.argv[2]), st.eval_file), 'utf8');
   const scale = cfg.scale || 3;
   fs.mkdirSync(cfg.out, { recursive: true });
   const result = { board: cfg.board, size: [390, 844], scale, states: {} };
@@ -93,7 +95,8 @@ async function shootLive(p, data, pre) {
     await p.evaluate(PREP);
     const data = await p.evaluate(COLLECT + '(' + JSON.stringify(cfg.live || []) + ')');
     // Texte ausblenden
-    await p.addStyleTag({ content: '.m2g-t{color:transparent!important;text-shadow:none!important;-webkit-text-stroke:0!important} [data-m2g-live]{visibility:hidden!important}' });
+    // Seitenhintergrund durchsichtig (manche Mockups setzen body weiß), sonst haben Knöpfe weiße Ränder
+    await p.addStyleTag({ content: 'html,body{background:transparent!important} .m2g-t{color:transparent!important;text-shadow:none!important;-webkit-text-stroke:0!important} [data-m2g-live]{visibility:hidden!important}' });
     // Hintergrund ohne Knöpfe
     await p.addStyleTag({ content: '[data-m2g-btn]{visibility:hidden!important}' });
     const pre = path.join(cfg.out, st.name);
@@ -124,10 +127,11 @@ async function shootLive(p, data, pre) {
     await p.evaluate((o) => window.__dcComp.setState(o), ov.set || {});
     if (ov.eval) await p.evaluate(ov.eval);
     await p.waitForTimeout(250);
-    await p.evaluate(PREP);
+    // erst vergleichen, dann Texte einpacken (sonst gilt jedes Element mit Text als neu)
     const n = await p.evaluate(MARK_OVERLAY + '(' + JSON.stringify(base) + ')');
+    await p.evaluate(PREP);
     const data = await p.evaluate(COLLECT + '(' + JSON.stringify(cfg.live || []) + ')');
-    await p.addStyleTag({ content: '.m2g-t{color:transparent!important;text-shadow:none!important} [data-m2g-live]{visibility:hidden!important} #dc-root{visibility:hidden!important} [data-m2g-ov]{visibility:visible!important} [data-m2g-btn]{visibility:hidden!important}' });
+    await p.addStyleTag({ content: 'html,body{background:transparent!important} .m2g-t{color:transparent!important;text-shadow:none!important} [data-m2g-live]{visibility:hidden!important} #dc-root{visibility:hidden!important} [data-m2g-ov]{visibility:visible!important} [data-m2g-btn]{visibility:hidden!important}' });
     const box = await p.evaluate(() => { let a = null; document.querySelectorAll('[data-m2g-ov], [data-m2g-ov] *').forEach(e => { const q = e.getBoundingClientRect(); if (q.width < 0.5 || q.height < 0.5) return; const cs = getComputedStyle(e);
       const shadow = parseFloat((cs.boxShadow.match(/(\d+)px\)?\s*$/) || [0, 0])[1]) || 0; const g = Math.min(40, 6 + (cs.boxShadow !== 'none' ? 24 : 0));
       const r = [q.left - g, q.top - g, q.right + g, q.bottom + g]; a = a ? [Math.min(a[0], r[0]), Math.min(a[1], r[1]), Math.max(a[2], r[2]), Math.max(a[3], r[3])] : r; });

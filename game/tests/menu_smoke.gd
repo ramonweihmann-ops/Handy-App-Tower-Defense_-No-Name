@@ -77,8 +77,12 @@ func _run() -> bool:
 			print("SMOKE boni: ", save.battle_bonus())
 			print("SMOKE booster: ", save.booster_slots(), " aufwerten ", save.upgrade_booster("medipack"), " tauschen '", save.toggle_booster("zeitlupe"), "'")
 		3:
-			var page: Control = m._content.get_child(m._content.get_child_count() - 1)
+			# Reiter aus den Mockups liegen nicht in _content, sondern als eigener Bildschirm darüber
+			var page: Control = m._content.get_child(m._content.get_child_count() - 1) if m._content.get_child_count() > 0 else m._mock
 			print("SMOKE reiter breite ", page.size.x, " inhalt ", m._content.size.x)
+			if m._mock and m._mock.has_method("grid_ids"):
+				print("SMOKE talente im raster: ", m._mock.grid_ids().size())
+				m._mock._draw_talents(1)
 			var top: Control = m._frame.get_child(0)
 			var parts := []
 			for c in top.get_child(0).get_children():
@@ -98,6 +102,14 @@ func _run() -> bool:
 			m._open_hero("fritzi")
 			m.sub_tab["upgrades"] = "munition"
 			m.show_tab("upgrades")
+			# Tech-Baum nach Mockup: Fenster zu jedem Knotenzustand, Kaufen, Munition
+			if m._mock and m._mock.has_method("open_pop"):
+				var n: int = save.tech_count()
+				for i in [0, mini(n + 1, MetaData.TECH.size() - 1), n]:
+					m._mock.open_pop(i)
+				m._mock._buy_tech()
+				m._mock.close_ammo()
+				print("SMOKE tech-baum: gebaut ", save.tech_count())
 		8:
 			var u: Updater = main.updater
 			u.current_code = 100

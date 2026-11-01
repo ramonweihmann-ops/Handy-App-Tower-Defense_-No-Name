@@ -13,8 +13,11 @@ als Bilder, alle Texte als echte Texte (Schrift, Größe, Farbe, Schatten aus de
 ändert (Level-Knoten, Werte), steht in der Konfiguration unter `live` und zeichnet das Spiel selbst.
 Rote Hinweis-Punkte werden immer herausgenommen und vom Spiel nur gezeigt, wenn etwas wartet.
 
-Konfiguration (`cfg/*.json`): `board` (Mockup-Datei), `out`, `states` (Zustände mit `set` = setState),
-`overlays` (Popups: nur die neuen Elemente gegenüber dem Grundzustand), `live` (`sel` = CSS-Auswahl,
-`id`, `img` = Bild mit aufnehmen).
+Konfiguration (`cfg/*.json`): `board` (Mockup-Datei), `out`, `states` (Zustände mit `set` = setState,
+`eval` bzw. `eval_file` = JavaScript, das vorher die Seite umbaut, z. B. Symbole für alle Knoten im
+Spiel ergänzen – Beispiel `cfg/upgrades_tech.js`), `overlays` (Popups: nur die neuen Elemente gegenüber
+dem Grundzustand), `live` (`sel` = CSS-Auswahl, `id`, `img` = Bild mit aufnehmen, `pad` = Rand um das
+Bild in Punkten, Standard 8, mehr bei Leuchten/Schatten). Liegt ein Live-Element in einem anderen, fehlt
+es auf dessen Bild (so lassen sich Rahmen und Symbol getrennt aufnehmen).
 
 Benötigt Node mit Playwright (Chromium) und Python mit Pillow.

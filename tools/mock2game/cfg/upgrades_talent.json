@@ -1,0 +1,11 @@
+{"board": "Upgrades-Talente.dc.html", "out": "out/upgrades_talent",
+ "states": [{"name": "main", "eval_file": "upgrades_talent.js"}],
+ "live": [
+  {"sel": "div[style*=\"#5fe07a, #2fa84a\"]", "id": "card_all"},
+  {"sel": "div[style*=\"#5fe07a, #2fa84a\"]:nth-child(2)", "id": "card", "img": true, "pad": 22},
+  {"sel": ".m2g-tslot", "id": "tslot"},
+  {"sel": "div[style*=\"#5fe07a, #2fa84a\"] > div:last-child", "id": "tlevel"},
+  {"sel": ".m2g-tic", "id": "tic", "img": true, "pad": 12},
+  {"sel": "div[aria-label=\"Noch nicht entdeckt\"]", "id": "unk_all"},
+  {"sel": "div[aria-label=\"Noch nicht entdeckt\"]:nth-child(3)", "id": "unk", "img": true, "pad": 8}
+ ]}
