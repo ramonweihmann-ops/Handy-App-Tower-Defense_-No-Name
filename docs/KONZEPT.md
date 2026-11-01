@@ -274,8 +274,11 @@ eine Zielkurve.
 
 - **Level 1–10:** Gegnerleben steigt gleichmäßig (+20 % je Level), Gegnerschaden gleich.
 - **Level 11–20:** Leben +5,5 % je Level, Schaden wächst mit dem Schild der Station mit (+3,5 % Druck).
-- **Ab Level 21 (Phase 2):** einmaliger Sprung (Leben ×3,8, Schaden ×1,6), danach Leben +2,5 % je
-  Level – im Gleichschritt mit einem Spieler, der regelmäßig aufwertet. Bosse ab Level 21: Leben ×1,4.
+- **Ab Level 21 (Phase 2):** einmaliger Sprung (Leben ×4,7, Schaden ×1,6), danach Leben +2,5 % je
+  Level – im Gleichschritt mit einem Spieler, der regelmäßig aufwertet. Bosse ab Level 21: Leben ×1,22.
+- **Heldentypen:** Start-Helden (Dusty, Iska, Brocken, Kalle, Fritzi) tragen den Kampfbeginn;
+  Verstärkungs-Helden (Volta, Margot, Lynx) sind als erster Held schwächer, im Kampf dazugerufen aber
+  stark (+30 % eigener Schaden, ganzes Team +6 %). Im Labor: Lynx als Start 63 %, dazugerufen 85 %.
 - **Helden:** jede Heldenstufe +7 % Schaden (prozentual), Stufe bis 30.
 - Ergebnis im Labor (Durchschnitt ohne Käufe / Zahlend): normale Level ab 21 meist 50–100 % /
   83–100 %, Bosse ab 21 etwa 33–67 % / 67–100 %. Werte in `game/scripts/game_data.gd`.
@@ -292,6 +295,6 @@ eine Zielkurve.
   ausgeht (höchstens eine Stufe darüber). Gold sammelt sich ab Level 30 an: Platz für spätere
   Goldsenken (Gebäude, Booster, neue Upgrades).
 - **Vorteil durch Käufe ist verhältnismäßig, nicht wachsend:** Zahlende sind in jedem Level etwa
-  gleich viel stärker (rund 25 %, entspricht 3 Heldenstufen, dazu Prime). Kaufangebote wachsen mit
+  gleich viel stärker (rund 30 %, entspricht 4 Heldenstufen, dazu Prime; vom Nutzer bestätigt). Kaufangebote wachsen mit
   dem Fortschritt (z. B. Heldentruhe: 10 + 1,5 × höchstes Level Karten), damit ein Kauf immer
   ungefähr gleich viel bringt.
