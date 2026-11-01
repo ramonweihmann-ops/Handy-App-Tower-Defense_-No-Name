@@ -411,29 +411,38 @@ func show_tab(id: String) -> void:
 
 # --- Bildschirme aus den Mockups ------------------------------------------------------
 
-## Neuer Bildschirm (1:1 nach Mockup) für einen Reiter; null = bisherige Seite
+## Neuer Bildschirm (1:1 nach Mockup) für einen Reiter; null = bisherige Seite.
+## Gefunden wird er über den Dateinamen: scripts/ui/screens/tab_<reiter>.gd (Konstruktor: menu).
 func _mock_for(id: String) -> MockScreen:
-	match id:
-		"kampf":
-			return HomeScreen.new(self)
+	if id == "kampf":
+		return HomeScreen.new(self)
+	var path := "res://scripts/ui/screens/tab_%s.gd" % id
+	if ResourceLoader.exists(path):
+		return load(path).new(self)
 	return null
 
 
-## Ein Mockup-Fenster öffnen, auf das ein Knopf verweist (z. B. „Missionen.dc.html“)
+## Ein Mockup-Fenster öffnen, auf das ein Knopf verweist (z. B. „Missionen.dc.html“).
+## Gefunden über scripts/ui/screens/board_<mockup-name klein>.gd, z. B. board_missionen.gd.
 func open_board(href: String) -> void:
-	var screen: Control = null
-	match href:
-		"Main.dc.html":
-			show_tab("kampf")
-			return
-		"Artboard-zqpq.dc.html":
-			_open_wheel()
-			return
-	if screen == null:
-		toast("Kommt bald")
+	if href == "Main.dc.html":
+		show_tab("kampf")
 		return
+	var slug := href.trim_suffix(".dc.html").to_lower()
+	var path := "res://scripts/ui/screens/board_%s.gd" % slug
+	if not ResourceLoader.exists(path):
+		if href == "Artboard-zqpq.dc.html":
+			_open_wheel()
+		else:
+			toast("Kommt bald")
+		return
+	var screen: Control = load(path).new(self)
 	_boards.append(screen)
 	add_child(screen)
+
+
+func info(title: String, text: String) -> void:
+	_info(title, text)
 
 
 func close_board(screen: Control) -> void:
