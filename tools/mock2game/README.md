@@ -21,4 +21,11 @@ Reiter Truhen/Aufladen/Event aus den Bausteinen des Mockups, `cfg/wheel.json` pa
 Glücksrads an die echten Gewinne an und nimmt Rad, Nabe und Zeiger als eigene Bilder auf.
 `to_game.py` legt gleiche Bilder (z. B. denselben Hintergrund in mehreren Zuständen) nur einmal ab.
 
+Konfiguration (`cfg/*.json`): `board` (Mockup-Datei), `out`, `states` (Zustände mit `set` = setState,
+`eval` bzw. `eval_file` = JavaScript, das vorher die Seite umbaut, z. B. Symbole für alle Knoten im
+Spiel ergänzen – Beispiel `cfg/upgrades_tech.js`), `overlays` (Popups: nur die neuen Elemente gegenüber
+dem Grundzustand), `live` (`sel` = CSS-Auswahl, `id`, `img` = Bild mit aufnehmen, `pad` = Rand um das
+Bild in Punkten, Standard 8, mehr bei Leuchten/Schatten). Liegt ein Live-Element in einem anderen, fehlt
+es auf dessen Bild (so lassen sich Rahmen und Symbol getrennt aufnehmen).
+
 Benötigt Node mit Playwright (Chromium) und Python mit Pillow.

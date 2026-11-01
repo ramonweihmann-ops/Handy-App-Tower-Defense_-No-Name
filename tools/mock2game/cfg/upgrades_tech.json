@@ -1,0 +1,26 @@
+{"board": "Artboard-wpji.dc.html", "out": "out/upgrades_tech",
+ "states": [{"name": "main", "eval_file": "upgrades_tech.js"}],
+ "overlays": [
+  {"name": "pop_cur", "set": {"sel": 2}},
+  {"name": "pop_done", "set": {"sel": 0}},
+  {"name": "pop_lock", "set": {"sel": 3}},
+  {"name": "bought", "set": {"bought": true}}
+ ],
+ "live": [
+  {"sel": "div[style*=\"rgba(255,255,255,0.35)\"][style*=\"width: 10px\"]", "id": "line"},
+  {"sel": "div[style*=\"#ffd34d, #3fd05a\"]", "id": "line_done"},
+  {"sel": ".m2g-node", "id": "node"},
+  {"sel": ".m2g-node[aria-label^=\"Schildgenerator I (\"]", "id": "node_done", "img": true, "pad": 18},
+  {"sel": ".m2g-node[aria-label^=\"Schildgenerator II:\"]", "id": "node_cur", "img": true, "pad": 32},
+  {"sel": ".m2g-node[aria-label^=\"Kampfsimulator\"]", "id": "node_lock", "img": true, "pad": 18},
+  {"sel": ".m2g-nic", "id": "nic"},
+  {"sel": ".m2g-ic", "id": "icon", "img": true, "pad": 4},
+  {"sel": ".m2g-gic", "id": "gicon", "img": true, "pad": 4},
+  {"sel": "svg[viewBox=\"0 0 200 200\"]", "id": "cur_glow", "img": true},
+  {"sel": "span[style*=\"min-width: 30px\"]", "id": "lvl_badge", "img": true, "pad": 6},
+  {"sel": "div[role=\"dialog\"] svg[width=\"44\"]", "id": "pop_icon"},
+  {"sel": "div[role=\"dialog\"] > div:first-child > div:nth-child(2)", "id": "pop_text"},
+  {"sel": "div[role=\"dialog\"] > div:nth-child(2) > span:nth-child(2)", "id": "price"},
+  {"sel": "div[role=\"dialog\"] > div:nth-child(2) svg", "id": "coin", "img": true, "pad": 2},
+  {"sel": "div[role=\"dialog\"] > div:last-child > svg[width=\"16\"]", "id": "need_lock", "img": true, "pad": 2}
+ ]}

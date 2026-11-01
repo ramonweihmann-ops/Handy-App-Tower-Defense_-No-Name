@@ -66,16 +66,16 @@ static func booster_cost(level: int) -> int:
 # --- Tech-Baum: Knoten werden nacheinander gekauft ---------------------------
 
 const TECH := [
-	{"id": "shield1", "title": "Schildgenerator I", "desc": "Schild +10 %", "cost": 100},
+	{"id": "shield1", "title": "Schildgenerator I", "desc": "Schild +10 % in jedem Kampf", "cost": 100},
 	{"id": "crit", "title": "Zielhilfe", "desc": "Kritische Treffer +5 %", "cost": 200},
-	{"id": "shield2", "title": "Schildgenerator II", "desc": "Schild +10 %", "cost": 350},
-	{"id": "xp", "title": "Kampfsimulator", "desc": "Erfahrung +10 %", "cost": 550},
+	{"id": "shield2", "title": "Schildgenerator II", "desc": "Schild +10 % in jedem Kampf", "cost": 350},
+	{"id": "xp", "title": "Kampfsimulator", "desc": "Erfahrung +10 % nach jedem Kampf", "cost": 550},
 	{"id": "gold", "title": "Bergungsteam", "desc": "Gold nach dem Kampf +10 %", "cost": 800},
 	{"id": "heal", "title": "Reparaturdrohne", "desc": "Schild heilt 1 % nach jeder Welle", "cost": 1100},
-	{"id": "shield3", "title": "Schildgenerator III", "desc": "Schild +15 %", "cost": 1500},
+	{"id": "shield3", "title": "Schildgenerator III", "desc": "Schild +15 % in jedem Kampf", "cost": 1500},
 	{"id": "crit2", "title": "Zielcomputer", "desc": "Kritische Treffer +5 %", "cost": 2000},
 	{"id": "damage", "title": "Waffenkammer", "desc": "Schaden aller Helden +5 %", "cost": 2600},
-	{"id": "xp2", "title": "Gefechtsübung", "desc": "Erfahrung +10 %", "cost": 3300},
+	{"id": "xp2", "title": "Gefechtsübung", "desc": "Erfahrung +10 % nach jedem Kampf", "cost": 3300},
 ]
 
 # --- Munition: dauerhafte Stufen für die Kugelbahn -----------------------------

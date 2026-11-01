@@ -1,6 +1,6 @@
 // Mockup -> Spiel: zerlegt einen Mockup-Bildschirm in Hintergrund, Knöpfe und Texte.
 // node export.js <config.json>
-// Config: {board, out, states:[{name, set:{...}}], live:[{sel, id}], scale}
+// Config: {board, out, states:[{name, set:{...}, eval|eval_file}], live:[{sel, id, img, pad}], scale}
 //  - live: Elemente, die das Spiel selbst darstellt (z. B. 3D-Helden); sie fehlen im Hintergrund,
 //    ihr Rechteck steht in der JSON-Datei.
 const fs = require('fs'); const path = require('path');
@@ -108,6 +108,8 @@ async function shootLive(p, data, pre) {
   const cfg = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
   // script: Hilfs-Skript (Pfad relativ zur Konfiguration), läuft vor jedem eval, z. B. für Zusatz-Zustände
   const helper = cfg.script ? fs.readFileSync(path.resolve(path.dirname(process.argv[2]), cfg.script), 'utf8') : '';
+  // eval_file: JavaScript aus einer Datei neben der Konfiguration (statt eval als Zeichenkette)
+  for (const st of [...(cfg.states || []), ...(cfg.overlays || [])]) if (st.eval_file) st.eval = fs.readFileSync(path.join(path.dirname(process.argv[2]), st.eval_file), 'utf8');
   const scale = cfg.scale || 3;
   fs.mkdirSync(cfg.out, { recursive: true });
   const result = { board: cfg.board, size: [390, 844], scale, states: {}, transparent: !!cfg.only };
@@ -121,7 +123,7 @@ async function shootLive(p, data, pre) {
       const r = document.querySelector('#dc-root > div'); r.style.setProperty('background', 'transparent', 'important'); }, cfg.only);
     const data = await p.evaluate(COLLECT + '(' + JSON.stringify(cfg.live || []) + ')');
     // Texte ausblenden
-    await p.addStyleTag({ content: '.m2g-t{color:transparent!important;text-shadow:none!important;-webkit-text-stroke:0!important} .m2g-svgt{fill:transparent!important;stroke:transparent!important} [data-m2g-live]{visibility:hidden!important}' });
+    await p.addStyleTag({ content: 'html,body{background:transparent!important} .m2g-t{color:transparent!important;text-shadow:none!important;-webkit-text-stroke:0!important} .m2g-svgt{fill:transparent!important;stroke:transparent!important} [data-m2g-live]{visibility:hidden!important}' });
     // Hintergrund ohne Knöpfe
     await p.addStyleTag({ content: '[data-m2g-btn]{visibility:hidden!important}' });
     const pre = path.join(cfg.out, st.name);
@@ -152,10 +154,11 @@ async function shootLive(p, data, pre) {
     await p.evaluate((o) => window.__dcComp.setState(o), ov.set || {});
     if (ov.eval) { if (helper) await p.evaluate(helper); await p.evaluate(ov.eval); }
     await p.waitForTimeout(250);
-    await p.evaluate(PREP);
+    // erst vergleichen, dann Texte einpacken (sonst gilt jedes Element mit Text als neu)
     const n = await p.evaluate(MARK_OVERLAY + '(' + JSON.stringify(base) + ')');
+    await p.evaluate(PREP);
     const data = await p.evaluate(COLLECT + '(' + JSON.stringify(cfg.live || []) + ')');
-    await p.addStyleTag({ content: '.m2g-t{color:transparent!important;text-shadow:none!important} .m2g-svgt{fill:transparent!important;stroke:transparent!important} [data-m2g-live]{visibility:hidden!important} #dc-root{visibility:hidden!important} [data-m2g-ov]{visibility:visible!important} [data-m2g-btn]{visibility:hidden!important}' });
+    await p.addStyleTag({ content: 'html,body{background:transparent!important} .m2g-t{color:transparent!important;text-shadow:none!important} .m2g-svgt{fill:transparent!important;stroke:transparent!important} [data-m2g-live]{visibility:hidden!important} #dc-root{visibility:hidden!important} [data-m2g-ov]{visibility:visible!important} [data-m2g-btn]{visibility:hidden!important}' });
     const box = await p.evaluate(() => { let a = null; document.querySelectorAll('[data-m2g-ov], [data-m2g-ov] *').forEach(e => { const q = e.getBoundingClientRect(); if (q.width < 0.5 || q.height < 0.5) return; const cs = getComputedStyle(e);
       const shadow = parseFloat((cs.boxShadow.match(/(\d+)px\)?\s*$/) || [0, 0])[1]) || 0; const g = Math.min(40, 6 + (cs.boxShadow !== 'none' ? 24 : 0));
       const r = [q.left - g, q.top - g, q.right + g, q.bottom + g]; a = a ? [Math.min(a[0], r[0]), Math.min(a[1], r[1]), Math.max(a[2], r[2]), Math.max(a[3], r[3])] : r; });
