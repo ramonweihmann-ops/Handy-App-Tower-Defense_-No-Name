@@ -464,8 +464,9 @@ func _draw_front(c: Control) -> void:
 	var rr := fill.size.y * 0.5
 	var cols := PackedColorArray([Color(0.44, 0.82, 1.0), Color(1.0, 0.83, 0.3).lerp(Color(0.44, 0.82, 1.0), 1.0 - _shown),
 		Color(1.0, 0.83, 0.3).lerp(Color(0.44, 0.82, 1.0), 1.0 - _shown), Color(0.44, 0.82, 1.0)])
-	c.draw_polygon(PackedVector2Array([fill.position + Vector2(rr, 0), fill.end - Vector2(rr, fill.size.y),
-		fill.end - Vector2(rr, 0), fill.position + Vector2(rr, fill.size.y)]), cols)
+	if fill.size.x - rr * 2.0 > 1.0:
+		c.draw_polygon(PackedVector2Array([fill.position + Vector2(rr, 0), fill.end - Vector2(rr, fill.size.y),
+			fill.end - Vector2(rr, 0), fill.position + Vector2(rr, fill.size.y)]), cols)
 	c.draw_circle(fill.position + Vector2(rr, rr), rr, cols[0])
 	c.draw_circle(fill.end - Vector2(rr, rr), rr, cols[1])
 	# Blitz-Knopf am Ende des Balkens, pulsiert

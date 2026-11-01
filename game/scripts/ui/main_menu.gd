@@ -37,6 +37,8 @@ var _toast: Label
 var _toast_t := 0.0
 var _tick := 0.0
 var _bg_mat: ShaderMaterial
+var _mock: MockScreen          # Bildschirm aus den Mockups für den aktuellen Reiter (oder null)
+var _boards: Array[Control] = []   # darüber geöffnete Mockup-Fenster (Angebote, Missionen …)
 
 
 func _ready() -> void:
@@ -206,6 +208,8 @@ func _pill(row: HBoxContainer, icon: String, on_plus: Callable) -> Label:
 
 
 func _refresh_top() -> void:
+	if is_instance_valid(_mock):
+		_mock.refresh_top()
 	if _energy_label == null:
 		return
 	_update_badges()
@@ -370,6 +374,15 @@ func show_tab(id: String) -> void:
 				b.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	for c in _content.get_children():
 		c.queue_free()
+	if is_instance_valid(_mock):
+		_mock.queue_free()
+	_mock = _mock_for(id)
+	_frame.visible = _mock == null
+	if _mock:
+		add_child(_mock)
+		move_child(_mock, _frame.get_index() + 1)
+		_refresh_top()
+		return
 	var page: Control
 	match id:
 		"shop":
@@ -394,6 +407,61 @@ func show_tab(id: String) -> void:
 	tw.tween_property(page, "offset_top", 0.0, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tw.tween_property(page, "offset_bottom", 0.0, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_refresh_top()
+
+
+# --- Bildschirme aus den Mockups ------------------------------------------------------
+
+## Neuer Bildschirm (1:1 nach Mockup) für einen Reiter; null = bisherige Seite
+func _mock_for(id: String) -> MockScreen:
+	match id:
+		"kampf":
+			return HomeScreen.new(self)
+	return null
+
+
+## Ein Mockup-Fenster öffnen, auf das ein Knopf verweist (z. B. „Missionen.dc.html“)
+func open_board(href: String) -> void:
+	var screen: Control = null
+	match href:
+		"Main.dc.html":
+			show_tab("kampf")
+			return
+		"Artboard-zqpq.dc.html":
+			_open_wheel()
+			return
+	if screen == null:
+		toast("Kommt bald")
+		return
+	_boards.append(screen)
+	add_child(screen)
+
+
+func close_board(screen: Control) -> void:
+	_boards.erase(screen)
+	if is_instance_valid(screen):
+		screen.queue_free()
+	if is_instance_valid(_mock):
+		_mock.refresh()
+
+
+func play_selected() -> void:
+	_on_fight()
+
+
+func mission_ready() -> bool:
+	return _mission_ready()
+
+
+func open_daily() -> void:
+	_open_daily()
+
+
+func open_energy() -> void:
+	_open_energy()
+
+
+func open_settings() -> void:
+	_open_settings()
 
 
 # --- Bausteine -------------------------------------------------------------------
@@ -468,6 +536,7 @@ static func reward_icon(r: Dictionary) -> String:
 func toast(text: String) -> void:
 	_toast.text = text
 	_toast_t = 2.2
+	move_child(_toast, -1)
 
 
 # --- Reiter: Kampf ------------------------------------------------------------------
