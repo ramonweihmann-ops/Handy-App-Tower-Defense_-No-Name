@@ -1,6 +1,7 @@
 // Mockup -> Spiel: zerlegt einen Mockup-Bildschirm in Hintergrund, Knöpfe und Texte.
 // node export.js <config.json>
-// Config: {board, out, states:[{name, set:{...}}], live:[{sel, id}], scale}
+// Config: {board, out, states:[{name, set:{...}}], overlays:[{name, base, set, only_live}], live:[{sel, id}], scale}
+//  - overlays mit only_live: nur die Live-Bilder des Popups (z. B. das Symbol je Held und Fähigkeit)
 //  - live: Elemente, die das Spiel selbst darstellt (z. B. 3D-Helden); sie fehlen im Hintergrund,
 //    ihr Rechteck steht in der JSON-Datei.
 const fs = require('fs'); const path = require('path');
@@ -20,12 +21,16 @@ const PREP = `(() => {
   // 2) Animationen anhalten (fester Zeitpunkt)
   for (const sv of document.querySelectorAll('svg')) { try { sv.pauseAnimations(); sv.setCurrentTime(0.35); } catch (e) {} }
   for (const a of document.getAnimations()) { try { a.pause(); a.currentTime = 350; } catch (e) {} }
+  // weißer Seitenhintergrund mancher Mockups: Knöpfe und Live-Bilder brauchen Durchsicht
+  document.documentElement.style.setProperty('background', 'transparent', 'important');
+  document.body.style.setProperty('background', 'transparent', 'important');
   return nodes.length;
 })()`;
 
-const SIGS = `(() => { const out = []; document.querySelectorAll('#dc-root *').forEach(e => { if (e.classList.contains('m2g-t')) return; out.push(e.localName + '|' + (e.getAttribute('style') || '') + '|' + (e.getAttribute('src') || '') + '|' + (e.getAttribute('d') || '') + '|' + Array.from(e.childNodes).filter(n => n.nodeType === 3).map(n => n.nodeValue.trim()).join('')); }); return out; })()`;
+// Kennung je Element; Texte zählen gleich, ob schon in m2g-t-Spans gepackt oder nicht
+const SIGS = `(() => { const out = []; document.querySelectorAll('#dc-root *').forEach(e => { if (e.classList.contains('m2g-t')) return; out.push(e.localName + '|' + (e.getAttribute('style') || '') + '|' + (e.getAttribute('src') || '') + '|' + (e.getAttribute('d') || '') + '|' + Array.from(e.childNodes).map(n => n.nodeType === 3 ? n.nodeValue.trim() : (n.classList && n.classList.contains('m2g-t') ? n.textContent.trim() : '')).join('')); }); return out; })()`;
 const MARK_OVERLAY = `((base) => { const cnt = {}; base.forEach(k => cnt[k] = (cnt[k] || 0) + 1); let n = 0;
-  document.querySelectorAll('#dc-root *').forEach(e => { if (e.classList.contains('m2g-t')) return; const k = e.localName + '|' + (e.getAttribute('style') || '') + '|' + (e.getAttribute('src') || '') + '|' + (e.getAttribute('d') || '') + '|' + Array.from(e.childNodes).filter(n => n.nodeType === 3).map(n => n.nodeValue.trim()).join('');
+  document.querySelectorAll('#dc-root *').forEach(e => { if (e.classList.contains('m2g-t')) return; const k = e.localName + '|' + (e.getAttribute('style') || '') + '|' + (e.getAttribute('src') || '') + '|' + (e.getAttribute('d') || '') + '|' + Array.from(e.childNodes).map(n => n.nodeType === 3 ? n.nodeValue.trim() : (n.classList && n.classList.contains('m2g-t') ? n.textContent.trim() : '')).join('');
     if (e.parentElement && e.parentElement.closest('[data-m2g-ov]')) return; if (cnt[k]) { cnt[k]--; return; } e.setAttribute('data-m2g-ov', '1'); n++; });
   return n; })`;
 const COLLECT = `((liveSel) => {
@@ -85,7 +90,7 @@ async function shootLive(p, data, pre) {
   const cfg = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
   const scale = cfg.scale || 3;
   fs.mkdirSync(cfg.out, { recursive: true });
-  const result = { board: cfg.board, size: [390, 844], scale, states: {} };
+  const result = { board: cfg.board, size: [390, 844], scale, states: {}, lossy_alpha: !!cfg.lossy_alpha };
   for (const st of cfg.states || [{ name: 'main' }]) {
     const { b, p } = await open(cfg.board, scale);
     if (st.set) { await p.evaluate((o) => window.__dcComp.setState(o), st.set); await p.waitForTimeout(200); }
@@ -127,6 +132,15 @@ async function shootLive(p, data, pre) {
     await p.evaluate(PREP);
     const n = await p.evaluate(MARK_OVERLAY + '(' + JSON.stringify(base) + ')');
     const data = await p.evaluate(COLLECT + '(' + JSON.stringify(cfg.live || []) + ')');
+    if (ov.only_live) {
+      // nur die Live-Bilder (z. B. ein Symbol je Held), kein Hintergrund, keine Knöpfe
+      await p.addStyleTag({ content: '.m2g-t{color:transparent!important;text-shadow:none!important}' });
+      data.texts = []; data.buttons = [];
+      await shootLive(p, data, path.join(cfg.out, 'ov_' + ov.name));
+      result.overlays[ov.name] = data;
+      await b.close();
+      continue;
+    }
     await p.addStyleTag({ content: '.m2g-t{color:transparent!important;text-shadow:none!important} [data-m2g-live]{visibility:hidden!important} #dc-root{visibility:hidden!important} [data-m2g-ov]{visibility:visible!important} [data-m2g-btn]{visibility:hidden!important}' });
     const box = await p.evaluate(() => { let a = null; document.querySelectorAll('[data-m2g-ov], [data-m2g-ov] *').forEach(e => { const q = e.getBoundingClientRect(); if (q.width < 0.5 || q.height < 0.5) return; const cs = getComputedStyle(e);
       const shadow = parseFloat((cs.boxShadow.match(/(\d+)px\)?\s*$/) || [0, 0])[1]) || 0; const g = Math.min(40, 6 + (cs.boxShadow !== 'none' ? 24 : 0));

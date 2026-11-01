@@ -14,7 +14,14 @@ als Bilder, alle Texte als echte Texte (Schrift, Größe, Farbe, Schatten aus de
 Rote Hinweis-Punkte werden immer herausgenommen und vom Spiel nur gezeigt, wenn etwas wartet.
 
 Konfiguration (`cfg/*.json`): `board` (Mockup-Datei), `out`, `states` (Zustände mit `set` = setState),
-`overlays` (Popups: nur die neuen Elemente gegenüber dem Grundzustand), `live` (`sel` = CSS-Auswahl,
-`id`, `img` = Bild mit aufnehmen).
+`overlays` (Popups: nur die neuen Elemente gegenüber dem Grundzustand; `only_live: true` = nur die
+Live-Bilder, z. B. ein Symbol je Held), `live` (`sel` = CSS-Auswahl, `id`, `img` = Bild mit aufnehmen),
+`lossy_alpha` (auch Bilder mit Durchsicht verlustbehaftet, für Bildschirme mit vielen großen Symbolen).
+
+`to_game.py` speichert gleiche Bilder nur einmal (z. B. dieselben Knöpfe in jedem Zustand; Hintergründe,
+die sich nur in der Kantenglättung unterscheiden, ebenso).
+
+Beispiele: `cfg/home.json` (Abenteuer-Pfad), `cfg/helden.json` (Heldenübersicht, Karten zeichnet das
+Spiel), `cfg/held.json` (Held aufleveln: ein Zustand je Held, Fähigkeiten-Fenster, Symbole je Held).
 
 Benötigt Node mit Playwright (Chromium) und Python mit Pillow.

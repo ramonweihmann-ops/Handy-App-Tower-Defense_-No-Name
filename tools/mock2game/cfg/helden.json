@@ -1,0 +1,9 @@
+{"board": "Artboard-seqx.dc.html", "out": "out/helden", "states": [{"name": "main"}],
+ "live": [
+  {"sel": "div[style*=\"position: relative; height: 48px\"]", "id": "banner", "img": true},
+  {"sel": "span[style*=\"rgba(15,61,18,0.6)\"]", "id": "pill_ok"},
+  {"sel": "span[style*=\"rgba(90,10,40,0.6)\"]", "id": "pill_lock"},
+  {"sel": "div[style*=\"background: rgba(30,20,80,0.55)\"]", "id": "card"},
+  {"sel": "span[aria-label=\"Kann aufgelevelt werden\"]", "id": "dot", "img": true},
+  {"sel": "img[alt=\"Volta\"] + svg", "id": "shine", "img": true}
+ ]}
