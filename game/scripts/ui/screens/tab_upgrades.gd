@@ -7,7 +7,7 @@ extends MockScreen
 ## Tech-Baum: Knoten von unten nach oben (MetaData.TECH), gebaut / als nächstes kaufbar / gesperrt,
 ## mit Rahmen und Symbolen aus dem Mockup. Der Baum scrollt, wenn er höher als der Bildschirm ist.
 ## Antippen öffnet das Fenster aus dem Mockup (Beschreibung, Preis, AUFWERTEN).
-## Munition (dauerhafte Stufen der Kugelbahn) steht nicht im Mockup und öffnet sich über einen
+## Munition (dauerhafte Stufen für Plasma und Energiekern) steht nicht im Mockup und öffnet sich über einen
 ## Knopf links unten im Baum in einem Fenster im selben Stil.
 ##
 ## Talente: Raster mit entdeckten Talenten (Karte, Symbol, Stufe) und „?“-Feldern, unten
@@ -620,7 +620,7 @@ class AmmoButton:
 			accept_event()
 
 
-## Fenster „Munition“: dauerhafte Stufen der Kugelbahn (Logik wie im alten Upgrade-Reiter)
+## Fenster „Munition“: dauerhafte Stufen für Plasma und Energiekern (Logik wie im alten Upgrade-Reiter)
 class AmmoPanel:
 	extends Control
 	const PANEL := Rect2(16, 112, 358, 574)

@@ -225,7 +225,7 @@ func _build_layout() -> void:
 	world_holder.add_child(hud)
 
 	# Plasma-Erzeuger und Energiekern (ersetzen die Kugelbahn): laufen ohne eigene Ansicht,
-	# angezeigt werden sie in der Kampfleiste (Hud)
+	# angezeigt werden sie in der Kampfanzeige (BattleHud)
 	plasma = PlasmaCore.new()
 	plasma.ammo = ammo
 	add_child(plasma)
@@ -940,7 +940,7 @@ func _on_level_lost() -> void:
 		return
 	state = "result"
 	_apply_speed(1)
-	_show_result("Der Schild ist gefallen", "Versuch eine andere Kartenwahl. Oft hilft mehr Munition aus der Kugelbahn.", false, _grant_rewards(false))
+	_show_result("Der Schild ist gefallen", "Versuch eine andere Kartenwahl. Oft hilft mehr Plasma, zum Beispiel über die Karten nach jeder Welle.", false, _grant_rewards(false))
 
 
 func _show_result(title: String, text: String, won: bool, rewards: Array = []) -> void:

@@ -1140,7 +1140,7 @@ func _tab_upgrades() -> Control:
 
 
 func _ammo_upgrades(v: VBoxContainer) -> void:
-	v.add_child(_wrap_left("Dauerhafte Verbesserungen der Kugelbahn. Sie gelten in jedem Kampf.", 20, UiKit.C_MUTED))
+	v.add_child(_wrap_left("Dauerhafte Verbesserungen für Plasma und Energiekern. Sie gelten in jedem Kampf.", 20, UiKit.C_MUTED))
 	for u in MetaData.AMMO_UPGRADES:
 		var id: String = u["id"]
 		var lvl := Save.ammo_level(id)

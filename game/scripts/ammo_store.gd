@@ -1,6 +1,6 @@
 class_name AmmoStore
 extends RefCounted
-## Gemeinsamer Munitionsspeicher: Die Kugelbahn füllt ihn, die Helden laden daraus nach.
+## Gemeinsamer Plasmavorrat: Der Plasma-Erzeuger füllt ihn, die Helden laden daraus nach.
 
 signal changed
 

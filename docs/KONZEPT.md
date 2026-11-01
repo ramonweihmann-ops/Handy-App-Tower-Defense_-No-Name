@@ -87,6 +87,13 @@ Unten auf dem Bildschirm liegt eine kleine **Flipper- bzw. Murmelbahn** für Ene
 
 **Entschieden (30.10.2026):** A, die Kugelbahn. Im Piloten umgesetzt, mit Hebel als freiwilligem Bonus.
 
+**Geändert (01.11.2026, nach den Mockups):** Die Kugelbahn ist ersetzt durch einen
+**Plasma-Erzeuger**, der den Vorrat gleichmäßig auffüllt (im Schnitt so viel wie die Kugelbahn),
+und den **Energiekern**: Er lädt sich mit der Zeit und durch besiegte Gegner auf, angetippt gibt er
+einen Schwall Plasma und alle Helden feuern 6 Sekunden doppelt so schnell. Die Tore wirken als
+Mehrertrag weiter, statt zufälliger Tore gibt es **nach jeder Welle eine Kartenwahl** (z. B.
+Magazin +2, schneller nachladen, Kern lädt schneller).
+
 ---
 
 ## 4. Helden: rund 40 über Waffenfamilien
@@ -262,9 +269,9 @@ nie ein Muss.
 - **Käufe, die helfen:** Helden im Angebot (z. B. 2,99 €), Prime (4 statt 3 Karten bei der
   Kartenwahl), Battle Pass, Edelsteine. Jeder Kauf ist ein spürbarer Schub, kein Pflichtkauf.
 - **Kein Held darf deutlich stärker sein als die anderen** seiner Seltenheit.
-- **Munition:** knapp genug, dass Aufwertungen zählen, aber kein Dauer-Engpass. Der Hebel ist
-  eine **Überladung** (alle 20 Spielsekunden ein Schwall Kugeln), die hilft, aber keine
-  Daueraufgabe ist – auch nicht bei x2.
+- **Munition:** knapp genug, dass Aufwertungen zählen, aber kein Dauer-Engpass. Der Energiekern
+  (lädt in etwa 20 Spielsekunden, durch Treffer schneller) hilft, ist aber keine
+  Daueraufgabe – auch nicht bei x2.
 
 Das **Balance-Labor** (geplant) prüft diese Regeln automatisch: alle Level, viele Durchläufe, drei
 Spielertypen (ohne Käufe/Anfänger, ohne Käufe/Durchschnitt, zahlend), Siegquote je Level gegen

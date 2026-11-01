@@ -46,7 +46,7 @@ const BOOSTERS := {
 	"medipack": {"title": "Medipack", "desc": "Repariert 25 %% des Schilds", "cd": 30.0, "unlock": 0, "icon": "medic"},
 	"zeitlupe": {"title": "Zeitlupe", "desc": "Alle Gegner 5 s lang 60 %% langsamer", "cd": 26.0, "unlock": 2, "icon": "clock"},
 	"kuppel": {"title": "Schutzkuppel", "desc": "Der Schild nimmt 4 s lang keinen Schaden", "cd": 34.0, "unlock": 3, "icon": "dome"},
-	"munition": {"title": "Munitionskiste", "desc": "Sofort 25 Kugeln in den Speicher", "cd": 24.0, "unlock": 1, "icon": "crate"},
+	"munition": {"title": "Munitionskiste", "desc": "Sofort 25 Plasma in den Vorrat", "cd": 24.0, "unlock": 1, "icon": "crate"},
 }
 
 
@@ -78,14 +78,14 @@ const TECH := [
 	{"id": "xp2", "title": "Gefechtsübung", "desc": "Erfahrung +10 % nach jedem Kampf", "cost": 3300},
 ]
 
-# --- Munition: dauerhafte Stufen für die Kugelbahn -----------------------------
+# --- Munition: dauerhafte Stufen für Plasma-Erzeuger und Energiekern -----------------------------
 
 const AMMO_UPGRADES := [
-	{"id": "rate", "title": "Abschuss-Takt", "desc": "Der Hebel schießt 6 %% öfter (je Stufe)", "max": 10, "cost": 80},
-	{"id": "cap", "title": "Speicher", "desc": "+8 Kugeln Platz (je Stufe)", "max": 10, "cost": 60},
-	{"id": "start", "title": "Startvorrat", "desc": "+5 Kugeln zu Beginn (je Stufe)", "max": 10, "cost": 50},
-	{"id": "lever", "title": "Überladung", "desc": "Überladung 1,5 s schneller bereit und +2 Kugeln (je Stufe)", "max": 5, "cost": 150},
-	{"id": "count", "title": "Zweiter Lauf", "desc": "+1 Kugel pro Abschuss (je Stufe)", "max": 3, "cost": 500},
+	{"id": "rate", "title": "Plasma-Takt", "desc": "Plasma kommt 6 %% schneller nach (je Stufe)", "max": 10, "cost": 80},
+	{"id": "cap", "title": "Plasma-Tank", "desc": "+8 Plasma Platz (je Stufe)", "max": 10, "cost": 60},
+	{"id": "start", "title": "Startvorrat", "desc": "+5 Plasma zu Beginn (je Stufe)", "max": 10, "cost": 50},
+	{"id": "lever", "title": "Energiekern", "desc": "Energiekern 1,5 s schneller bereit und +2 Plasma (je Stufe)", "max": 5, "cost": 150},
+	{"id": "count", "title": "Zweiter Erzeuger", "desc": "+1 Plasma pro Ladung (je Stufe)", "max": 3, "cost": 500},
 	{"id": "gate", "title": "Start-Tore", "desc": "Stufe 1: +3-Tor, Stufe 2: zweites ×2-Tor von Anfang an", "max": 2, "cost": 1200},
 ]
 
@@ -102,9 +102,9 @@ const TALENTS := {
 	"sanitaet": {"title": "Sanitätskoffer", "desc": "Schild heilt 2 % je Stufe nach jeder Welle", "color": Color(1.0, 0.4, 0.45)},
 	"kopfgeld": {"title": "Kopfgeld", "desc": "Gold nach dem Kampf +8 % je Stufe", "color": Color(1.0, 0.8, 0.25)},
 	"scharfschuetze": {"title": "Scharfschütze", "desc": "Kritische Treffer +2 % je Stufe", "color": Color(1.0, 0.55, 0.2)},
-	"munitionslager": {"title": "Munitionslager", "desc": "Speicher +6 Kugeln je Stufe", "color": Color(0.95, 0.9, 0.4)},
+	"munitionslager": {"title": "Munitionslager", "desc": "Plasma-Tank +6 je Stufe", "color": Color(0.95, 0.9, 0.4)},
 	"feuerkraft": {"title": "Feuerkraft", "desc": "Schaden +3 % je Stufe", "color": Color(1.0, 0.35, 0.25)},
-	"glueckspilz": {"title": "Glückspilz", "desc": "4 % je Stufe: Kugel im Sammler zählt doppelt", "color": Color(0.4, 1.0, 0.55)},
+	"glueckspilz": {"title": "Glückspilz", "desc": "4 % je Stufe: Plasma zählt doppelt", "color": Color(0.4, 1.0, 0.55)},
 	"lernfreude": {"title": "Lernfreude", "desc": "Erfahrung +5 % je Stufe", "color": Color(0.7, 0.5, 1.0)},
 }
 const TALENT_SLOTS := 12
@@ -142,7 +142,7 @@ static func building_cost(level: int) -> int:
 const MISSIONS := [
 	{"id": "kills", "text": "Besiege %d Gegner", "goal": 120, "points": 50},
 	{"id": "wins", "text": "Gewinne %d Level", "goal": 2, "points": 60},
-	{"id": "pulls", "text": "Löse %d-mal die Überladung aus", "goal": 4, "points": 40},
+	{"id": "pulls", "text": "Entlade %d-mal den Energiekern", "goal": 4, "points": 40},
 	{"id": "cards", "text": "Wähle %d Fähigkeitskarten", "goal": 12, "points": 40},
 	{"id": "waves", "text": "Überstehe %d Wellen", "goal": 25, "points": 50},
 	{"id": "boss", "text": "Besiege %d Boss", "goal": 1, "points": 80},

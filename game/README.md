@@ -1,7 +1,8 @@
 # Pilot: Station am Wurmloch (Godot 4.7)
 
-Spielbarer Pilot: 10 Level in zwei Welten (Schleim-Welt, Zombie-Kolonie), 8 Helden, Kugelbahn als
-Munitions-Maschine, Kartenauswahl im Run, Booster im Kampf, Hauptmenü mit Shop, Sammlung
+Spielbarer Pilot: 10 Level in zwei Welten (Schleim-Welt, Zombie-Kolonie), 8 Helden, Plasma-Erzeuger und
+Energiekern als Munitions-Maschine, Kartenwahl nach jeder Welle, Booster im Kampf, animierter
+Ladebildschirm, Hauptmenü mit Shop, Sammlung
 (Aufstellung bis 10 Helden, Booster), Upgrades (Tech-Baum, Munition, Talente), Basislager und
 Battle Pass, Töne und Musik, Spielstand und Selbst-Update für die Testphase. Helden und Gegner
 sind fertige, animierte 3D-Modelle (CC0 von Quaternius, Quellen in `models/QUELLEN.md`).
@@ -19,20 +20,22 @@ sind fertige, animierte 3D-Modelle (CC0 von Quaternius, Quellen in `models/QUELL
 | `scripts/main.gd` | Spielablauf: Menü, Heldenwahl, Karten, Pause, Ergebnis, automatischer Test |
 | `scripts/game_data.gd` | Helden, Gegner, Wellen, Erfahrung (alle Balance-Werte) |
 | `scripts/battle/` | 3D-Schlachtfeld, Helden, Gegner, Geschosse, Effekte |
-| `scripts/machine/` | Kugelbahn (2D-Physik) und Energiekugeln |
+| `scripts/machine/` | Plasma-Erzeuger und Energiekern (`plasma_core.gd`) |
 | `scripts/ammo_store.gd` | gemeinsamer Munitionsspeicher |
 | `scripts/meta_data.gd`, `scripts/save_game.gd` | Menü-Werte (Energie, Booster, Upgrades, Pass) und Spielstand |
 | `scripts/sfx.gd` | Töne und Musik (Autoload „Sfx“) |
-| `scripts/ui/` | Menü, Anzeige im Kampf, Theme (weiche „Candy“-Flächen), Levelbild, Porträts |
+| `scripts/ui/` | Menü, Anzeige im Kampf, Kartenwahl, Ladebildschirm, Theme, Levelbild, Porträts |
+| `scripts/ui/mock/`, `ui_mock/` | Menü- und Kampfbildschirme 1:1 aus den Mockups (Bilder und Texte, erzeugt mit `tools/mock2game/`) |
+| `fonts/` | Schriften Fredoka und Nunito (OFL, Lizenzen daneben) |
 | `shaders/` | Deck, Energiezaun, Wurmloch, Sternenhimmel, Menü- und Levelbild-Hintergrund |
 | `models/` | 3D-Modelle (glTF) für Helden, Gegner und Waffen, Zuordnung in `scripts/battle/models.gd` |
 | `audio/` | Töne und Musik, selbst erzeugt mit `scripts/make_sounds.py` (keine fremden Rechte) |
-| `tests/` | Tests ohne Fenster: Kugelbahn und Menü-Rundgang |
+| `tests/` | Tests ohne Fenster: Menü-Rundgang und automatischer Kampf |
 
 ## Befehle (im Hauptordner)
 
 ```bash
-GODOT=/pfad/zu/godot scripts/test.sh        # Kugelbahn-Test und Level 1–5 automatisch
+GODOT=/pfad/zu/godot scripts/test.sh        # Menü-Rundgang und Level 1–5 automatisch
 GODOT=/pfad/zu/godot scripts/build-android.sh   # Android-App (APK) mit Download-Seite nach docs/pilot/
 GODOT=/pfad/zu/godot scripts/build-web.sh       # Browser-Version nach build/web/ (nur für Tests am PC)
 python3 scripts/make_sounds.py                  # Töne und Musik neu erzeugen
@@ -68,8 +71,7 @@ Versionsname über `VNAME=…`. Später ersetzt Google Play diesen Weg.
 ## Tempo und Leistung
 
 - Tempo je Stufe in `TEMPO_SCALE` (`main.gd`): x1 = 68 %, x2 = 120 %, x3 = 180 % der Rechengeschwindigkeit. x3 gibt es nur in der Testphase; später erst etwa ab Level 100.
-- Grafik „Hoch“ (Leuchten, Schatten) oder „Sparsam“, umschaltbar in den Einstellungen. Treffer-Funken nur bei kritischen Treffern, höchstens 55 Kugeln gleichzeitig, Formen und Materialien von Geschossen werden wiederverwendet.
-- Die Kugelbahn läuft in einer eigenen Ansicht in voller Größe und wird auf 78 % verkleinert angezeigt; darunter bleibt Abstand zur Gestenleiste des Handys.
+- Grafik „Hoch“ (Leuchten, Schatten) oder „Sparsam“, umschaltbar in den Einstellungen. Treffer-Funken nur bei kritischen Treffern, höchstens 55 Geschosse gleichzeitig, Formen und Materialien von Geschossen werden wiederverwendet.
 - Im breiten Fenster bleibt das Spiel eine Hochformat-Spalte in der Mitte.
 
 ## Android-Build
