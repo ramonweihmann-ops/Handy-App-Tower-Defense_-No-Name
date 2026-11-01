@@ -15,13 +15,12 @@ const BASE_SPEED := 0.6
 const TEMPO_SCALE := {1: 0.68, 2: 1.2, 3: 1.8}
 ## Breiteste erlaubte Spalte im Verhältnis zur Höhe (Querformat am PC wird zur Hochformat-Spalte).
 const MAX_ASPECT := 0.62
-## Anzeigegröße der Kugelbahn und freier Streifen darunter (Gestenleiste des Handys)
-const MACHINE_SCALE := 0.78
-const MACHINE_BOTTOM := 70.0
+## Energiekern entladen: so lange feuern alle Helden doppelt so schnell
+const OVERDRIVE_TIME := 6.0
 
 var battle: Battle
-var ball_run: BallRun
-var hud: Hud
+var plasma: PlasmaCore
+var hud: BattleHud
 var ammo := AmmoStore.new()
 
 var level := 1
@@ -99,7 +98,7 @@ func _warm_up() -> void:
 		[0.35, "Crew bezieht Stellung …"],
 		[0.55, "Schleimwesen werden gezählt …"],
 		[0.75, "Energiezaun lädt …"],
-		[0.9, "Kugelbahn wird geölt …"],
+		[0.9, "Energiekern lädt …"],
 	]
 	screen.set_progress(steps[0][0], steps[0][1])
 	await _frames(20)
@@ -128,11 +127,11 @@ func _warm_up() -> void:
 	Fx.burst(battle, Vector3(0, 1, -6), Color(0.4, 1.0, 0.5), 12, 4.0, 0.1)
 	await _frames(40)
 	screen.set_progress(steps[4][0], steps[4][1])
-	ball_run.active = true
+	plasma.active = true
 	await _frames(40)
 	screen.set_progress(1.0, "Bereit!")
 	await _frames(25)
-	ball_run.reset()
+	plasma.reset()
 	Sfx.muted = false
 	Sfx.start_music()
 	show_menu()
@@ -219,39 +218,17 @@ func _build_layout() -> void:
 	container.add_child(viewport)
 	battle = Battle.new()
 	viewport.add_child(battle)
-	hud = Hud.new()
+	hud = BattleHud.new()
 	hud.set_anchors_preset(Control.PRESET_FULL_RECT)
 	hud.battle = battle
 	world_holder.add_child(hud)
 
-	# Kugelbahn: läuft in einer eigenen Ansicht in voller Größe (die Physik bleibt unverändert)
-	# und wird verkleinert angezeigt. Darunter bleibt ein freier Streifen, damit man beim
-	# Hebel nicht in die Gestenleiste des Handys greift.
-	var holder := Control.new()
-	holder.custom_minimum_size = Vector2(0, BallRun.PANEL_H * MACHINE_SCALE + MACHINE_BOTTOM)
-	holder.clip_contents = true
-	column.add_child(holder)
-	var holder_bg := ColorRect.new()
-	holder_bg.color = Color(0.03, 0.035, 0.08)
-	holder_bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	holder_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	holder.add_child(holder_bg)
-	var machine_view := SubViewportContainer.new()
-	machine_view.stretch = false
-	machine_view.size = Vector2(BallRun.DESIGN_W, BallRun.PANEL_H)
-	machine_view.scale = Vector2.ONE * MACHINE_SCALE
-	holder.add_child(machine_view)
-	var machine_vp := SubViewport.new()
-	machine_vp.size = Vector2i(int(BallRun.DESIGN_W), int(BallRun.PANEL_H))
-	machine_view.add_child(machine_vp)
-	ball_run = BallRun.new()
-	ball_run.size = Vector2(BallRun.DESIGN_W, BallRun.PANEL_H)
-	ball_run.ammo = ammo
-	machine_vp.add_child(ball_run)
-	var place := func() -> void:
-		machine_view.position = Vector2(floorf((holder.size.x - BallRun.DESIGN_W * MACHINE_SCALE) * 0.5), 4.0)
-	holder.resized.connect(place)
-	place.call()
+	# Plasma-Erzeuger und Energiekern (ersetzen die Kugelbahn): laufen ohne eigene Ansicht,
+	# angezeigt werden sie in der Kampfleiste (Hud)
+	plasma = PlasmaCore.new()
+	plasma.ammo = ammo
+	add_child(plasma)
+	hud.plasma = plasma
 
 	var layer := CanvasLayer.new()
 	layer.layer = 10
@@ -285,7 +262,11 @@ func _build_layout() -> void:
 			if heal > 0.0:
 				battle.repair_fence(heal, 0.0)
 	)
-	ball_run.manual_pulled.connect(func() -> void: Save.track("pulls"))
+	plasma.manual_pulled.connect(func() -> void:
+		Save.track("pulls")
+		battle.overdrive(OVERDRIVE_TIME)
+		hud.show_banner("Energiekern!")
+		Sfx.play("whoosh", 0.05))
 	battle.fence_changed.connect(hud.set_fence)
 	battle.damage_dealt.connect(hud.add_floater)
 	battle.level_won.connect(_on_level_won)
@@ -375,7 +356,7 @@ func _process(delta: float) -> void:
 	if _perf_t >= 2.0 and state == "battle":
 		_perf_t = 0.0
 		print("PERF fps=%d tempo=%d gegner=%d kugeln=%d knoten=%d physik_ms=%.1f bild_ms=%.1f" % [
-			Engine.get_frames_per_second(), tempo, battle.enemies.size(), ball_run.ball_count(),
+			Engine.get_frames_per_second(), tempo, battle.enemies.size(), plasma.ball_count(),
 			Performance.get_monitor(Performance.OBJECT_NODE_COUNT),
 			Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0,
 			Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0])
@@ -403,7 +384,7 @@ func _process(delta: float) -> void:
 		if _auto_pull_t <= 0.0:
 			_auto_pull_t = 1.0
 			if _auto_pull:
-				ball_run.try_manual_pull()
+				plasma.try_manual_pull()
 			for i in _boosters.size():
 				_use_booster(i)
 			for h in battle.heroes:
@@ -442,7 +423,7 @@ func show_menu() -> void:
 	get_tree().paused = false
 	_apply_speed(1)
 	battle.clear()
-	ball_run.reset()
+	plasma.reset()
 	hud.visible = false
 	_set_screen(null)
 	_column.visible = false
@@ -462,8 +443,8 @@ func _old_menu() -> void:
 	v.add_child(UiKit.label("Pilot · Arbeitstitel", 24, UiKit.C_MUTED))
 	var how := UiKit.wrap_label(
 		"Aus dem Wurmloch kommen Schleimwesen. Deine Crew hinter dem Energiezaun schießt von selbst.\n\n"
-		+ "Die Munition kommt aus der Kugelbahn unten: Jede Kugel im Sammler ist Munition. "
-		+ "Tore verdoppeln Kugeln oder machen Feuer- und Eismunition. Ist die Überladung bereit, zieh den Hebel rechts: Dann kommt ein ganzer Schwall Kugeln.\n\n"
+		+ "Die Munition ist Plasma: Der Vorrat unten füllt sich von selbst, jeder Held lädt sein Magazin daraus nach. "
+		+ "Ist der Energiekern in der Mitte voll, tippe ihn an: Dann gibt es einen Schwall Plasma und alle feuern doppelt so schnell.\n\n"
 		+ "Bei jedem Aufstieg wählst du eine von drei Karten.", 22, UiKit.C_TEXT)
 	how.custom_minimum_size = Vector2(600, 0)
 	v.add_child(how)
@@ -519,16 +500,16 @@ func start_level(n: int, hard_mode := false) -> void:
 		battle.hero_damage[id] = MetaData.hero_damage_mult(Save.hero_level(id)) * (1.0 + float(bonus["damage"]))
 	battle.fence_max *= 1.0 + float(bonus["shield"])
 	battle.fence_hp = battle.fence_max
-	ball_run.reset()
-	ball_run.lucky = float(bonus["lucky"])
-	ball_run.manual_cd_bonus = float(bonus["lever"])
-	ball_run.manual_extra = int(bonus["lever_balls"])
-	ball_run.rate_bonus = float(bonus["rate"])
-	ball_run.update_interval()
-	ball_run.base_count_bonus = int(bonus["count"])
-	ball_run.balls_per_launch += int(bonus["count"])
+	plasma.reset()
+	plasma.lucky = float(bonus["lucky"])
+	plasma.manual_cd_bonus = float(bonus["lever"])
+	plasma.manual_extra = int(bonus["lever_balls"])
+	plasma.rate_bonus = float(bonus["rate"])
+	plasma.update_interval()
+	plasma.base_count_bonus = int(bonus["count"])
+	plasma.balls_per_launch += int(bonus["count"])
 	for g in bonus["gates"]:
-		ball_run.add_gate(g)
+		plasma.add_gate(g)
 	hud.visible = true
 	_boosters = Save.booster_slots()
 	_booster_cd.clear()
@@ -581,13 +562,14 @@ func _on_hero_picked(id: String) -> void:
 	if _autotest:
 		_apply_speed(1)
 	battle.start()
-	ball_run.active = true
+	plasma.active = true
 
 
 # --- Erfahrung und Karten ---------------------------------------------------
 
 func _on_enemy_killed(e: Enemy, gained: int) -> void:
 	Save.track("kills")
+	plasma.on_kill(e.is_boss())
 	if e.is_boss():
 		Save.track("boss")
 	_xp_carry += gained * (1.0 + float(bonus.get("xp", 0.0)))
@@ -766,43 +748,61 @@ func _apply_hero_mod(h: Hero, mod: String) -> void:
 
 
 func _machine_cards() -> Array:
-	var free := ball_run.free_slots() > 0
+	var free := plasma.free_slots() > 0
 	var gates := [
-		["x2", "×2-Tor", "Neues Tor in der Kugelbahn: verdoppelt jede Kugel, die hindurchrollt.", 3],
-		["plus3", "+3-Tor", "Neues Tor: Jede Kugel bringt 3 weitere mit.", 2],
-		["fire", "Feuer-Tor", "Kugeln werden zu Brandmunition: Getroffene Gegner brennen.", 1],
-		["ice", "Eis-Tor", "Kugeln werden zu Frostmunition: Getroffene Gegner werden langsamer.", 1],
+		["x2", "Plasma-Verdichter", "Der Erzeuger liefert dauerhaft etwa 12 % mehr Plasma.", 3],
+		["plus3", "Großer Verdichter", "Der Erzeuger liefert dauerhaft etwa 20 % mehr Plasma.", 2],
+		["fire", "Feuer-Plasma", "Ein Teil des Plasmas wird zu Brandmunition: Getroffene Gegner brennen.", 1],
+		["ice", "Eis-Plasma", "Ein Teil des Plasmas wird zu Frostmunition: Getroffene Gegner werden langsamer.", 1],
 	]
 	var list: Array = []
 	for g in gates:
 		var type: String = g[0]
 		var count := 0
-		for i in BallRun.GATE_SLOTS.size():
-			if ball_run._gate_types[i] == type:
+		for t in plasma._gate_types:
+			if t == type:
 				count += 1
 		list.append({
-			"key": "gate:" + type, "kind": "machine", "target": "Kugelbahn", "color": UiKit.C_MACHINE,
+			"key": "gate:" + type, "kind": "machine", "target": "Plasma", "color": UiKit.C_MACHINE,
 			"title": g[1], "desc": g[2], "stars": count, "max": g[3], "available": free,
-			"emblem": BallRun.GATE_INFO[type]["label"], "weight": 1.3,
-			"apply": func() -> void: ball_run.add_gate(type),
+			"emblem": PlasmaCore.GATE_INFO[type]["label"], "weight": 1.3,
+			"apply": func() -> void: plasma.add_gate(type),
 		})
 	list.append({
-		"key": "machine:rate", "kind": "machine", "target": "Kugelbahn", "color": UiKit.C_MACHINE,
-		"title": "Schneller abschießen", "desc": "Der Hebel schießt 25 % öfter von selbst.",
-		"stars": ball_run.rate_level, "max": 4, "emblem": "»", "weight": 1.2,
-		"apply": func() -> void: ball_run.upgrade_rate(),
+		"key": "machine:rate", "kind": "machine", "target": "Plasma", "color": UiKit.C_MACHINE,
+		"title": "Schneller laden", "desc": "Der Plasma-Vorrat füllt sich 25 % schneller.",
+		"stars": plasma.rate_level, "max": 4, "emblem": "»", "weight": 1.2,
+		"apply": func() -> void: plasma.upgrade_rate(),
 	})
 	list.append({
-		"key": "machine:count", "kind": "machine", "target": "Kugelbahn", "color": UiKit.C_MACHINE,
-		"title": "Mehr Kugeln", "desc": "+1 Kugel pro Abschuss.",
-		"stars": ball_run.balls_per_launch - BallRun.BASE_COUNT - ball_run.base_count_bonus, "max": 3, "emblem": "+1", "weight": 1.2,
-		"apply": func() -> void: ball_run.upgrade_count(),
+		"key": "machine:count", "kind": "machine", "target": "Plasma", "color": UiKit.C_MACHINE,
+		"title": "Mehr Plasma", "desc": "+1 Plasma pro Ladung.",
+		"stars": plasma.balls_per_launch - PlasmaCore.BASE_COUNT - plasma.base_count_bonus, "max": 3, "emblem": "+1", "weight": 1.2,
+		"apply": func() -> void: plasma.upgrade_count(),
 	})
 	list.append({
-		"key": "machine:tank", "kind": "machine", "target": "Kugelbahn", "color": UiKit.C_MACHINE,
-		"title": "Größerer Speicher", "desc": "Speicher +30, dazu sofort 15 Kugeln.",
+		"key": "machine:tank", "kind": "machine", "target": "Plasma", "color": UiKit.C_MACHINE,
+		"title": "Größerer Tank", "desc": "Plasma-Vorrat +30, dazu sofort 15 Plasma.",
 		"stars": int(card_levels.get("machine:tank", 0)), "max": 3, "emblem": "+30", "weight": 0.8,
 		"apply": _apply_tank,
+	})
+	list.append({
+		"key": "plasma:mag", "kind": "machine", "target": "Magazin", "color": UiKit.C_MACHINE,
+		"title": "+2 Schuss", "desc": "+2 Schuss im Magazin für alle Helden.",
+		"stars": int(card_levels.get("plasma:mag", 0)), "max": 3, "emblem": "+2", "weight": 1.1,
+		"apply": func() -> void: battle.team_mag += 2,
+	})
+	list.append({
+		"key": "plasma:reload", "kind": "machine", "target": "Nachladen", "color": UiKit.C_MACHINE,
+		"title": "−20 %", "desc": "Alle Helden laden 20 % schneller nach.",
+		"stars": int(card_levels.get("plasma:reload", 0)), "max": 3, "emblem": "↻", "weight": 1.1,
+		"apply": func() -> void: battle.bonus_reload += 0.25,
+	})
+	list.append({
+		"key": "plasma:core", "kind": "machine", "target": "Kern", "color": UiKit.C_MACHINE,
+		"title": "+30 %", "desc": "Der Energiekern lädt 30 % schneller auf.",
+		"stars": int(card_levels.get("plasma:core", 0)), "max": 3, "emblem": "⚡", "weight": 1.0,
+		"apply": func() -> void: plasma.core_speed *= 1.3,
 	})
 	return list
 
@@ -919,7 +919,7 @@ func _resume() -> void:
 
 
 func _on_level_won() -> void:
-	ball_run.active = false
+	plasma.active = false
 	if _autotest:
 		_finish_autotest("win")
 		return
@@ -939,7 +939,7 @@ func _on_level_won() -> void:
 
 
 func _on_level_lost() -> void:
-	ball_run.active = false
+	plasma.active = false
 	if _autotest:
 		_finish_autotest("lost")
 		return
@@ -988,10 +988,10 @@ func _finish_autotest(result: String) -> void:
 		names.append(h.id)
 	print("AUTOTEST level=%d result=%s time=%.0f wave=%d/%d kills=%d fence=%d/%d wait=%.2f fill=%.2f full=%.2f collected=%d heroes=%s balls=%d ammo=%d cards=%s" % [
 		level, result, battle.elapsed, battle.wave, battle.total_waves, battle.kills,
-		int(battle.fence_hp), int(battle.fence_max), battle.ammo_wait_ratio(), battle.fill_sum / maxf(1.0, battle.elapsed), battle.full_time / maxf(1.0, battle.elapsed), ball_run.collected_total,
-		",".join(PackedStringArray(names)), ball_run.ball_count(), ammo.total(),
+		int(battle.fence_hp), int(battle.fence_max), battle.ammo_wait_ratio(), battle.fill_sum / maxf(1.0, battle.elapsed), battle.full_time / maxf(1.0, battle.elapsed), plasma.collected_total,
+		",".join(PackedStringArray(names)), plasma.ball_count(), ammo.total(),
 		",".join(PackedStringArray(cards_taken))])
-	print("   kugelbahn: ", ball_run.stats)
+	print("   plasma: ", plasma.stats)
 	get_tree().quit()
 
 

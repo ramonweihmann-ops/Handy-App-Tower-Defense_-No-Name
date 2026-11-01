@@ -167,7 +167,9 @@ func damage() -> float:
 
 
 func interval() -> float:
-	return float(data["interval"]) / (1.0 + 0.15 * mods["rate"])
+	# Energiekern entladen: doppelt so schnell feuern
+	var boost := 2.0 if battle and battle.overdrive_left > 0.0 else 1.0
+	return float(data["interval"]) / (1.0 + 0.15 * mods["rate"]) / boost
 
 
 func reload_time() -> float:
@@ -176,7 +178,8 @@ func reload_time() -> float:
 
 
 func mag_size() -> int:
-	return int(round(float(data["mag"]) * (1.0 + 0.5 * mods["mag"])))
+	var team: int = battle.team_mag if battle else 0
+	return int(round(float(data["mag"]) * (1.0 + 0.5 * mods["mag"]))) + team
 
 
 func ammo_cost() -> int:
@@ -226,7 +229,7 @@ func _process(delta: float) -> void:
 				_shot_cd = interval() / 3.0
 		return
 	if reloading:
-		reload_left -= delta
+		reload_left -= delta * (8.0 if battle.overdrive_left > 0.0 else 1.0)
 		if reload_left <= 0.0:
 			reloading = false
 		return

@@ -17,6 +17,10 @@ const DECK_HALF_W := 4.7
 
 var level := 1
 var ammo: AmmoStore
+## Energiekern entladen: so viele Sekunden feuern alle Helden doppelt so schnell
+var overdrive_left := 0.0
+## Karte „+2 Schuss“: zusätzliche Schüsse im Magazin für alle Helden
+var team_mag := 0
 var camera: Camera3D
 var enemies: Array[Enemy] = []
 var heroes: Array[Hero] = []
@@ -101,6 +105,8 @@ func setup(level_: int, ammo_: AmmoStore) -> void:
 		_plan.append(GameData.wave_spawns(level, w))
 	wave = 0
 	kills = 0
+	overdrive_left = 0.0
+	team_mag = 0
 	elapsed = 0.0
 	hero_wait_time = 0.0
 	hero_time = 0.0
@@ -170,6 +176,7 @@ func _process(delta: float) -> void:
 		return
 	elapsed += delta
 	shield_guard = maxf(0.0, shield_guard - delta)
+	overdrive_left = maxf(0.0, overdrive_left - delta)
 	if ammo:
 		var ratio := float(ammo.total()) / maxf(1.0, ammo.cap)
 		fill_sum += ratio * delta
@@ -331,6 +338,13 @@ func repair_fence(fraction: float, raise_max: float) -> void:
 
 
 ## Anteil der Zeit, in der Helden auf Munition warten mussten.
+## Energiekern entladen: alle Helden feuern einige Sekunden doppelt so schnell und laden sofort nach
+func overdrive(seconds: float) -> void:
+	overdrive_left = seconds
+	for h in heroes:
+		h.reload_left = 0.0
+
+
 func ammo_wait_ratio() -> float:
 	return hero_wait_time / maxf(0.001, hero_time)
 

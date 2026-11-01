@@ -1,0 +1,19 @@
+{"board":"Kampf-2-Helden.dc.html","out":"out/kampf_hud","states":[{"name":"main"}],
+ "only":["#dc-root > div > div[style*=\"top: 522px\"]","#dc-root > div > svg[style*=\"top: 552px\"]","#dc-root > div > div[style*=\"top: 532px\"]",
+   "#dc-root > div > div[style*=\"top: 12px\"]","#dc-root > div > div[style*=\"right: 10px; top: 56px\"]",
+   "#dc-root > div > svg[style*=\"top: 716px\"]","#dc-root > div > div[style*=\"top: 786px\"]",
+   "#dc-root > div > div[aria-label^=\"Dusty Jo:\"]","#dc-root > div > div[aria-label^=\"Iska:\"]","#dc-root > div > div[style*=\"left: 94px; top: 666px\"]",
+   "#dc-root > div > div[style*=\"translateX(-50\"]","#dc-root > div > svg[style*=\"left: 96px; top: 652px\"]","#dc-root > div > svg[style*=\"left: 230px; top: 652px\"]"],
+ "live":[
+  {"sel":"div[style*=\"#ff9f1c, #ffe27a\"]","id":"wave_fill"},
+  {"sel":"div[style*=\"#7dff8a, #7dff8acc\"]","id":"shield_fill"},
+  {"sel":"rect[fill=\"#7dff8a\"][rx=\"3\"]","id":"plasma_fill"},
+  {"sel":"circle[r=\"4.5\"]","id":"use_dot"},
+  {"sel":"circle[stroke-dasharray=\"120.6 150.8\"]","id":"core_ring"},
+  {"sel":"div[aria-label^=\"Dusty Jo:\"]","id":"pill","img":true},
+  {"sel":"div[aria-label^=\"Iska:\"]","id":"pill2"},
+  {"sel":"div[style*=\"left: 94px; top: 666px\"]","id":"badge","img":true},
+  {"sel":"div[style*=\"translateX(-50\"]","id":"tippen","img":true},
+  {"sel":"svg[style*=\"left: 96px; top: 652px\"]","id":"ring","img":true},
+  {"sel":"svg[style*=\"left: 230px; top: 652px\"]","id":"ring2","img":true}
+ ]}

@@ -67,7 +67,7 @@ def convert(src, name):
         return out
 
     for st, d in lay['states'].items():
-        d['bg'] = add(f'{st}_bg.png', 0.82, True)
+        d['bg'] = add(f'{st}_bg.png', 0.82, not lay.get('transparent', False))
         for b in d['buttons']:
             b['img'] = add(f'{st}_btn{b["i"]}.png', 0.9, False) if 'img_rect' in b else ''
         for l in d.get('live', []):

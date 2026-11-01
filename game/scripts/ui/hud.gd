@@ -10,6 +10,7 @@ signal booster_pressed(index: int)
 const MAX_FLOATERS := 40
 
 var battle: Battle
+var plasma: PlasmaCore
 var _wave_label: Label
 var _xp_bar: ProgressBar
 var _xp_label: Label

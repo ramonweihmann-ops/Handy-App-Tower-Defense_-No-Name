@@ -20,6 +20,8 @@ const PREP = `(() => {
   // 2) Animationen anhalten (fester Zeitpunkt)
   for (const sv of document.querySelectorAll('svg')) { try { sv.pauseAnimations(); sv.setCurrentTime(0.35); } catch (e) {} }
   for (const a of document.getAnimations()) { try { a.pause(); a.currentTime = 350; } catch (e) {} }
+  // SVG-Texte ebenfalls als Text behandeln (Zahlen in Anzeigen)
+  document.querySelectorAll('#dc-root svg text').forEach(t => { if (t.textContent.trim()) t.classList.add('m2g-svgt'); });
   return nodes.length;
 })()`;
 
@@ -42,6 +44,16 @@ const COLLECT = `((liveSel) => {
     const r = el.getBoundingClientRect(); if (r.width > 20) return; const owner = el.closest('[data-m2g-btn]');
     el.setAttribute('data-m2g-live', 'badge' + k); out.live.push({ id: 'badge' + k, rect: [r.left, r.top, r.width, r.height], rot: 0, badge: true, button: owner ? +owner.getAttribute('data-m2g-btn') : -1 }); });
   (liveSel || []).forEach(l => { document.querySelectorAll(l.sel).forEach((el, k) => { if (!visible(el) || !inOv(el)) return; el.setAttribute('data-m2g-live', l.id + (k ? '_' + k : '')); const r = el.getBoundingClientRect(); out.live.push({ id: l.id + (k ? '_' + k : ''), rect: [r.left, r.top, r.width, r.height], rot: rot(el), img: !!l.img }); }); });
+  document.querySelectorAll('.m2g-svgt').forEach((t, k) => {
+    if (!visible(t) || t.closest('[data-m2g-live]') || !inOv(t)) return;
+    const cs = getComputedStyle(t); const r = t.getBoundingClientRect(); if (r.width < 0.5) return;
+    const anchor = t.getAttribute('text-anchor') || cs.textAnchor || 'start';
+    const owner = t.closest('[data-m2g-btn]');
+    out.texts.push({ i: 10000 + k, text: t.textContent.trim(), lines: [{ rect: [r.left, r.top, r.width, r.height], text: t.textContent.trim() }],
+      family: (t.getAttribute('font-family') || cs.fontFamily).split(',')[0].replace(/["']/g, '').trim(), weight: +(t.getAttribute('font-weight') || cs.fontWeight), size: parseFloat(cs.fontSize) * (t.getScreenCTM() ? Math.hypot(t.getScreenCTM().a, t.getScreenCTM().b) : 1),
+      color: cs.fill && cs.fill.startsWith('rgb') ? cs.fill : cs.color, ls: cs.letterSpacing === 'normal' ? 0 : parseFloat(cs.letterSpacing) || 0, shadow: 'none',
+      align: anchor === 'middle' ? 'center' : (anchor === 'end' ? 'right' : 'left'), rot: rot(t), opacity: op(t), button: owner ? +owner.getAttribute('data-m2g-btn') : -1, svg: true });
+  });
   document.querySelectorAll('.m2g-t').forEach((s, i) => {
     if (!visible(s) || s.closest('[data-m2g-live]') || !inOv(s)) return;
     const cs = getComputedStyle(s); const range = document.createRange(); range.selectNodeContents(s);
@@ -85,19 +97,22 @@ async function shootLive(p, data, pre) {
   const cfg = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
   const scale = cfg.scale || 3;
   fs.mkdirSync(cfg.out, { recursive: true });
-  const result = { board: cfg.board, size: [390, 844], scale, states: {} };
+  const result = { board: cfg.board, size: [390, 844], scale, states: {}, transparent: !!cfg.only };
   for (const st of cfg.states || [{ name: 'main' }]) {
     const { b, p } = await open(cfg.board, scale);
     if (st.set) { await p.evaluate((o) => window.__dcComp.setState(o), st.set); await p.waitForTimeout(200); }
     if (st.eval) { await p.evaluate(st.eval); await p.waitForTimeout(200); }
     await p.evaluate(PREP);
+    if (cfg.only) await p.evaluate((sels) => { const keep = new Set(); sels.forEach(q => document.querySelectorAll(q).forEach(e => keep.add(e)));
+      document.querySelectorAll('#dc-root *').forEach(e => { let k = false; for (let a = e; a; a = a.parentElement) if (keep.has(a)) { k = true; break; } if (!k) { let d = false; keep.forEach(x => { if (e.contains(x)) d = true; }); if (!d) e.style.setProperty('display', 'none', 'important'); } });
+      const r = document.querySelector('#dc-root > div'); r.style.setProperty('background', 'transparent', 'important'); }, cfg.only);
     const data = await p.evaluate(COLLECT + '(' + JSON.stringify(cfg.live || []) + ')');
     // Texte ausblenden
-    await p.addStyleTag({ content: '.m2g-t{color:transparent!important;text-shadow:none!important;-webkit-text-stroke:0!important} [data-m2g-live]{visibility:hidden!important}' });
+    await p.addStyleTag({ content: '.m2g-t{color:transparent!important;text-shadow:none!important;-webkit-text-stroke:0!important} .m2g-svgt{fill:transparent!important;stroke:transparent!important} [data-m2g-live]{visibility:hidden!important}' });
     // Hintergrund ohne Knöpfe
     await p.addStyleTag({ content: '[data-m2g-btn]{visibility:hidden!important}' });
     const pre = path.join(cfg.out, st.name);
-    await p.screenshot({ path: pre + '_bg.png' });
+    await p.screenshot({ path: pre + '_bg.png', omitBackground: !!cfg.only });
     await p.addStyleTag({ content: '[data-m2g-btn]{visibility:visible!important}' });
     // Knöpfe einzeln, mit Rand für Schatten
     for (const btn of data.buttons) {
@@ -127,7 +142,7 @@ async function shootLive(p, data, pre) {
     await p.evaluate(PREP);
     const n = await p.evaluate(MARK_OVERLAY + '(' + JSON.stringify(base) + ')');
     const data = await p.evaluate(COLLECT + '(' + JSON.stringify(cfg.live || []) + ')');
-    await p.addStyleTag({ content: '.m2g-t{color:transparent!important;text-shadow:none!important} [data-m2g-live]{visibility:hidden!important} #dc-root{visibility:hidden!important} [data-m2g-ov]{visibility:visible!important} [data-m2g-btn]{visibility:hidden!important}' });
+    await p.addStyleTag({ content: '.m2g-t{color:transparent!important;text-shadow:none!important} .m2g-svgt{fill:transparent!important;stroke:transparent!important} [data-m2g-live]{visibility:hidden!important} #dc-root{visibility:hidden!important} [data-m2g-ov]{visibility:visible!important} [data-m2g-btn]{visibility:hidden!important}' });
     const box = await p.evaluate(() => { let a = null; document.querySelectorAll('[data-m2g-ov], [data-m2g-ov] *').forEach(e => { const q = e.getBoundingClientRect(); if (q.width < 0.5 || q.height < 0.5) return; const cs = getComputedStyle(e);
       const shadow = parseFloat((cs.boxShadow.match(/(\d+)px\)?\s*$/) || [0, 0])[1]) || 0; const g = Math.min(40, 6 + (cs.boxShadow !== 'none' ? 24 : 0));
       const r = [q.left - g, q.top - g, q.right + g, q.bottom + g]; a = a ? [Math.min(a[0], r[0]), Math.min(a[1], r[1]), Math.max(a[2], r[2]), Math.max(a[3], r[3])] : r; });
