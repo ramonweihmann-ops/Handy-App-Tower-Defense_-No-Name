@@ -39,6 +39,7 @@ var bonus := {}
 var updater: Updater
 var menu: MainMenu
 var _xp_carry := 0.0
+var _card_wave := 1
 var _boosters: Array[String] = []
 var _booster_cd: Array[float] = []
 
@@ -258,6 +259,10 @@ func _build_layout() -> void:
 		hud.set_next_wave(battle.next_wave_text())
 		if w > 1:
 			Save.track("waves")
+			# Nach jeder geschafften Welle eine Karte wählen (Mockup „Karte nach der Welle“)
+			pending_levelups += 1
+			_card_wave = w - 1
+			_open_card_pick.call_deferred()
 			var heal := float(bonus.get("heal", 0.0))
 			if heal > 0.0:
 				battle.repair_fence(heal, 0.0)
@@ -579,11 +584,8 @@ func _on_enemy_killed(e: Enemy, gained: int) -> void:
 	while xp >= xp_needed:
 		xp -= xp_needed
 		levelups += 1
-		pending_levelups += 1
 		xp_needed = GameData.xp_needed(levelups)
 	hud.set_xp(xp, xp_needed)
-	if pending_levelups > 0 and state == "battle":
-		_open_card_pick.call_deferred()
 
 
 func _open_card_pick() -> void:
@@ -600,16 +602,9 @@ func _open_card_pick() -> void:
 		_on_card_picked(_auto_choose(cards))
 		return
 	Sfx.play("levelup", 0.0)
-	var s := _full_screen()
-	s.add_child(UiKit.dim(0.6))
-	var v := _centered(s, 22)
-	v.add_child(UiKit.label("Fähigkeit wählen", 44, UiKit.C_GOLD))
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 12)
-	v.add_child(row)
-	for c in cards:
-		row.add_child(_card_button(c, _on_card_picked))
-	_set_screen(s)
+	var pick := CardPick.new(cards, _card_wave)
+	pick.picked.connect(_on_card_picked)
+	_set_screen(pick)
 
 
 ## Kartenwahl im automatischen Test: grob wie ein vernünftiger Spieler.

@@ -11,7 +11,7 @@ signal level_lost
 
 const FENCE_Z := 0.0
 const SPAWN_Z := -27.0
-const HERO_Z := 1.7
+const HERO_Z := 3.3
 const MAX_HEROES := 4
 const DECK_HALF_W := 4.7
 
@@ -162,7 +162,7 @@ func has_hero(id: String) -> bool:
 
 func _layout_heroes(snap_new: bool) -> void:
 	var n := heroes.size()
-	var spacing := 2.3
+	var spacing := 3.4
 	for i in n:
 		var x := (i - (n - 1) * 0.5) * spacing
 		heroes[i].slide_to(x)
@@ -529,7 +529,7 @@ func _build_world() -> void:
 	e.background_mode = Environment.BG_SKY
 	var sky := Sky.new()
 	var sky_mat := ShaderMaterial.new()
-	sky_mat.shader = preload("res://shaders/space_sky.gdshader")
+	sky_mat.shader = preload("res://shaders/nebula_sky.gdshader")
 	sky.sky_material = sky_mat
 	e.sky = sky
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
@@ -574,8 +574,7 @@ func _build_world() -> void:
 	var deck_mesh := PlaneMesh.new()
 	deck_mesh.size = Vector2(DECK_HALF_W * 2.0, 46.0)
 	var deck_mat := ShaderMaterial.new()
-	deck_mat.shader = preload("res://shaders/deck.gdshader")
-	deck_mat.set_shader_parameter("tiles", Vector2(4.0, 19.6))
+	deck_mat.shader = preload("res://shaders/deck_mock.gdshader")
 	# Zaun liegt bei z = 0; das Deck reicht von z = +9 bis z = -37.
 	deck_mat.set_shader_parameter("fence_v", (FENCE_Z - (-37.0)) / 46.0)
 	var deck := Fx.inst(deck_mesh, deck_mat)
@@ -606,9 +605,11 @@ func _build_world() -> void:
 		var x := -DECK_HALF_W + 0.25 + k * (DECK_HALF_W * 2.0 - 0.5) / 7.0
 		var post := Fx.box(Vector3(0.22, 1.3, 0.22), Fx.mat(Color(0.28, 0.3, 0.36), 0.0, 0.8, 0.3))
 		post.position = Vector3(x, 0.65, FENCE_Z)
+		post.visible = false   # die Mauer zeichnet die Kampfanzeige (Mockup)
 		add_child(post)
 		var cap := Fx.sphere(0.13, Fx.mat(Color(0.2, 0.85, 1.0), 3.0), 8, 4)
 		cap.position = Vector3(x, 1.36, FENCE_Z)
+		cap.visible = false
 		add_child(cap)
 	var field := QuadMesh.new()
 	field.size = Vector2(DECK_HALF_W * 2.0 - 0.4, 1.25)
@@ -628,6 +629,7 @@ func _build_world() -> void:
 	add_child(hole_inst)
 	_wormhole_ring = Node3D.new()
 	_wormhole_ring.position = Vector3(0, 3.6, -33.6)
+	_wormhole_ring.visible = false   # im Mockup nur der Wirbel, ohne Rahmen
 	add_child(_wormhole_ring)
 	var ring := Fx.torus(5.0, 5.5, Fx.mat(Color(0.35, 0.3, 0.45), 0.0, 0.8, 0.3))
 	ring.rotation.x = PI * 0.5
@@ -648,12 +650,15 @@ func _build_world() -> void:
 	for p in props:
 		var crate := Fx.box(p[1], Fx.mat(p[2], 0.0, 0.4, 0.5))
 		crate.position = p[0]
+		crate.visible = false   # im Mockup stehen keine Kisten neben der Brücke
 		add_child(crate)
 	var mast := Fx.cylinder(0.08, 0.12, 4.0, Fx.mat(Color(0.5, 0.52, 0.58), 0.0, 0.8, 0.3))
 	mast.position = Vector3(6.3, 3.6, 2.0)
+	mast.visible = false
 	add_child(mast)
 	var beacon := Fx.sphere(0.2, Fx.mat(Color(1.0, 0.2, 0.2), 4.0), 8, 4)
 	beacon.position = Vector3(6.3, 5.7, 2.0)
+	beacon.visible = false
 	add_child(beacon)
 
 	# Asteroiden und ein Planet im Hintergrund
@@ -667,10 +672,68 @@ func _build_world() -> void:
 		rock.scale = Vector3(1.0, rng.randf_range(0.6, 0.9), rng.randf_range(0.8, 1.2))
 		add_child(rock)
 		_asteroids.append(rock)
-	var planet := Fx.sphere(9.0, Fx.mat(Color(0.25, 0.45, 0.75), 0.25, 0.0, 0.8), 32, 16)
-	planet.position = Vector3(-26.0, 6.0, -62.0)
-	add_child(planet)
-	var planet_ring := Fx.torus(11.0, 13.5, Fx.mat(Color(0.75, 0.6, 0.45), 0.2, 0.0, 0.8))
-	planet_ring.position = planet.position
-	planet_ring.rotation = Vector3(0.4, 0.0, 0.3)
-	add_child(planet_ring)
+	# Planeten wie im Mockup: großer Lava-Planet links, Eisplanet mit Ring rechts oben
+	var lava := _noise_tex(3, 0.012, PackedColorArray([Color(0.35, 0.08, 0.06), Color(0.85, 0.35, 0.15), Color(1.0, 0.75, 0.45), Color(0.6, 0.2, 0.12)]), PackedFloat32Array([0.0, 0.4, 0.6, 1.0]))
+	_planet(Vector3(-27.0, -6.0, -40.0), 17.0, lava, Color(1.0, 0.55, 0.35))
+	var ice := _noise_tex(9, 0.018, PackedColorArray([Color(0.1, 0.25, 0.6), Color(0.3, 0.6, 0.95), Color(0.85, 0.95, 1.0), Color(0.2, 0.45, 0.85)]), PackedFloat32Array([0.0, 0.45, 0.62, 1.0]))
+	var p2 := _planet(Vector3(19.0, 16.0, -62.0), 5.0, ice, Color(0.5, 0.8, 1.0))
+	var pring := MeshInstance3D.new()
+	var q := PlaneMesh.new()
+	q.size = Vector2(22, 22)
+	pring.mesh = q
+	var rm := ShaderMaterial.new()
+	rm.shader = preload("res://shaders/planet_ring.gdshader")
+	pring.material_override = rm
+	pring.rotation_degrees = Vector3(14, 0, -18)
+	p2.add_child(pring)
+
+
+## Rauschtextur für Planetenoberflächen
+func _noise_tex(seed: int, freq: float, cols: PackedColorArray, offs: PackedFloat32Array) -> NoiseTexture2D:
+	var n := FastNoiseLite.new()
+	n.seed = seed
+	n.frequency = freq
+	n.fractal_octaves = 5
+	n.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
+	var t := NoiseTexture2D.new()
+	t.width = 512
+	t.height = 256
+	t.seamless = true
+	t.noise = n
+	var g := Gradient.new()
+	g.offsets = offs
+	g.colors = cols
+	t.color_ramp = g
+	return t
+
+
+## Planet mit Oberfläche und leuchtender Atmosphäre
+func _planet(pos: Vector3, r: float, tex: Texture2D, atmo: Color) -> Node3D:
+	var root := Node3D.new()
+	root.position = pos
+	add_child(root)
+	var mi := MeshInstance3D.new()
+	var sm := SphereMesh.new()
+	sm.radius = r
+	sm.height = r * 2.0
+	sm.radial_segments = 48
+	sm.rings = 24
+	mi.mesh = sm
+	var m := StandardMaterial3D.new()
+	m.albedo_texture = tex
+	m.roughness = 0.85
+	mi.material_override = m
+	root.add_child(mi)
+	var at := MeshInstance3D.new()
+	var s2 := SphereMesh.new()
+	s2.radius = r * 1.06
+	s2.height = r * 2.12
+	s2.radial_segments = 48
+	s2.rings = 24
+	at.mesh = s2
+	var am := ShaderMaterial.new()
+	am.shader = preload("res://shaders/atmosphere.gdshader")
+	am.set_shader_parameter("col", atmo)
+	at.material_override = am
+	root.add_child(at)
+	return root

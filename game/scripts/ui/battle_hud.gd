@@ -97,7 +97,7 @@ func set_xp(_xp: int, _needed: int) -> void:
 
 
 func set_fence(hp: float, max_hp: float) -> void:
-	set_text("Schild 1.462 / 1.700", "Schild %s / %s" % [MockScreen.num(int(ceil(hp))), MockScreen.num(int(max_hp))])
+	set_text("Schild 1.462 / 1.700", "Schild %s / %s" % [MockScreen.num(mini(int(ceil(hp)), int(round(max_hp)))), MockScreen.num(int(round(max_hp)))])
 
 
 func set_boosters(ids: Array[String]) -> void:

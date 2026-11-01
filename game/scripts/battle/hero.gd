@@ -103,9 +103,11 @@ func activate_ult() -> bool:
 			var strong: Array = battle.enemies.filter(func(e: Enemy) -> bool: return is_instance_valid(e) and e.alive)
 			strong.sort_custom(func(a: Enemy, b: Enemy) -> bool: return a.hp > b.hp)
 			for k in mini(4 + lvl, strong.size()):
-				var e: Enemy = strong[k]
+				# Nur die Kennung merken: der Gegner kann bis zum Schuss schon besiegt sein
+				var eid: int = (strong[k] as Enemy).get_instance_id()
 				get_tree().create_timer(0.18 * k, false).timeout.connect(func() -> void:
-					if battle and is_instance_valid(e) and e.alive:
+					var e := instance_from_id(eid) as Enemy
+					if battle and e and e.alive:
 						battle.fire_bullet(_muzzle.global_position, e, dmg * 4.0, true, "normal", 3, 70.0, 1.6))
 	battle.add_shake(0.35)
 	Fx.flash(battle, global_position + Vector3(0, 1.4, 0), Color(1.0, 0.85, 0.3), 2.5, 0.35)
@@ -137,7 +139,9 @@ func _build_ult_ring() -> void:
 
 
 ## Darstellungsgröße der Helden.
-const VIS_SCALE := 1.4
+const VIS_SCALE := 2.0
+## Helden schauen schräg zur Kamera statt ins Feld (Mockup „Kampf“)
+const FACE_CAMERA := true
 
 
 ## Ton beim Schuss je Waffenfamilie.
@@ -309,6 +313,9 @@ func _fire(target: Enemy) -> void:
 func _aim_at(target_pos: Vector3, delta: float) -> void:
 	var d := target_pos - global_position
 	var yaw := atan2(-d.x, -d.z)
+	# Wie im Mockup: Held schräg zur Kamera gedreht (Gesicht und Waffe sichtbar), zum Ziel hin geneigt
+	if FACE_CAMERA:
+		yaw += PI * 0.78 * (1.0 if d.x >= 0.0 else -1.0)
 	rotation.y = lerp_angle(rotation.y, yaw, minf(1.0, delta * 12.0))
 
 
@@ -339,16 +346,20 @@ func _build_visual() -> void:
 	var skin: Color = data["skin"]
 	var dark := Color(0.16, 0.17, 0.22)
 	# Geschützsockel der Station
+	# (Sockel entfällt: im Mockup stehen die Helden frei vor der Mauer, den Ring zeichnet die Anzeige)
 	var base := Fx.cylinder(0.72, 0.82, 0.22, Fx.mat(Color(0.25, 0.27, 0.33), 0.0, 0.7, 0.35), 6)
 	base.position.y = 0.11
+	base.visible = false
 	add_child(base)
 	var rim := Fx.cylinder(0.74, 0.74, 0.04, Fx.mat(Color(0.2, 0.85, 1.0), 2.0), 6)
 	rim.position.y = 0.23
+	rim.visible = false
 	add_child(rim)
 	# Munitionsleitung zur Kugelbahn
 	_pipe_mat = Fx.mat(Color(0.2, 0.8, 1.0), 0.4, 0.3, 0.3)
 	var pipe := Fx.cylinder(0.08, 0.08, 6.0, _pipe_mat, 8)
 	_pipe = pipe
+	pipe.visible = false
 	pipe.rotation.x = PI * 0.5
 	pipe.position = Vector3(0, 0.08, 3.2)
 	add_child(pipe)
@@ -621,6 +632,7 @@ func _build_model() -> void:
 	_body.add_child(_model)
 	_model.position.y = 0.0
 	Models.recolor(_model, "Skin", data["skin"])
+	Models.recolor(_model, "Face", Color(0.1, 0.07, 0.12))
 	_anim = Models.player(_model)
 	_pose_aim()
 

@@ -1,0 +1,6 @@
+{"board":"Alt-Nachladen-Karten.dc.html","out":"out/karten","states":[{"name":"main"}],
+ "only":["#dc-root > div > div[style*=\"top: 200px\"]","#dc-root > div > button[aria-label^=\"Karte\"]","#dc-root > div > a[style*=\"top: 500px\"]","#dc-root > div > div[style*=\"top: 566px\"]"],
+ "live":[
+  {"sel":"button[aria-label^=\"Karte\"] svg","id":"card_icon"},
+  {"sel":"button[aria-label^=\"Karte\"] img","id":"card_hero","img":true}
+ ]}
