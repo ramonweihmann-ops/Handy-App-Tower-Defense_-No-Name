@@ -2,7 +2,7 @@
 """Export (PNG + layout.json) in den Spielordner übernehmen: WebP, Import-Einstellungen (verlustbehaftet,
 spart Platz), Bildpfade in der layout.json.  Aufruf: to_game.py <export-ordner> <bildschirm-name>"""
 import hashlib, json, os, sys
-from PIL import Image
+from PIL import Image, ImageChops
 
 GAME = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'game')
 IMPORT = '''[remap]
@@ -47,7 +47,10 @@ def convert(src, name):
     os.makedirs(dst, exist_ok=True)
     lay = json.load(open(os.path.join(src, 'layout.json')))
     keep = set()
-    seen = {}   # gleiche Bilder (z. B. Hintergrund mehrerer Zustände) nur einmal ablegen
+    # lossy_alpha (Konfiguration): auch Bilder mit Durchsicht verlustbehaftet speichern (viele große Symbole)
+    lossy_alpha = bool(lay.get('lossy_alpha', False))
+    opaque_seen = []
+    seen = {}  # gleiche Bilder (z. B. derselbe Knopf in jedem Zustand) nur einmal speichern
 
     def add(f, q, opaque):
         src_f = os.path.join(src, f)
@@ -57,18 +60,26 @@ def convert(src, name):
         im = im.convert('RGB') if opaque else im.convert('RGBA')
         if not opaque and im.getbbox() is None:
             return ''
-        digest = hashlib.sha1(im.tobytes() + str(im.size).encode() + im.mode.encode()).hexdigest()
-        if digest in seen:
-            return seen[digest]
-        out = f.replace('.png', '.webp')
+        h = hashlib.md5(im.mode.encode() + str(im.size).encode() + im.tobytes()).hexdigest()
+        if h in seen:
+            return seen[h]
         if opaque:
+            # Hintergründe, die sich nur durch Kantenglättung unterscheiden, auch nur einmal
+            for prev, prev_name in opaque_seen:
+                if prev.size == im.size and max(e[1] for e in ImageChops.difference(prev, im).getextrema()) <= 12:
+                    return prev_name
+        out = f.replace('.png', '.webp')
+        seen[h] = out
+        if opaque:
+            opaque_seen.append((im, out))
+        lossy = opaque or lossy_alpha
+        if lossy:
             im.save(os.path.join(dst, out), 'WEBP', quality=int(q * 100), method=5)
         else:
             im.save(os.path.join(dst, out), 'WEBP', lossless=True, quality=100, method=5)
         keep.add(out)
         imp = os.path.join(dst, out + '.import')
-        open(imp, 'w').write(IMPORT.format(name=name, file=out, q=q, mode=1 if opaque else 0))
-        seen[digest] = out
+        open(imp, 'w').write(IMPORT.format(name=name, file=out, q=q, mode=1 if lossy else 0))
         return out
 
     for st, d in lay['states'].items():

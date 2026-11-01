@@ -100,6 +100,17 @@ func _run() -> bool:
 			m._open_settings()
 			m._open_hero("kalle")
 			m._open_hero("fritzi")
+			# Fenster „Held aufleveln“: blättern, Fähigkeit ansehen, aufleveln, schließen
+			HeroBoard.start_hero = "dusty"
+			m.open_board("Artboard-seqx-c6i2.dc.html")
+			var hb: HeroBoard = m._boards[-1]
+			hb._set_hero("kalle")
+			hb._open_skill("kett")
+			hb._close_skill()
+			hb._set_hero("dusty")
+			hb._level_up()
+			print("SMOKE heldenfenster: ", hb.hero, " stufe ", save.hero_level("dusty"))
+			m.close_board(hb)
 			m.sub_tab["upgrades"] = "munition"
 			m.show_tab("upgrades")
 			# Tech-Baum nach Mockup: Fenster zu jedem Knotenzustand, Kaufen, Munition

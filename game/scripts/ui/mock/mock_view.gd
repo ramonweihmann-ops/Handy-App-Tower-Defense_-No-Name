@@ -104,7 +104,10 @@ func show_state(state_name: String) -> void:
 			mb.texture = load(dir + str(b["img"]))
 		_btn_layer.add_child(mb)
 		_buttons.append(mb)
-	_live.clear()
+	# frei gesetzte Elemente (place_at) behalten ihre Lage, nur die des Mockups wechseln
+	for id in _live.keys():
+		if not str(id).begins_with("_frei_"):
+			_live.erase(id)
 	_live_info.clear()
 	for l in data.get("live", []):
 		var r: Array = l["rect"]
@@ -186,7 +189,7 @@ func _redraw_texts() -> void:
 func _draw_free_texts() -> void:
 	for t in data.get("texts", []):
 		if int(t["button"]) < 0:
-			draw_text(_text_layer, t, Vector2.ZERO)
+			draw_text(_text_layer, t, off)  # Bildschirmpunkt von Mockup-(0,0)
 
 
 ## Einen Mockup-Text zeichnen; origin = Bildschirmpunkt, der Mockup-Punkt (0,0) entspricht

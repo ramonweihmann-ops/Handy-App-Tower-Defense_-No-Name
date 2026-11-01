@@ -1,6 +1,7 @@
 // Mockup -> Spiel: zerlegt einen Mockup-Bildschirm in Hintergrund, Knöpfe und Texte.
 // node export.js <config.json>
-// Config: {board, out, states:[{name, set:{...}, eval|eval_file}], live:[{sel, id, img, pad}], scale}
+// Config: {board, out, states:[{name, set:{...}, eval|eval_file}], overlays:[{name, base, set, only_live}], live:[{sel, id, img, pad}], scale, only, lossy_alpha}
+//  - overlays mit only_live: nur die Live-Bilder des Popups (z. B. das Symbol je Held und Fähigkeit)
 //  - live: Elemente, die das Spiel selbst darstellt (z. B. 3D-Helden); sie fehlen im Hintergrund,
 //    ihr Rechteck steht in der JSON-Datei.
 const fs = require('fs'); const path = require('path');
@@ -30,6 +31,9 @@ const PREP = `(() => {
   for (const a of document.getAnimations()) { try { a.pause(); a.currentTime = 350; } catch (e) {} }
   // SVG-Texte ebenfalls als Text behandeln (Zahlen in Anzeigen)
   document.querySelectorAll('#dc-root svg text').forEach(t => { if (t.textContent.trim()) t.classList.add('m2g-svgt'); });
+  // weißer Seitenhintergrund mancher Mockups: Knöpfe und Live-Bilder brauchen Durchsicht
+  document.documentElement.style.setProperty('background', 'transparent', 'important');
+  document.body.style.setProperty('background', 'transparent', 'important');
   return nodes.length;
 })()`;
 
@@ -112,7 +116,7 @@ async function shootLive(p, data, pre) {
   for (const st of [...(cfg.states || []), ...(cfg.overlays || [])]) if (st.eval_file) st.eval = fs.readFileSync(path.join(path.dirname(process.argv[2]), st.eval_file), 'utf8');
   const scale = cfg.scale || 3;
   fs.mkdirSync(cfg.out, { recursive: true });
-  const result = { board: cfg.board, size: [390, 844], scale, states: {}, transparent: !!cfg.only };
+  const result = { board: cfg.board, size: [390, 844], scale, states: {}, transparent: !!cfg.only, lossy_alpha: !!cfg.lossy_alpha };
   for (const st of cfg.states || [{ name: 'main' }]) {
     const { b, p } = await open(cfg.board, scale);
     if (st.set) { await p.evaluate((o) => window.__dcComp.setState(o), st.set); await p.waitForTimeout(200); }
@@ -158,6 +162,15 @@ async function shootLive(p, data, pre) {
     const n = await p.evaluate(MARK_OVERLAY + '(' + JSON.stringify(base) + ')');
     await p.evaluate(PREP);
     const data = await p.evaluate(COLLECT + '(' + JSON.stringify(cfg.live || []) + ')');
+    if (ov.only_live) {
+      // nur die Live-Bilder (z. B. ein Symbol je Held), kein Hintergrund, keine Knöpfe
+      await p.addStyleTag({ content: '.m2g-t{color:transparent!important;text-shadow:none!important}' });
+      data.texts = []; data.buttons = [];
+      await shootLive(p, data, path.join(cfg.out, 'ov_' + ov.name));
+      result.overlays[ov.name] = data;
+      await b.close();
+      continue;
+    }
     await p.addStyleTag({ content: 'html,body{background:transparent!important} .m2g-t{color:transparent!important;text-shadow:none!important} .m2g-svgt{fill:transparent!important;stroke:transparent!important} [data-m2g-live]{visibility:hidden!important} #dc-root{visibility:hidden!important} [data-m2g-ov]{visibility:visible!important} [data-m2g-btn]{visibility:hidden!important}' });
     const box = await p.evaluate(() => { let a = null; document.querySelectorAll('[data-m2g-ov], [data-m2g-ov] *').forEach(e => { const q = e.getBoundingClientRect(); if (q.width < 0.5 || q.height < 0.5) return; const cs = getComputedStyle(e);
       const shadow = parseFloat((cs.boxShadow.match(/(\d+)px\)?\s*$/) || [0, 0])[1]) || 0; const g = Math.min(40, 6 + (cs.boxShadow !== 'none' ? 24 : 0));
