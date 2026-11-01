@@ -65,6 +65,10 @@ func handle(b: Dictionary) -> bool:
 		"Tägliche Belohnung":
 			menu.open_daily()
 			return true
+		"Glücksrad":
+			# Der Knopf hat im Mockup kein Ziel; das Glücksrad ist das Mockup „Artboard-zqpq“
+			menu.open_board("Artboard-zqpq.dc.html")
+			return true
 	if href == "#kampf" and b.get("rect", [0, 0, 0, 0])[1] > 600 and b.get("rect")[1] < 760:
 		menu.play_selected()  # großer Spielen-Knopf
 		return true

@@ -9,6 +9,12 @@ const { open } = require('./shoot.js');
 const PREP = `(() => {
   // 1) Texte in Spans packen, damit sie messbar und ausblendbar sind
   const root = document.getElementById('dc-root');
+  // Text mit <br> direkt in einem Grid/Flex: im Browser ein gemeinsames Element; damit das nach dem
+  // Einpacken in Spans so bleibt, alles in einen Span fassen (z. B. „JETZT<br>BEITRETEN“)
+  root.querySelectorAll('br').forEach(br => { const p = br.parentElement; const d = getComputedStyle(p).display;
+    if (!/grid|flex/.test(d) || p.dataset.m2gWrap) return; const kids = Array.from(p.childNodes);
+    if (!kids.every(k => k.nodeType === 3 || k.localName === 'br')) return;
+    const s = document.createElement('span'); kids.forEach(k => s.appendChild(k)); p.appendChild(s); p.dataset.m2gWrap = '1'; });
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   const nodes = []; let n;
   while ((n = walker.nextNode())) {
@@ -100,13 +106,15 @@ async function shootLive(p, data, pre) {
 
 (async () => {
   const cfg = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+  // script: Hilfs-Skript (Pfad relativ zur Konfiguration), läuft vor jedem eval, z. B. für Zusatz-Zustände
+  const helper = cfg.script ? fs.readFileSync(path.resolve(path.dirname(process.argv[2]), cfg.script), 'utf8') : '';
   const scale = cfg.scale || 3;
   fs.mkdirSync(cfg.out, { recursive: true });
   const result = { board: cfg.board, size: [390, 844], scale, states: {}, transparent: !!cfg.only };
   for (const st of cfg.states || [{ name: 'main' }]) {
     const { b, p } = await open(cfg.board, scale);
     if (st.set) { await p.evaluate((o) => window.__dcComp.setState(o), st.set); await p.waitForTimeout(200); }
-    if (st.eval) { await p.evaluate(st.eval); await p.waitForTimeout(200); }
+    if (st.eval) { if (helper) await p.evaluate(helper); await p.evaluate(st.eval); await p.evaluate(() => document.fonts.ready); await p.waitForTimeout(300); }
     await p.evaluate(PREP);
     if (cfg.only) await p.evaluate((sels) => { const keep = new Set(); sels.forEach(q => document.querySelectorAll(q).forEach(e => keep.add(e)));
       document.querySelectorAll('#dc-root *').forEach(e => { let k = false; for (let a = e; a; a = a.parentElement) if (keep.has(a)) { k = true; break; } if (!k) { let d = false; keep.forEach(x => { if (e.contains(x)) d = true; }); if (!d) e.style.setProperty('display', 'none', 'important'); } });
@@ -142,7 +150,7 @@ async function shootLive(p, data, pre) {
     if (ov.base) await p.evaluate((o) => window.__dcComp.setState(o), ov.base);
     const base = await p.evaluate(SIGS);
     await p.evaluate((o) => window.__dcComp.setState(o), ov.set || {});
-    if (ov.eval) await p.evaluate(ov.eval);
+    if (ov.eval) { if (helper) await p.evaluate(helper); await p.evaluate(ov.eval); }
     await p.waitForTimeout(250);
     await p.evaluate(PREP);
     const n = await p.evaluate(MARK_OVERLAY + '(' + JSON.stringify(base) + ')');
