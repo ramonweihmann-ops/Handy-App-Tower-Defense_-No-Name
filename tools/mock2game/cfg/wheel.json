@@ -1,0 +1,20 @@
+{"board": "Artboard-zqpq.dc.html", "out": "out/wheel", "script": "wheel.js",
+ "states": [
+  {"name": "idle", "eval": "m2g.fields()"},
+  {"name": "spinning", "set": {"phase": "spinning", "angle": 0, "fast": true}, "eval": "m2g.fields(); m2g.hideWheel()"},
+  {"name": "done", "set": {"phase": "done", "angle": 0, "fast": true}, "eval": "m2g.fields(); m2g.hideWheel(); m2g.hidePanel()"}
+ ],
+ "overlays": [
+  {"name": "win", "base": {"phase": "idle"}, "set": {"phase": "done"}, "eval": "m2g.win()"}
+ ],
+ "live": [
+  {"sel": "div[style*=\"width: 300px; height: 300px; transform\"]", "id": "wheel", "img": true},
+  {"sel": "svg[width=\"340\"][style*=\"pointer-events\"]", "id": "hub", "img": true},
+  {"sel": "svg[width=\"56\"][height=\"70\"]", "id": "pointer", "img": true},
+  {"sel": "[role=\"status\"] > svg", "id": "win_rays", "img": true},
+  {"sel": "[data-icon=\"gold\"]", "id": "icon_gold", "img": true},
+  {"sel": "[data-icon=\"gems\"]", "id": "icon_gems", "img": true},
+  {"sel": "[data-icon=\"energy\"]", "id": "icon_energy", "img": true},
+  {"sel": "[data-icon=\"stars\"]", "id": "icon_stars", "img": true},
+  {"sel": "[data-icon=\"cards\"]", "id": "icon_cards", "img": true}
+ ]}

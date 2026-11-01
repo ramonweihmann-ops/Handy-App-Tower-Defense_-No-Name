@@ -15,6 +15,10 @@ Rote Hinweis-Punkte werden immer herausgenommen und vom Spiel nur gezeigt, wenn 
 
 Konfiguration (`cfg/*.json`): `board` (Mockup-Datei), `out`, `states` (Zustände mit `set` = setState),
 `overlays` (Popups: nur die neuen Elemente gegenüber dem Grundzustand), `live` (`sel` = CSS-Auswahl,
-`id`, `img` = Bild mit aufnehmen).
+`id`, `img` = Bild mit aufnehmen), `eval` (JavaScript je Zustand/Popup, läuft nach `set`) und `script`
+(Hilfs-Skript neben der Konfiguration, läuft vor jedem `eval`). Beispiele: `cfg/shop.json` baut die
+Reiter Truhen/Aufladen/Event aus den Bausteinen des Mockups, `cfg/wheel.json` passt die Felder des
+Glücksrads an die echten Gewinne an und nimmt Rad, Nabe und Zeiger als eigene Bilder auf.
+`to_game.py` legt gleiche Bilder (z. B. denselben Hintergrund in mehreren Zuständen) nur einmal ab.
 
 Benötigt Node mit Playwright (Chromium) und Python mit Pillow.
