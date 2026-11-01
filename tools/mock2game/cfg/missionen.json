@@ -1,0 +1,19 @@
+{"board": "Missionen.dc.html", "out": "out/missionen", "states": [{"name": "main"}],
+ "note": "Truhen-Popup: im Mockup schneidet overflow:hidden das Popup ab; für den Export wird es per eval sichtbar gemacht.",
+ "overlays": [
+  {"name": "chest", "set": {"sel": 100}, "eval": "document.head.insertAdjacentHTML('beforeend', '<style>div:has(> div[role=dialog]){overflow:visible!important}</style>')"},
+  {"name": "chest_gold", "set": {"sel": 60}, "eval": "document.head.insertAdjacentHTML('beforeend', '<style>div:has(> div[role=dialog]){overflow:visible!important}</style>')"}
+ ],
+ "live": [
+  {"sel": "div[style*=\"width: 34%\"]", "id": "pts_fill", "img": true},
+  {"sel": "div[style*=\"width: 40px; height: 40px; border-radius: 50%\"]", "id": "pts_dial", "img": true},
+  {"sel": "button[aria-label^=\"Truhe\"] > div", "id": "chest", "img": true, "pad": 20},
+  {"sel": "div[style*=\"background: #fff; box-shadow: 0 3px 0 #e8c890\"]", "id": "card", "img": true},
+  {"sel": "div[style*=\"height: 100%; background: linear-gradient(90deg\"]", "id": "fill", "img": true},
+  {"sel": "div[style*=\"font: 800 14px Nunito, sans-serif; color: #4a3a7a\"]", "id": "mtext"},
+  {"sel": "span[style*=\"font:800 14px/1 Fredoka\"]", "id": "mpts"},
+  {"sel": "span[style*=\"font: 800 11px Nunito, sans-serif; color: #fff\"]", "id": "mbar"},
+  {"sel": "div[role=\"dialog\"] svg", "id": "icon", "img": true},
+  {"sel": "div[role=\"dialog\"] > div[aria-hidden]", "id": "arrow", "img": true},
+  {"sel": "div[role=\"dialog\"] div[style*=\"flex: 1; min-width: 0\"]", "id": "item"}
+ ]}

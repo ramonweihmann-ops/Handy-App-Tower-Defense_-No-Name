@@ -16,7 +16,9 @@ const PREP = `(() => {
     const p = n.parentElement; if (!p || p.closest('svg')) continue;
     nodes.push(n);
   }
-  for (const t of nodes) { const s = document.createElement('span'); s.className = 'm2g-t'; t.replaceWith(s); s.appendChild(t); }
+  // In Flex-/Grid-Behältern bilden Text und <br> zusammen ein Element; die Spans dürfen das nicht aufbrechen
+  for (const t of nodes) { const s = document.createElement('span'); s.className = 'm2g-t'; const pd = getComputedStyle(t.parentElement).display;
+    if (/flex|grid/.test(pd) && t.parentElement.querySelector(':scope > br')) s.style.display = 'contents'; t.replaceWith(s); s.appendChild(t); }
   // 2) Animationen anhalten (fester Zeitpunkt)
   for (const sv of document.querySelectorAll('svg')) { try { sv.pauseAnimations(); sv.setCurrentTime(0.35); } catch (e) {} }
   for (const a of document.getAnimations()) { try { a.pause(); a.currentTime = 350; } catch (e) {} }
@@ -25,9 +27,10 @@ const PREP = `(() => {
   return nodes.length;
 })()`;
 
-const SIGS = `(() => { const out = []; document.querySelectorAll('#dc-root *').forEach(e => { if (e.classList.contains('m2g-t')) return; out.push(e.localName + '|' + (e.getAttribute('style') || '') + '|' + (e.getAttribute('src') || '') + '|' + (e.getAttribute('d') || '') + '|' + Array.from(e.childNodes).filter(n => n.nodeType === 3).map(n => n.nodeValue.trim()).join('')); }); return out; })()`;
+// Signatur je Element; Texte zählen gleich, ob schon in m2g-t-Spans verpackt oder nicht
+const SIGS = `(() => { const out = []; document.querySelectorAll('#dc-root *').forEach(e => { if (e.classList.contains('m2g-t')) return; out.push(e.localName + '|' + (e.getAttribute('style') || '') + '|' + (e.getAttribute('src') || '') + '|' + (e.getAttribute('d') || '') + '|' + Array.from(e.childNodes).map(n => n.nodeType === 3 ? n.nodeValue.trim() : (n.classList && n.classList.contains('m2g-t') ? n.textContent.trim() : '')).join('')); }); return out; })()`;
 const MARK_OVERLAY = `((base) => { const cnt = {}; base.forEach(k => cnt[k] = (cnt[k] || 0) + 1); let n = 0;
-  document.querySelectorAll('#dc-root *').forEach(e => { if (e.classList.contains('m2g-t')) return; const k = e.localName + '|' + (e.getAttribute('style') || '') + '|' + (e.getAttribute('src') || '') + '|' + (e.getAttribute('d') || '') + '|' + Array.from(e.childNodes).filter(n => n.nodeType === 3).map(n => n.nodeValue.trim()).join('');
+  document.querySelectorAll('#dc-root *').forEach(e => { if (e.classList.contains('m2g-t')) return; const k = e.localName + '|' + (e.getAttribute('style') || '') + '|' + (e.getAttribute('src') || '') + '|' + (e.getAttribute('d') || '') + '|' + Array.from(e.childNodes).map(n => n.nodeType === 3 ? n.nodeValue.trim() : (n.classList && n.classList.contains('m2g-t') ? n.textContent.trim() : '')).join('');
     if (e.parentElement && e.parentElement.closest('[data-m2g-ov]')) return; if (cnt[k]) { cnt[k]--; return; } e.setAttribute('data-m2g-ov', '1'); n++; });
   return n; })`;
 const COLLECT = `((liveSel) => {
@@ -43,7 +46,7 @@ const COLLECT = `((liveSel) => {
   Array.from(document.querySelectorAll('#dc-root span[style*="background: #ff3b30"]')).filter(e => visible(e) && inOv(e)).forEach((el, k) => {
     const r = el.getBoundingClientRect(); if (r.width > 20) return; const owner = el.closest('[data-m2g-btn]');
     el.setAttribute('data-m2g-live', 'badge' + k); out.live.push({ id: 'badge' + k, rect: [r.left, r.top, r.width, r.height], rot: 0, badge: true, button: owner ? +owner.getAttribute('data-m2g-btn') : -1 }); });
-  (liveSel || []).forEach(l => { document.querySelectorAll(l.sel).forEach((el, k) => { if (!visible(el) || !inOv(el)) return; el.setAttribute('data-m2g-live', l.id + (k ? '_' + k : '')); const r = el.getBoundingClientRect(); out.live.push({ id: l.id + (k ? '_' + k : ''), rect: [r.left, r.top, r.width, r.height], rot: rot(el), img: !!l.img }); }); });
+  (liveSel || []).forEach(l => { document.querySelectorAll(l.sel).forEach((el, k) => { if (!visible(el) || !inOv(el)) return; el.setAttribute('data-m2g-live', l.id + (k ? '_' + k : '')); const r = el.getBoundingClientRect(); out.live.push({ id: l.id + (k ? '_' + k : ''), rect: [r.left, r.top, r.width, r.height], rot: rot(el), img: !!l.img, pad: l.pad || 8 }); }); });
   document.querySelectorAll('.m2g-svgt').forEach((t, k) => {
     if (!visible(t) || t.closest('[data-m2g-live]') || !inOv(t)) return;
     const cs = getComputedStyle(t); const r = t.getBoundingClientRect(); if (r.width < 0.5) return;
@@ -84,8 +87,10 @@ async function shootLive(p, data, pre) {
       document.querySelectorAll('#dc-root *').forEach(e => { if (e.style.visibility === 'visible') e.style.removeProperty('visibility'); });
       document.querySelectorAll('[data-m2g-ov]').forEach(e => e.style.setProperty('visibility', 'hidden', 'important'));
       document.querySelectorAll('[data-m2g-btn]').forEach(e => e.style.setProperty('visibility', 'hidden', 'important'));
-      document.querySelector('[data-m2g-live="' + id + '"]').style.setProperty('visibility', 'visible', 'important'); }, l.id);
-    const [x, y, w, h] = l.rect; const pad = 8;
+      const el = document.querySelector('[data-m2g-live="' + id + '"]'); el.style.setProperty('visibility', 'visible', 'important');
+      // Kinder des Elements (z. B. Pfade eines SVG in einem Popup) nicht einzeln verstecken, Knöpfe schon
+      el.querySelectorAll('*').forEach(c => { if (!c.hasAttribute('data-m2g-btn')) c.style.removeProperty('visibility'); }); }, l.id);
+    const [x, y, w, h] = l.rect; const pad = l.pad || 8;  // pad: Rand für Leuchten/Schatten (Konfiguration)
     const clip = { x: Math.max(0, x - pad), y: Math.max(0, y - pad), width: Math.min(390, x + w + pad) - Math.max(0, x - pad), height: Math.min(844, y + h + pad) - Math.max(0, y - pad) };
     l.img_rect = [clip.x, clip.y, clip.width, clip.height];
     await p.screenshot({ path: `${pre}_live_${l.id}.png`, clip, omitBackground: true });
