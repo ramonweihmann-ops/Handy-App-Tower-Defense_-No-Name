@@ -32,6 +32,8 @@ var hp_scale := 1.0
 var bonus_crit := 0.0
 var bonus_reload := 0.0
 var hero_damage := {}
+## Schadensbonus für alle Helden durch dazugerufene Verstärkungs-Helden.
+var team_aura := 0.0
 ## Für Auswertungen: Heldensekunden ohne Munition und Heldensekunden insgesamt.
 var hero_wait_time := 0.0
 var hero_time := 0.0
@@ -129,10 +131,14 @@ func start() -> void:
 	_next_wave()
 
 
-func add_hero(id: String) -> Hero:
+## joined: per Karte im Kampf dazugerufen (nicht der erste Held).
+func add_hero(id: String, joined := false) -> Hero:
 	var h := Hero.new()
 	add_child(h)
 	h.position = Vector3(0, 0, HERO_Z)
+	h.reinforced = joined and GameData.HERO_TYPE.get(id, "start") == "verstaerkung"
+	if h.reinforced:
+		team_aura += GameData.TEAM_AURA
 	h.setup(id, self)
 	heroes.append(h)
 	_layout_heroes(true)

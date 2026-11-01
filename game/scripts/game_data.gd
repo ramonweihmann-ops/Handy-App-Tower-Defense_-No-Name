@@ -5,6 +5,20 @@ extends RefCounted
 
 const HERO_IDS := ["dusty", "iska", "brocken", "volta", "kalle", "margot", "lynx", "fritzi"]
 
+## Heldentyp: Start-Helden tragen den Anfang eines Kampfes. Verstärkungs-Helden sind als erster
+## Held schwächer, werden aber stark, wenn sie im Kampf per Karte dazugerufen werden:
+## eigener Schaden +30 %, das ganze Team +6 % (je Verstärkung).
+const HERO_TYPE := {"dusty": "start", "iska": "start", "brocken": "start", "kalle": "start", "fritzi": "start",
+	"volta": "verstaerkung", "margot": "verstaerkung", "lynx": "verstaerkung"}
+const REINFORCE_DAMAGE := 0.3
+const TEAM_AURA := 0.06
+
+
+static func hero_type_text(id: String) -> String:
+	if HERO_TYPE.get(id, "start") == "verstaerkung":
+		return "Verstärkung: im Kampf dazugerufen +30 % Schaden, Team +6 %"
+	return "Start-Held: stark von Anfang an"
+
 const HEROES := {
 	"dusty": {
 		"name": "Dusty Jo",

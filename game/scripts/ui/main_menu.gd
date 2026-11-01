@@ -882,6 +882,8 @@ func _hero_card(id: String) -> Control:
 		v.add_child(bar)
 	if unlocked and Save.can_level_hero(id):
 		_mark(b)
+	var typ := UiKit.label("Verstärkung" if GameData.HERO_TYPE.get(id, "start") == "verstaerkung" else "Start-Held", 14, UiKit.C_GOLD)
+	v.add_child(typ)
 	if unlocked:
 		var in_team := UiKit.label("Im Team" if Save.in_squad(id) else "Reserve", 15, Color(0.45, 1.0, 0.55) if Save.in_squad(id) else UiKit.C_MUTED)
 		v.add_child(in_team)
@@ -898,6 +900,7 @@ func _open_hero(id: String) -> void:
 	portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	v.add_child(portrait)
 	v.add_child(UiKit.wrap_label(String(d["blurb"]), 21))
+	v.add_child(UiKit.wrap_label(GameData.hero_type_text(id), 19, UiKit.C_GOLD))
 	if not unlocked:
 		v.add_child(UiKit.wrap_label("Freischaltung: Gewinne Level %d – oder sofort für %d Edelsteine." % [int(MetaData.HERO_UNLOCK[id]), MetaData.HERO_UNLOCK_GEMS], 20, UiKit.C_MUTED))
 		var buy := UiKit.button("Freischalten · %d Edelsteine" % MetaData.HERO_UNLOCK_GEMS, func() -> void:

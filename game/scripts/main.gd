@@ -565,7 +565,7 @@ func _show_hero_picker(options: Array) -> void:
 		var d: Dictionary = GameData.HEROES[id]
 		var card := {
 			"kind": "hero_pick", "target": d["weapon"], "color": d["color"], "title": d["name"],
-			"desc": "%s\n\n%s" % [d["role"], d["blurb"]], "stars": 0, "max": 0, "emblem": String(d["name"]).left(1),
+			"desc": "%s\n\n%s\n%s" % [d["role"], d["blurb"], GameData.hero_type_text(id)], "stars": 0, "max": 0, "emblem": String(d["name"]).left(1),
 			"hero_id": id,
 		}
 		var hero_id: String = id
@@ -708,7 +708,7 @@ func _card_add_hero(id: String) -> Dictionary:
 	var d: Dictionary = GameData.HEROES[id]
 	return {
 		"key": "add:" + id, "kind": "add_hero", "target": "Neu im Team", "color": d["color"],
-		"title": d["name"], "desc": "%s mit %s.\n%s\n+10 Munition" % [d["role"], d["weapon"], d["blurb"]],
+		"title": d["name"], "desc": "%s mit %s.\n%s\n%s\n+10 Munition" % [d["role"], d["weapon"], d["blurb"], GameData.hero_type_text(id)],
 		"stars": 0, "max": 1, "emblem": String(d["name"]).left(1), "hero_id": id,
 		"weight": 4.0 if battle.heroes.size() < 2 else 2.2,
 		"apply": _apply_add_hero.bind(id),
@@ -716,7 +716,7 @@ func _card_add_hero(id: String) -> Dictionary:
 
 
 func _apply_add_hero(id: String) -> void:
-	battle.add_hero(id)
+	battle.add_hero(id, true)
 	ammo.add("normal", 10)
 
 

@@ -39,10 +39,11 @@ def run(godot, level, profile, seed):
             v = dict(re.findall(r"(\w+)=(\S+)", line))
             fence = v["fence"].split("/")
             start = re.search(r"start:(\w+)", v.get("cards", ""))
+            joined = re.findall(r"add:(\w+)", v.get("cards", ""))
             return {"level": level, "profile": profile, "seed": seed, "win": v["result"] == "win",
                     "time": float(v["time"]), "wait": float(v["wait"]), "fill": float(v["fill"]),
                     "shield": float(fence[0]) / max(1.0, float(fence[1])),
-                    "start": start.group(1) if start else "?"}
+                    "start": start.group(1) if start else "?", "joined": joined}
     return None
 
 
@@ -116,6 +117,17 @@ def main():
         q, sh = score(rs)
         t = sum(r["time"] for r in rs) / len(rs)
         lines.append(f"| {h} | {len(rs)} | {q:.0%} | {sh:.0%} | {t:.0f} s |")
+    lines += ["", "## Dazugerufene Helden", "",
+              "Siegquote, wenn der Held im Kampf per Karte dazukam. Verstärkungs-Helden (Volta, Margot, "
+              "Lynx) sollen hier besser abschneiden als beim Start.", "",
+              "| Held | Läufe | Siegquote | Ø Schild übrig |", "|---|---|---|---|"]
+    joined = collections.defaultdict(list)
+    for r in results:
+        for h in r["joined"]:
+            joined[h].append(r)
+    for h, rs in sorted(joined.items(), key=lambda kv: tuple(-x for x in score(kv[1]))):
+        q, sh = score(rs)
+        lines.append(f"| {h} | {len(rs)} | {q:.0%} | {sh:.0%} |")
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     with open(a.out, "w") as f:
         f.write("\n".join(lines) + "\n")

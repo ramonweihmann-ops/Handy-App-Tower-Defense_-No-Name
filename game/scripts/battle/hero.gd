@@ -7,6 +7,8 @@ var id := ""
 var data: Dictionary
 var battle: Battle
 ## Stufen der Verbesserungen aus der Kartenauswahl.
+## Als Verstärkung dazugerufen (Bonus-Schaden, siehe GameData.HERO_TYPE).
+var reinforced := false
 var mods := {"damage": 0, "rate": 0, "reload": 0, "mag": 0, "crit": 0, "special": 0, "ult": 0}
 
 var magazine: Array[String] = []
@@ -159,7 +161,9 @@ func setup(id_: String, battle_: Battle) -> void:
 
 func damage() -> float:
 	var meta: float = battle.hero_damage.get(id, 1.0) if battle else 1.0
-	return float(data["damage"]) * (1.0 + 0.2 * mods["damage"]) * meta
+	var team: float = 1.0 + (battle.team_aura if battle else 0.0)
+	var join := 1.0 + (GameData.REINFORCE_DAMAGE if reinforced else 0.0)
+	return float(data["damage"]) * (1.0 + 0.2 * mods["damage"]) * meta * team * join
 
 
 func interval() -> float:
