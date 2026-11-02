@@ -106,7 +106,7 @@ Munitionskiste. Sie werden mit Gold aufgewertet (mehr Wirkung, kürzere Abklingz
 
 `scripts/battle/models.gd` legt fest, welcher Held und welcher Gegner welches Modell bekommt
 (Datei, Höhe, Animationen). Helden stehen in einer Zielhaltung (Schuss-Animation angehalten) und
-halten ein Waffenmodell, wo es eins gibt; Tesla, Eiskanone und Flammenwerfer behalten ihre
+halten ein Waffenmodell, wo es eins gibt; Funkenpistole, Frostpistole und Brandflinte behalten ihre
 eigene Form. Gegner laufen mit ihrer Lauf-Animation und wechseln am Zaun in den Angriff; Treffer
 und Frost färben sie über eine Überlagerung, die nur eingeschaltet ist, solange sie wirkt. Fehlt
 eine Modelldatei, baut die Figur ihre einfache Form wie früher.

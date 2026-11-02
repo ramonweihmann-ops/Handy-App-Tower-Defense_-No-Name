@@ -23,10 +23,16 @@ Im Spiel hat jeder Held eine Waffenart mit eigener Wirkung (`GameData.HEROES`, `
 | Lynx | Präzisionsgewehr | Scharfschützengewehr | ja |
 | Fritzi | **Flammenwerfer** (Kegel, Brand) | hölzerne Doppelflinte | **nein** |
 
-Entscheidung nötig, bevor modelliert wird. Vorschlag ohne Laser und Plasma: Wirkung behalten, Waffe
-mechanisch aussehen lassen. Volta: Pistole mit Spule am Lauf (Funkenschuss) + Diagnosegerät. Kalle:
-Pistole mit Kühlzylinder (Frostmunition). Fritzi: Doppelflinte mit Brandmunition, dann zwei
-Doppelflinten im Team; oder Fritzi behält einen klassischen, mechanischen Flammenwerfer mit Tank.
+**Entschieden (02.11.2026): Wirkung behalten, Waffen mechanisch.** Keine Laser, kein Plasma.
+- **Volta:** Pistole mit Funkenspule am Lauf (Funkenschuss springt auf Nachbargegner) + Diagnosegerät
+  in der anderen Hand. Im Spiel „Funkenpistole“.
+- **Kalle:** Pistole mit Kühlzylinder unter dem Lauf, leichter Frostdampf an der Mündung (Frostmunition,
+  verlangsamt). Im Spiel „Frostpistole“.
+- **Fritzi:** hölzerne Doppelflinte wie im Design, mit Brandmunition (Feuerkegel, setzt in Brand).
+  Im Spiel „Brandflinte“. Damit sie sich von Käpt'n Margots Flinte abhebt: Holz und Messing statt
+  dunklem Metall, rote Patronenschlaufe am Schaft.
+
+Die Effekte (Funken, Frost, Feuer) zeichnet das Spiel selbst; sie gehören nicht ins Modell.
 
 ## 2. Ergänzungen für die GLB-Dateien
 

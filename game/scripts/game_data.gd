@@ -53,7 +53,7 @@ const HEROES := {
 	"volta": {
 		"name": "Volta",
 		"role": "Tesla-Tüftlerin",
-		"weapon": "Blitzwerfer",
+		"weapon": "Funkenpistole",
 		"blurb": "Trifft einen und schockt die Nachbarn mit.",
 		"family": "tesla",
 		"color": Color(0.62, 0.36, 0.95),
@@ -63,7 +63,7 @@ const HEROES := {
 	"kalle": {
 		"name": "Kalle",
 		"role": "Kühltechniker",
-		"weapon": "Eiskanone",
+		"weapon": "Frostpistole",
 		"blurb": "Friert ein, was zu schnell ist.",
 		"family": "cryo",
 		"color": Color(0.35, 0.8, 0.95),
@@ -93,7 +93,7 @@ const HEROES := {
 	"fritzi": {
 		"name": "Fritzi",
 		"role": "Feuerwehrfrau",
-		"weapon": "Flammenwerfer",
+		"weapon": "Brandflinte",
 		"blurb": "Heizt der ersten Reihe richtig ein.",
 		"family": "flamer",
 		"color": Color(0.95, 0.35, 0.15),

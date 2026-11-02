@@ -54,7 +54,7 @@
       "id": "volta",
       "name": "Volta",
       "target_file": "volta.glb",
-      "weapon": "Pistole und Diagnosegerät",
+      "weapon": "Pistole mit Funkenspule am Lauf (Funkenschuss, springt auf Nachbargegner) und Diagnosegerät",
       "model_status": "nicht erstellt",
       "rig_status": "nicht erstellt",
       "animation_status": "nicht erstellt"
@@ -63,7 +63,7 @@
       "id": "kalle",
       "name": "Kalle",
       "target_file": "kalle.glb",
-      "weapon": "Pistole",
+      "weapon": "Pistole mit Kühlzylinder (Frostmunition, verlangsamt)",
       "model_status": "nicht erstellt",
       "rig_status": "nicht erstellt",
       "animation_status": "nicht erstellt"
@@ -90,11 +90,11 @@
       "id": "fritzi",
       "name": "Fritzi",
       "target_file": "fritzi.glb",
-      "weapon": "Hölzerne doppelläufige Flinte",
+      "weapon": "Hölzerne doppelläufige Flinte mit Brandmunition (Feuerkegel)",
       "model_status": "nicht erstellt",
       "rig_status": "nicht erstellt",
       "animation_status": "nicht erstellt"
     }
-  ]
+  ],
+  "weapon_decision": "Wirkung der Waffen im Spiel bleibt, Aussehen klassisch mechanisch, keine Laser oder Plasma (Entscheidung 02.11.2026)"
 }
-
