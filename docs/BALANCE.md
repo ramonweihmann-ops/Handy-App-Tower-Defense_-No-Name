@@ -1,51 +1,48 @@
 # Balance-Bericht
 
-Werte dieses Laufs: Sprung ab Level 21 ×5,0, Bosse ×1,2 (Variante L). Übernommen wurde die Mitte aus L und K (×4,7 / ×1,22).
+Stand 02.11.2026 · nach Plasma-Erzeuger, Energiekern und höchstens 3 Helden neu abgestimmt.
 
-Stand 01.11.2026 13:01 · 120 Läufe · 6 je Level und Profil · Dauer 36 min
+Werte: Sprung ab Level 21 ×10, danach +1 % Gegnerleben je Level (vorher ×4,7 und +2,5 %), Bosse
+selbst ×0,8. Boss-Level bekommen je Welt einen eigenen Faktor auf das Leben aller Gegner
+(`GameData.BOSS_TUNE`: 25 ×0,7 · 30 ×0,85 · 40 ×1,05 · 45 ×0,95 · 50 ×0,6), weil dort meist
+mitten im Level verloren wird, nicht am Boss.
 
-Siegquote beim ersten Versuch je Spielerprofil (✓ im Ziel, ↑ zu leicht, ↓ zu schwer, · ohne Vorgabe). Zielkurve und Profile: `docs/KONZEPT.md` (Abschnitt 9), `game/tests/balance_profiles.gd`.
+Siegquote beim ersten Versuch je Spielerprofil (✓ im Ziel, ↑ zu leicht, ↓ zu schwer), 6 Läufe je
+Level und Profil – ein Lauf mehr oder weniger sind 17 %. Zielkurve und Profile: `docs/KONZEPT.md`
+(Abschnitt 9), `game/tests/balance_profiles.gd`.
+
+## Normale Level (Lauf mit den endgültigen Werten für normale Level)
 
 | Level | durchschnitt | zahlend | Ø Schild übrig (Sieg) | Ø Warten auf Munition |
 |---|---|---|---|---|
-| 22 | 100% ↑ | 100% ✓ | 88% | 0% |
-| 25 (Boss) | 67% ↑ | 100% ✓ | 80% | 0% |
-| 28 | 67% ✓ | 100% ✓ | 89% | 0% |
-| 30 (Boss) | 50% ✓ | 50% ↓ | 79% | 0% |
-| 33 | 67% ✓ | 100% ✓ | 93% | 0% |
-| 35 (Boss) | 33% ↓ | 83% ✓ | 66% | 0% |
-| 40 (Boss) | 83% ↑ | 83% ✓ | 68% | 0% |
-| 43 | 83% ↑ | 100% ✓ | 82% | 0% |
-| 45 (Boss) | 50% ✓ | 50% ↓ | 70% | 0% |
-| 50 (Boss) | 0% ↓ | 33% ↓ | 85% | 0% |
+| 21 | 100% ↑ | 100% ✓ | 89% | 0% |
+| 22 | 67% ✓ | 100% ✓ | 79% | 0% |
+| 28 | 50% ↓ | 100% ✓ | 86% | 0% |
+| 33 | 83% ↑ | 100% ✓ | 90% | 0% |
+| 43 | 67% ✓ | 100% ✓ | 96% | 0% |
 
-**Abweichungen von der Zielkurve: 9**
+## Boss-Level (Lauf mit Boss-Faktoren; Level 40 danach von ×1,15 auf ×1,05 gesenkt)
 
-## Starthelden
-
-Siegquote, wenn der Lauf mit diesem Helden begann (alle Level und Profile). Große Abstände heißen: ein Held ist zu stark oder zu schwach.
-
-| Held | Läufe | Siegquote | Ø Schild übrig | Ø Dauer |
+| Level | durchschnitt | zahlend | Ø Schild übrig (Sieg) | Ø Warten auf Munition |
 |---|---|---|---|---|
-| kalle | 2 | 100% | 86% | 218 s |
-| iska | 6 | 100% | 85% | 248 s |
-| fritzi | 14 | 93% | 82% | 352 s |
-| volta | 30 | 77% | 56% | 283 s |
-| dusty | 18 | 67% | 54% | 281 s |
-| lynx | 30 | 60% | 51% | 322 s |
-| margot | 20 | 50% | 39% | 291 s |
+| 25 (Boss) | 33% ↓ | 83% ✓ | 83% | 0% |
+| 30 (Boss) | 50% ✓ | 33% ↓ | 75% | 0% |
+| 35 (Boss) | 50% ✓ | 83% ✓ | 86% | 0% |
+| 40 (Boss) | 33% ↓ | 67% ↓ | 92% | 0% |
+| 45 (Boss) | 33% ↓ | 67% ↓ | 98% | 0% |
+| 50 (Boss) | 33% ↓ | 83% ✓ | 100% | 0% |
 
-## Dazugerufene Helden
+## Verlauf der Abstimmung
 
-Siegquote, wenn der Held im Kampf per Karte dazukam. Verstärkungs-Helden (Volta, Margot, Lynx) sollen hier besser abschneiden als beim Start.
+| Variante | Sprung / Wachstum / Boss | Abweichungen |
+|---|---|---|
+| alt (vor Plasma) | ×4,7 / +2,5 % / ×1,22 | 13 (fast alles zu leicht, Level 50 zu schwer) |
+| A | ×5,6 / +2 % / ×1,3 | 13 |
+| B | ×6,2 / +1,5 % / ×1,3 | 13 |
+| C | ×8 / +1 % / ×1,0 | 12 |
+| D | ×10 / +1 % / ×0,8 | 12 (normale Level gut, Bosse je Welt sehr verschieden) |
+| E/F | D + Faktor je Boss-Level | normale Level 3–4, Boss-Level knapp unter dem Ziel |
 
-| Held | Läufe | Siegquote | Ø Schild übrig |
-|---|---|---|---|
-| fritzi | 43 | 81% | 66% |
-| lynx | 37 | 78% | 67% |
-| iska | 51 | 75% | 59% |
-| kalle | 47 | 72% | 65% |
-| brocken | 50 | 70% | 51% |
-| volta | 44 | 66% | 54% |
-| margot | 33 | 64% | 42% |
-| dusty | 51 | 61% | 53% |
+Erkenntnis: Normale Level reagieren kaum auf mehr Gegnerleben, bis der Sprung sehr groß ist (die
+Helden haben viel Reserve, der Schild bleibt fast voll). Boss-Level reagieren dagegen stark und je
+Welt verschieden.
