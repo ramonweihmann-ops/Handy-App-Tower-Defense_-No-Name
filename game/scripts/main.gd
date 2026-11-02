@@ -3,6 +3,8 @@ extends Node
 ##
 ## Automatischer Test (ohne Fenster):
 ##   godot --headless --fixed-fps 60 --path game -- --autotest --level=1 [--seed=1] [--pull]
+## Multiplayer im automatischen Test (Messung für die Computergegner, scripts/mp-lab.py):
+##   godot --headless --fixed-fps 60 --path game -- --autotest --mp --level=12 --profile=durchschnitt
 
 const SAVE_PATH := "user://pilot.cfg"
 const START_AMMO := 20
@@ -17,6 +19,8 @@ const TEMPO_SCALE := {1: 0.68, 2: 1.2, 3: 1.8}
 const MAX_ASPECT := 0.62
 ## Energiekern entladen: so lange feuern alle Helden doppelt so schnell
 const OVERDRIVE_TIME := 6.0
+## Tempo im Multiplayer: fest, für alle gleich (kein Tempo-Knopf), etwas flotter als x1
+const MP_SPEED := 1.0
 
 var battle: Battle
 var plasma: PlasmaCore
@@ -35,6 +39,12 @@ var state := "menu"
 var tempo := 1
 
 var hard := false
+## Multiplayer-Kampf läuft (MpMatch hält die Computergegner)
+var mp := false
+var mp_match: MpMatch
+var _mp_seed := 0
+var _mp_curve: Array[int] = []
+var _mp_hud_t := 0.0
 var bonus := {}
 var updater: Updater
 var menu: MainMenu
@@ -56,6 +66,10 @@ var _shot_path := ""
 ## Nur für Tests mit Fenster: Menübild speichern (--menushot=pfad.png[,reiter]) und beenden.
 var _menu_shot := ""
 var _world_holder: Control
+var _world_container: SubViewportContainer
+## Gemaltes Schlachtfeld hinter dem Kampf; _field_fill füllt Ränder bei anderem Seitenverhältnis
+var _field_bg: TextureRect
+var _field_fill: TextureRect
 var _menu_shot_t := 0
 
 
@@ -71,7 +85,9 @@ func _ready() -> void:
 			Save.sim = true
 			load("res://tests/balance_profiles.gd").apply(Save, _profile, level)
 	_build_layout()
-	if _autotest:
+	if _autotest and mp:
+		start_mp(level)
+	elif _autotest:
 		start_level(level)
 	elif _menu_shot != "":
 		show_menu()
@@ -82,7 +98,7 @@ func _ready() -> void:
 ## Setzt das Spieltempo (x1 oder x2). Die Physik bleibt bei 60 Schritten pro Spielsekunde,
 ## weniger Schritte lassen schnelle Kugeln durch die Wände der Kugelbahn rutschen.
 func _apply_speed(t: int) -> void:
-	Engine.time_scale = float(TEMPO_SCALE.get(t, BASE_SPEED * float(t)))
+	Engine.time_scale = MP_SPEED if mp and state in ["battle", "cards", "paused"] else float(TEMPO_SCALE.get(t, BASE_SPEED * float(t)))
 
 
 ## Ladebildschirm: Jede Figur und jeder Effekt wird einmal unsichtbar dahinter gezeigt,
@@ -156,6 +172,8 @@ func _parse_args() -> void:
 			var uc: Node = load("res://tests/ult_check.gd").new()
 			uc.set("main", self)
 			add_child.call_deferred(uc)
+		elif arg == "--mp":
+			mp = true
 		elif arg == "--pull":
 			_auto_pull = true
 		elif arg.begins_with("--level="):
@@ -178,6 +196,12 @@ func _parse_args() -> void:
 			GameData.DPS_GROWTH_LATE = float(arg.get_slice("=", 1))
 		elif arg.begins_with("--bosshp="):
 			GameData.HARD_BOSS_HP = float(arg.get_slice("=", 1))
+		elif arg.begins_with("--mphp="):
+			MpData.HP_WAVE = float(arg.get_slice("=", 1))
+		elif arg.begins_with("--mptune="):
+			MpData.HP_TUNE_FIXED = float(arg.get_slice("=", 1))
+		elif arg.begins_with("--mpboss="):
+			MpData.BOSS_TUNE_FIXED = float(arg.get_slice("=", 1))
 		elif arg.begins_with("--profile="):
 			_profile = arg.get_slice("=", 1)
 		elif arg.begins_with("--menushot="):
@@ -209,12 +233,27 @@ func _build_layout() -> void:
 	world_holder.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	world_holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	column.add_child(world_holder)
+	_field_fill = TextureRect.new()
+	_field_fill.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_field_fill.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_field_fill.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_field_fill.modulate = Color(0.45, 0.42, 0.6)
+	_field_fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	world_holder.add_child(_field_fill)
+	_field_bg = TextureRect.new()
+	_field_bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_field_bg.stretch_mode = TextureRect.STRETCH_SCALE
+	_field_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	world_holder.add_child(_field_bg)
 	var container := SubViewportContainer.new()
+	_world_container = container
 	container.stretch = true
 	container.set_anchors_preset(Control.PRESET_FULL_RECT)
 	container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	world_holder.add_child(container)
+	world_holder.resized.connect(_fit_world)
 	var viewport := SubViewport.new()
+	viewport.transparent_bg = true
 	viewport.own_world_3d = true
 	container.add_child(viewport)
 	battle = Battle.new()
@@ -248,6 +287,7 @@ func _build_layout() -> void:
 	menu.visible = false
 	_overlay.add_child(menu)
 	menu.play_requested.connect(start_level)
+	menu.mp_requested.connect(func(m: MpMatch) -> void: start_mp(0, m))
 	menu.quality_changed.connect(battle.apply_quality)
 
 	get_viewport().size_changed.connect(_fit_column)
@@ -282,6 +322,38 @@ func _build_layout() -> void:
 
 
 ## Hält das Spiel als Hochformat-Spalte in der Mitte, auch im breiten Fenster.
+## Kampfbild auf den Rahmen der Anzeige legen (390 × 844, wie die Mockups): Bei gemaltem Schlachtfeld
+## deckt das 3D-Bild genau das gemalte Bild ab, damit die Gegner auf der gemalten Brücke laufen.
+func _fit_world() -> void:
+	if _world_container == null or _world_holder == null:
+		return
+	var hs := _world_holder.size
+	var on := battle != null and battle.field != ""
+	var sc := minf(hs.x / MockView.W, hs.y / MockView.H)
+	var frame := Rect2((hs - Vector2(MockView.W, MockView.H) * sc) * 0.5, Vector2(MockView.W, MockView.H) * sc)
+	if not on:
+		frame = Rect2(Vector2.ZERO, hs)
+	_world_container.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_world_container.position = frame.position
+	_world_container.size = frame.size
+	_field_bg.position = frame.position
+	_field_bg.size = frame.size
+	_field_bg.visible = on
+	_field_fill.visible = on
+	if hud:
+		hud.world_frame = frame
+
+
+func _set_field(id: String) -> void:
+	battle.set_field(id)
+	var tex := Battlefields.texture(id) if id != "" else null
+	if id != "" and tex == null:
+		battle.set_field("")
+	_field_bg.texture = tex
+	_field_fill.texture = tex
+	_fit_world()
+
+
 func _fit_column() -> void:
 	var vp := get_viewport().get_visible_rect().size
 	var w := minf(vp.x, vp.y * MAX_ASPECT)
@@ -335,8 +407,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	var mb := event as InputEventMouseButton
 	if not mb.pressed or mb.button_index != MOUSE_BUTTON_LEFT:
 		return
-	var local := mb.position - _world_holder.global_position
-	if not Rect2(Vector2.ZERO, _world_holder.size).has_point(local):
+	var local := mb.position - _world_container.global_position
+	if not Rect2(Vector2.ZERO, _world_container.size).has_point(local):
 		return
 	var best: Hero = null
 	var best_d := 110.0
@@ -356,6 +428,8 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(delta: float) -> void:
 	if state == "battle":
 		_update_boosters(delta)
+		if mp and mp_match:
+			_update_mp(delta)
 	# Leistungsmessung für Tests im Browser (erscheint in der Browser-Konsole)
 	_perf_t += delta / maxf(0.01, Engine.time_scale)
 	if _perf_t >= 2.0 and state == "battle":
@@ -425,6 +499,7 @@ func _centered(parent: Control, separation := 18) -> VBoxContainer:
 
 func show_menu() -> void:
 	state = "menu"
+	mp = false
 	get_tree().paused = false
 	_apply_speed(1)
 	battle.clear()
@@ -475,10 +550,23 @@ func _old_menu() -> void:
 	_set_screen(s)
 
 
+## Multiplayer starten: Station nach dem Fortschritt im Abenteuer, drei Kommandanten als Gegner.
+## found: schon gefundene Gegner (Gegnersuche); leer = neue würfeln
+func start_mp(station := 0, found: MpMatch = null) -> void:
+	var lvl := station if station > 0 else (found.level if found else MpData.station_level(Save.max_level()))
+	_start(lvl, false, true, found)
+
+
 func start_level(n: int, hard_mode := false) -> void:
+	_start(n, hard_mode, false)
+
+
+func _start(n: int, hard_mode: bool, multi: bool, found: MpMatch = null) -> void:
 	if not _autotest and not Save.use_energy(MetaData.ENERGY_COST):
 		show_menu()
 		return
+	mp = multi
+	mp_match = found
 	level = n
 	hard = hard_mode
 	state = "hero_select"
@@ -496,7 +584,12 @@ func start_level(n: int, hard_mode := false) -> void:
 	pending_levelups = 0
 	card_levels.clear()
 	cards_taken.clear()
-	battle.setup(n, ammo)
+	if mp:
+		_mp_seed = mp_match.match_seed if mp_match else randi()
+		battle.setup_mp(n, ammo, _mp_seed)
+	else:
+		battle.setup(n, ammo)
+	_set_field(Battlefields.for_mode("mp", n) if mp else Battlefields.for_level(n))
 	battle.hp_scale = 1.5 if hard else 1.0
 	battle.bonus_crit = float(bonus["crit"])
 	battle.bonus_reload = float(bonus["reload"])
@@ -521,8 +614,9 @@ func start_level(n: int, hard_mode := false) -> void:
 	for id in _boosters:
 		# Zu Beginn sind Booster halb geladen
 		_booster_cd.append(MetaData.booster_cd(id, Save.booster_level(id)) * 0.5)
-	hud.reset(level, GameData.waves_in_level(level))
-	hud.show_banner("%d · %s" % [level, GameData.level_name(level)])
+	hud.reset(level, battle.total_waves)
+	hud.set_mp(mp)
+	hud.show_banner("Multiplayer · Station %d" % level if mp else "%d · %s" % [level, GameData.level_name(level)])
 	hud.set_boosters(_boosters)
 	hud.set_next_wave(battle.next_wave_text())
 	hud.set_xp(0, xp_needed)
@@ -565,6 +659,11 @@ func _on_hero_picked(id: String) -> void:
 	battle.add_hero(id)
 	cards_taken.append("start:" + id)
 	state = "battle"
+	if mp:
+		if mp_match == null:
+			mp_match = MpMatch.new(level, Save.trophies(), _mp_seed, id)
+		_mp_curve.clear()
+		_apply_speed(1)
 	if _autotest:
 		_apply_speed(1)
 	battle.start()
@@ -906,7 +1005,26 @@ class Emblem extends Control:
 
 # --- Pause, Tempo, Ende ---------------------------------------------------
 
+## Multiplayer: Computergegner weiterrechnen, Rangliste und Restzeit in der Kampfanzeige
+func _update_mp(delta: float) -> void:
+	mp_match.step(battle.elapsed)
+	while _mp_curve.size() < int(battle.elapsed / 10.0):
+		_mp_curve.append(battle.kills)
+	_mp_hud_t -= delta
+	if _mp_hud_t <= 0.0:
+		_mp_hud_t = 0.25
+		hud.set_mp_state(mp_match.live(_mp_player(false)), MpData.MATCH_TIME - battle.elapsed, battle.wave)
+
+
+func _mp_player(out: bool) -> Dictionary:
+	var hero: String = battle.heroes[0].id if not battle.heroes.is_empty() else "dusty"
+	return {"name": "DU", "hero": hero, "kills": battle.kills, "bosses": battle.bosses,
+		"secs": minf(battle.elapsed, MpData.MATCH_TIME), "out": out, "me": true, "trophies": Save.trophies()}
+
+
 func _toggle_tempo() -> void:
+	if mp:
+		return
 	# x3 nur für die Testphase
 	tempo = tempo % 3 + 1
 	_apply_speed(tempo)
@@ -923,8 +1041,18 @@ func _on_pause() -> void:
 	var v := _centered(s, 18)
 	v.add_child(UiKit.label("Pause", 48, UiKit.C_GOLD))
 	v.add_child(UiKit.button("Weiter", _resume))
-	v.add_child(UiKit.secondary(UiKit.button("Level neu starten", func() -> void: start_level(level, hard))))
-	v.add_child(UiKit.secondary(UiKit.button("Zum Menü", show_menu)))
+	if mp:
+		# Im Multiplayer gibt es keinen Neustart: Aufgeben zählt wie das Fallen der Station
+		v.add_child(UiKit.secondary(UiKit.button("Aufgeben", func() -> void:
+			_set_screen(null)
+			get_tree().paused = false
+			state = "battle"
+			battle.running = false
+			plasma.active = false
+			_finish_mp(true))))
+	else:
+		v.add_child(UiKit.secondary(UiKit.button("Level neu starten", func() -> void: start_level(level, hard))))
+		v.add_child(UiKit.secondary(UiKit.button("Zum Menü", show_menu)))
 	_set_screen(s)
 
 
@@ -936,6 +1064,9 @@ func _resume() -> void:
 
 func _on_level_won() -> void:
 	plasma.active = false
+	if mp:
+		_finish_mp(false)
+		return
 	if _autotest:
 		_finish_autotest("win")
 		return
@@ -946,6 +1077,9 @@ func _on_level_won() -> void:
 
 func _on_level_lost() -> void:
 	plasma.active = false
+	if mp:
+		_finish_mp(true)
+		return
 	if _autotest:
 		_finish_autotest("lost")
 		return
@@ -977,6 +1111,67 @@ func _show_result(won: bool, rewards: Dictionary) -> void:
 		show_menu()
 		menu.show_tab("sammlung"))
 	_set_screen(r)
+
+
+## Multiplayer zu Ende (out = Station ist gefallen): werten, Pokale und Belohnung, Ergebnis zeigen.
+func _finish_mp(out: bool) -> void:
+	_mp_curve.append(battle.kills)
+	var standings := mp_match.finish(_mp_player(out))
+	var place := 4
+	for e in standings:
+		if e.get("me", false):
+			place = int(e["place"])
+	if _autotest:
+		var me: Dictionary = {}
+		for e in standings:
+			if e.get("me", false):
+				me = e
+		var others: Array[String] = []
+		for e in standings:
+			if not e.get("me", false):
+				others.append("%d/%d/%d" % [int(e["kills"]), int(e["secs"]), int(e["points"])])
+		print("MPTEST level=%d place=%d kills=%d bosses=%d secs=%.0f out=%s points=%d curve=%s heroes=%d bots=%s" % [
+			level, place, battle.kills, battle.bosses, battle.elapsed, str(out), int(me.get("points", 0)),
+			",".join(PackedStringArray(_mp_curve.map(func(k: int) -> String: return str(k)))), battle.heroes.size(),
+			",".join(PackedStringArray(others))])
+		get_tree().quit()
+		return
+	state = "result"
+	var delta := Save.mp_record(place, standings)
+	var rewards := _grant_mp_rewards(place)
+	rewards["delta"] = delta
+	rewards["place"] = place
+	rewards["standings"] = standings
+	rewards["trophies"] = Save.trophies()
+	mp = false
+	_apply_speed(1)
+	Sfx.play("win" if place <= 2 else "lose", 0.0)
+	hud.visible = false
+	var r := MpResultScreen.new(rewards)
+	r.again_pressed.connect(func() -> void: menu.open_mp_search())
+	r.ranking_pressed.connect(func() -> void:
+		show_menu()
+		menu.open_board("Rangliste.dc.html"))
+	r.menu_pressed.connect(show_menu)
+	_set_screen(r)
+
+
+## Belohnung nach Platz (MpData): Gold, Heldenkarten für die Helden im Kampf, Pass-Punkte
+func _grant_mp_rewards(place: int) -> Dictionary:
+	var i := clampi(place, 1, 4) - 1
+	var mult := 1.0 + float(bonus.get("gold", 0.0))
+	var gold := int(round(MetaData.win_gold(level) * float(MpData.GOLD_SHARE[i]) * mult))
+	Save.data["gold"] = Save.gold() + gold
+	var out := {"gold": gold, "pass": int(MpData.PASS_POINTS[i]), "cards": []}
+	for h in battle.heroes:
+		var n := int(round(MetaData.win_cards(level) * float(MpData.CARD_SHARE[i])))
+		Save.add_hero_cards(h.id, n)
+		out["cards"].append({"hero": h.id, "amount": n})
+	Save.add_pass_points(int(MpData.PASS_POINTS[i]))
+	if place == 1:
+		Save.track("wins")
+	Save.save_game()
+	return out
 
 
 func _finish_autotest(result: String) -> void:

@@ -62,6 +62,8 @@ func default_data() -> Dictionary:
 		"booster_slots": ["luftangriff", "medipack"],
 		"prime": false,
 		"pass_premium": false,
+		"trophies": 0,
+		"mp": {"games": 0, "wins": 0, "history": [], "season": -1, "season_games": 0},
 	}
 
 
@@ -730,6 +732,108 @@ func daily_ready(key: String) -> bool:
 func mark_daily(key: String) -> void:
 	data[key] = today()
 	save_game()
+
+
+# --- Multiplayer: Pokale, Liga, letzte Kämpfe, Saison -----------------------------
+
+func trophies() -> int:
+	return int(data.get("trophies", 0))
+
+
+func mp() -> Dictionary:
+	if not data.has("mp") or not data["mp"] is Dictionary:
+		data["mp"] = {"games": 0, "wins": 0, "history": [], "season": -1, "season_games": 0}
+	return data["mp"]
+
+
+## Ergebnis eines Kampfes speichern: Pokale, Verlauf (die letzten 10). Gibt die Pokal-Änderung zurück.
+func mp_record(place: int, standings: Array) -> int:
+	var m := mp()
+	var before := trophies()
+	var d := MpData.trophy_delta(before, place)
+	if not test_mode:
+		data["trophies"] = before + d
+		m["games"] = int(m["games"]) + 1
+		m["season_games"] = int(m.get("season_games", 0)) + 1
+		if place == 1:
+			m["wins"] = int(m["wins"]) + 1
+		var rows: Array = []
+		for e in standings:
+			rows.append({"name": e["name"], "hero": e["hero"], "kills": e["kills"], "secs": int(e["secs"]),
+				"points": e["points"], "me": e.get("me", false)})
+		var hist: Array = m["history"]
+		hist.push_front({"date": today(), "place": place, "delta": d, "rows": rows})
+		while hist.size() > 10:
+			hist.pop_back()
+		save_game()
+	return d
+
+
+## Liga-Rangliste der laufenden Saison: 30 Kommandanten derselben Liga (inkl. Spieler), absteigend.
+## Die anderen sind im Pilot Computergegner; ihre Pokale wachsen über die Saison langsam an.
+func leaderboard(now := -1) -> Array:
+	if now < 0:
+		now = _now()
+	var season := MpData.season(now)
+	var mine := trophies()
+	var league := MpData.league_index(mine)
+	var lo: int = MpData.LEAGUES[league]["from"]
+	var hi: int = MpData.LEAGUES[league + 1]["from"] if league + 1 < MpData.LEAGUES.size() else lo + 2000
+	var rng := RandomNumberGenerator.new()
+	rng.seed = season * 101 + league * 7 + 3
+	var names: Array = MpData.NAMES.duplicate()
+	var progress := 1.0 - float(MpData.season_left(now)) / float(MpData.SEASON_DAYS * 86400)
+	var rows: Array = []
+	for i in 29:
+		var n: String = names.pop_at(rng.randi_range(0, names.size() - 1)) if not names.is_empty() else "Kommandant_%d" % i
+		var base := rng.randf_range(lo, lo + (hi - lo) * 0.85)
+		var gain := rng.randf_range(0.0, (hi - lo) * 0.25)
+		rows.append({"name": n, "hero": GameData.HERO_IDS[rng.randi_range(0, GameData.HERO_IDS.size() - 1)],
+			"trophies": int(base + gain * progress), "me": false})
+	var me_hero: String = squad()[0] if not squad().is_empty() else "dusty"
+	rows.append({"name": "DU", "hero": me_hero, "trophies": mine, "me": true})
+	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		if a["trophies"] != b["trophies"]:
+			return a["trophies"] > b["trophies"]
+		return bool(a["me"]))
+	for i in rows.size():
+		rows[i]["rank"] = i + 1
+	return rows
+
+
+func leaderboard_rank() -> int:
+	for r in leaderboard():
+		if r["me"]:
+			return int(r["rank"])
+	return 30
+
+
+## Saisonwechsel: Wer in der letzten Saison gespielt hat, bekommt eine Truhe nach seinem Platz
+## (goldene Truhe für die ersten Plätze, sonst silberne). Gibt die Gewinne zurück (leer = nichts).
+func mp_season_check() -> Array:
+	var m := mp()
+	var now := _now()
+	var cur := MpData.season(now)
+	var last := int(m.get("season", -1))
+	if last == cur:
+		return []
+	var got: Array = []
+	if last >= 0 and int(m.get("season_games", 0)) > 0:
+		# Platz zum Ende der letzten Saison (die Rangliste dieses Zeitpunkts nachbilden)
+		var end_time := (last + 1) * MpData.SEASON_DAYS * 86400 - 1
+		var rank := 30
+		for r in leaderboard(end_time):
+			if r["me"]:
+				rank = int(r["rank"])
+		var chest: Array = MetaData.MP_CHEST_GOLD if rank <= MpData.GOLD_CHEST_RANKS else MetaData.MP_CHEST_SILVER
+		for r in chest:
+			var g := grant(r)
+			g["source"] = "Saison-Truhe · Platz %d" % rank
+			got.append(g)
+	m["season"] = cur
+	m["season_games"] = 0
+	save_game()
+	return got
 
 
 # --- Boni für den Kampf (Tech-Baum, Talente) -----------------------------------

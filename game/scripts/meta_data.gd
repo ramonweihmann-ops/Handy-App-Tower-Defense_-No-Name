@@ -227,6 +227,9 @@ const DAILY_REWARDS := [
 ]
 ## Treue-Truhe alle 7 Tage am Stück (zusammen mit Tag 7: 70 Edelsteine je Woche wie bisher)
 const LOYALTY_CHEST := [{"type": "gems", "amount": 20}, {"type": "cards", "amount": 8}]
+## Saison-Truhen der Multiplayer-Liga (goldene für die ersten Plätze, sonst silberne)
+const MP_CHEST_GOLD := [{"type": "gems", "amount": 40}, {"type": "gold", "amount": 1500}, {"type": "cards", "amount": 12}]
+const MP_CHEST_SILVER := [{"type": "gems", "amount": 15}, {"type": "gold", "amount": 600}, {"type": "cards", "amount": 5}]
 
 const REWARD_NAMES := {
 	"gold": "Gold", "gems": "Edelsteine", "cards": "Heldenkarten", "stars": "Sterne", "energy": "Energie",

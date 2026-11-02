@@ -97,7 +97,7 @@ func activate_ult() -> bool:
 					if battle == null:
 						return
 					for e in battle.enemies.duplicate():
-						if is_instance_valid(e) and e.alive and e.position.z > -12.0:
+						if is_instance_valid(e) and e.alive and e.position.z > -12.0 * battle.z_scale:
 							battle.fire_bullet(_muzzle.global_position, e, dmg * 1.4, false, "normal", 0, 34.0, 0.8))
 		"sniper":
 			var strong: Array = battle.enemies.filter(func(e: Enemy) -> bool: return is_instance_valid(e) and e.alive)

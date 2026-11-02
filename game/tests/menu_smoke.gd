@@ -5,6 +5,7 @@ extends Node
 var main: Node
 var frame := 0
 var step := 0
+var mp_step := -1
 
 
 func _ready() -> void:
@@ -168,6 +169,34 @@ func _run() -> bool:
 				main.show_menu()
 			elif step == 640:
 				print("SMOKE zurück im menü: ", main.menu.visible, " ", main.state)
+				# Multiplayer: Spielmodi, Rangliste, Gegnersuche, Kampf, Ergebnis
+				m.open_board("Spielmodi.dc.html")
+			elif step == 645:
+				print("SMOKE spielmodi offen: ", m._boards.size() > 0)
+				m.close_board(m._boards[-1])
+				m.open_board("Rangliste.dc.html")
+			elif step == 650:
+				var rb = m._boards[-1]
+				print("SMOKE rangliste: plätze ", rb.rows.size(), " eigener platz ", save.leaderboard_rank(), " liga ", MpData.league_name(save.trophies()))
+				m.close_board(rb)
+				m.open_mp_search()
+			elif step > 650 and mp_step < 0:
+				if main.state == "hero_select":
+					print("SMOKE gegner gefunden: ", main.mp_match.bots.map(func(b: Dictionary) -> String: return b["name"]))
+					main._on_hero_picked("dusty")
+					mp_step = step
+				elif step > 1400:
+					print("SMOKE FEHLER: Gegnersuche endet nicht")
+					return true
+			elif mp_step > 0 and step == mp_step + 400:
+				print("SMOKE multiplayer läuft: ", main.mp, " zeit ", int(main.battle.elapsed), " rangliste ", main.hud._mp_rows.size(), " gegner ", main.battle.enemies.size())
+				main.battle.fence_hp = 1.0
+				main.battle.damage_fence(5.0)
+			elif mp_step > 0 and step == mp_step + 420:
+				var rs = main._screen
+				print("SMOKE multiplayer-ergebnis: ", rs is MpResultScreen, " platz ", rs.info.get("place") if rs is MpResultScreen else -1, " pokale ", save.trophies(), " kämpfe ", save.mp()["games"])
+				main.show_menu()
+			elif mp_step > 0 and step == mp_step + 430:
 				print("SMOKE fertig")
 				return true
 	step += 1

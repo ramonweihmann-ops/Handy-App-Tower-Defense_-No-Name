@@ -11,11 +11,25 @@ signal level_lost
 
 const FENCE_Z := 0.0
 const SPAWN_Z := -27.0
+## Gemaltes Schlachtfeld (Battlefields): Die Brücke im Bild ist doppelt so lang wie die frühere
+## 3D-Bahn. Gegner starten deshalb am oberen Ende und laufen doppelt so schnell, die Zeit bis zur
+## Mauer bleibt gleich (Balance unverändert).
+const BACKDROP_Z := 2.0
+## Kamera passend zur gemalten Brücke (aus der Mockup-Vorlage, auf die Bahnbreite umgerechnet):
+## Mauer bei 1140 von 1688 Bildpunkten, oberes Brückenende (z = -56,8) bei 294.
+const BACKDROP_CAM_POS := Vector3(0, 15.96, 19.51)
+const BACKDROP_CAM_LOOK := Vector3(0, 0, -8.87)
+const BACKDROP_CAM_FOV := 52.0
 const HERO_Z := 3.3
 const MAX_HEROES := 3
 const DECK_HALF_W := 4.7
 
 var level := 1
+## Gemaltes Schlachtfeld aktiv (sonst die frühere 3D-Station); Tiefenfaktor siehe BACKDROP_Z
+var field := ""
+var z_scale := 1.0
+var _decor: Array[Node3D] = []
+var _shadow_floor: MeshInstance3D
 var ammo: AmmoStore
 ## Energiekern entladen: so viele Sekunden feuern alle Helden doppelt so schnell
 var overdrive_left := 0.0
@@ -30,7 +44,13 @@ var running := false
 var wave := 0
 var total_waves := 0
 var kills := 0
+## Besiegte Bosse (Multiplayer-Wertung)
+var bosses := 0
 var elapsed := 0.0
+## "level" = Abenteuer, "mp" = Multiplayer (Wellen nach Zeit, Nachschub beim Besiegen, MpData)
+var mode := "level"
+var _mp_boss_done := false
+var _mp_rng := RandomNumberGenerator.new()
 ## Boni aus Spielstand und Schwierigkeit (setzt main.gd beim Levelstart)
 var hp_scale := 1.0
 var bonus_crit := 0.0
@@ -83,6 +103,43 @@ func _apply_world() -> void:
 
 ## Grafikstufe aus den Einstellungen: Hoch = Leuchten, Schatten und Stations-Inseln,
 ## Sparsam = ohne (spart Rechenzeit auf älteren Handys).
+func spawn_z() -> float:
+	return SPAWN_Z * z_scale
+
+
+## Gemaltes Schlachtfeld einschalten (id aus Battlefields) oder ausschalten (""): Die 3D-Station
+## verschwindet, das Bild liegt hinter dem Kampf (main.gd), sichtbar bleiben Gegner, Helden,
+## Schüsse, Effekte, der Energiezaun und die Schatten auf der Brücke.
+func set_field(id: String) -> void:
+	field = id
+	var on := id != ""
+	z_scale = BACKDROP_Z if on else 1.0
+	for n in _decor:
+		n.visible = not on
+	if _shadow_floor:
+		_shadow_floor.visible = on
+	if _env:
+		_env.background_mode = Environment.BG_CLEAR_COLOR if on else Environment.BG_SKY
+		_env.background_color = Color(0, 0, 0, 0)
+	if on:
+		camera.fov = BACKDROP_CAM_FOV
+		camera.keep_aspect = Camera3D.KEEP_HEIGHT
+		camera.position = BACKDROP_CAM_POS
+		camera.look_at(BACKDROP_CAM_LOOK, Vector3.UP)
+		if _rim:
+			_rim.position = Vector3(0, 4, spawn_z())
+			_rim.light_color = Battlefields.FIELDS.get(id, {}).get("rim", Color(0.7, 0.35, 1.0))
+	else:
+		camera.fov = 34.0
+		camera.keep_aspect = Camera3D.KEEP_WIDTH
+		camera.position = Vector3(0, 15.5, 13.5)
+		camera.look_at(Vector3(0, 0, -8.5), Vector3.UP)
+		if _rim:
+			_rim.position = Vector3(0, 4, -27)
+	_cam_base = camera.transform
+	apply_quality()
+
+
 func apply_quality() -> void:
 	var high: bool = Save.data.get("quality", "hoch") == "hoch"
 	if _env:
@@ -90,7 +147,7 @@ func apply_quality() -> void:
 	if _sun:
 		_sun.shadow_enabled = high
 	for o in _islands:
-		o.visible = high
+		o.visible = high and field == ""
 
 
 # --- Ablauf ----------------------------------------------------------------
@@ -108,6 +165,9 @@ func setup(level_: int, ammo_: AmmoStore) -> void:
 		_plan.append(GameData.wave_spawns(level, w))
 	wave = 0
 	kills = 0
+	bosses = 0
+	mode = "level"
+	_mp_boss_done = false
 	overdrive_left = 0.0
 	team_mag = 0
 	elapsed = 0.0
@@ -117,6 +177,16 @@ func setup(level_: int, ammo_: AmmoStore) -> void:
 	full_time = 0.0
 	running = false
 	fence_changed.emit(fence_hp, fence_max)
+
+
+## Multiplayer: gleiche Station wie im Abenteuer, aber Wellen nach Zeit (MpData.WAVE_TIME), ständig
+## Nachschub, sobald Platz auf der Bahn ist, und der Boss schon in Welle MpData.BOSS_WAVE.
+func setup_mp(level_: int, ammo_: AmmoStore, seed_: int) -> void:
+	setup(level_, ammo_)
+	mode = "mp"
+	total_waves = MpData.WAVES
+	_plan.clear()
+	_mp_rng.seed = seed_
 
 
 func clear() -> void:
@@ -137,6 +207,9 @@ func clear() -> void:
 
 func start() -> void:
 	running = true
+	if mode == "mp":
+		_spawn_timer = 0.6
+		return
 	_next_wave()
 
 
@@ -193,6 +266,9 @@ func _process(delta: float) -> void:
 
 
 func _update_spawning(delta: float) -> void:
+	if mode == "mp":
+		_update_mp(delta)
+		return
 	if not _spawn_queue.is_empty():
 		_spawn_timer -= delta
 		if _spawn_timer <= 0.0:
@@ -210,6 +286,25 @@ func _update_spawning(delta: float) -> void:
 		level_won.emit()
 
 
+func _update_mp(delta: float) -> void:
+	if elapsed >= MpData.MATCH_TIME:
+		running = false
+		level_won.emit()
+		return
+	var w := MpData.wave_at(elapsed)
+	if w != wave:
+		wave = w
+		wave_started.emit(wave, total_waves)
+		_pulse = 1.0
+		if wave == MpData.BOSS_WAVE and not _mp_boss_done:
+			_mp_boss_done = true
+			spawn_enemy(MpData.boss_kind(level))
+	_spawn_timer -= delta
+	if _spawn_timer <= 0.0 and enemies.size() < MpData.alive_target(wave):
+		spawn_enemy(MpData.pick_kind(level, wave, _mp_rng.randf()))
+		_spawn_timer = MpData.SPAWN_GAP
+
+
 func _next_wave() -> void:
 	wave += 1
 	_spawn_queue.assign(_plan[wave - 1])
@@ -221,6 +316,8 @@ func _next_wave() -> void:
 
 ## Text für die Vorschau: welche Gegner in der nächsten Welle kommen.
 func next_wave_text() -> String:
+	if mode == "mp":
+		return "Boss in Welle %d" % MpData.BOSS_WAVE if wave < MpData.BOSS_WAVE else "Halte bis zum Schluss durch!"
 	if wave >= total_waves:
 		return "Letzte Welle – halte durch!"
 	var counts := {}
@@ -244,16 +341,16 @@ func spawn_enemy(kind: String, pos := Vector3.INF) -> Enemy:
 	var e := Enemy.new()
 	add_child(e)
 	if pos == Vector3.INF:
-		pos = Vector3(randf_range(-3.6, 3.6), 0, SPAWN_Z + randf_range(-1.0, 1.0))
+		pos = Vector3(randf_range(-3.6, 3.6), 0, spawn_z() + randf_range(-1.0, 1.0))
 	e.position = pos
 	e.tint = GameData.world_tint(level)
 	e.dps_scale = GameData.dps_mult(level)
-	var hp := GameData.hp_mult(level, maxi(wave, 1)) * hp_scale
+	var hp := (MpData.hp_mult(level, maxi(wave, 1)) if mode == "mp" else GameData.hp_mult(level, maxi(wave, 1))) * hp_scale
 	if GameData.ENEMIES[kind]["tier"] == "boss":
-		hp *= GameData.boss_hp(level)
+		hp *= GameData.boss_hp(level) * (MpData.BOSS_HP * MpData.boss_tune(level) if mode == "mp" else 1.0)
 	e.setup(kind, self, hp)
 	enemies.append(e)
-	if pos.z < SPAWN_Z + 3.0:
+	if pos.z < spawn_z() + 3.0:
 		# Auftauchen aus dem Wurmloch
 		Fx.flash(self, pos + Vector3(0, 0.8, 0), Color(0.75, 0.35, 1.0), 1.6, 0.4)
 	if GameData.ENEMIES[kind]["tier"] == "boss":
@@ -265,6 +362,8 @@ func spawn_enemy(kind: String, pos := Vector3.INF) -> Enemy:
 func on_enemy_died(e: Enemy) -> void:
 	enemies.erase(e)
 	kills += 1
+	if e.is_boss():
+		bosses += 1
 	var col := Color(0.4, 1.0, 0.5)
 	match e.kind:
 		"tentakler":
@@ -310,7 +409,7 @@ func booster_air_strike(power: float) -> void:
 		if e.ready_as_target():
 			spots.append(e.global_position)
 	while spots.size() < 5:
-		spots.append(Vector3(randf_range(-3.5, 3.5), 0, randf_range(-20.0, -4.0)))
+		spots.append(Vector3(randf_range(-3.5, 3.5), 0, randf_range(-20.0, -4.0) * z_scale))
 	for i in spots.size():
 		var p := spots[i]
 		get_tree().create_timer(0.15 * i).timeout.connect(func() -> void:
@@ -620,11 +719,11 @@ func _build_world() -> void:
 		cap.position = Vector3(x, 1.36, FENCE_Z)
 		cap.visible = false
 		add_child(cap)
-	var field := QuadMesh.new()
-	field.size = Vector2(DECK_HALF_W * 2.0 - 0.4, 1.25)
+	var fence_quad := QuadMesh.new()
+	fence_quad.size = Vector2(DECK_HALF_W * 2.0 - 0.4, 1.25)
 	_fence_mat = ShaderMaterial.new()
 	_fence_mat.shader = preload("res://shaders/energy_fence.gdshader")
-	var field_inst := Fx.inst(field, _fence_mat)
+	var field_inst := Fx.inst(fence_quad, _fence_mat)
 	field_inst.position = Vector3(0, 0.66, FENCE_Z)
 	add_child(field_inst)
 
@@ -696,6 +795,22 @@ func _build_world() -> void:
 	pring.material_override = rm
 	pring.rotation_degrees = Vector3(14, 0, -18)
 	p2.add_child(pring)
+	# Alles bis hierher (außer Licht, Kamera, Umgebung und Energiezaun) ist Deko der 3D-Station
+	for c in get_children():
+		if c is Node3D and not (c is Camera3D or c is Light3D or c is WorldEnvironment) and c != field_inst:
+			_decor.append(c)
+	# Schattenfänger: unsichtbarer Boden, der nur die Schatten der Figuren auf die gemalte Brücke legt
+	var floor_mesh := PlaneMesh.new()
+	floor_mesh.size = Vector2(16.0, 80.0)
+	var fm := StandardMaterial3D.new()
+	fm.shadow_to_opacity = true
+	fm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	fm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	fm.albedo_color = Color(0.05, 0.03, 0.12, 0.55)
+	_shadow_floor = Fx.inst(floor_mesh, fm)
+	_shadow_floor.position = Vector3(0, 0.01, -30.0)
+	_shadow_floor.visible = false
+	add_child(_shadow_floor)
 
 
 ## Schwebende Felsinseln mit Stationsteilen neben der Brücke (wie im Mockup „Kampf“):

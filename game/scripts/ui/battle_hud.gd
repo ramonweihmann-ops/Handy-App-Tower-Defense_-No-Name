@@ -29,6 +29,13 @@ var _banner := ""
 var _banner_t := 0.0
 var _t := 0.0
 var _layer: HudLayer
+## Wo das 3D-Kampfbild in dieser Anzeige liegt (main.gd, gemaltes Schlachtfeld = Mockup-Rahmen)
+var world_frame := Rect2()
+## Multiplayer: Rangliste der vier Kommandanten, Restzeit, Hinweis auf den Boss (Mockup „Multiplayer · Kampf“)
+var _mp := false
+var _mp_rows: Array = []
+var _mp_left := 0.0
+var _mp_tag := ""
 
 
 func _init() -> void:
@@ -87,8 +94,30 @@ func set_wave(level: int, wave: int, total: int) -> void:
 	show_banner("Letzte Welle!" if wave == total else "Welle %d" % wave)
 
 
+func set_mp(on: bool) -> void:
+	_mp = on
+	_mp_rows = []
+	_mp_left = MpData.MATCH_TIME
+	_mp_tag = "Boss in Welle %d" % MpData.BOSS_WAVE
+	_update_title()
+
+
+func set_mp_state(rows: Array, left: float, wave: int) -> void:
+	_mp_rows = rows
+	_mp_left = left
+	if wave < MpData.BOSS_WAVE:
+		_mp_tag = "Boss in Welle %d" % MpData.BOSS_WAVE
+	elif battle and battle.bosses > 0:
+		_mp_tag = "Boss besiegt!"
+	else:
+		_mp_tag = "Der Boss ist da!"
+
+
 func _update_title() -> void:
-	set_text("Schleim-Welt · Level 7", "%s · Level %d" % [GameData.world_name(_level), _level])
+	if _mp:
+		set_text("Schleim-Welt · Level 7", "%s · Station %d" % [GameData.world_name(_level), _level])
+	else:
+		set_text("Schleim-Welt · Level 7", "%s · Level %d" % [GameData.world_name(_level), _level])
 	set_text("Welle 3/7", "Welle %d/%d" % [_wave, _total])
 
 
@@ -161,6 +190,13 @@ static func _hero_use(h: Hero) -> float:
 	var per_shot := float(h.ammo_cost()) / maxf(1.0, float(h.mag_size()))
 	var cycle := h.interval() * h.mag_size() + h.reload_time()
 	return per_shot * h.mag_size() / maxf(0.1, cycle)
+
+
+static func _gray(c: Color, a: float) -> Color:
+	var l := c.get_luminance()
+	var g := c.lerp(Color(l, l, l), 0.8)
+	g.a = c.a * a
+	return g
 
 
 static func _dec(v: float) -> String:
@@ -247,7 +283,74 @@ class HudLayer:
 		_draw_enemies(b)
 		_draw_heroes(b)
 		_draw_floaters(b)
+		if hud._mp:
+			_draw_mp()
 		_draw_banner()
+
+	## Multiplayer-Rangliste links oben, Restzeit und Boss-Hinweis rechts (Maße aus dem Mockup)
+	func _draw_mp() -> void:
+		var s := hud.s
+		var y := 132.0
+		for e in hud._mp_rows:
+			var me: bool = e.get("me", false)
+			var out: bool = e.get("out", false)
+			var r := Rect2(8, y, 118, 26)
+			var top := Color("#4fb8ff") if me else Color(1.0, 0.416, 0.478, 0.92)
+			var bot := Color("#2a6ad8") if me else Color(0.85, 0.188, 0.29, 0.92)
+			var sh := Color("#14408a") if me else Color("#7a1020")
+			var a := 0.55 if out else 1.0
+			if out:
+				top = BattleHud._gray(top, a)
+				bot = BattleHud._gray(bot, a)
+				sh = BattleHud._gray(sh, a)
+			MockPaint.rrect(self, Rect2((r.position + Vector2(0, 3)) * s, r.size * s), 7 * s, sh)
+			MockPaint.rrect(self, Rect2(r.position * s, r.size * s), 7 * s, top, bot)
+			var tc := "rgba(255, 247, 234, %.2f)" % a
+			MockPaint.text(hud, self, str(e["place"]), Rect2(11, y + 6, 10, 14), "Fredoka", 700, 10, tc, "0px 1px 0px #1a0f3a")
+			MpPaint.avatar(self, Vector2(32, y + 13) * s, 22 * s, str(e["hero"]), Color(1, 1, 1, a), 2 * s, out)
+			var kills := str(int(e["kills"]))
+			var kw := MockPaint.text_width(kills, "Fredoka", 700, 12)
+			var kx := 126.0 - 5.0 - kw
+			MockPaint.text(hud, self, kills, Rect2(kx, y + 5, kw, 16), "Fredoka", 700, 12, tc)
+			MpPaint.skull(self, Rect2((kx - 14) * s, (y + 7) * s, 12 * s, 12 * s))
+			var name_w := kx - 16.0 - 47.0
+			var name := _fit_text(str(e["name"]), name_w, 9)
+			if out:
+				var ly := y + 3.0
+				_left_text(name, Vector2(47, ly), name_w, 9, tc)
+				_left_text("RAUS · %s" % MpData.time_text(float(e["secs"])), Vector2(47, ly + 11), name_w, 7, "rgba(255, 208, 214, %.2f)" % a, "Nunito", 800)
+			else:
+				_left_text(name, Vector2(47, y + 8), name_w, 9, tc)
+			y += 29.0
+		# Restzeit
+		var t := MpData.time_text(hud._mp_left)
+		var tw := MockPaint.text_width(t, "Fredoka", 700, 15)
+		var pill := Rect2(380.0 - (6 + 16 + 5 + tw + 10), 136, 6 + 16 + 5 + tw + 10, 27)
+		var pr := Rect2(pill.position * s, pill.size * s)
+		MockPaint.rrect(self, pr, 12 * s, Color(10 / 255.0, 6 / 255.0, 30 / 255.0, 0.7))
+		MockPaint.border(self, pr, 12 * s, Color(111 / 255.0, 224 / 255.0, 1.0, 0.45), 1.5 * s)
+		MpPaint.clock(self, Rect2((pill.position + Vector2(6, 5.5)) * s, Vector2(16, 16) * s))
+		MockPaint.text(hud, self, t, Rect2(pill.position.x + 27, 139, tw, 20), "Fredoka", 700, 15, "rgb(255, 247, 234)")
+		# Boss-Hinweis
+		var tag := hud._mp_tag
+		var gw := MockPaint.text_width(tag, "Nunito", 800, 10)
+		var tr := Rect2(380.0 - (gw + 16), 168, gw + 16, 18)
+		MockPaint.rrect(self, Rect2(tr.position * s, tr.size * s), 8 * s, Color(1.0, 0.416, 0.478, 0.85))
+		MockPaint.text(hud, self, tag, Rect2(tr.position.x + 8, 170, gw, 14), "Nunito", 800, 10, "rgb(255, 247, 234)")
+
+	## Text linksbündig ab p (Mockup-Punkte), höchstens w breit
+	func _left_text(txt: String, p: Vector2, w: float, size: float, color: String, family := "Fredoka", weight := 700) -> void:
+		var tw := MockPaint.text_width(txt, family, weight, size)
+		MockPaint.text(hud, self, txt, Rect2(p.x, p.y, minf(tw, w), size * 1.2), family, weight, size, color)
+
+	## Kürzt einen Namen mit „…“, bis er passt (text-overflow: ellipsis)
+	func _fit_text(txt: String, w: float, size: float) -> String:
+		if MockPaint.text_width(txt, "Fredoka", 700, size) <= w:
+			return txt
+		var t := txt
+		while t.length() > 1 and MockPaint.text_width(t + "…", "Fredoka", 700, size) > w:
+			t = t.left(t.length() - 1)
+		return t + "…"
 
 	## Verbrauch je Held: farbiger Punkt und „−x/s“
 	func _draw_usage(b: Battle) -> void:
@@ -352,7 +455,8 @@ class HudLayer:
 	func _screen(cam: Camera3D, p3: Vector3) -> Vector2:
 		var vp := cam.get_viewport()
 		var vs := Vector2(vp.get_visible_rect().size)
-		return cam.unproject_position(p3) / vs * hud.size - hud.off
+		var fr := hud.world_frame if hud.world_frame.size != Vector2.ZERO else Rect2(Vector2.ZERO, hud.size)
+		return cam.unproject_position(p3) / vs * fr.size + fr.position - hud.off
 
 	## Ring, Stufe, Magazin und „TIPPEN!“ an jedem Helden
 	func _draw_heroes(b: Battle) -> void:

@@ -1,0 +1,34 @@
+{
+ "board": "MP-Ergebnis.dc.html",
+ "out": "out/mp_ergebnis",
+ "states": [
+  {
+   "name": "main",
+   "eval": "document.querySelectorAll('#dc-root div[style*=\"height: 66px\"] span svg').forEach(e => e.remove());"
+  }
+ ],
+ "live": [
+  {
+   "sel": "div[style*=\"repeating-conic-gradient\"]",
+   "id": "rays",
+   "img": true,
+   "pad": 0
+  },
+  {
+   "sel": "div[style*=\"height: 66px\"]",
+   "id": "row",
+   "img": true,
+   "pad": 24
+  },
+  {
+   "sel": "div[style*=\"height: 66px\"] > svg",
+   "id": "crown",
+   "img": true,
+   "pad": 4
+  },
+  {
+   "sel": "div[style*=\"height: 66px\"] span[style*=\"border-radius: 50%; overflow: hidden\"]",
+   "id": "av"
+  }
+ ]
+}

@@ -37,7 +37,7 @@ func bind() -> void:
 	set_text("Schleim-Welt", name.substr(0, dash + 1) + "\n" + name.substr(dash + 1) if dash > 0 else name)
 	set_text("Level 4 · 5", "Level %d · %d" % [menu.selected_level, MetaData.ENERGY_COST])
 	var badges := {"Tägliche Belohnung": Save.daily_ready("daily_date"), "Glücksrad": Save.daily_ready("wheel_date"),
-		"Missionen": menu.mission_ready()}
+		"Missionen": menu.mission_ready(), "Spielmodi": int(Save.mp()["games"]) == 0}
 	for b in buttons():
 		var lab := str(b.info.get("label", ""))
 		if badges.has(lab):

@@ -1,0 +1,7 @@
+{"board": "Rangliste.dc.html", "out": "out/rangliste",
+ "states": [{"name": "main"}],
+ "live": [
+  {"sel": "span[style*=\"border-radius: 50%; overflow: hidden\"]", "id": "av"},
+  {"sel": "div[style*=\"height: 44px; border-radius: 10px\"]", "id": "row", "img": true, "pad": 6},
+  {"sel": "div[style*=\"top: 692px\"]", "id": "me", "img": true, "pad": 22}
+ ]}

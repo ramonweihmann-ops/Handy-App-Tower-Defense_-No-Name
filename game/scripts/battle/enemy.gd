@@ -52,7 +52,7 @@ func setup(kind_: String, battle_: Battle, hp_mult: float) -> void:
 	data = GameData.ENEMIES[kind]
 	max_hp = float(data["hp"]) * hp_mult
 	hp = max_hp
-	speed = float(data["speed"]) * randf_range(0.92, 1.08)
+	speed = float(data["speed"]) * randf_range(0.92, 1.08) * battle.z_scale
 	armor = float(data["armor"])
 	dps = float(data["dps"]) * dps_scale
 	xp = int(data["xp"])

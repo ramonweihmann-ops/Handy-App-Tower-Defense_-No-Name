@@ -4,6 +4,8 @@ extends Control
 ## fünf Reiter (Shop · Sammlung · Kampf · Upgrades · Basislager), Battle Pass und Dialoge.
 
 signal play_requested(level: int, hard: bool)
+## Multiplayer: Gegner sind gefunden, der Kampf soll beginnen
+signal mp_requested(found: MpMatch)
 signal quality_changed
 
 const MAX_ASPECT := 0.62
@@ -477,6 +479,10 @@ func play_selected() -> void:
 
 func mission_ready() -> bool:
 	return _mission_ready()
+
+
+func open_mp_search() -> void:
+	open_board("MP-Gegnersuche.dc.html")
 
 
 func open_daily() -> void:

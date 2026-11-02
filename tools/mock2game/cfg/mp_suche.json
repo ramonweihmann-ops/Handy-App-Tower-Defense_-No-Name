@@ -1,0 +1,6 @@
+{"board": "MP-Gegnersuche.dc.html", "out": "out/mp_suche", "states": [{"name": "main"}],
+ "live": [
+  {"sel": "span[style*=\"border-radius: 50%; overflow: hidden\"]", "id": "av"},
+  {"sel": "div[aria-hidden=\"true\"][style*=\"radial-gradient(circle at 35% 30%, #5a4ab0\"]", "id": "qmark"},
+  {"sel": "div[style*=\"italic 700 78px\"]", "id": "vs", "img": true, "pad": 30}
+ ]}
