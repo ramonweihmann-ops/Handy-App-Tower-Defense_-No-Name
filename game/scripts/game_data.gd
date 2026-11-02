@@ -211,9 +211,10 @@ static var DPS_GROWTH_LATE := 1.0
 ## Ab diesem Level brauchen Bosse ohne Käufe in der Regel einen Versuch mehr (Konzept, Abschnitt 9).
 const HARD_BOSS_FROM := 21
 static var HARD_BOSS_HP := 0.8
-## Feinabstimmung je Welt-Boss (Level -> Faktor auf das Bossleben). Die Bosse der Welten sind
-## unterschiedlich zäh und schnell, ein gemeinsamer Wert trifft die Zielkurve nicht.
-static var BOSS_TUNE := {25: 0.8, 30: 0.85, 40: 1.2, 45: 0.9, 50: 0.75}
+## Feinabstimmung der Boss-Level (Level -> Faktor auf das Leben aller Gegner dieses Levels).
+## Boss-Level haben mehr und gemischtere Wellen; verloren wird meist mitten im Level, nicht am
+## Boss. Die Welten sind unterschiedlich, ein gemeinsamer Wert trifft die Zielkurve nicht.
+static var BOSS_TUNE := {25: 0.7, 30: 0.85, 40: 1.15, 45: 0.95, 50: 0.6}
 
 
 static func world_of(level: int) -> int:
@@ -258,7 +259,7 @@ static func level_hp(level: int) -> float:
 		return 1.0 + 0.2 * (level - 1)
 	if level < PHASE2_FROM:
 		return 2.8 * pow(HP_GROWTH, level - 10)
-	return 2.8 * pow(HP_GROWTH, PHASE2_FROM - 11) * HP_STEP * pow(HP_GROWTH_LATE, level - PHASE2_FROM)
+	return 2.8 * pow(HP_GROWTH, PHASE2_FROM - 11) * HP_STEP * pow(HP_GROWTH_LATE, level - PHASE2_FROM) * float(BOSS_TUNE.get(level, 1.0))
 
 
 ## Schild der Station in diesem Level (vor Boni).
@@ -283,9 +284,7 @@ static func hp_mult(level: int, wave: int) -> float:
 
 ## Zusätzlicher Lebensfaktor für den Boss dieses Levels.
 static func boss_hp(level: int) -> float:
-	if level < HARD_BOSS_FROM:
-		return 1.0
-	return HARD_BOSS_HP * float(BOSS_TUNE.get(level, 1.0))
+	return HARD_BOSS_HP if level >= HARD_BOSS_FROM else 1.0
 
 
 ## Stellt die Gegner einer Welle zusammen (Art nach Welt, Menge nach Level in der Welt).
