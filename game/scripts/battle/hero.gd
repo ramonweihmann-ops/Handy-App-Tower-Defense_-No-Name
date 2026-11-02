@@ -153,7 +153,7 @@ func setup(id_: String, battle_: Battle) -> void:
 	id = id_
 	battle = battle_
 	data = GameData.HEROES[id]
-	scale = Vector3.ONE * VIS_SCALE
+	scale = Vector3.ONE * VIS_SCALE * _field_scale()
 	_build_visual()
 	_build_ult_ring()
 	magazine.clear()
@@ -201,7 +201,11 @@ func family() -> String:
 
 ## Höhe über dem Boden für die Magazinanzeige.
 func top_height() -> float:
-	return 2.0 * VIS_SCALE
+	return 2.0 * VIS_SCALE * _field_scale()
+
+
+func _field_scale() -> float:
+	return Battle.BACKDROP_HERO_SCALE if battle and battle.field != "" else 1.0
 
 
 ## Für Porträts: Munitionsleitung ausblenden.

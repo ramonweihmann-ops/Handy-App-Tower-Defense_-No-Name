@@ -21,6 +21,10 @@ const BACKDROP_CAM_POS := Vector3(0, 15.96, 19.51)
 const BACKDROP_CAM_LOOK := Vector3(0, 0, -8.87)
 const BACKDROP_CAM_FOV := 52.0
 const HERO_Z := 3.3
+## Auf dem gemalten Schlachtfeld stehen die Helden vor der Mauer auf der Plattform (Füße bei
+## 1356 von 1688 Bildpunkten, Vorgabe 1360) und sind etwas kleiner, damit sie die Mauer nicht verdecken.
+const BACKDROP_HERO_Z := 4.0
+const BACKDROP_HERO_SCALE := 0.8
 const MAX_HEROES := 3
 const DECK_HALF_W := 4.7
 
@@ -217,7 +221,7 @@ func start() -> void:
 func add_hero(id: String, joined := false) -> Hero:
 	var h := Hero.new()
 	add_child(h)
-	h.position = Vector3(0, 0, HERO_Z)
+	h.position = Vector3(0, 0, BACKDROP_HERO_Z if field != "" else HERO_Z)
 	h.reinforced = joined and GameData.HERO_TYPE.get(id, "start") == "verstaerkung"
 	if h.reinforced:
 		team_aura += GameData.TEAM_AURA
