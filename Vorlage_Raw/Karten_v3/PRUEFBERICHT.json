@@ -1,0 +1,62 @@
+[
+  {
+    "datei": "desert_outpost.png",
+    "breite": 780,
+    "hoehe": 1688,
+    "oberer_bereich_pixelgleich": true,
+    "boden_geaendert": true,
+    "bytes": 3201260,
+    "git_sha": "8fa110184b33b2399da129a85a7a511cea397786",
+    "sha256": "271d843a2c6a7dcecc20f1a06f417897cf3b76c2f1186968e0c15d60e34008d6"
+  },
+  {
+    "datei": "ice_world.png",
+    "breite": 780,
+    "hoehe": 1688,
+    "oberer_bereich_pixelgleich": true,
+    "boden_geaendert": true,
+    "bytes": 3326195,
+    "git_sha": "1a5b62d0cc9deb52367ac27d85e063fe6bfc80b4",
+    "sha256": "77fc56a46cbc83f5c04ef3f59c9e1d613385f4d23926045a87038d3ba458b2b3"
+  },
+  {
+    "datei": "lava_asteroid.png",
+    "breite": 780,
+    "hoehe": 1688,
+    "oberer_bereich_pixelgleich": true,
+    "boden_geaendert": true,
+    "bytes": 3209810,
+    "git_sha": "e12d78b760d105b81106aac529fd1b28e8ea98e7",
+    "sha256": "5cb28ee4fc25a073e204324c445b3e174a7c7c607083874228cbd1eae47e1b74"
+  },
+  {
+    "datei": "nebula_portal.png",
+    "breite": 780,
+    "hoehe": 1688,
+    "oberer_bereich_pixelgleich": true,
+    "boden_geaendert": true,
+    "bytes": 3095349,
+    "git_sha": "146e1ba0ab01cb0dacc41e7aebd8d19e6757318e",
+    "sha256": "2eada5f7b708ca5fac3ae6268f7fedd39a407fc52d74c057ccbbf61601dd0738"
+  },
+  {
+    "datei": "ringed_planet.png",
+    "breite": 780,
+    "hoehe": 1688,
+    "oberer_bereich_pixelgleich": true,
+    "boden_geaendert": true,
+    "bytes": 2844828,
+    "git_sha": "e0b97388d9a7af36ba519a5bad649b8216535d60",
+    "sha256": "f1868f08b961116656fd769ae11a61cf726972717f7f7e373e09a3964b9abdb9"
+  },
+  {
+    "datei": "space_dock.png",
+    "breite": 780,
+    "hoehe": 1688,
+    "oberer_bereich_pixelgleich": true,
+    "boden_geaendert": true,
+    "bytes": 3051255,
+    "git_sha": "94b18d292eab597ede63230422a6d1faab16521c",
+    "sha256": "fb6b27a1edf578d610e4ac33e7f4a4837e79959382c18f3932c9e78d5d3bccf2"
+  }
+]

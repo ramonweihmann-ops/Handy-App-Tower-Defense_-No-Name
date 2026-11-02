@@ -22,3 +22,9 @@ Claude kann die PNGs direkt aus diesem Repository übernehmen. Gegner, Helden, M
 [Gemeinsame Bildvorlage und Ausschneideplan für Claude](Raumbasis_30/README_FUER_CLAUDE.md)
 
 30 gestalterisch freigegebene Gebäude in einer PNG-Datei mit ID-Verzeichnis und ungefähren Auswahlbereichen. Für frei platzierbare Sprites sind die Gebäude noch freizustellen.
+
+## Aktuelle Weltraumkarten – Version 3
+
+[Neue Karten mit ruhigen weltenspezifischen Verteidigungsböden und Einbauhinweisen](Karten_v3/LAYOUT_FUER_CLAUDE.md)
+
+Sechs PNGs mit je 780 × 1688 Pixeln. Die Brücken und Kulissen sind gegenüber Version 2 unverändert; nur die untere Plattform wurde mit feiner Materialstruktur neu gestaltet. Helden und Anzeigen bleiben dynamische Spielelemente. Für die aktuelle Gestaltung bitte die gleichnamigen PNGs aus Karten_v3 verwenden.
