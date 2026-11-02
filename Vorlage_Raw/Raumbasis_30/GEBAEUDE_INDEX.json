@@ -1,0 +1,550 @@
+{
+  "bild": "raumbasis_30_gebaeude_pruefansicht.png",
+  "breite": 724,
+  "hoehe": 2172,
+  "transparent": false,
+  "auswahlart": "Ungefähre rechteckige Auswahlbereiche; manuelle Freistellung erforderlich.",
+  "gebaeude": [
+    {
+      "id": "01",
+      "name": "Kommandozentrale",
+      "champion_count": 1,
+      "reihe_von_unten": 1,
+      "spalte_von_links": 1,
+      "auswahl_px": {
+        "x": 0,
+        "y": 1800,
+        "breite": 242,
+        "hoehe": 245
+      },
+      "fusspunkt_ca_px": {
+        "x": 121,
+        "y": 2020
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "02",
+      "name": "Sanitätsstation",
+      "champion_count": 2,
+      "reihe_von_unten": 1,
+      "spalte_von_links": 2,
+      "auswahl_px": {
+        "x": 242,
+        "y": 1800,
+        "breite": 242,
+        "hoehe": 245
+      },
+      "fusspunkt_ca_px": {
+        "x": 363,
+        "y": 2020
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "03",
+      "name": "Werkstatt",
+      "champion_count": 3,
+      "reihe_von_unten": 1,
+      "spalte_von_links": 3,
+      "auswahl_px": {
+        "x": 484,
+        "y": 1800,
+        "breite": 240,
+        "hoehe": 245
+      },
+      "fusspunkt_ca_px": {
+        "x": 604,
+        "y": 2020
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "04",
+      "name": "Hologrammakademie",
+      "champion_count": 4,
+      "reihe_von_unten": 2,
+      "spalte_von_links": 1,
+      "auswahl_px": {
+        "x": 0,
+        "y": 1575,
+        "breite": 242,
+        "hoehe": 225
+      },
+      "fusspunkt_ca_px": {
+        "x": 121,
+        "y": 1775
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "05",
+      "name": "Reaktorturm",
+      "champion_count": 5,
+      "reihe_von_unten": 2,
+      "spalte_von_links": 2,
+      "auswahl_px": {
+        "x": 242,
+        "y": 1575,
+        "breite": 242,
+        "hoehe": 225
+      },
+      "fusspunkt_ca_px": {
+        "x": 363,
+        "y": 1775
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "06",
+      "name": "Kommunikationsstation",
+      "champion_count": 6,
+      "reihe_von_unten": 2,
+      "spalte_von_links": 3,
+      "auswahl_px": {
+        "x": 484,
+        "y": 1575,
+        "breite": 240,
+        "hoehe": 225
+      },
+      "fusspunkt_ca_px": {
+        "x": 604,
+        "y": 1775
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "07",
+      "name": "Gewächshaus",
+      "champion_count": 7,
+      "reihe_von_unten": 3,
+      "spalte_von_links": 1,
+      "auswahl_px": {
+        "x": 0,
+        "y": 1380,
+        "breite": 242,
+        "hoehe": 195
+      },
+      "fusspunkt_ca_px": {
+        "x": 121,
+        "y": 1550
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "08",
+      "name": "Roboterlabor",
+      "champion_count": 8,
+      "reihe_von_unten": 3,
+      "spalte_von_links": 2,
+      "auswahl_px": {
+        "x": 242,
+        "y": 1380,
+        "breite": 242,
+        "hoehe": 195
+      },
+      "fusspunkt_ca_px": {
+        "x": 363,
+        "y": 1550
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "09",
+      "name": "Sternwarte",
+      "champion_count": 9,
+      "reihe_von_unten": 3,
+      "spalte_von_links": 3,
+      "auswahl_px": {
+        "x": 484,
+        "y": 1380,
+        "breite": 240,
+        "hoehe": 195
+      },
+      "fusspunkt_ca_px": {
+        "x": 604,
+        "y": 1550
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "10",
+      "name": "Schiffswerft",
+      "champion_count": 10,
+      "reihe_von_unten": 4,
+      "spalte_von_links": 1,
+      "auswahl_px": {
+        "x": 0,
+        "y": 1170,
+        "breite": 242,
+        "hoehe": 210
+      },
+      "fusspunkt_ca_px": {
+        "x": 121,
+        "y": 1355
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "11",
+      "name": "Schildgenerator",
+      "champion_count": 11,
+      "reihe_von_unten": 4,
+      "spalte_von_links": 2,
+      "auswahl_px": {
+        "x": 242,
+        "y": 1170,
+        "breite": 242,
+        "hoehe": 210
+      },
+      "fusspunkt_ca_px": {
+        "x": 363,
+        "y": 1355
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "12",
+      "name": "Trainingshalle",
+      "champion_count": 12,
+      "reihe_von_unten": 4,
+      "spalte_von_links": 3,
+      "auswahl_px": {
+        "x": 484,
+        "y": 1170,
+        "breite": 240,
+        "hoehe": 210
+      },
+      "fusspunkt_ca_px": {
+        "x": 604,
+        "y": 1355
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "13",
+      "name": "Kristallforschung",
+      "champion_count": 13,
+      "reihe_von_unten": 5,
+      "spalte_von_links": 1,
+      "auswahl_px": {
+        "x": 0,
+        "y": 985,
+        "breite": 242,
+        "hoehe": 185
+      },
+      "fusspunkt_ca_px": {
+        "x": 121,
+        "y": 1145
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "14",
+      "name": "Panzerwerkstatt",
+      "champion_count": 14,
+      "reihe_von_unten": 5,
+      "spalte_von_links": 2,
+      "auswahl_px": {
+        "x": 242,
+        "y": 985,
+        "breite": 242,
+        "hoehe": 185
+      },
+      "fusspunkt_ca_px": {
+        "x": 363,
+        "y": 1145
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "15",
+      "name": "Drohnenhangar",
+      "champion_count": 15,
+      "reihe_von_unten": 5,
+      "spalte_von_links": 3,
+      "auswahl_px": {
+        "x": 484,
+        "y": 985,
+        "breite": 240,
+        "hoehe": 185
+      },
+      "fusspunkt_ca_px": {
+        "x": 604,
+        "y": 1145
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "16",
+      "name": "Alchemielabor",
+      "champion_count": 16,
+      "reihe_von_unten": 6,
+      "spalte_von_links": 1,
+      "auswahl_px": {
+        "x": 0,
+        "y": 795,
+        "breite": 242,
+        "hoehe": 190
+      },
+      "fusspunkt_ca_px": {
+        "x": 121,
+        "y": 960
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "17",
+      "name": "Energiespeicher",
+      "champion_count": 17,
+      "reihe_von_unten": 6,
+      "spalte_von_links": 2,
+      "auswahl_px": {
+        "x": 242,
+        "y": 795,
+        "breite": 242,
+        "hoehe": 190
+      },
+      "fusspunkt_ca_px": {
+        "x": 363,
+        "y": 960
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "18",
+      "name": "Navigationszentrale",
+      "champion_count": 18,
+      "reihe_von_unten": 6,
+      "spalte_von_links": 3,
+      "auswahl_px": {
+        "x": 484,
+        "y": 795,
+        "breite": 240,
+        "hoehe": 190
+      },
+      "fusspunkt_ca_px": {
+        "x": 604,
+        "y": 960
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "19",
+      "name": "Eisforschung",
+      "champion_count": 19,
+      "reihe_von_unten": 7,
+      "spalte_von_links": 1,
+      "auswahl_px": {
+        "x": 0,
+        "y": 610,
+        "breite": 242,
+        "hoehe": 185
+      },
+      "fusspunkt_ca_px": {
+        "x": 121,
+        "y": 770
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "20",
+      "name": "Feuerforschung",
+      "champion_count": 20,
+      "reihe_von_unten": 7,
+      "spalte_von_links": 2,
+      "auswahl_px": {
+        "x": 242,
+        "y": 610,
+        "breite": 242,
+        "hoehe": 185
+      },
+      "fusspunkt_ca_px": {
+        "x": 363,
+        "y": 770
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "21",
+      "name": "Waffenwerkstatt",
+      "champion_count": 21,
+      "reihe_von_unten": 7,
+      "spalte_von_links": 3,
+      "auswahl_px": {
+        "x": 484,
+        "y": 610,
+        "breite": 240,
+        "hoehe": 185
+      },
+      "fusspunkt_ca_px": {
+        "x": 604,
+        "y": 770
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "22",
+      "name": "Bibliotheksarchiv",
+      "champion_count": 22,
+      "reihe_von_unten": 8,
+      "spalte_von_links": 1,
+      "auswahl_px": {
+        "x": 0,
+        "y": 435,
+        "breite": 242,
+        "hoehe": 175
+      },
+      "fusspunkt_ca_px": {
+        "x": 121,
+        "y": 585
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "23",
+      "name": "Biolabor",
+      "champion_count": 23,
+      "reihe_von_unten": 8,
+      "spalte_von_links": 2,
+      "auswahl_px": {
+        "x": 242,
+        "y": 435,
+        "breite": 242,
+        "hoehe": 175
+      },
+      "fusspunkt_ca_px": {
+        "x": 363,
+        "y": 585
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "24",
+      "name": "Teleportstation",
+      "champion_count": 24,
+      "reihe_von_unten": 8,
+      "spalte_von_links": 3,
+      "auswahl_px": {
+        "x": 484,
+        "y": 435,
+        "breite": 240,
+        "hoehe": 175
+      },
+      "fusspunkt_ca_px": {
+        "x": 604,
+        "y": 585
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "25",
+      "name": "Veredelungsanlage",
+      "champion_count": 25,
+      "reihe_von_unten": 9,
+      "spalte_von_links": 1,
+      "auswahl_px": {
+        "x": 0,
+        "y": 255,
+        "breite": 242,
+        "hoehe": 180
+      },
+      "fusspunkt_ca_px": {
+        "x": 121,
+        "y": 410
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "26",
+      "name": "Kommandantenresidenz",
+      "champion_count": 26,
+      "reihe_von_unten": 9,
+      "spalte_von_links": 2,
+      "auswahl_px": {
+        "x": 242,
+        "y": 255,
+        "breite": 242,
+        "hoehe": 180
+      },
+      "fusspunkt_ca_px": {
+        "x": 363,
+        "y": 410
+      },
+      "hinweis": "Kontrollschild zeigt irrtümlich 6."
+    },
+    {
+      "id": "27",
+      "name": "Reparaturdock",
+      "champion_count": 27,
+      "reihe_von_unten": 9,
+      "spalte_von_links": 3,
+      "auswahl_px": {
+        "x": 484,
+        "y": 255,
+        "breite": 240,
+        "hoehe": 180
+      },
+      "fusspunkt_ca_px": {
+        "x": 604,
+        "y": 410
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "28",
+      "name": "Satellitenkontrolle",
+      "champion_count": 28,
+      "reihe_von_unten": 10,
+      "spalte_von_links": 1,
+      "auswahl_px": {
+        "x": 0,
+        "y": 60,
+        "breite": 242,
+        "hoehe": 195
+      },
+      "fusspunkt_ca_px": {
+        "x": 121,
+        "y": 230
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "29",
+      "name": "Reparaturdock",
+      "champion_count": 29,
+      "reihe_von_unten": 10,
+      "spalte_von_links": 2,
+      "auswahl_px": {
+        "x": 242,
+        "y": 60,
+        "breite": 242,
+        "hoehe": 195
+      },
+      "fusspunkt_ca_px": {
+        "x": 363,
+        "y": 230
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    },
+    {
+      "id": "30",
+      "name": "Heldenhalle",
+      "champion_count": 30,
+      "reihe_von_unten": 10,
+      "spalte_von_links": 3,
+      "auswahl_px": {
+        "x": 484,
+        "y": 60,
+        "breite": 240,
+        "hoehe": 195
+      },
+      "fusspunkt_ca_px": {
+        "x": 604,
+        "y": 230
+      },
+      "hinweis": "Kontrollnummer und Umgebung vor Sprite-Verwendung entfernen."
+    }
+  ]
+}
+
