@@ -1,0 +1,38 @@
+{
+	"animationen": {
+		"Death": {
+			"dauer_sekunden": 3.5,
+			"spuren": 68
+		},
+		"Hit": {
+			"dauer_sekunden": 0.791666686534882,
+			"spuren": 68
+		},
+		"Idle": {
+			"dauer_sekunden": 2.41666674613953,
+			"spuren": 68
+		},
+		"Run": {
+			"dauer_sekunden": 0.625,
+			"spuren": 68
+		},
+		"Shoot": {
+			"dauer_sekunden": 0.416666656732559,
+			"spuren": 68
+		},
+		"Victory": {
+			"dauer_sekunden": 3.0,
+			"spuren": 68
+		}
+	},
+	"godot_version": "4.5.1-stable (official)",
+	"handknochen": "mixamorig_RightHand",
+	"knochen": 72,
+	"muendungsrichtung_im_anschlag": [
+		-0.000000223517446329424,
+		0.000000849366301736154,
+		1.0
+	],
+	"status": "Godot-Import und sechs Animationen erfolgreich geprüft",
+	"waffenanker": "/root/dusty_jo/SmartRigArmature/Skeleton3D/mixamorig_RightHand/WeaponSocket"
+}
