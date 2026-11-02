@@ -66,6 +66,25 @@ dazu schwankt jede Welle (Kartenglück). Stärke wirkt auf Tempo (Stärke^RATE_P
 gewürfelte Computergegner an. Ziel: Ein typischer Spieler landet im Mittel auf Platz 2,2–2,8; ein
 stärkerer schneidet besser, ein schwächerer schlechter ab.
 
-## Messwerte
+## Abstimmung (Messung 02.11.2026, gemaltes Schlachtfeld, 6 Läufe je Feld)
 
-Siehe Abschnitt „Abstimmung“ unten (wird mit `scripts/mp-lab.py` erneuert).
+| Station | Anfänger: hält durch / Boss / besiegt | Durchschnitt | Zahlend |
+|---|---|---|---|
+| 5 | 0 % / 67 % / 331 | 67 % / 67 % / 354 | 83 % / 100 % / 406 |
+| 15 | 0 % / 0 % / 207 | 50 % / 83 % / 304 | 100 % / 100 % / 350 |
+| 25 | 0 % / 0 % / 153 | 0 % / 33 % / 214 | 17 % / 83 % / 266 |
+| 35 | 0 % / 0 % / 143 | 0 % / 67 % / 226 | 67 % / 83 % / 286 |
+| 45 | 0 % / 0 % / 116 | 0 % / 67 % / 239 | 50 % / 67 % / 284 |
+
+Ab Station 25 fällt ein typischer Spieler meist in den letzten beiden Wellen (≈4:15), den Boss schafft
+er in jedem zweiten Kampf. Die Profile liegen klar getrennt: Aufwerten lohnt sich.
+
+**Fairness** (`tests/mp_fairness.gd`, 300 Kämpfe je echtem Lauf, Bronze-Liga):
+
+| Profil | Platz 1 | 2 | 3 | 4 | Mittel |
+|---|---|---|---|---|---|
+| Anfänger | 15 % | 6 % | 19 % | 60 % | 3,23 |
+| Durchschnitt | 31 % | 22 % | 27 % | 19 % | 2,35 |
+| Zahlend | 64 % | 17 % | 13 % | 6 % | 1,60 |
+
+Rangregel: in 12.105 Fällen „zuerst gefallen und am wenigsten besiegt“ immer Letzter, keine verletzten Paare.

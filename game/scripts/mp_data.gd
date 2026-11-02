@@ -34,7 +34,7 @@ const LEAGUES := [
 ## Pokale je Platz 1–4, je Liga (in den unteren Ligen geht es schneller aufwärts).
 const TROPHIES := [[30, 15, 5, -5], [30, 12, 0, -10], [30, 10, -5, -15], [30, 8, -10, -20]]
 ## Stärke der Computergegner je Liga (1.0 = ein typischer Spieler auf demselben Stand).
-const BOT_SKILL := [0.96, 1.0, 1.04, 1.08, 1.12, 1.16]
+const BOT_SKILL := [1.0, 1.04, 1.08, 1.12, 1.16, 1.2]
 const BOT_SKILL_SPREAD := 0.1
 ## Belohnung je Platz: Anteil am Siegesgold eines Levels, Heldenkarten-Faktor, Pass-Punkte
 const GOLD_SHARE := [1.0, 0.75, 0.55, 0.4]

@@ -7,16 +7,16 @@ extends RefCounted
 ## Alles hängt nur vom Startwert ab, damit Läufe nachprüfbar sind.
 
 ## Besiegte Gegner je Sekunde eines typischen Spielers, je Welle (gemessen, mp-lab).
-static var RATE := [0.55, 0.62, 0.66, 0.68, 0.66, 0.66, 0.64]
+static var RATE := [0.70, 0.97, 1.01, 1.01, 1.19, 1.13, 0.95]
 ## Wahrscheinlichkeit je Sekunde auszuscheiden, je Welle (gemessen, mp-lab).
-static var HAZARD := [0.0, 0.0, 0.0002, 0.0008, 0.0016, 0.0024, 0.003]
+static var HAZARD := [0.0, 0.0, 0.0005, 0.001, 0.002, 0.0117, 0.0217]
 ## Anteil der typischen Spieler, die den Boss besiegen, und wie lange sie dafür brauchen (s).
-static var BOSS_CHANCE := 0.5
+static var BOSS_CHANCE := 0.63
 static var BOSS_DELAY := [12.0, 45.0]
 ## Wie stark die Stärke wirkt: Rate ~ Stärke^RATE_POW, Ausscheiden ~ Stärke^-HAZARD_POW, Boss ~ Stärke^BOSS_POW.
-static var RATE_POW := 0.6
-static var HAZARD_POW := 4.0
-static var BOSS_POW := 2.5
+static var RATE_POW := 0.36
+static var HAZARD_POW := 4.5
+static var BOSS_POW := 1.2
 ## Schwankung je Welle (Kartenglück)
 static var WAVE_NOISE := 0.12
 
