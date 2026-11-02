@@ -204,13 +204,16 @@ static var DPS_GROWTH := 1.035
 ## Ab Level 21 (Spiel-Phase 2) ein spürbarer Sprung, danach wächst es im Gleichschritt mit
 ## einem Spieler, der regelmäßig aufwertet (abgestimmt mit dem Balance-Labor, docs/BALANCE.md).
 const PHASE2_FROM := 21
-static var HP_STEP := 4.7
-static var HP_GROWTH_LATE := 1.025
+static var HP_STEP := 10.0
+static var HP_GROWTH_LATE := 1.01
 static var DPS_STEP := 1.6
 static var DPS_GROWTH_LATE := 1.0
 ## Ab diesem Level brauchen Bosse ohne Käufe in der Regel einen Versuch mehr (Konzept, Abschnitt 9).
 const HARD_BOSS_FROM := 21
-static var HARD_BOSS_HP := 1.22
+static var HARD_BOSS_HP := 0.8
+## Feinabstimmung je Welt-Boss (Level -> Faktor auf das Bossleben). Die Bosse der Welten sind
+## unterschiedlich zäh und schnell, ein gemeinsamer Wert trifft die Zielkurve nicht.
+static var BOSS_TUNE := {25: 0.8, 30: 0.85, 40: 1.2, 45: 0.9, 50: 0.75}
 
 
 static func world_of(level: int) -> int:
@@ -280,7 +283,9 @@ static func hp_mult(level: int, wave: int) -> float:
 
 ## Zusätzlicher Lebensfaktor für den Boss dieses Levels.
 static func boss_hp(level: int) -> float:
-	return HARD_BOSS_HP if level >= HARD_BOSS_FROM else 1.0
+	if level < HARD_BOSS_FROM:
+		return 1.0
+	return HARD_BOSS_HP * float(BOSS_TUNE.get(level, 1.0))
 
 
 ## Stellt die Gegner einer Welle zusammen (Art nach Welt, Menge nach Level in der Welt).
