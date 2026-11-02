@@ -13,7 +13,8 @@
     "Run",
     "Shoot",
     "Hit",
-    "Death"
+    "Death",
+    "Victory"
   ],
   "enemy_animations": [
     "Walk",
@@ -96,5 +97,20 @@
       "animation_status": "nicht erstellt"
     }
   ],
-  "weapon_decision": "Wirkung der Waffen im Spiel bleibt, Aussehen klassisch mechanisch, keine Laser oder Plasma (Entscheidung 02.11.2026)"
+  "weapon_decision": "Wirkung der Waffen im Spiel bleibt, Aussehen klassisch mechanisch, keine Laser oder Plasma (Entscheidung 02.11.2026)",
+  "node_names": {
+    "weapon_socket": "WeaponSocket",
+    "weapon": "Weapon",
+    "muzzle": "Muzzle",
+    "weapon_socket_parent_bone": "mixamorig:RightHand",
+    "muzzle_forward_axis": "-Z (lokal)"
+  },
+  "required_bones": [
+    "mixamorig:Hips",
+    "mixamorig:Head",
+    "mixamorig:RightHand",
+    "mixamorig:LeftHand",
+    "mixamorig:RightFoot",
+    "mixamorig:LeftFoot"
+  ]
 }

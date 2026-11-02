@@ -36,16 +36,22 @@ Die Effekte (Funken, Frost, Feuer) zeichnet das Spiel selbst; sie gehören nicht
 
 ## 2. Ergänzungen für die GLB-Dateien
 
-**Waffe und Mündung**
-- Waffe als eigenes Mesh-Objekt `Weapon`, im Rig an den Knochen der rechten Hand gehängt (nicht in
-  den Körper eingeschmolzen). Zweihändige Waffen bleiben an der rechten Hand, die linke Hand greift mit.
-- Ein leeres Objekt **`Muzzle`** an der Laufmündung (Kindobjekt der Waffe). Dort erscheinen Schüsse,
-  Mündungsfeuer und Raketen. Ohne `Muzzle` schießen die Kugeln aus der falschen Stelle.
+**Waffe, Anker und Mündung: exakte Namen (verbindlich)**
 
-**Knochennamen**
-- Einheitlich in allen acht Helden, menschliches Standardskelett. Mindestens eindeutig benannt:
-  rechte Hand, linke Hand, linker und rechter Fuß, Kopf. Mixamo-Namen (`mixamorig:RightHand` …) sind
-  in Ordnung. Das Spiel braucht Hand (Waffe) und Füße (Figur steht im Menü auf dem Boden).
+| Objekt | exakter Name | hängt an | Zweck |
+|---|---|---|---|
+| Waffen-Anker | `WeaponSocket` | Knochen der rechten Hand (Bone Parent in Blender) | Griffpunkt; das Spiel kann hier auch andere Waffen anhängen |
+| Waffe | `Weapon` | `WeaponSocket` | sichtbares Waffen-Mesh, starr, nicht gehäutet |
+| Mündung | `Muzzle` | `Weapon` | Laufspitze; Schüsse, Mündungsfeuer, Raketen; lokale −Z-Achse zeigt in Schussrichtung |
+
+Groß- und Kleinschreibung genau so. Ohne Leerzeichen, ohne Nummern-Endung (Blender hängt bei
+Duplikaten `.001` an; das bitte vor dem Export entfernen). Das Spiel sucht nach diesen drei Namen.
+
+**Knochennamen (verbindlich): Mixamo-Standard**, wortgetreu, mindestens:
+`mixamorig:Hips`, `mixamorig:Head`, `mixamorig:RightHand`, `mixamorig:LeftHand`,
+`mixamorig:RightFoot`, `mixamorig:LeftFoot`. Alle acht Helden mit demselben Skelett und denselben
+Namen. Kommt das Skelett aus Meshy oder Tripo mit anderen Namen, vor dem Export auf diese Namen
+umbenennen (oder über Mixamo neu riggen, das liefert sie direkt).
 
 **Blickrichtung**
 - Figur schaut in glTF-Vorwärtsrichtung (+Z), wie die bisherigen Modelle. Alle acht gleich.
