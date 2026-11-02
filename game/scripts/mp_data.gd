@@ -139,7 +139,7 @@ static func hp_mult(level: int, wave: int) -> float:
 ## Abstimmung je Levelbereich (gemessen mit scripts/mp-lab.py): Das Abenteuer ist je nach Bereich
 ## unterschiedlich streng, der Multiplayer soll überall gleich spannend sein. Zwischen den Stützstellen
 ## wird gleitend übergeblendet.
-static var HP_TUNE := {5: 0.85, 15: 1.2, 25: 0.31, 35: 0.34, 45: 0.42}
+static var HP_TUNE := {5: 0.85, 15: 1.15, 25: 0.29, 35: 0.31, 45: 0.37}
 ## Nur für das Labor: fester Faktor statt HP_TUNE (0 = aus)
 static var HP_TUNE_FIXED := 0.0
 

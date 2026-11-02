@@ -105,7 +105,7 @@ func _fairness_check() -> void:
 		var bp: Dictionary = by_profile[prof]
 		var n := float(bp["n"])
 		var pl: Array = bp["places"]
-		var mean := (pl[0] * 1.0 + pl[1] * 2.0 + pl[2] * 3.0 + pl[3] * 4.0) / n
+		var mean: float = (pl[0] * 1.0 + pl[1] * 2.0 + pl[2] * 3.0 + pl[3] * 4.0) / n
 		avg[prof] = mean
 		print("MPCHECK Fairness %-12s %d Läufe: Platz 1 %.0f %%, 2 %.0f %%, 3 %.0f %%, 4 %.0f %%, Mittel %.2f · echt: %.0f besiegt, hält durch %.0f %%" % [
 			prof, int(bp["runs"]), 100.0 * pl[0] / n, 100.0 * pl[1] / n, 100.0 * pl[2] / n, 100.0 * pl[3] / n, mean,
