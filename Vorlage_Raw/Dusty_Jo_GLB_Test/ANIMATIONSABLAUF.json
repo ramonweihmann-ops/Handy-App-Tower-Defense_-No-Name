@@ -1,0 +1,30 @@
+{
+  "bildrate": 24,
+  "animationen": {
+    "Idle": {
+      "dauer_sekunden": 2.4166666666666665,
+      "schleife": true
+    },
+    "Run": {
+      "dauer_sekunden": 0.625,
+      "schleife": true
+    },
+    "Shoot": {
+      "dauer_sekunden": 0.4166666666666667,
+      "schleife": false
+    },
+    "Hit": {
+      "dauer_sekunden": 0.7916666666666666,
+      "schleife": true
+    },
+    "Death": {
+      "dauer_sekunden": 3.5,
+      "schleife": false
+    },
+    "Victory": {
+      "dauer_sekunden": 3.0,
+      "schleife": true
+    }
+  },
+  "herkunft": "Körper und Lauf-/Treffer-/Tod-/Siegerbewegungen: Meshy; Anschlag, Atmung, Rückstoß und Revolver lokal in Blender bearbeitet."
+}

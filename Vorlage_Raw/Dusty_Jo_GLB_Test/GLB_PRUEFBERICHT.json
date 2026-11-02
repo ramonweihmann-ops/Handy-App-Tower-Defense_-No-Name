@@ -1,0 +1,82 @@
+{
+  "status": "Technische GLB-Prüfung bestanden; Godot-Spielintegration durch Claude folgt.",
+  "datei": "dusty_jo.glb",
+  "bytes": 1956788,
+  "sha256": "13817c2cd1dc0bba9854a72a1232029be7dd0d67de56b1b2cbb777245dbbbead",
+  "dreiecke_inklusive_revolver": 7819,
+  "materialien": 2,
+  "texturgroessen": [
+    [
+      1024,
+      1024
+    ]
+  ],
+  "skins": 1,
+  "gelenke": 72,
+  "pflichtknochen_exakt": [
+    "mixamorig:Hips",
+    "mixamorig:Head",
+    "mixamorig:RightHand",
+    "mixamorig:LeftHand",
+    "mixamorig:RightFoot",
+    "mixamorig:LeftFoot"
+  ],
+  "waffenhierarchie": [
+    "mixamorig:RightHand",
+    "WeaponSocket",
+    "Weapon",
+    "Muzzle"
+  ],
+  "waffe_starr": true,
+  "muendung_lokale_schussrichtung": "-Z",
+  "animationen": {
+    "Death": {
+      "dauer_sekunden": 3.5,
+      "horizontale_wurzelbewegung": [
+        1.257285475730896e-08,
+        1.862645149230957e-08
+      ],
+      "kanaele": 216
+    },
+    "Hit": {
+      "dauer_sekunden": 0.7917,
+      "horizontale_wurzelbewegung": [
+        1.30385160446167e-08,
+        1.1175870895385742e-08
+      ],
+      "kanaele": 216
+    },
+    "Idle": {
+      "dauer_sekunden": 2.4167,
+      "horizontale_wurzelbewegung": [
+        0.0,
+        0.0
+      ],
+      "kanaele": 216
+    },
+    "Run": {
+      "dauer_sekunden": 0.625,
+      "horizontale_wurzelbewegung": [
+        1.3271346688270569e-08,
+        7.450580596923828e-09
+      ],
+      "kanaele": 216
+    },
+    "Shoot": {
+      "dauer_sekunden": 0.4167,
+      "horizontale_wurzelbewegung": [
+        0.0,
+        0.0
+      ],
+      "kanaele": 216
+    },
+    "Victory": {
+      "dauer_sekunden": 3,
+      "horizontale_wurzelbewegung": [
+        1.3737007975578308e-08,
+        1.1175870895385742e-08
+      ],
+      "kanaele": 216
+    }
+  }
+}
