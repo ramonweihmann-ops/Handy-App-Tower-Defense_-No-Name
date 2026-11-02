@@ -52,6 +52,8 @@ func _ready() -> void:
 	_hero = Hero.new()
 	vp.add_child(_hero)
 	_hero.setup(hero_id, null)
+	# Im Kampf werden Helden größer gezeichnet; das Porträt zeigt sie in Normalgröße
+	_hero.scale = Vector3.ONE * 1.5
 	_hero.hide_pipe()
 	_hero.rotation.y = 0.35
 	if locked:

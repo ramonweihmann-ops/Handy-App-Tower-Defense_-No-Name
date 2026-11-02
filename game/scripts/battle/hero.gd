@@ -140,8 +140,8 @@ func _build_ult_ring() -> void:
 
 ## Darstellungsgröße der Helden.
 const VIS_SCALE := 2.0
-## Helden schauen schräg zur Kamera statt ins Feld (Mockup „Kampf“)
-const FACE_CAMERA := true
+## Helden schräg zur Kamera drehen (aus: sie schauen beim Schießen zu den Gegnern)
+const FACE_CAMERA := false
 
 
 ## Ton beim Schuss je Waffenfamilie.

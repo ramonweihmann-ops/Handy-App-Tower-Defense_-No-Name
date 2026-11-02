@@ -551,7 +551,8 @@ func _show_hero_picker(options: Array) -> void:
 		var d: Dictionary = GameData.HEROES[id]
 		var card := {
 			"kind": "hero_pick", "target": d["weapon"], "color": d["color"], "title": d["name"],
-			"desc": "%s\n\n%s\n%s" % [d["role"], d["blurb"], GameData.hero_type_text(id)], "stars": 0, "max": 0, "emblem": String(d["name"]).left(1),
+			"role": d["role"], "desc": d["blurb"], "note": GameData.hero_type_text(id),
+			"stars": 0, "max": 0, "emblem": String(d["name"]).left(1),
 			"hero_id": id,
 		}
 		var hero_id: String = id
@@ -693,6 +694,9 @@ func _card_add_hero(id: String) -> Dictionary:
 
 
 func _apply_add_hero(id: String) -> void:
+	# Höchstens drei Helden gleichzeitig auf dem Feld
+	if battle.heroes.size() >= Battle.MAX_HEROES:
+		return
 	battle.add_hero(id, true)
 	ammo.add("normal", 10)
 
@@ -818,47 +822,64 @@ func _card_repair() -> Dictionary:
 	}
 
 
-func _card_button(card: Dictionary, on_pick: Callable) -> Button:
+func _card_button(card: Dictionary, on_pick: Callable) -> Control:
 	var col: Color = card["color"]
-	var b := Button.new()
-	b.custom_minimum_size = Vector2(214, 380)
+	# Die Karte wächst mit ihrem Inhalt, damit Bild und Text immer im Rahmen bleiben
+	var b := PanelContainer.new()
+	b.custom_minimum_size = Vector2(214, 0)
+	b.size_flags_vertical = Control.SIZE_FILL
 	var normal := UiKit.box(Color(0.1, 0.12, 0.22), 18, 3, col)
+	normal.content_margin_left = 10
+	normal.content_margin_right = 10
+	normal.content_margin_top = 10
+	normal.content_margin_bottom = 14
 	var hover := normal.duplicate() as StyleBoxFlat
 	hover.bg_color = Color(0.14, 0.17, 0.3)
-	b.add_theme_stylebox_override("normal", normal)
-	b.add_theme_stylebox_override("hover", hover)
-	b.add_theme_stylebox_override("pressed", hover)
-	b.pressed.connect(func() -> void: on_pick.call(card))
+	b.add_theme_stylebox_override("panel", normal)
+	b.mouse_filter = Control.MOUSE_FILTER_STOP
+	b.mouse_entered.connect(func() -> void: b.add_theme_stylebox_override("panel", hover))
+	b.mouse_exited.connect(func() -> void: b.add_theme_stylebox_override("panel", normal))
+	b.gui_input.connect(func(e: InputEvent) -> void:
+		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+			b.accept_event()
+			on_pick.call(card))
 	var v := VBoxContainer.new()
-	v.set_anchors_preset(Control.PRESET_FULL_RECT)
-	v.offset_left = 10
-	v.offset_right = -10
-	v.offset_top = 10
-	v.offset_bottom = -12
-	v.add_theme_constant_override("separation", 8)
+	v.add_theme_constant_override("separation", 6)
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.add_child(v)
 	var head := PanelContainer.new()
 	head.add_theme_stylebox_override("panel", UiKit.box(col, 10))
 	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	head.add_child(UiKit.label(card["target"], 18, Color(0.08, 0.08, 0.12)))
-	(head.get_child(0) as Label).add_theme_constant_override("outline_size", 0)
+	var head_label := UiKit.label(card["target"], 18, Color(0.08, 0.08, 0.12))
+	head_label.add_theme_constant_override("outline_size", 0)
+	head.add_child(head_label)
 	v.add_child(head)
 	if card.has("hero_id"):
-		var portrait := HeroPortrait.make(String(card["hero_id"]), 130)
+		var portrait := HeroPortrait.make(String(card["hero_id"]), 140)
 		portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		v.add_child(portrait)
 	else:
-		var emblem := Emblem.new(col, String(card.get("emblem", "")))
-		v.add_child(emblem)
-	var title := UiKit.wrap_label(card["title"], 26, UiKit.C_GOLD)
-	v.add_child(title)
-	var desc := UiKit.wrap_label(card["desc"], 19, UiKit.C_TEXT)
+		v.add_child(Emblem.new(col, String(card.get("emblem", ""))))
+	v.add_child(_card_text(card["title"], 26, UiKit.C_GOLD))
+	if card.has("role"):
+		v.add_child(_card_text(card["role"], 16, UiKit.C_MUTED))
+	var desc := _card_text(card["desc"], 17, UiKit.C_TEXT)
 	desc.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	v.add_child(desc)
+	if card.has("note"):
+		v.add_child(_card_text(card["note"], 15, col.lightened(0.35)))
 	if int(card["max"]) > 1:
 		v.add_child(UiKit.StarRow.new(int(card["stars"]), int(card["max"])))
 	return b
+
+
+## Text auf einer Karte: bricht nur zwischen Wörtern um, nie mitten im Wort
+func _card_text(text: String, font_size: int, color: Color) -> Label:
+	var l := UiKit.wrap_label(text, font_size, color)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD
+	l.custom_minimum_size.x = 190
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return l
 
 
 ## Rundes Abzeichen oben auf einer Karte.

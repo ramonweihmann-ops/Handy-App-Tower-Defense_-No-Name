@@ -9,6 +9,13 @@ signal picked(card: Dictionary)
 ## Rahmen aus dem Mockup: 0 = gold (Magazin), 1 = cyan mit Helden-Chip (Nachladen), 2 = lila (Kern)
 const FRAME_LABELS := ["Karte MAGAZIN: +2 Schuss für alle Helden", "Karte NACHLADEN für Dusty Jo: −20 % schneller nachladen", "Karte KERN: +30 % lädt schneller auf"]
 const ACCENT := [Color("ffd34d"), Color("6fe0ff"), Color("c08aff")]
+## Oberkante der Kartenreihe wie im Mockup (Überschrift steht darüber, ohne Überlappung)
+const ROW_Y := 300.0
+## Lage im Rahmenbild der Helden-Karte (Anteil der Bildhöhe/-breite): Kreis, Namensschild, Stufen-Schild
+const HERO_CIRCLE := Vector2(0.5, 0.163)
+const HERO_CIRCLE_D := 0.32
+const HERO_NAME_Y := 0.266
+const HERO_LV_Y := 0.362
 const HERO_MODS := {
 	"damage": ["SCHADEN", "+20 %", "mehr Schaden"],
 	"rate": ["FEUERRATE", "+15 %", "schneller feuern"],
@@ -41,7 +48,6 @@ func _ready() -> void:
 	add_child(dim)
 	move_child(dim, 0)
 	set_text("WELLE 3 GESCHAFFT!", "WELLE %d GESCHAFFT!" % wave)
-	set_text("Ersetzt die Tore der Kugelmaschine: Die Karten gelten bis zum Ende des Levels.", "Die Karten gelten bis zum Ende des Levels.")
 	# Kartenknöpfe aus dem Mockup nur als Rahmen-Vorlage, gezeichnet wird in der eigenen Ebene
 	for b in buttons():
 		if str(b.info.get("label", "")).begins_with("Karte"):
@@ -69,7 +75,7 @@ func slot_rect(i: int) -> Rect2:
 	var n := cards.size()
 	var w := 106.0 if n <= 3 else 84.0
 	var gap := (W - 22.0 * 2.0 - w * n) / maxf(1.0, n - 1)
-	var r := Rect2(22.0 + i * (w + gap), 300.0, w, 168.0)
+	var r := Rect2(22.0 + i * (w + gap), ROW_Y, w, 168.0)
 	if i == _sel:
 		r = r.grow_individual(3, 18, 3, 9)
 	return r
@@ -90,8 +96,8 @@ func face(c: Dictionary) -> Dictionary:
 		return {"frame": 1, "label": m[0], "value": m[1], "sub": m[2], "hero": hid,
 			"lv": int(c.get("stars", 0))}
 	if kind == "add_hero":
-		return {"frame": 1, "label": "NEU IM TEAM", "value": "+1", "sub": String(GameData.HEROES[c["hero_id"]]["weapon"]),
-			"hero": c["hero_id"], "lv": -1}
+		return {"frame": 1, "label": String(GameData.HEROES[c["hero_id"]]["weapon"]).to_upper(), "value": "+1",
+			"sub": "neu im Team", "hero": c["hero_id"], "lv": -1}
 	if kind == "station":
 		return {"frame": 2, "label": "SCHILD", "value": "+35 %", "sub": "Schild flicken", "hero": ""}
 	var target := String(c.get("target", "")).to_upper()
@@ -109,10 +115,12 @@ func _place_portraits() -> void:
 		var f := face(cards[i])
 		if str(f["hero"]) == "":
 			continue
-		var r := slot_rect(i)
+		var img := _layer.frame_rect(1, slot_rect(i)) if _layer else Rect2()
+		var d := img.size.x * HERO_CIRCLE_D
+		var c := img.position + img.size * HERO_CIRCLE
 		var por := HeroPortrait.make(str(f["hero"]), 64)
 		por.spin = false
-		place_at(por, Rect2(r.get_center().x - 22.0, r.position.y - 33.0, 44.0, 44.0), true)
+		place_at(por, Rect2(c.x - d * 0.5, c.y - d * 0.5, d, d), true)
 		_portraits.append(por)
 
 
@@ -135,6 +143,15 @@ class CardLayer:
 		await get_tree().process_frame
 		queue_redraw()
 
+	## Wo das Rahmenbild für einen Kartenplatz liegt (Mockup-Punkte)
+	func frame_rect(fr: int, slot: Rect2) -> Rect2:
+		if _btn_rects.size() <= fr:
+			return slot
+		var br := _btn_rects[fr]
+		var ir := _img_rects[fr]
+		var k := slot.size / br.size
+		return Rect2(slot.position + (ir.position - br.position) * k, ir.size * k)
+
 	func _draw() -> void:
 		var s := pick.s
 		for i in pick.cards.size():
@@ -143,41 +160,64 @@ class CardLayer:
 			var fr: int = f["frame"]
 			var slot := pick.slot_rect(i)
 			# Rahmenbild so strecken, dass der Kartenkörper genau im Platz liegt
-			var br := _btn_rects[fr]
-			var ir := _img_rects[fr]
-			var k := slot.size / br.size
-			var img := Rect2(slot.position + (ir.position - br.position) * k, ir.size * k)
+			var img := frame_rect(fr, slot)
 			if _tex[fr]:
 				draw_texture_rect(_tex[fr], Rect2(img.position * s, img.size * s), false, Color.WHITE if i == pick._sel else Color(0.85, 0.85, 0.9))
 			var cx := slot.get_center().x * s
 			var font := MockFonts.font("Fredoka", 700)
 			var small := MockFonts.font("Nunito", 700)
-			# Höhen wie im Mockup; der cyane Rahmen hat oben noch das Stufen-Schild
-			var hero_frame := fr == 1
-			var y_label := 46.0 if hero_frame else 26.0
-			var y_icon := 78.0 if hero_frame else 60.0
-			var y_value := 130.0 if hero_frame else 116.0
-			var y_sub := 140.0 if hero_frame else 132.0
-			var kk := slot.size.y / (195.0 if hero_frame and i == pick._sel else 168.0)
-			y_label *= kk
-			y_icon *= kk
-			y_value *= kk
-			y_sub *= kk
-			_center(font, f["label"], Vector2(cx, (slot.position.y + y_label) * s), roundi(11 * s), CardPick.ACCENT[fr])
-			# Symbol: leuchtender Kreis mit Zeichen
-			var ic := Vector2(cx, (slot.position.y + y_icon) * s)
-			draw_circle(ic, 22.0 * s, Color(CardPick.ACCENT[fr], 0.18))
-			draw_circle(ic, 17.0 * s, Color(CardPick.ACCENT[fr], 0.35))
-			var emb := str(f.get("icon", f["value"] if str(f["value"]).length() <= 3 else "★"))
-			_center(font, emb, ic + Vector2(0, 7.0 * s), roundi(18 * s), Color.WHITE)
-			_center(font, str(f["value"]), Vector2(cx, (slot.position.y + y_value) * s), roundi((24 if str(f["value"]).length() <= 6 else 16) * s), Color("fff7ea"))
-			_wrap(small, str(f["sub"]), Vector2(cx, (slot.position.y + y_sub) * s), (slot.size.x - 12.0) * s, roundi(11 * s), Color("cfc8f0"))
-			if str(f["hero"]) != "":
-				var name := String(GameData.HEROES[f["hero"]]["name"]).to_upper()
-				_center(font, name, Vector2(cx, (slot.position.y - 3.0) * s), roundi(9 * s), Color("4a2000"))
-				var lv: int = f.get("lv", -1)
-				if lv >= 0:
-					_center(font, "Lv. %d → Lv. %d" % [lv, lv + 1], Vector2(cx, (slot.position.y + 28.0 * kk) * s), roundi(10 * s), Color("ffd34d"))
+			if fr == 1:
+				_draw_hero_card(f, img, cx)
+				continue
+			# Höhen wie im Mockup (gold und lila)
+			var kk := slot.size.y / 168.0
+			var top := slot.position.y
+			_center(font, f["label"], Vector2(cx, (top + 26.0 * kk) * s), roundi(11 * s), CardPick.ACCENT[fr])
+			_icon(f, fr, Vector2(cx, (top + 60.0 * kk) * s), font)
+			_center(font, str(f["value"]), Vector2(cx, (top + 116.0 * kk) * s), roundi((24 if str(f["value"]).length() <= 6 else 16) * s), Color("fff7ea"))
+			_wrap(small, str(f["sub"]), Vector2(cx, (top + 132.0 * kk) * s), (slot.size.x - 12.0) * s, roundi(11 * s), Color("cfc8f0"))
+
+	## Helden-Karte: alles am Rahmenbild ausgerichtet, von oben nach unten ohne Überlappung:
+	## Kreis mit Porträt, Name im goldenen Schild, Stufe im dunklen Schild, Überschrift, Symbol,
+	## großer Wert, kleiner Text
+	func _draw_hero_card(f: Dictionary, img: Rect2, cx: float) -> void:
+		var s := pick.s
+		var font := MockFonts.font("Fredoka", 700)
+		var small := MockFonts.font("Nunito", 700)
+		var h := img.size.y
+		var y0 := img.position.y
+		var hero_name := String(GameData.HEROES[f["hero"]]["name"]).to_upper()
+		# Name muss ins goldene Schild passen (lange Namen wie „Käpt'n Margot“ werden kleiner)
+		_center_mid(font, hero_name, Vector2(cx, (y0 + h * CardPick.HERO_NAME_Y) * s), _fit(font, hero_name, 9.0, img.size.x * 0.46), Color("4a2000"))
+		var lv: int = f.get("lv", -1)
+		var lv_text := "Lv. %d → Lv. %d" % [lv, lv + 1] if lv >= 0 else "NEU IM TEAM"
+		_center_mid(font, lv_text, Vector2(cx, (y0 + h * CardPick.HERO_LV_Y) * s), _fit(font, lv_text, 9.5, img.size.x * 0.52), Color("ffd34d"))
+		_center_mid(font, str(f["label"]), Vector2(cx, (y0 + h * 0.455) * s), _fit(font, str(f["label"]), 10.5, img.size.x * 0.6), CardPick.ACCENT[1])
+		_icon(f, 1, Vector2(cx, (y0 + h * 0.585) * s), font, 0.85)
+		_center_mid(font, str(f["value"]), Vector2(cx, (y0 + h * 0.715) * s), roundi((22 if str(f["value"]).length() <= 6 else 15) * s), Color("fff7ea"))
+		_wrap(small, str(f["sub"]), Vector2(cx, (y0 + h * 0.765) * s), (img.size.x * 0.7) * s, roundi(10.5 * s), Color("cfc8f0"))
+
+	## Schriftgröße (in Pixeln), bei der der Text höchstens max_w Mockup-Punkte breit ist
+	func _fit(font: Font, txt: String, size_pt: float, max_w: float) -> int:
+		var s := pick.s
+		var fs := roundi(size_pt * s)
+		while fs > 6 and font.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > max_w * s:
+			fs -= 1
+		return fs
+
+	## Leuchtender Kreis mit Zeichen
+	func _icon(f: Dictionary, fr: int, ic: Vector2, font: Font, k := 1.0) -> void:
+		var s := pick.s
+		draw_circle(ic, 22.0 * k * s, Color(CardPick.ACCENT[fr], 0.18))
+		draw_circle(ic, 17.0 * k * s, Color(CardPick.ACCENT[fr], 0.35))
+		var emb := str(f.get("icon", f["value"] if str(f["value"]).length() <= 3 else "★"))
+		_center_mid(font, emb, ic, roundi(18 * k * s), Color.WHITE)
+
+	## Text mittig um einen Punkt (waagrecht und senkrecht)
+	func _center_mid(font: Font, txt: String, at: Vector2, fs: int, col: Color) -> void:
+		var asc := font.get_ascent(fs)
+		var desc := font.get_descent(fs)
+		_center(font, txt, at + Vector2(0, (asc - desc) * 0.5), fs, col)
 
 	func _center(font: Font, txt: String, at: Vector2, fs: int, col: Color) -> void:
 		var w := font.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x

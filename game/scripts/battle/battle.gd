@@ -12,7 +12,7 @@ signal level_lost
 const FENCE_Z := 0.0
 const SPAWN_Z := -27.0
 const HERO_Z := 3.3
-const MAX_HEROES := 4
+const MAX_HEROES := 3
 const DECK_HALF_W := 4.7
 
 var level := 1
