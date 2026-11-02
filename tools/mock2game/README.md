@@ -38,4 +38,6 @@ die sich nur in der Kantenglättung unterscheiden, ebenso).
 Beispiele: `cfg/home.json` (Abenteuer-Pfad), `cfg/helden.json` (Heldenübersicht, Karten zeichnet das
 Spiel), `cfg/held.json` (Held aufleveln: ein Zustand je Held, Fähigkeiten-Fenster, Symbole je Held).
 
+Weitere: `cfg/taeglich.json` (Tägliche Belohnung: Tageskarten je Zustand und ihre Symbole einzeln, `taeglich.js` baut die Zustände), `cfg/erfolg.json` (Erfolgsmeldung; die Mitte zeichnet das Spiel, `scripts/ui/gem_3d.gd`).
+
 Benötigt Node mit Playwright (Chromium) und Python mit Pillow.

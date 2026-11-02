@@ -1,0 +1,8 @@
+{"board": "Taegliche-Belohnung-Erhalten.dc.html", "out": "out/erfolg",
+ "states": [{"name": "main", "eval": "const o=document.querySelector('#dc-root > div > div[style*=\"inset: 0\"]'); o.style.background='transparent'; const g=document.querySelector('#dc-root div[style*=\"animation: bob\"]'); if(g) g.remove(); document.querySelectorAll('[style*=\"animation\"]').forEach(e=>{e.style.animation='none'});"}],
+ "only": ["#dc-root > div > div > *"],
+ "live": [
+  {"sel": "div[style*=\"repeating-conic-gradient\"]", "id": "rays", "img": true, "pad": 0},
+  {"sel": "div[style*=\"animation-delay: .2s\"]", "id": "center"},
+  {"sel": "div[style*=\"white-space: nowrap\"]", "id": "chip"}
+ ]}

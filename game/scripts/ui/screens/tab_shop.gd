@@ -158,8 +158,7 @@ func _buy_chest() -> void:
 		return
 	Save.add("cards", cards)
 	Sfx.play("win")
-	menu.celebrate("cards", "+%d Heldenkarten" % cards)
-	menu.info("Heldentruhe", "%d Heldenkarten erhalten. Schau in der Sammlung nach, wer aufsteigen kann!" % cards)
+	menu.reward_success([{"type": "cards", "amount": cards}], "Heldentruhe")
 	refresh()
 
 
@@ -169,7 +168,7 @@ func _claim_gift() -> void:
 		return
 	Save.add("gold", GIFT_GOLD)
 	Save.mark_daily("shop_free_date")
-	menu.celebrate("gold", "+%d Gold" % GIFT_GOLD)
+	menu.reward_success([{"type": "gold", "amount": GIFT_GOLD}], "Geschenk des Tages")
 	refresh()
 
 
@@ -180,9 +179,10 @@ func _buy_energy() -> void:
 	if not Save.spend("gems", MetaData.SHOP_ENERGY_COST):
 		menu.toast("Dir fehlen noch %d Edelsteine" % (MetaData.SHOP_ENERGY_COST - Save.gems()))
 		return
+	var refill := MetaData.ENERGY_MAX - Save.energy()
 	Save.data["energy"] = MetaData.ENERGY_MAX
 	Save.save_game()
-	menu.celebrate("energy", "Energie aufgefüllt!", Color(0.5, 1.0, 0.5))
+	menu.reward_success([{"type": "energy", "amount": refill}], "Energie aufgefüllt")
 	refresh()
 
 

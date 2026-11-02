@@ -136,7 +136,7 @@ func row_pressed(i: int) -> void:
 	Sfx.play("click")
 	if int(r["prog"]) >= int(r["goal"]):
 		if Save.claim_mission(str(r["id"])):
-			menu.celebrate("star", "+%d Pass-Punkte" % int(r["points"]))
+			menu.reward_success([{"type": "pass", "amount": int(r["points"])}], "Tägliche Mission")
 		refresh()
 	else:
 		menu.close_board(self)

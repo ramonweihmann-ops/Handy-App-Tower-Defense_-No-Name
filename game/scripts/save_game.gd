@@ -48,6 +48,7 @@ func default_data() -> Dictionary:
 		"pass_points": 0,
 		"pass_claimed": [],
 		"daily_date": "",
+		"daily_streak": 0,
 		"wheel_date": "",
 		"shop_free_date": "",
 		"tutorial_seen": false,
@@ -660,6 +661,67 @@ func claim_pass(level: int) -> Dictionary:
 
 
 # --- Täglich -------------------------------------------------------------------
+
+# --- Tägliche Belohnung (7-Tage-Kalender und Treue-Serie) ------------------------------
+
+static func _yesterday() -> String:
+	return Time.get_date_string_from_unix_time(_now() - 86400)
+
+
+## Heute schon abgeholt?
+func daily_claimed_today() -> bool:
+	return str(data.get("daily_date", "")) == today()
+
+
+## Aktuelle Serie: abgeholte Tage am Stück (bricht ab, wenn ein Tag fehlt)
+func daily_streak() -> int:
+	var last := str(data.get("daily_date", ""))
+	if last == today() or last == _yesterday():
+		return int(data.get("daily_streak", 0))
+	return 0
+
+
+## Tag im 7-Tage-Kalender, der heute dran ist (oder heute schon abgeholt wurde), 1..7
+func daily_day() -> int:
+	var st := daily_streak()
+	if daily_claimed_today():
+		return (st - 1) % 7 + 1
+	return st % 7 + 1
+
+
+## Tagesbelohnung abholen; gibt die Gewinne für die Erfolgsmeldungen zurück
+func claim_daily() -> Array:
+	if daily_claimed_today():
+		return []
+	var day := daily_day()
+	var streak := daily_streak() + 1
+	data["daily_streak"] = streak
+	data["daily_date"] = today()
+	var got: Array = []
+	for r in MetaData.DAILY_REWARDS[day - 1]:
+		got.append(grant(r))
+	if streak % 7 == 0:
+		for r in MetaData.LOYALTY_CHEST:
+			var g := grant(r)
+			g["source"] = "Treue-Truhe · %d Tage" % streak
+			got.append(g)
+	save_game()
+	return got
+
+
+## Einen Gewinn gutschreiben: {type, amount, hero}
+func grant(r: Dictionary) -> Dictionary:
+	var t := str(r["type"])
+	var n := int(r.get("amount", 1))
+	match t:
+		"hero":
+			add_hero_cards(str(r["hero"]), n)
+		"pass":
+			add_pass_points(n)
+		_:
+			add(t, n)
+	return r.duplicate()
+
 
 func daily_ready(key: String) -> bool:
 	return data.get(key, "") != today()

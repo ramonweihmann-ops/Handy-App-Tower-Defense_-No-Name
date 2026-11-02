@@ -74,8 +74,11 @@ func handle(b: Dictionary) -> bool:
 		_finish()
 		return true
 	if label == "Schließen" or str(b.get("href", "")) == "Main.dc.html":
-		# Gewinn ist schon gutgeschrieben, auch wenn man während des Drehens schließt
+		# Gewinn ist schon gutgeschrieben, auch wenn man während des Drehens schließt;
+		# beim Abholen kommt die Erfolgsmeldung
 		menu.close_board(self)
+		if phase in ["spinning", "done"] and not prize.is_empty():
+			menu.reward_success([prize], "Glücksrad")
 		return true
 	return false
 
@@ -111,7 +114,6 @@ func _finish() -> void:
 	_set_phase("done")
 	_show_win()
 	Sfx.play("win")
-	menu.celebrate(MainMenu.reward_icon(prize), "+%d %s" % [int(prize["amount"]), MetaData.REWARD_NAMES.get(prize["type"], "")])
 
 
 func _set_phase(p: String) -> void:

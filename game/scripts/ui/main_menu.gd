@@ -128,6 +128,9 @@ func refresh() -> void:
 
 
 func _process(delta: float) -> void:
+	# Erfolgsmeldung bleibt immer obenauf, auch wenn dahinter ein Fenster neu aufgebaut wird
+	if is_instance_valid(_success) and _success.get_index() != get_child_count() - 1:
+		move_child(_success, -1)
 	_tick += delta
 	if _tick >= 1.0:
 		_tick = 0.0
@@ -477,7 +480,7 @@ func mission_ready() -> bool:
 
 
 func open_daily() -> void:
-	_open_daily()
+	open_board("Taegliche-Belohnung.dc.html")
 
 
 func open_energy() -> void:
@@ -550,6 +553,36 @@ func celebrate(kind: String, text: String, color := Color(1.0, 0.82, 0.3)) -> vo
 		c.fly_to = ic.global_position + ic.size * 0.5 - global_position
 		c.fly_count = 8
 	add_child(c)
+
+
+# --- Erfolgsmeldungen -----------------------------------------------------------------
+
+var _success_queue: Array = []
+var _success: SuccessScreen
+
+
+## Nach jedem Gewinn von Karten oder Rohstoffen: Erfolgsmeldung je Gewinn, nacheinander
+## (items: [{type, amount, hero}], schon gutgeschrieben). chip = Zusatzzeile unten.
+func reward_success(items: Array, source := "", chip := "") -> void:
+	for it in items:
+		if int(it.get("amount", 1)) <= 0:
+			continue
+		_success_queue.append({"item": it, "source": str(it.get("source", source)), "chip": "" if it.has("source") else chip})
+	if not is_instance_valid(_success):
+		_next_success()
+
+
+func _next_success() -> void:
+	if _success_queue.is_empty():
+		_success = null
+		_refresh_top()
+		return
+	var e: Dictionary = _success_queue.pop_front()
+	_success = SuccessScreen.new(e["item"], e["source"], e["chip"])
+	add_child(_success)
+	_success.done.connect(func() -> void:
+		_success.queue_free()
+		_next_success())
 
 
 ## Passendes Symbol zu einer Belohnung ({type, amount}).
@@ -1262,15 +1295,14 @@ func _tab_shop() -> Control:
 		Save.daily_ready("shop_free_date"), func() -> void:
 			Save.add("gold", 100)
 			Save.mark_daily("shop_free_date")
-			celebrate("gold", "+100 Gold")
+			reward_success([{"type": "gold", "amount": 100}], "Angebot des Tages")
 			show_tab("shop")))
 	var chest := MetaData.chest_cards(Save.max_level())
 	v.add_child(_shop_item("cards", "Heldentruhe", "%d zufällige Heldenkarten (wächst mit deinem Fortschritt)" % chest, "%d Edelsteine" % MetaData.SHOP_CHEST_COST,
 		Save.gems() >= MetaData.SHOP_CHEST_COST, func() -> void:
 			if Save.spend("gems", MetaData.SHOP_CHEST_COST):
 				Save.add("cards", chest)
-				celebrate("cards", "+%d Heldenkarten" % chest)
-				_info("Heldentruhe", "%d Heldenkarten erhalten. Schau in der Sammlung nach, wer aufsteigen kann!" % chest)
+				reward_success([{"type": "cards", "amount": chest}], "Heldentruhe")
 			show_tab("shop")))
 	v.add_child(_shop_item("energy", "Energie auffüllen", "Energie sofort auf %d" % MetaData.ENERGY_MAX, "%d Edelsteine" % MetaData.SHOP_ENERGY_COST,
 		Save.gems() >= MetaData.SHOP_ENERGY_COST, _buy_energy))
@@ -1679,7 +1711,7 @@ func open_battle_pass() -> void:
 		var mission_id: String = id
 		var b := _small_button("Erledigt" if done else "Abholen", func() -> void:
 			if Save.claim_mission(mission_id):
-				celebrate("star", "+%d Pass-Punkte" % int(d["points"]))
+				reward_success([{"type": "pass", "amount": int(d["points"])}], "Tägliche Mission")
 			open_battle_pass()
 		, 140)
 		b.disabled = done or prog < int(d["goal"])
@@ -1703,17 +1735,15 @@ func open_battle_pass() -> void:
 	frame.add_child(bottom)
 	var all_btn := _small_button("Alles beanspruchen", func() -> void:
 		var got := []
-		var last := {}
 		for l in Save.pass_claimable():
 			var r := Save.claim_pass(l)
 			if not r.is_empty():
-				got.append(_reward_text(r))
-				last = r
+				got.append(r)
 		open_battle_pass()
 		if got.is_empty():
 			toast("Noch nichts abzuholen.")
 		else:
-			celebrate(reward_icon(last), "%d Belohnungen abgeholt!" % got.size())
+			reward_success(got, "Battle Pass")
 	, 260)
 	all_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	all_btn.disabled = Save.pass_claimable().is_empty()
@@ -1748,7 +1778,7 @@ func _pass_row(lvl: int) -> Control:
 			var r := Save.claim_pass(lvl)
 			open_battle_pass()
 			if not r.is_empty():
-				celebrate(reward_icon(r), _reward_text(r))
+				reward_success([r], "Battle Pass · Stufe %d" % lvl)
 		, 100)
 		btn.custom_minimum_size = Vector2(100, 56)
 		fp.get_child(0).add_child(btn)

@@ -130,10 +130,22 @@ func _run() -> bool:
 			m._open_bestiary()
 			m.show_rewards("Test", "Text", [{"type": "gold", "text": "+5 Gold"}])
 		9:
+			# Tägliche Belohnung: abholen, Erfolgsmeldung muss erscheinen
+			m.open_daily()
+			var board = m._boards[-1]
+			var gold_before: int = save.gold()
+			board._claim()
+			print("SMOKE täglich: tag ", save.daily_day(), " serie ", save.daily_streak(), " abgeholt ", save.daily_claimed_today(),
+				" erfolgsmeldung ", is_instance_valid(m._success), " gold +", save.gold() - gold_before)
+			m._success_queue.clear()
+			if is_instance_valid(m._success):
+				m._success.queue_free()
+			m.close_board(board)
+		10:
 			m._close_modal()
 			main.start_level(1, false)
 			print("SMOKE level gestartet, zustand ", main.state, " energie ", save.energy())
-		10:
+		11:
 			main._on_hero_picked("dusty")
 		200:
 			main._booster_cd[0] = 0.0

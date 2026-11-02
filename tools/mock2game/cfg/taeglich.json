@@ -1,0 +1,62 @@
+{
+ "board": "Taegliche-Belohnung.dc.html",
+ "out": "out/taeglich",
+ "script": "taeglich.js",
+ "states": [
+  {
+   "name": "main",
+   "eval": "tbPrep('main')"
+  },
+  {
+   "name": "abgeholt",
+   "set": {
+    "claimed": true
+   },
+   "eval": "tbPrep('main')"
+  },
+  {
+   "name": "gesperrt",
+   "eval": "tbPrep('locked')"
+  },
+  {
+   "name": "heute",
+   "eval": "tbPrep('today')"
+  }
+ ],
+ "live": [
+  {
+   "sel": "div[data-tb-day]",
+   "id": "day",
+   "img": true,
+   "pad": 10
+  },
+  {
+   "sel": "div[data-tb-day] div[style*=\"width: 50px; height: 44px\"]",
+   "id": "dicon",
+   "img": true,
+   "pad": 6
+  },
+  {
+   "sel": "div[data-tb-t7]",
+   "id": "t7",
+   "img": true,
+   "pad": 12
+  },
+  {
+   "sel": "div[data-tb-t7] div[style*=\"height: 46px; display: grid\"]",
+   "id": "t7icon",
+   "img": true,
+   "pad": 6
+  },
+  {
+   "sel": "button[aria-label^=\"Treue-Truhe\"] > div",
+   "id": "chest",
+   "img": true,
+   "pad": 10
+  },
+  {
+   "sel": "div[aria-hidden=\"true\"][style*=\"width: 34%\"]",
+   "id": "fill"
+  }
+ ]
+}

@@ -338,7 +338,7 @@ func _buy(id: String) -> void:
 		return
 	_armed = ""
 	if Save.unlock_with_gems(id):
-		menu.celebrate("up", "%s ist jetzt dabei!" % name, GameData.HEROES[id]["color"])
+		menu.reward_success([{"type": "hero", "hero": id, "amount": 1, "label": "%s ist jetzt im Team!" % name}], "Neuer Held")
 	refresh()
 
 

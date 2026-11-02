@@ -210,6 +210,20 @@ const GEM_PACKS := [
 	{"gems": 1200, "price": "19,99 €"},
 ]
 
+## Tägliche Belohnung: Gewinne je Tag im 7-Tage-Kalender (wie im Mockup „Tägliche Belohnung“)
+const DAILY_REWARDS := [
+	[{"type": "gold", "amount": 300}],
+	[{"type": "energy", "amount": 10}],
+	[{"type": "gems", "amount": 20}],
+	[{"type": "hero", "hero": "iska", "amount": 6}],
+	[{"type": "gold", "amount": 1000}],
+	[{"type": "energy", "amount": 20}],
+	[{"type": "gems", "amount": 80}, {"type": "gold", "amount": 2000}, {"type": "hero", "hero": "dusty", "amount": 10},
+		{"type": "hero", "hero": "margot", "amount": 10}, {"type": "pass", "amount": 50}],
+]
+## Treue-Truhe alle 7 Tage am Stück
+const LOYALTY_CHEST := [{"type": "gems", "amount": 50}, {"type": "cards", "amount": 12}]
+
 const REWARD_NAMES := {
 	"gold": "Gold", "gems": "Edelsteine", "cards": "Heldenkarten", "stars": "Sterne", "energy": "Energie",
 }
