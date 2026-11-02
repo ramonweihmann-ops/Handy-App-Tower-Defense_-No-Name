@@ -1,0 +1,22 @@
+Erstelle eine einzige detaillierte Gesamtvorschau einer ausgebauten Weltraumbasis mit EXAKT 30 einzelnen, klar voneinander getrennten Champion-Gebäuden. Das angehängte Bild ist die verbindliche Stilreferenz: hochwertiger verspielter stilisierter 3D-Mobilegame-Look, violetter Mondfels, elfenbeinfarbene Science-Fiction-Architektur, goldene Metallkanten, türkis leuchtende Fenster und violette Energie, kleine begrünte Inseln, schöne Beleuchtung. Keine realistische nüchterne Stadt, sondern dieselbe liebevolle hochwertige Modellbau-Optik wie die Vorlage.
+
+LAYOUT: sehr langes Hochformat 1024x3072, eine zusammenhängende nach OBEN erweiterbare Kolonie. EXAKT DREI klar erkennbare einzelne Gebäude nebeneinander pro Reihe, EXAKT ZEHN Reihen übereinander = 30 Gebäude. Gleichbleibender Maßstab über das komplette Bild, orthografische isometrische Ansicht ohne Fluchtpunktverkleinerung. Alle 30 Gebäude vollständig im Bild, keine verdeckten Gebäude. Eine einzige durchgehende felsige Basisplattform mit verzweigten Wegen, keine getrennten Bildkacheln, keine Trennrahmen. Platz zwischen den Reihen für Zugangswege. Große Plattformunterkante mit kleinem Zugang ganz unten; neue Reihen wachsen nach oben. Schmaler Streifen Weltraum oben mit großem angeschnittenem orangeviolettem Planeten, restlicher Hintergrund nur Sterne und Felsen, KEINE zusätzlichen Gebäude außerhalb der 30.
+
+KONTROLLNUMMERN: auf dem Boden direkt VOR jedem Gebäude eine saubere gut lesbare dunkle Plakette mit genau EINER weißen zweistelligen Nummer. Von UNTEN nach OBEN:
+unterste Reihe 01,02,03;
+zweite Reihe 04,05,06;
+dritte 07,08,09;
+vierte 10,11,12;
+fünfte 13,14,15;
+sechste 16,17,18;
+siebte 19,20,21;
+achte 22,23,24;
+neunte 25,26,27;
+oberste 28,29,30.
+Jede Nummer genau einmal, nur Nummern keine sonstige Schrift.
+
+Jedes Gebäude hat eigene gut sichtbare Silhouette und Nutzung. Von 01 bis 30: Kommandozentrale mit großer blauer Kuppel; Sanitätsstation mit leuchtendem Kreuz; Werkstatt mit kleinem Kran; Hologrammakademie mit Stern; violetter Reaktorturm; Kommunikationsstation mit Schüssel; Gewächshaus mit Glasdach; Roboterlabor; Sternwarte mit Teleskop; kleine Schiffswerft; Schildgenerator; Trainingshalle; Kristallforschung; Panzerwerkstatt; Drohnenhangar; Alchemielabor; Energiespeicher; Navigationszentrale; Eisforschung mit Frostkuppel; Feuerforschung mit orangefarbenem Kern; Waffenwerkstatt; Bibliotheksarchiv; Biolabor; Teleportstation; Versorgungsdepot; kleine Veredelungsanlage; kleine Kommandantenresidenz; Satellitenkontrolle; Reparaturdock; besonderes Heldenmonument als begehbares Hallengebäude.
+Gebäudeteile gehören sichtbar zusammen zu genau einem Baukörper, nicht zufällig mehrere kleine Häuser pro Stellplatz. Keine Spielfiguren, keine Bedienoberfläche, keine Menüs, keine Buttons. Diese Grafik ist eine nummerierte Entwurfsvorschau zur Kontrolle der maximalen Gebäudezahl und Anordnung, kein fertiger Spiel-Export.
+
+Korrekturdurchgang: Nur Kontrollnummern der zweiten Reihe von oben auf 25, 26, 27 korrigieren. Integrierte Bildfunktion verwendet. Nur Entwurfsvorschau; noch keine Freigabe oder Veröffentlichung auf GitHub.
+
