@@ -1,0 +1,85 @@
+# Prüfung der GLB-Vorgaben (Claude, 02.11.2026)
+
+Geprüft: `README_FUER_CLAUDE.md` und `PRODUKTIONSVORGABEN.json` gegen den Spielcode
+(`game/scripts/battle/hero.gd`, `enemy.gd`, `models.gd`, `game/scripts/ui/hero_view_3d.gd`).
+
+**Ergebnis:** Die Vorgaben passen in den Grundzügen (GLB, Y oben, 2 Einheiten, Ursprung zwischen den
+Füßen, eingebettete Texturen bis 1024, Animationen ohne Vorwärtsbewegung, Lizenznachweis). Es fehlen
+einige Punkte, ohne die das Spiel die Modelle nicht sauber nutzen kann, und es gibt einen inhaltlichen
+Widerspruch bei drei Waffen.
+
+## 1. Waffen: Design und Spielmechanik passen bei drei Helden nicht zusammen
+
+Im Spiel hat jeder Held eine Waffenart mit eigener Wirkung (`GameData.HEROES`, `family`):
+
+| Held | im Spiel | im freigegebenen Design | passt? |
+|---|---|---|---|
+| Dusty Jo | Revolver | Revolver | ja |
+| Iska | Maschinengewehr (Dauerfeuer) | Sturmgewehr | ja |
+| Brocken | Raketenwerfer (Flächenschaden) | Raketenwerfer | ja |
+| Volta | **Blitzwerfer** (Kettenblitz) | Pistole + Diagnosegerät | **nein** |
+| Kalle | **Eiskanone** (verlangsamt) | Pistole | **nein** |
+| Käpt'n Margot | Schrotflinte | Doppelflinte | ja |
+| Lynx | Präzisionsgewehr | Scharfschützengewehr | ja |
+| Fritzi | **Flammenwerfer** (Kegel, Brand) | hölzerne Doppelflinte | **nein** |
+
+Entscheidung nötig, bevor modelliert wird. Vorschlag ohne Laser und Plasma: Wirkung behalten, Waffe
+mechanisch aussehen lassen. Volta: Pistole mit Spule am Lauf (Funkenschuss) + Diagnosegerät. Kalle:
+Pistole mit Kühlzylinder (Frostmunition). Fritzi: Doppelflinte mit Brandmunition, dann zwei
+Doppelflinten im Team; oder Fritzi behält einen klassischen, mechanischen Flammenwerfer mit Tank.
+
+## 2. Ergänzungen für die GLB-Dateien
+
+**Waffe und Mündung**
+- Waffe als eigenes Mesh-Objekt `Weapon`, im Rig an den Knochen der rechten Hand gehängt (nicht in
+  den Körper eingeschmolzen). Zweihändige Waffen bleiben an der rechten Hand, die linke Hand greift mit.
+- Ein leeres Objekt **`Muzzle`** an der Laufmündung (Kindobjekt der Waffe). Dort erscheinen Schüsse,
+  Mündungsfeuer und Raketen. Ohne `Muzzle` schießen die Kugeln aus der falschen Stelle.
+
+**Knochennamen**
+- Einheitlich in allen acht Helden, menschliches Standardskelett. Mindestens eindeutig benannt:
+  rechte Hand, linke Hand, linker und rechter Fuß, Kopf. Mixamo-Namen (`mixamorig:RightHand` …) sind
+  in Ordnung. Das Spiel braucht Hand (Waffe) und Füße (Figur steht im Menü auf dem Boden).
+
+**Blickrichtung**
+- Figur schaut in glTF-Vorwärtsrichtung (+Z), wie die bisherigen Modelle. Alle acht gleich.
+
+**Animationen: genauer festlegen**
+- `Idle`, `Run`, `Hit`: in Schleife, auf der Stelle (keine Wurzelbewegung).
+- `Shoot`: beginnt im **Zielanschlag** (Waffe auf Brusthöhe nach vorn), dann Rückstoß, zurück in den
+  Anschlag, **0,3–0,5 s**. Die Helden stehen im Kampf die ganze Zeit im Anschlag und spielen nur den
+  Rückstoß; das Spiel pausiert dazu im Anschlag. Iska (Dauerfeuer) zusätzlich schleifenfähig.
+- `Death`: endet liegend und bleibt im letzten Bild.
+- **Zusätzlich für die Menüs: `Victory`** (Siegerpose, Schleife, 2–4 s). Die Heldenseiten zeigen heute
+  je Held eine Pose (Jubeln, Sprung, Schuss); ohne `Victory` stehen die Helden dort nur im Idle.
+- Optional `Special` (Superfähigkeit, 0,6–1,0 s).
+
+**Dreiecke: niedriger als 15.000 ansetzen**
+- Im Kampf sind bis zu 3 Helden und über 20 Gegner gleichzeitig zu sehen, auf älteren Handys mit
+  einfachem Renderer. 15.000 je Held ist die Obergrenze, Ziel **8.000–12.000** je Held.
+- Gegner (wenn sie neu kommen): leicht **≤ 3.000**, mittel **≤ 5.000**, stark **≤ 7.000**, Boss **≤ 12.000**.
+
+**Materialien**
+- Möglichst **ein Material und eine Textur** je Figur (Atlas), höchstens zwei (Körper, Waffe).
+- Keine eigenen Lichter, Kameras oder Hilfsobjekte in der Datei (außer `Muzzle`).
+
+## 3. Stil: großer Wechsel gegenüber dem jetzigen Spiel
+
+Die Freigabe zeigt erwachsene, schlanke Figuren. Die Helden im Spiel sind derzeit kindlich-runde
+Low-Poly-Figuren (großer Kopf). Wird umgestellt, ändern sich auch alle Heldenbilder in den Menüs und
+Mockups (Heldenseiten, Karten, Rundbilder). Die rendere ich dann aus den neuen Modellen neu.
+Die Figuren sind deutlich schmaler; ich prüfe nach dem ersten Modell, ob sie aus der Kampfkamera noch
+gut lesbar sind, und passe bei Bedarf die Größe im Spiel an.
+
+## 4. Lieferumfang je Held (Checkliste)
+
+- `<id>.glb` (Namen wie in `PRODUKTIONSVORGABEN.json`)
+- kurze Lizenznotiz: Werkzeug, Tarif zum Zeitpunkt der Erzeugung, Nutzungsbedingungen (Link, Datum),
+  Herkunft der Animationen (z. B. Mixamo), Namensnennung falls nötig
+- ein Bild von vorn und von der Seite aus Blender zur schnellen Kontrolle
+
+## 5. Empfehlung zum Ablauf
+
+Zuerst **nur Dusty Jo** komplett liefern. Ich baue ihn ein, teste Laufen, Drehen, Anschlag, Schuss,
+Treffer, Tod, Menüpose und die Leistung, und melde die nötigen Korrekturen. Erst dann die übrigen
+sieben im selben Ablauf mit denselben Einstellungen.
