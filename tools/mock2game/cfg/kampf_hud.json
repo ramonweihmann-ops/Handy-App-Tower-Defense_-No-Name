@@ -1,4 +1,4 @@
-{"board":"Kampf-2-Helden.dc.html","out":"out/kampf_hud","states":[{"name":"main"}],
+{"board":"Feld-space-dock.dc.html","out":"out/kampf_hud","states":[{"name":"main"}],
  "only":["#dc-root > div > div[style*=\"top: 522px\"]","#dc-root > div > svg[style*=\"top: 552px\"]","#dc-root > div > div[style*=\"top: 532px\"]",
    "#dc-root > div > div[style*=\"top: 12px\"]","#dc-root > div > div[style*=\"right: 10px; top: 56px\"]",
    "#dc-root > div > svg[style*=\"top: 716px\"]","#dc-root > div > div[style*=\"top: 786px\"]",
