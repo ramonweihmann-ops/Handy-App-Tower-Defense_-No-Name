@@ -148,7 +148,11 @@ func _run() -> bool:
 				main.battle.fence_hp = 1.0
 				main.battle.damage_fence(5.0)
 			elif step == 620:
-				print("SMOKE ergebnis, zustand ", main.state, " gold ", save.gold(), " karten dusty ", save.hero_cards("dusty"))
+				print("SMOKE ergebnis, zustand ", main.state, " gold ", save.gold(), " karten dusty ", save.hero_cards("dusty"),
+					" fenster ", main._screen.get_class() if main._screen else "keins", " ", (main._screen as ResultScreen) != null)
+				main._show_result(true, {"gold": 1200, "stars": 3, "pass": 20, "cards": [{"hero": "dusty", "amount": 7}, {"hero": "iska", "amount": 7}]})
+			elif step == 630:
+				print("SMOKE sieg-fenster: ", (main._screen as ResultScreen) != null)
 				main.show_menu()
 			elif step == 640:
 				print("SMOKE zurück im menü: ", main.menu.visible, " ", main.state)

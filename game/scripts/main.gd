@@ -941,17 +941,7 @@ func _on_level_won() -> void:
 		return
 	state = "result"
 	_apply_speed(1)
-	var title := "Geschafft!"
-	var text := "Die Station hält. Level %d ist geschafft." % level
-	if GameData.is_boss_level(level):
-		var boss: String = GameData.enemy_name(GameData.WORLDS[GameData.world_of(level)]["kinds"][3], level)
-		title = "%s ist besiegt!" % boss
-		text = "Die %s ist befreit." % GameData.world_name(level)
-		if level == GameData.LEVEL_COUNT:
-			text += " Alle Level des Piloten sind geschafft – jetzt wartet der Schwer-Modus!"
-		elif level == GameData.LEVELS_PER_WORLD:
-			text += " Das Wurmloch öffnet sich zur nächsten Welt, und der Schwer-Modus ist frei."
-	_show_result(title, text, true, _grant_rewards(true))
+	_show_result(true, _grant_rewards(true))
 
 
 func _on_level_lost() -> void:
@@ -961,41 +951,32 @@ func _on_level_lost() -> void:
 		return
 	state = "result"
 	_apply_speed(1)
-	_show_result("Der Schild ist gefallen", "Versuch eine andere Kartenwahl. Oft hilft mehr Plasma, zum Beispiel über die Karten nach jeder Welle.", false, _grant_rewards(false))
+	_show_result(false, _grant_rewards(false))
 
 
-func _show_result(title: String, text: String, won: bool, rewards: Array = []) -> void:
+## Belohnungsfenster nach dem Kampf (Mockups „Belohnung nach dem Sieg / der Niederlage“)
+func _show_result(won: bool, rewards: Dictionary) -> void:
 	Sfx.play("win" if won else "lose", 0.0)
-	var s := _full_screen()
-	s.add_child(UiKit.dim(0.65))
-	var v := _centered(s, 18)
-	v.custom_minimum_size = Vector2(600, 0)
-	v.add_child(UiKit.label(title, 44, UiKit.C_GOLD if won else Color(1.0, 0.5, 0.45)))
-	var t := UiKit.wrap_label(text, 24)
-	t.custom_minimum_size = Vector2(580, 0)
-	v.add_child(t)
-	var secs := int(battle.elapsed)
-	v.add_child(UiKit.label("Besiegt: %d  ·  Zeit: %d:%02d  ·  Welle %d/%d" % [battle.kills, secs / 60, secs % 60, battle.wave, battle.total_waves], 22, UiKit.C_MUTED))
-	if not rewards.is_empty():
-		var grid := GridContainer.new()
-		grid.columns = 2
-		grid.add_theme_constant_override("h_separation", 24)
-		grid.add_theme_constant_override("v_separation", 6)
-		for r in rewards:
-			var row := HBoxContainer.new()
-			var kind: String = {"gold": "gold", "gems": "gem", "stars": "star", "pass": "pass"}.get(r["type"], "cards")
-			row.add_child(Icon.make(kind, 34))
-			row.add_child(UiKit.label(str(r["text"]), 21, UiKit.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT))
-			grid.add_child(row)
-		var gc := CenterContainer.new()
-		gc.add_child(grid)
-		v.add_child(gc)
-	var cost := " · %d Energie" % MetaData.ENERGY_COST
-	if won and level < GameData.LEVEL_COUNT:
-		v.add_child(UiKit.button("Weiter zu Level %d%s" % [level + 1, cost], func() -> void: start_level(level + 1, hard), 460))
-	v.add_child(UiKit.secondary(UiKit.button("Nochmal" + cost, func() -> void: start_level(level, hard), 460)))
-	v.add_child(UiKit.secondary(UiKit.button("Zum Menü", show_menu, 460)))
-	_set_screen(s)
+	var info := rewards.duplicate()
+	info["level"] = level
+	info["world"] = GameData.world_name(level)
+	info["boss"] = GameData.is_boss_level(level)
+	info["kills"] = battle.kills
+	info["secs"] = int(battle.elapsed)
+	info["shield"] = battle.fence_hp / maxf(1.0, battle.fence_max)
+	info["wave"] = battle.wave
+	info["waves"] = battle.total_waves
+	info["last_level"] = level >= GameData.LEVEL_COUNT
+	# Kampfanzeige ausblenden, das Fenster liegt über dem abgedunkelten Schlachtfeld
+	hud.visible = false
+	var r := ResultScreen.new(won, info)
+	r.next_pressed.connect(func() -> void: start_level(level + 1, hard))
+	r.retry_pressed.connect(func() -> void: start_level(level, hard))
+	r.menu_pressed.connect(show_menu)
+	r.heroes_pressed.connect(func() -> void:
+		show_menu()
+		menu.show_tab("sammlung"))
+	_set_screen(r)
 
 
 func _finish_autotest(result: String) -> void:
@@ -1034,26 +1015,26 @@ func _exit_tree() -> void:
 
 # --- Belohnungen nach dem Kampf ------------------------------------------------
 
-## Vergibt Belohnungen und gibt sie als Liste für die Anzeige zurück.
-func _grant_rewards(won: bool) -> Array:
+## Vergibt Belohnungen und gibt die Werte für das Belohnungsfenster zurück.
+func _grant_rewards(won: bool) -> Dictionary:
 	var mult := (1.5 if hard else 1.0) * (1.0 + float(bonus.get("gold", 0.0)))
-	var out: Array = []
+	var out := {"gold": 0, "stars": 0, "pass": 0, "cards": []}
 	# Abgestimmt mit scripts/economy-sim.py: ohne Käufe reicht das Gold für die Heldenstufen,
 	# von denen die Schwierigkeitskurve ausgeht. Bei Niederlage gibt es einen Trostpreis.
 	var gold := int(round((battle.kills * 2 + (MetaData.win_gold(level) if won else MetaData.LOSS_GOLD)) * mult))
 	Save.data["gold"] = Save.gold() + gold
-	out.append({"type": "gold", "text": "+%d Gold" % gold})
+	out["gold"] = gold
 	for h in battle.heroes:
 		var n := MetaData.win_cards(level) if won else MetaData.win_cards(level) / 2
 		Save.add_hero_cards(h.id, n)
-		out.append({"type": "cards", "text": "+%d %s" % [n, h.data["name"]]})
+		out["cards"].append({"hero": h.id, "amount": n})
 	if won:
 		var first := Save.level_won(level, hard)
 		var stars := 3 if first else 1
 		Save.data["stars"] = Save.stars() + stars
-		out.append({"type": "stars", "text": "+%d %s" % [stars, "Sterne" if stars > 1 else "Stern"]})
+		out["stars"] = stars
 		Save.track("wins")
 		Save.add_pass_points(MetaData.PASS_WIN_POINTS)
-		out.append({"type": "pass", "text": "+%d Pass-Punkte" % MetaData.PASS_WIN_POINTS})
+		out["pass"] = MetaData.PASS_WIN_POINTS
 	Save.save_game()
 	return out

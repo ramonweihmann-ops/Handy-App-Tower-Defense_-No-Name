@@ -1,0 +1,8 @@
+{"board": "Belohnung-Sieg.dc.html", "out": "out/belohnung_sieg",
+ "states": [{"name": "main", "eval": "document.querySelectorAll('#dc-root > div > img, #dc-root > div > div[style*=\"inset: 0\"]').forEach(e => e.remove()); document.querySelectorAll('.pop').forEach(e => { e.style.animation = 'none'; }); document.querySelectorAll('[style*=\"animation\"]').forEach(e => { e.style.animation = 'none'; });"}],
+ "only": ["#dc-root > div > *"],
+ "live": [
+  {"sel": "div[style*=\"repeating-conic-gradient\"]", "id": "rays", "img": true, "pad": 0},
+  {"sel": ".pop[style*=\"gap: 5px\"]", "id": "hero"},
+  {"sel": "div[style*=\"width: 18px; height: 18px\"]", "id": "badge", "img": true, "pad": 2}
+ ]}
