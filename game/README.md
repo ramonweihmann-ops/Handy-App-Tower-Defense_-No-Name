@@ -71,7 +71,7 @@ Versionsname über `VNAME=…`. Später ersetzt Google Play diesen Weg.
 ## Tempo und Leistung
 
 - Tempo je Stufe in `TEMPO_SCALE` (`main.gd`): x1 = 68 %, x2 = 120 %, x3 = 180 % der Rechengeschwindigkeit. x3 gibt es nur in der Testphase; später erst etwa ab Level 100.
-- Grafik „Hoch“ (Leuchten, Schatten) oder „Sparsam“, umschaltbar in den Einstellungen. Treffer-Funken nur bei kritischen Treffern, höchstens 55 Geschosse gleichzeitig, Formen und Materialien von Geschossen werden wiederverwendet.
+- Grafik „Hoch“ (Leuchten, Schatten, Stations-Inseln neben der Brücke) oder „Sparsam“ (ohne), umschaltbar in den Einstellungen. Treffer-Funken nur bei kritischen Treffern, höchstens 55 Geschosse gleichzeitig, Formen und Materialien von Geschossen werden wiederverwendet.
 - Im breiten Fenster bleibt das Spiel eine Hochformat-Spalte in der Mitte.
 
 ## Android-Build

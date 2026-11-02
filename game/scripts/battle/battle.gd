@@ -81,13 +81,16 @@ func _apply_world() -> void:
 		_rim.light_color = w["rim"]
 
 
-## Grafikstufe aus den Einstellungen: Hoch = Leuchten und Schatten, Sparsam = ohne.
+## Grafikstufe aus den Einstellungen: Hoch = Leuchten, Schatten und Stations-Inseln,
+## Sparsam = ohne (spart Rechenzeit auf älteren Handys).
 func apply_quality() -> void:
 	var high: bool = Save.data.get("quality", "hoch") == "hoch"
 	if _env:
 		_env.glow_enabled = high
 	if _sun:
 		_sun.shadow_enabled = high
+	for o in _islands:
+		o.visible = high
 
 
 # --- Ablauf ----------------------------------------------------------------
@@ -523,6 +526,8 @@ func _animate_world(delta: float) -> void:
 	# Stations-Inseln schweben leicht auf und ab
 	var t := Time.get_ticks_msec() * 0.001
 	for o in _islands:
+		if not o.visible:
+			continue
 		o.position.y = float(o.get_meta("base_y")) + sin(t * 0.6 + float(o.get_meta("phase"))) * 0.18
 
 
