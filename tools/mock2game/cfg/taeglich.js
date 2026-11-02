@@ -13,7 +13,7 @@ window.tbPrep = function (mode) {
   const todayT = kids.find(k => k.textContent.includes('HEUTE'));
   if (mode !== 'main' && lockedT && todayT) {
     const srcIcon = [kids[4], kids[5], todayT, kids[3], kids[4], kids[5]].map(iconOf);
-    const amounts = ['×300', '×10', '×20', '×6', '×1.000', '×20'];
+    const amounts = ['×150', '×5', '×10', '×5', '×300', '×10'];
     for (let i = 0; i < 6; i++) {
       const tpl = (mode === 'locked' ? lockedT : todayT).cloneNode(true);
       const ic = iconOf(tpl); if (ic && srcIcon[i]) ic.replaceWith(srcIcon[i].cloneNode(true));

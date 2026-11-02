@@ -27,7 +27,7 @@ TECH = [100, 200, 350, 550, 800, 1100, 1500, 2000, 2600, 3300]
 AMMO = {"rate": (10, 80), "cap": (10, 60), "start": (10, 50), "lever": (5, 150), "count": (3, 500), "gate": (2, 1200)}
 BOOSTER_COST = lambda lvl: 200 * lvl
 BOOSTER_MAX = 5
-DAILY_GOLD = 150 + 100               # tägliche Belohnung + Gratis-Angebot im Shop
+DAILY_GOLD = 150 + 100               # Tagesbelohnung (7-Tage-Kalender: 1.050 Gold je Woche) + Gratis-Angebot im Shop
 WHEEL_GOLD = 120                     # grober Mittelwert pro Dreh (1x täglich)
 PASS_GOLD_PER_DAY = 90               # grob: Missionen -> Pass-Stufen, davon Gold-Anteil
 

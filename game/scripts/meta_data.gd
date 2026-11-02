@@ -210,19 +210,23 @@ const GEM_PACKS := [
 	{"gems": 1200, "price": "19,99 €"},
 ]
 
-## Tägliche Belohnung: Gewinne je Tag im 7-Tage-Kalender (wie im Mockup „Tägliche Belohnung“)
+## Tägliche Belohnung: Gewinne je Tag im 7-Tage-Kalender (Mockup „Tägliche Belohnung“).
+## Abgestimmt auf die Wirtschaft (scripts/economy-sim.py): eine volle Woche bringt so viel Gold
+## und Edelsteine wie früher die feste Tagesbelohnung (7 × 150 Gold, 7 × 10 Edelsteine), nur mit
+## Höhepunkt an Tag 7 und Treue-Truhe. Edelsteine sind die Kaufwährung (80 = 1,99 €) und bleiben
+## deshalb knapp; Energie und Karten sind ein kleiner Zusatz (15 Energie = 3 Kämpfe je Woche).
 const DAILY_REWARDS := [
+	[{"type": "gold", "amount": 150}],
+	[{"type": "energy", "amount": 5}],
+	[{"type": "gems", "amount": 10}],
+	[{"type": "hero", "hero": "iska", "amount": 5}],
 	[{"type": "gold", "amount": 300}],
 	[{"type": "energy", "amount": 10}],
-	[{"type": "gems", "amount": 20}],
-	[{"type": "hero", "hero": "iska", "amount": 6}],
-	[{"type": "gold", "amount": 1000}],
-	[{"type": "energy", "amount": 20}],
-	[{"type": "gems", "amount": 80}, {"type": "gold", "amount": 2000}, {"type": "hero", "hero": "dusty", "amount": 10},
-		{"type": "hero", "hero": "margot", "amount": 10}, {"type": "pass", "amount": 50}],
+	[{"type": "gems", "amount": 40}, {"type": "gold", "amount": 600}, {"type": "hero", "hero": "dusty", "amount": 6},
+		{"type": "hero", "hero": "margot", "amount": 6}, {"type": "pass", "amount": 30}],
 ]
-## Treue-Truhe alle 7 Tage am Stück
-const LOYALTY_CHEST := [{"type": "gems", "amount": 50}, {"type": "cards", "amount": 12}]
+## Treue-Truhe alle 7 Tage am Stück (zusammen mit Tag 7: 70 Edelsteine je Woche wie bisher)
+const LOYALTY_CHEST := [{"type": "gems", "amount": 20}, {"type": "cards", "amount": 8}]
 
 const REWARD_NAMES := {
 	"gold": "Gold", "gems": "Edelsteine", "cards": "Heldenkarten", "stars": "Sterne", "energy": "Energie",

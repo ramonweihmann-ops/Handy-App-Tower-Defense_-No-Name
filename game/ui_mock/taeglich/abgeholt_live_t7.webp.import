@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bg1hhk5vmiiyj"
-path="res://.godot/imported/abgeholt_live_chest.webp-97e8ce2031537095dff3ffe96fbe886a.ctex"
+uid="uid://bitrah54qntxd"
+path="res://.godot/imported/abgeholt_live_t7.webp-7f34d1211e197909f1785f0d5391d74c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui_mock/taeglich/abgeholt_live_chest.webp"
-dest_files=["res://.godot/imported/abgeholt_live_chest.webp-97e8ce2031537095dff3ffe96fbe886a.ctex"]
+source_file="res://ui_mock/taeglich/abgeholt_live_t7.webp"
+dest_files=["res://.godot/imported/abgeholt_live_t7.webp-7f34d1211e197909f1785f0d5391d74c.ctex"]
 
 [params]
 

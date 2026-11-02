@@ -212,7 +212,7 @@ func handle(b: Dictionary) -> bool:
 		return true
 	var label := str(b.get("label", ""))
 	if label.begins_with("Treue-Truhe"):
-		menu.toast("Treue-Truhe: 50 Edelsteine und 12 Heldenkarten für jede volle Woche am Stück")
+		menu.toast("Treue-Truhe: 20 Edelsteine und 8 Heldenkarten für jede volle Woche am Stück")
 		return true
 	return false
 
