@@ -8,8 +8,9 @@ Alle Modelle sind von **Quaternius** (https://quaternius.com) und stehen unter *
 | `heroes/` | Ultimate Animated Character Pack | Cowboy_Male, BlueSoldier_Female, Worker_Male, Doctor_Female_Young, Casual3_Male, Pirate_Female, Soldier_Female, Worker_Female |
 | `enemies/` | Ultimate Animated Character Pack | Zombie_Male, Zombie_Female |
 | `enemies/` | Ultimate Monsters (Blob, Flying, Big) | GreenBlob, GreenSpikyBlob, PinkBlob, Squidle, Orc, Yeti, Dragon_Evolved (Drache im Ladebildschirm) |
+| `station/` | Ultimate Space Kit (Environment) | Rock_Large_1, Base_Large, GeodesicDome, SolarPanel_Structure, SolarPanel_Ground, Roof_Radar, Roof_Antenna, Building_L, House_Cylinder, Rock_1–4 (Stations-Inseln und Felsbrocken neben der Brücke) |
 | `guns/` | Toon Shooter Game Kit (Guns) | Revolver, AK, RocketLauncher, Shotgun, Sniper, GrenadeLauncher, ShortCannon |
 
-Geladen am 31.10.2026 aus den öffentlichen Google-Drive-Ordnern, die auf quaternius.com verlinkt
+Geladen am 31.10.2026 (Station am 02.11.2026) aus den öffentlichen Google-Drive-Ordnern, die auf quaternius.com verlinkt
 sind. Zuordnung zu Helden und Gegnern: `scripts/battle/models.gd`. Die Hautfarbe der Figuren
 (Material „Skin“) wird im Spiel je Held bzw. für Zombies umgefärbt.

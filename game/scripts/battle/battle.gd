@@ -520,6 +520,10 @@ func _animate_world(delta: float) -> void:
 	for i in _asteroids.size():
 		_asteroids[i].rotate_y(delta * (0.1 + 0.05 * i))
 		_asteroids[i].rotate_x(delta * 0.07)
+	# Stations-Inseln schweben leicht auf und ab
+	var t := Time.get_ticks_msec() * 0.001
+	for o in _islands:
+		o.position.y = float(o.get_meta("base_y")) + sin(t * 0.6 + float(o.get_meta("phase"))) * 0.18
 
 
 func _build_world() -> void:
@@ -661,17 +665,18 @@ func _build_world() -> void:
 	beacon.visible = false
 	add_child(beacon)
 
-	# Asteroiden und ein Planet im Hintergrund
-	var rock_mat := Fx.mat(Color(0.42, 0.36, 0.34), 0.0, 0.1, 0.9)
+	# Felsbrocken (Modelle aus dem Weltraum-Paket, grau-violett wie im Mockup)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 7
 	for k in 12:
 		var side := -1.0 if k % 2 == 0 else 1.0
-		var rock := Fx.sphere(rng.randf_range(0.5, 1.6), rock_mat, 7, 4)
+		var rock := _station_model("Rock_%d" % (k % 4 + 1), rng.randf_range(0.25, 0.6))
 		rock.position = Vector3(side * rng.randf_range(8.0, 15.0), rng.randf_range(-5.0, 3.0), rng.randf_range(-36.0, 4.0))
-		rock.scale = Vector3(1.0, rng.randf_range(0.6, 0.9), rng.randf_range(0.8, 1.2))
+		rock.rotation = Vector3(rng.randf() * TAU, rng.randf() * TAU, rng.randf() * TAU)
+		_tint_rock(rock)
 		add_child(rock)
 		_asteroids.append(rock)
+	_stations()
 	# Planeten wie im Mockup: großer Lava-Planet links, Eisplanet mit Ring rechts oben
 	var lava := _noise_tex(3, 0.012, PackedColorArray([Color(0.35, 0.08, 0.06), Color(0.85, 0.35, 0.15), Color(1.0, 0.75, 0.45), Color(0.6, 0.2, 0.12)]), PackedFloat32Array([0.0, 0.4, 0.6, 1.0]))
 	_planet(Vector3(-27.0, -6.0, -40.0), 17.0, lava, Color(1.0, 0.55, 0.35))
@@ -686,6 +691,61 @@ func _build_world() -> void:
 	pring.material_override = rm
 	pring.rotation_degrees = Vector3(14, 0, -18)
 	p2.add_child(pring)
+
+
+## Schwebende Felsinseln mit Stationsteilen neben der Brücke (wie im Mockup „Kampf“):
+## links Basis mit Radar, Kuppel und Solarfeld, rechts Wohnmodule mit Antenne und Solarpanels,
+## weiter hinten zwei kleine Inseln. Teile: [Modell, Lage auf der Insel, Größe, Drehung]
+const ISLANDS := [
+	[Vector3(-7.4, -0.6, -11.5), 35.0, 0.36, [["Base_Large", Vector3(-1, 0, -0.5), 0.6, 0.0], ["GeodesicDome", Vector3(2.6, 0, 1.6), 0.42, 0.0], ["SolarPanel_Structure", Vector3(-1.2, 0, 3.4), 0.5, 30.0], ["Roof_Radar", Vector3(-1, 2.95, -0.5), 0.55, 40.0]]],
+	[Vector3(8.4, -0.8, -16.0), -30.0, 0.4, [["Building_L", Vector3(-1.5, 0, -0.5), 0.5, 0.0], ["House_Cylinder", Vector3(2.2, 0, 1.8), 0.6, 0.0], ["SolarPanel_Ground", Vector3(0.0, 0, 3.4), 0.6, 15.0], ["Roof_Antenna", Vector3(-1.5, 2.15, -0.5), 0.6, 0.0]]],
+	[Vector3(-8.0, 2.0, -28.0), 60.0, 0.26, [["GeodesicDome", Vector3(0, 0, 0), 0.45, 0.0]]],
+	[Vector3(8.0, 2.8, -30.0), -50.0, 0.26, [["SolarPanel_Structure", Vector3(0, 0, 0), 0.6, 0.0]]],
+]
+const ROCK_TINT := Color(0.4, 0.38, 0.52)
+var _islands: Array[Node3D] = []
+
+
+func _stations() -> void:
+	for k in ISLANDS.size():
+		var d: Array = ISLANDS[k]
+		var o := Node3D.new()
+		o.position = d[0]
+		o.rotation_degrees.y = d[1]
+		o.scale = Vector3.ONE * float(d[2])
+		o.set_meta("base_y", float(d[0].y))
+		o.set_meta("phase", k * 1.7)
+		add_child(o)
+		var rock := _station_model("Rock_Large_1", 1.25)
+		rock.position = Vector3(0, -0.4, 0)
+		rock.rotation_degrees = Vector3(180, 0, 0)
+		_tint_rock(rock)
+		o.add_child(rock)
+		for pt in d[3]:
+			var m := _station_model(pt[0], pt[2])
+			m.position = pt[1]
+			m.rotation_degrees.y = pt[3]
+			o.add_child(m)
+		_islands.append(o)
+
+
+func _station_model(file: String, sc: float) -> Node3D:
+	var n: Node3D = (load("res://models/station/%s.gltf" % file) as PackedScene).instantiate()
+	n.scale = Vector3.ONE * sc
+	return n
+
+
+## Felsen ohne Wüstenfarbe: einfarbig grau-violett
+func _tint_rock(n: Node) -> void:
+	if n is MeshInstance3D:
+		var mi := n as MeshInstance3D
+		var m := StandardMaterial3D.new()
+		m.albedo_color = ROCK_TINT
+		m.roughness = 1.0
+		for i in mi.mesh.get_surface_count():
+			mi.set_surface_override_material(i, m)
+	for c in n.get_children():
+		_tint_rock(c)
 
 
 ## Rauschtextur für Planetenoberflächen
