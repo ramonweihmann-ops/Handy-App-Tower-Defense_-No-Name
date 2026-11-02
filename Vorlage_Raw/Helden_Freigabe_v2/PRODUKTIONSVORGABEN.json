@@ -1,0 +1,100 @@
+{
+  "status": "Design freigegeben; echte 3D-Produktion ausstehend",
+  "design_reference": "helden_design_freigegeben.png",
+  "format": "glTF 2.0 / GLB",
+  "textures_embedded": true,
+  "up_axis": "Y",
+  "approx_height_units": 2,
+  "max_triangles_including_weapon": 15000,
+  "max_texture_width": 1024,
+  "max_texture_height": 1024,
+  "hero_animations": [
+    "Idle",
+    "Run",
+    "Shoot",
+    "Hit",
+    "Death"
+  ],
+  "enemy_animations": [
+    "Walk",
+    "Attack",
+    "Hit",
+    "Death"
+  ],
+  "license_status": "Kommerzielle Nutzung gefordert; für spätere GLBs noch nachzuweisen",
+  "heroes": [
+    {
+      "id": "dusty_jo",
+      "name": "Dusty Jo",
+      "target_file": "dusty_jo.glb",
+      "weapon": "Revolver",
+      "model_status": "nicht erstellt",
+      "rig_status": "nicht erstellt",
+      "animation_status": "nicht erstellt"
+    },
+    {
+      "id": "iska",
+      "name": "Iska",
+      "target_file": "iska.glb",
+      "weapon": "Sturmgewehr mit gebogenem Magazin",
+      "model_status": "nicht erstellt",
+      "rig_status": "nicht erstellt",
+      "animation_status": "nicht erstellt"
+    },
+    {
+      "id": "brocken",
+      "name": "Brocken",
+      "target_file": "brocken.glb",
+      "weapon": "Mehrfach-Raketenwerfer",
+      "model_status": "nicht erstellt",
+      "rig_status": "nicht erstellt",
+      "animation_status": "nicht erstellt"
+    },
+    {
+      "id": "volta",
+      "name": "Volta",
+      "target_file": "volta.glb",
+      "weapon": "Pistole und Diagnosegerät",
+      "model_status": "nicht erstellt",
+      "rig_status": "nicht erstellt",
+      "animation_status": "nicht erstellt"
+    },
+    {
+      "id": "kalle",
+      "name": "Kalle",
+      "target_file": "kalle.glb",
+      "weapon": "Pistole",
+      "model_status": "nicht erstellt",
+      "rig_status": "nicht erstellt",
+      "animation_status": "nicht erstellt"
+    },
+    {
+      "id": "kaeptn_margot",
+      "name": "Käpt'n Margot",
+      "target_file": "kaeptn_margot.glb",
+      "weapon": "Doppelläufige Schrotflinte",
+      "model_status": "nicht erstellt",
+      "rig_status": "nicht erstellt",
+      "animation_status": "nicht erstellt"
+    },
+    {
+      "id": "lynx",
+      "name": "Lynx",
+      "target_file": "lynx.glb",
+      "weapon": "Scharfschützengewehr mit Zielfernrohr",
+      "model_status": "nicht erstellt",
+      "rig_status": "nicht erstellt",
+      "animation_status": "nicht erstellt"
+    },
+    {
+      "id": "fritzi",
+      "name": "Fritzi",
+      "target_file": "fritzi.glb",
+      "weapon": "Hölzerne doppelläufige Flinte",
+      "model_status": "nicht erstellt",
+      "rig_status": "nicht erstellt",
+      "animation_status": "nicht erstellt"
+    }
+  ]
+}
+
