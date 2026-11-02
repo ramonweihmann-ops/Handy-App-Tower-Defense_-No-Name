@@ -1,0 +1,50 @@
+[
+  {
+    "datei": "desert_outpost.png",
+    "breite": 780,
+    "hoehe": 1688,
+    "umgebung_ausserhalb_brueckenmaske_unveraendert": true,
+    "untere_plattform_pixelgleich": true,
+    "sha256": "77d4fa1bdbd8db126adefcdae1042df407d74dcec01e0045902a59461bbecc18"
+  },
+  {
+    "datei": "ice_world.png",
+    "breite": 780,
+    "hoehe": 1688,
+    "umgebung_ausserhalb_brueckenmaske_unveraendert": true,
+    "untere_plattform_pixelgleich": true,
+    "sha256": "40a0f6ed502365b9a9fbf51ab17742b804049b6d772a01291dc20fccc721a7b6"
+  },
+  {
+    "datei": "lava_asteroid.png",
+    "breite": 780,
+    "hoehe": 1688,
+    "umgebung_ausserhalb_brueckenmaske_unveraendert": true,
+    "untere_plattform_pixelgleich": true,
+    "sha256": "b71a99d4387c470752c58fa87e8b2d9464eee63f77b45bcc4dfcea0a4b87a089"
+  },
+  {
+    "datei": "nebula_portal.png",
+    "breite": 780,
+    "hoehe": 1688,
+    "umgebung_ausserhalb_brueckenmaske_unveraendert": true,
+    "untere_plattform_pixelgleich": true,
+    "sha256": "632349f96e172834cd5cc469d8dbef7f914f94e27b80f42facab328b329cfd1c"
+  },
+  {
+    "datei": "ringed_planet.png",
+    "breite": 780,
+    "hoehe": 1688,
+    "umgebung_ausserhalb_brueckenmaske_unveraendert": true,
+    "untere_plattform_pixelgleich": true,
+    "sha256": "d7d66ebebee2de81a6b46b68d21a02dfb20e33f2dcc1fa518dce8c8433fb96cd"
+  },
+  {
+    "datei": "space_dock.png",
+    "breite": 780,
+    "hoehe": 1688,
+    "umgebung_ausserhalb_brueckenmaske_unveraendert": true,
+    "untere_plattform_pixelgleich": true,
+    "sha256": "129119bfee6e673da395140994b596e1c829586a6fec49301f60c1eb65866286"
+  }
+]
