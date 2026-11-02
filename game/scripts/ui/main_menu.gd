@@ -62,7 +62,6 @@ func _ready() -> void:
 	_frame.add_theme_constant_override("separation", 0)
 	add_child(_frame)
 	_frame.add_child(_build_top_bar())
-	_frame.add_child(_build_banner())
 	_content = Control.new()
 	_content.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_content.clip_contents = true
@@ -78,6 +77,9 @@ func _ready() -> void:
 	_toast.add_theme_constant_override("outline_size", 10)
 	_toast.modulate.a = 0.0
 	add_child(_toast)
+	# Update-Hinweis liegt frei über allen Bildschirmen (auch über den Mockup-Bildschirmen,
+	# bei denen der alte Rahmen ausgeblendet ist)
+	add_child(_build_banner())
 
 	get_viewport().size_changed.connect(_fit)
 	_fit()
@@ -102,6 +104,19 @@ func _fit() -> void:
 	_frame.offset_right = w * 0.5
 	_frame.offset_top = 0.0
 	_frame.offset_bottom = 0.0
+	# Update-Hinweis unter der Kopfleiste und dem Battle-Pass-Band des Mockups (390 × 844 Punkte)
+	if _banner:
+		var ms := minf(vp.x / 390.0, vp.y / 844.0)
+		var top := (vp.y - 844.0 * ms) * 0.5 + 106.0 * ms
+		var bw := minf(w, 390.0 * ms) - 24.0
+		_banner.anchor_left = 0.5
+		_banner.anchor_right = 0.5
+		_banner.anchor_top = 0.0
+		_banner.anchor_bottom = 0.0
+		_banner.offset_left = -bw * 0.5
+		_banner.offset_right = bw * 0.5
+		_banner.offset_top = top
+		_banner.offset_bottom = top
 
 
 func refresh() -> void:
