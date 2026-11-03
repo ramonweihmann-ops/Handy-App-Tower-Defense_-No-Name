@@ -37,6 +37,9 @@ Godot-Test → **Prüfbild für die Freigabe** → erst dann im Spiel aktiv.
   Freigabe). Ein Beinpaar in Blender zu entfernen geht, hinterlässt aber leicht Löcher und schiefe Gewichte.
 - Danach rigge ich die sechs Beine selbst und erzeuge einen Dreifuß-Gang (`Walk`) und einen Biss (`Attack`).
 
+**Stand:** Zombie, Tentakler und Panzerkäfer sind freigegeben und aktiv (Version 0.7.4). Auftrag für die
+übrigen fünf: `Vorlage_Raw/Monster_Roh/NAECHSTE_MONSTER_FUER_CHATGPT.md` (etwa 75 Meshy-Credits, wartet auf Freigabe).
+
 **Schritt 4 – restliche Gegner**, wenn die drei laufen: Schleimling, Schleimmutter (Boss), Krabbler, Brecher,
 Zombie-Koloss (Boss). Je Gegner: Bildvorlage (ChatGPT) → Meshy → mein Skript → Prüfbild → Einbau.
 Planetenversionen (Welt 3–10) erst danach; bis dahin färbt das Spiel die Gegner je Welt ein wie heute.
