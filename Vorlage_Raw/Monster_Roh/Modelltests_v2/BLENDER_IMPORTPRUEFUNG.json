@@ -1,0 +1,23 @@
+{
+  "datei": "panzerkaefer_statisch_roh.glb",
+  "import_erfolgreich": true,
+  "netze": 1,
+  "dreiecke": 10444,
+  "skelette": 0,
+  "animationen": [],
+  "grenzen_blender_xyz": [
+    [
+      -0.4748539924621582,
+      0.4748539924621582
+    ],
+    [
+      -0.3454590141773224,
+      0.3454590141773224
+    ],
+    [
+      -0.2126459926366806,
+      0.20288099348545074
+    ]
+  ],
+  "hinweis": "Beinzahl wird in den gerenderten Ansichten visuell geprueft; noch keine automatische oder Godot-Freigabe."
+}

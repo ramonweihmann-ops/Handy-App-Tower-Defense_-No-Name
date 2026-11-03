@@ -1,0 +1,57 @@
+{
+  "beine_gesamt": 6,
+  "beine_je_seite": 3,
+  "pruefmethode": "Visuelle Kontrolle der orthografischen Ober- und Unteransicht des aus der GLB importierten Modells",
+  "beinzahl_bestanden": true,
+  "rohmodell_unveraendert": true,
+  "credits_verbraucht": 15,
+  "erzeugungsversuche": 1,
+  "modell": "Meshy T2.5",
+  "modus": "Smart Topology",
+  "polygonziel": 10000,
+  "textur_an": true,
+  "posekorrektur": false,
+  "privat": true,
+  "rigging_beauftragt": false,
+  "tatsaechliche_eingabe": "panzerkaefer_vorlage_oben.png",
+  "mehransichten_uebermittelt": false,
+  "zusatztext_uebermittelt": false,
+  "offene_nacharbeit": [
+    "Spitzen Netzfortsatz am mittleren Bein entfernen",
+    "Textur auf 1024 verkleinern",
+    "Gegnergroesse und Bodenkontakt einstellen",
+    "Skelett und Walk/Attack durch Claude"
+  ],
+  "bilder": [
+    {
+      "datei": "panzerkaefer_draufsicht_pruefung.png",
+      "breite": 1024,
+      "hoehe": 1024,
+      "sha256": "32fa980fc7f80b816bf806ec045a9722d6e149fee9fae90b235c02bb0340a677"
+    },
+    {
+      "datei": "panzerkaefer_modellvorschau.png",
+      "breite": 1024,
+      "hoehe": 1024,
+      "sha256": "1a195b7092a4a731df91fa9e28ab24e1c71ae35355ff41b8457c47344424e47c"
+    },
+    {
+      "datei": "panzerkaefer_unterseite_pruefung.png",
+      "breite": 1024,
+      "hoehe": 1024,
+      "sha256": "82cd095ad098fcea466cd60bc5a117f236c65266cbdbfb3997ab417fdd4d92d7"
+    },
+    {
+      "datei": "panzerkaefer_vorlage_oben.png",
+      "breite": 1254,
+      "hoehe": 1254,
+      "sha256": "cbbc51e1f84228f35b6f48a6c08288437f9f59d3904b8ff7557d813b64d6978c"
+    },
+    {
+      "datei": "panzerkaefer_vorlage_vorn.png",
+      "breite": 1254,
+      "hoehe": 1254,
+      "sha256": "95069627532f39bb45c0935bfdb62b72f2eecbd5dfe4872136283b8ef5c0ba8a"
+    }
+  ]
+}

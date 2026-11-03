@@ -1,0 +1,25 @@
+[
+  {
+    "datei": "panzerkaefer_statisch_roh.glb",
+    "bytes": 3154968,
+    "sha256": "f52a433edbc5dd1b75b697573a51392cbec632cbfe1c288ca7ebc5cb9fd0aa4e",
+    "git_blob_sha": "a4d482752faad1adbdeffe3bf392d365d467bb4e",
+    "glTF_version": 2,
+    "dreiecke": 10444,
+    "materialien": 1,
+    "texturen": [
+      {
+        "name": null,
+        "eingebettet": true,
+        "breite": 2048,
+        "hoehe": 2048
+      }
+    ],
+    "skelette": 0,
+    "knochen": [],
+    "animationen": [],
+    "knoten": [
+      "geometry_0"
+    ]
+  }
+]
