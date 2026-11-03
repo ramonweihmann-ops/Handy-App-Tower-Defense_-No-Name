@@ -38,7 +38,7 @@ func default_data() -> Dictionary:
 		"won_levels": [],
 		"hard_unlocked": false,
 		"heroes": heroes,
-		"tech": 0,
+		"tech": [],
 		"talents": {},
 		"base": {},
 		"missions": {"date": "", "ids": [], "progress": {}, "claimed": {}},
@@ -110,7 +110,10 @@ func full_data() -> Dictionary:
 	d["unlocked"] = GameData.HERO_IDS.duplicate()
 	for id in GameData.HERO_IDS:
 		d["heroes"][id] = {"level": 15, "cards": 40}
-	d["tech"] = MetaData.TECH.size()
+	var all_tech: Array = []
+	for t in MetaData.TECH:
+		all_tech.append(t["id"])
+	d["tech"] = all_tech
 	var ups := {}
 	for u in MetaData.AMMO_UPGRADES:
 		ups[u["id"]] = int(u["max"])
@@ -369,15 +372,51 @@ func add_hero_cards(id: String, n: int) -> void:
 
 # --- Tech-Baum ---------------------------------------------------------------
 
+## Gekaufte Module der Tech-Werft. Ältere Spielstände speichern nur die Anzahl (Kauf der Reihe
+## nach); die werden hier in die Module der alten Reihenfolge übersetzt, Gekauftes bleibt erhalten.
+func tech_ids() -> Array:
+	if _neutral():
+		return []
+	var t = data.get("tech", 0)
+	if t is Array:
+		return t
+	var out: Array = []
+	for i in clampi(int(t), 0, MetaData.TECH.size()):
+		out.append(MetaData.TECH[i]["id"])
+	return out
+
+
 func tech_count() -> int:
-	return 0 if _neutral() else int(data["tech"])
+	return tech_ids().size()
 
 
 func has_tech(id: String) -> bool:
-	for i in tech_count():
-		if MetaData.TECH[i]["id"] == id:
-			return true
-	return false
+	return tech_ids().has(id)
+
+
+## Zustand eines Moduls: "done" (erforscht), "open" (Voraussetzung erfüllt), "lock"
+func tech_state(id: String) -> String:
+	if has_tech(id):
+		return "done"
+	var need := str(MetaData.tech(id).get("needs", ""))
+	return "open" if need == "" or has_tech(need) else "lock"
+
+
+func can_buy_tech_id(id: String) -> bool:
+	var t := MetaData.tech(id)
+	return not t.is_empty() and tech_state(id) == "open" and gold() >= int(t["cost"])
+
+
+func buy_tech(id: String) -> bool:
+	if tech_state(id) != "open":
+		return false
+	if not spend("gold", int(MetaData.tech(id)["cost"])):
+		return false
+	var ids := tech_ids().duplicate()
+	ids.append(id)
+	data["tech"] = ids
+	save_game()
+	return true
 
 
 # --- Booster ---------------------------------------------------------------------
@@ -446,8 +485,10 @@ func buy_ammo_upgrade(id: String) -> bool:
 # --- Hinweise fürs Menü: Wo kann gerade etwas aufgewertet oder abgeholt werden? ---
 
 func can_buy_tech() -> bool:
-	var i := tech_count()
-	return i < MetaData.TECH.size() and gold() >= int(MetaData.TECH[i]["cost"])
+	for t in MetaData.TECH:
+		if can_buy_tech_id(str(t["id"])):
+			return true
+	return false
 
 
 func can_buy_ammo(id: String) -> bool:
@@ -514,15 +555,12 @@ func draw_talents(n: int) -> Array[String]:
 	return out
 
 
+## Das günstigste Modul kaufen, das gerade offen ist (für Tests und das einfache Menü)
 func buy_next_tech() -> bool:
-	var i := tech_count()
-	if i >= MetaData.TECH.size():
-		return false
-	if not spend("gold", int(MetaData.TECH[i]["cost"])):
-		return false
-	data["tech"] = i + 1
-	save_game()
-	return true
+	for t in MetaData.TECH:
+		if tech_state(str(t["id"])) == "open":
+			return buy_tech(str(t["id"]))
+	return false
 
 
 # --- Talente -------------------------------------------------------------------

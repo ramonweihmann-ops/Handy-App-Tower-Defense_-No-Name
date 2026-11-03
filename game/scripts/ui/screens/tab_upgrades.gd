@@ -1,44 +1,57 @@
 class_name UpgradesTab
 extends MockScreen
-## Reiter „Upgrades“ nach den Mockups „Upgrades“ (Tech-Baum) und „Upgrades · Talente“.
-## Oben zwei Unterreiter TECH-BAUM / TALENTE; jeder ist ein eigener Mockup-Bildschirm
-## (ui_mock/upgrades_tech, ui_mock/upgrades_talent), gewählt über menu.sub_tab["upgrades"].
+## Reiter „Upgrades“ nach den freigegebenen Entwürfen „Upgrades · Tech-Werft (neu)“ und
+## „Upgrades · Talente (neu)“ (Vorlage_Raw/Tech_Werft_v1, Vorlage_Raw/Talente_v1).
+## Hintergrund, Kopfleiste, Umschalter TECH-WERFT / TALENTE, Ziehknöpfe und Reiterleiste kommen aus
+## dem Export (ui_mock/upgrades_tech_neu, ui_mock/upgrades_talente_neu); was sich ändert, zeichnet
+## dieser Reiter aus den gelieferten Bauteilen (ui/upgrades_v2).
 ##
-## Tech-Baum: Knoten von unten nach oben (MetaData.TECH), gebaut / als nächstes kaufbar / gesperrt,
-## mit Rahmen und Symbolen aus dem Mockup. Der Baum scrollt, wenn er höher als der Bildschirm ist.
-## Antippen öffnet das Fenster aus dem Mockup (Beschreibung, Preis, AUFWERTEN).
-## Munition (dauerhafte Stufen für Plasma und Energiekern) steht nicht im Mockup und öffnet sich über einen
-## Knopf links unten im Baum in einem Fenster im selben Stil.
+## Tech-Werft: drei Bereiche (Angriff, Schutz, Technik), je ein Grundmodul und zwei Äste, die
+## parallel ausbaubar sind (MetaData.TECH). Antippen wählt ein Modul, die Detailbox zeigt es mit
+## AUSBAUEN. Munition (dauerhafte Stufen für Plasma und Energiekern) öffnet sich über einen Knopf
+## unter dem Umschalter.
 ##
-## Talente: Raster mit entdeckten Talenten (Karte, Symbol, Stufe) und „?“-Feldern, unten
-## „Neues Talent erhalten“ mit Ziehen für einen Stern und „5 Sterne auf einmal ziehen“.
+## Talente: Raster mit entdeckten Talenten und „?“-Feldern, darunter „Neues Talent erhalten“.
 
 const TECH_TOP := {"level": "12", "energy": "25/30", "gold": "4.573", "gems": "350"}
 const TALENT_TOP := {"level": "12", "stars": "3", "gold": "4.573", "gems": "350"}
+const PARTS := "res://ui/upgrades_v2/"
+## Maßstab der Vorlage (978 breit) auf Mockup-Punkte
+const K := 390.0 / 978.0
 
-## Baum: Abstand der Knoten, Mitte, sichtbarer Bereich (Mockup-Punkte)
-const STEP := 150.0
-const TREE_X := 195.0
-const TREE_RECT := Rect2(0, 64, 390, 646)
-const CUR_Y := 332.0        # Mitte des aktuellen Knotens im Mockup
-const FIRST_Y := 632.0      # Mitte des untersten Knotens im Mockup
-const TOP_Y := 160.0        # höchste Lage des obersten Knotens
-const AMMO_BUTTON := Rect2(16, 660, 112, 40)
-
-## Talente: Raster (Mockup: 4 Spalten, Karten 112 hoch, 8 Punkte Abstand)
-const GRID_RECT := Rect2(12, 72, 366, 470)
+## Talente: Karten 198 × 204 (Vorlage), Spalten im Abstand 210, Zeilen 101 Punkte
+const CARD := Vector2(198.0 * K, 204.0 * K)
+const CELL := CARD
+const GRID_X := 76.0 * K
+const GRID_COL := 210.0 * K
+const GRID_Y := 66.0
+const GRID_ROW := 101.0
 const GRID_COLS := 4
 const GRID_CELLS := 16
-const CELL := Vector2(85.5, 112)
-const GAP := 8.0
+const GRID_RECT := Rect2(0, 60, 390, 396)
+## Symbole der Talente: aus dem Entwurf, sonst die bisherigen (mit eingezeichnetem Plus)
+const TALENT_ICON := {"schnelllader": "icon_core", "sanitaet": "booster_medipack"}
+
+## Tech-Werft (Mockup-Punkte)
+const TECH_RECT := Rect2(0, 56, 390, 562)
+const MOD := Vector2(102, 89)
+const ROOT := Vector2(195, 410)
+const BRANCH_POS := {"links": [Vector2(105, 322), Vector2(105, 226)], "rechts": [Vector2(285, 322), Vector2(285, 226)]}
+const BRANCH_LABEL_X := {"links": 107.0, "rechts": 284.0}
+const AREA_TABS := {"angriff": Rect2(22, 106, 96, 28), "schutz": Rect2(141, 106, 110, 28), "technik": Rect2(262, 106, 106, 28)}
+const AREA_ICON := {"angriff": "ziel.svg", "schutz": "symbol_schild.webp", "technik": "zahnrad.svg"}
+const TITLE := Rect2(90, 62, 210, 33)
+const DETAIL := Rect2(26, 474, 338, 122)
+const BUILD := Rect2(93, 546, 204, 42)
+const TECH_ICON := {"crit": "tech_crit", "crit2": "tech_crit", "damage": "tech_damage", "xp": "tech_xp", "xp2": "tech_xp", "gold": "tech_gold"}
+const AMMO_BUTTON := Rect2(125, 674, 140, 34)
 
 var talents := false
+var area := "schutz"
+var selected := ""
 var _tex := {}
-var _tree: TreeLayer
+var _tech: TechLayer
 var _grid: TalentGrid
-var _pop: MockView          # Fenster zu einem Knoten
-var _pop_index := -1
-var _bought: MockView       # Meldung „… gebaut!“
 var _ammo: AmmoPanel
 var _talent_pop: TalentPop
 var _ammo_btn: AmmoButton
@@ -49,21 +62,25 @@ static func _is_talents(m: MainMenu) -> bool:
 
 
 func _init(m: MainMenu) -> void:
-	super("upgrades_talent" if _is_talents(m) else "upgrades_tech", m, TALENT_TOP if _is_talents(m) else TECH_TOP)
+	super("upgrades_talente_neu" if _is_talents(m) else "upgrades_tech_neu", m, TALENT_TOP if _is_talents(m) else TECH_TOP)
 	talents = _is_talents(m)
 
 
 func _ready() -> void:
 	super()
-	_copy_nav_badges()
+	BaseTab.copy_nav_badges(self)
 	if talents:
 		_grid = TalentGrid.new()
 		_grid.tab = self
 		place_at(_grid, GRID_RECT)
 	else:
-		_tree = TreeLayer.new()
-		_tree.tab = self
-		place_at(_tree, TREE_RECT)
+		area = str(menu.sub_tab.get("tech_area", ""))
+		if not area in MetaData.TECH_AREAS:
+			area = _default_area()
+		selected = _default_selection(area)
+		_tech = TechLayer.new()
+		_tech.tab = self
+		place_at(_tech, TECH_RECT)
 		_ammo_btn = AmmoButton.new()
 		_ammo_btn.tab = self
 		place_at(_ammo_btn, AMMO_BUTTON, true)
@@ -75,106 +92,117 @@ func _ready() -> void:
 # --- gemeinsame Werte ------------------------------------------------------------------
 
 func bind() -> void:
-	var tech := button("showTech")
-	var tal := button("showTalent")
+	var tech := button("Upgrades-Tech-Neu.dc.html")
+	var tal := button("Upgrades-Talente-Neu.dc.html")
 	if tech and tal:
-		tech.badge = talents and Save.can_buy_tech()
+		tech.badge = talents and (Save.can_buy_tech() or Save.any_ammo_upgrade())
 		tal.badge = not talents and Save.can_draw_talent()
 	if talents:
-		var one := button("#stern")
+		var one := button("draw_star")
 		if one:
 			one.modulate.a = 1.0 if Save.can_draw_talent() else 0.6
-		var five := button("#fuenf")
+		var five := button("draw_five")
 		if five:
 			five.modulate.a = 1.0 if Save.stars() >= 5 and Save.can_draw_talent() else 0.6
 		if _grid:
 			_grid.queue_redraw()
-	elif _tree:
-		_tree.queue_redraw()
+	elif _tech:
+		_tech.queue_redraw()
 	if _ammo_btn:
 		_ammo_btn.queue_redraw()
 	if is_instance_valid(_ammo):
 		_ammo.queue_redraw()
 
 
-## Die Reiterleiste dieser Mockups hat keine roten Punkte: Lage wie im Hauptbildschirm übernehmen
-func _copy_nav_badges() -> void:
-	var home: Dictionary = MockView.layout_of("home").get("states", {}).get("main", {})
-	var home_btns := {}
-	for hb in home.get("buttons", []):
-		home_btns[int(hb["i"])] = hb
-	for l in home.get("live", []):
-		if not bool(l.get("badge", false)) or not home_btns.has(int(l.get("button", -1))):
-			continue
-		var hb: Dictionary = home_btns[int(l["button"])]
-		var href := str(hb.get("href", ""))
-		var mine := button(href) if href != "" else null
-		if mine == null:
-			continue
-		var hr: Array = hb["rect"]
-		var mr: Array = mine.info["rect"]
-		var r: Array = l["rect"]
-		mine.badge_rect = Rect2(float(r[0]) - float(hr[0]) + float(mr[0]), float(r[1]) - float(hr[1]) + float(mr[1]), r[2], r[3])
-
-
 func handle(b: Dictionary) -> bool:
 	var on := str(b.get("on", ""))
 	var href := str(b.get("href", ""))
 	var label := str(b.get("label", ""))
+	if href in ["Upgrades-Tech-Neu.dc.html", "Upgrades-Talente-Neu.dc.html"]:
+		var want := href == "Upgrades-Talente-Neu.dc.html"
+		if want != talents:
+			menu.sub_tab["upgrades"] = "talente" if want else "tech"
+			menu.show_tab("upgrades")
+		return true
 	match on:
-		"showTech", "showTalent":
-			var want := on == "showTalent"
-			if want != talents:
-				menu.sub_tab["upgrades"] = "talente" if want else "tech"
-				menu.show_tab("upgrades")
-			return true
-		"closePop":
-			close_pop()
-			return true
-		"buy":
-			_buy_tech()
-			return true
-	match href:
-		"#stern":
+		"draw_star":
 			_draw_talents(1)
 			return true
-		"#fuenf":
+		"draw_five":
 			_draw_talents(5)
 			return true
-		"#werbung":
+		"draw_ad":
 			menu.info("Talent für Werbung", "In der Testphase gibt es keine Werbung. Talente gibt es hier für Sterne – Sterne bekommst du für gewonnene Level.")
 			return true
-	if label == "Talentsterne kaufen":
+	if label == "Sterne kaufen":
 		menu.toast("Sterne gibt es für gewonnene Level.")
 		return true
 	return false
 
 
-# --- Bilder und Texte ------------------------------------------------------------------
+# --- Bauteile und Texte ----------------------------------------------------------------
 
-## Bild eines Live-Elements (aus diesem Bildschirm oder einem Popup darüber)
-func tex_in(v: MockView, id: String) -> Texture2D:
-	var key := v.overlay + "/" + id
-	if not _tex.has(key):
-		var l: Dictionary = v._live_info.get(id, {})
-		_tex[key] = load("res://ui_mock/%s/%s" % [v.screen, l["img"]]) if str(l.get("img", "")) != "" else null
-	return _tex[key]
-
-
-## Wo das Bild eines Live-Elements liegt, wenn seine Mitte bei c ist (Mockup-Punkte, Maßstab k)
-func part_in(v: MockView, id: String, c: Vector2, k := 1.0) -> Rect2:
-	var lr := v.live_rect(id)
-	var ir: Array = v._live_info.get(id, {}).get("img_rect", [0, 0, 0, 0])
-	return Rect2(c + (Vector2(ir[0], ir[1]) - lr.get_center()) * k, Vector2(ir[2], ir[3]) * k)
+func part(file: String) -> Texture2D:
+	if not "." in file:
+		file += ".webp"
+	if not _tex.has(file):
+		_tex[file] = load(file if file.begins_with("res://") else PARTS + file)
+	return _tex[file]
 
 
-## Bild eines Live-Elements zeichnen; origin = Mockup-Punkt, der im CanvasItem bei (0,0) liegt
-func draw_part(ci: CanvasItem, v: MockView, id: String, c: Vector2, origin: Vector2, k := 1.0, mod := Color.WHITE) -> void:
-	var t := tex_in(v, id)
+## Bauteil gestreckt in r zeichnen (wie im Entwurf); origin = Mockup-Punkt bei (0,0) des CanvasItem
+func pic(ci: CanvasItem, file: String, r: Rect2, origin: Vector2, mod := Color.WHITE) -> void:
+	var t := part(file)
+	if t:
+		ci.draw_texture_rect(t, Rect2((r.position - origin) * s, r.size * s), false, mod)
+
+
+## Bauteil mit Seitenverhältnis in ein Quadrat der Kantenlänge box um c
+func pic_fit(ci: CanvasItem, file: String, c: Vector2, box: float, origin: Vector2, mod := Color.WHITE) -> void:
+	var t := part(file)
 	if t == null:
 		return
-	var r := part_in(v, id, c, k)
-	ci.draw_texture_rect(t, Rect2((r.position - origin) * s, r.size * s), false, mod)
+	var ts := t.get_size()
+	var k := box / maxf(ts.x, ts.y)
+	var sz := ts * k
+	ci.draw_texture_rect(t, Rect2((c - sz * 0.5 - origin) * s, sz * s), false, mod)
+
+
+## Pillenförmiger Knopf: Enden behalten ihre Form, die Mitte dehnt sich
+func pill(ci: CanvasItem, file: String, r: Rect2, origin: Vector2, mod := Color.WHITE) -> void:
+	var t := part(file)
+	if t == null:
+		return
+	var ts := t.get_size()
+	var cap_src := minf(ts.y * 0.5, ts.x * 0.5)
+	var dst := Rect2((r.position - origin) * s, r.size * s)
+	var cap_dst := minf(dst.size.y * 0.5, dst.size.x * 0.5)
+	ci.draw_texture_rect_region(t, Rect2(dst.position, Vector2(cap_dst, dst.size.y)), Rect2(0, 0, cap_src, ts.y), mod)
+	ci.draw_texture_rect_region(t, Rect2(dst.position + Vector2(cap_dst, 0), Vector2(dst.size.x - 2.0 * cap_dst, dst.size.y)), Rect2(cap_src, 0, ts.x - 2.0 * cap_src, ts.y), mod)
+	ci.draw_texture_rect_region(t, Rect2(dst.end.x - cap_dst, dst.position.y, cap_dst, dst.size.y), Rect2(ts.x - cap_src, 0, cap_src, ts.y), mod)
+
+
+## Text wie ein HTML-Block im Entwurf: links oben bei (x, top), Breite w, align -1/0/1
+func text_box(ci: CanvasItem, txt: String, x: float, top: float, w: float, origin: Vector2, family: String, weight: int, size_pt: float, col: Color, align := 0, shadow := Color(0, 0, 0, 0), shadow_off := Vector2.ZERO) -> void:
+	var cy := top + size_pt * (0.605 if family == "Fredoka" else 0.682)
+	var ax := x + w * 0.5
+	if align < 0:
+		ax = x
+	elif align > 0:
+		ax = x + w
+	label_at(ci, txt, (Vector2(ax, cy) - origin) * s, family, weight, size_pt, col, align, shadow, shadow_off)
+
+
+## Größte Schrift (höchstens size_pt), mit der txt in w passt
+func fit_size(txt: String, family: String, weight: int, size_pt: float, w: float, min_pt := 7.0) -> float:
+	while size_pt > min_pt and text_width(txt, family, weight, size_pt) > w:
+		size_pt -= 0.5
+	return size_pt
+
+
+func draw_dot(ci: CanvasItem, p: Vector2) -> void:
+	ci.draw_circle(p, 6.0 * s, Color.WHITE)
+	ci.draw_circle(p, 4.5 * s, Color(1.0, 0.23, 0.19))
 
 
 ## Text in Mockup-Schrift; p = Ankerpunkt in Bildschirmpunkten (x je nach align, y = Mitte)
@@ -215,99 +243,79 @@ func wrap(txt: String, family: String, weight: int, size_pt: float, width: float
 	return out
 
 
-## Knopfbild aus dem Mockup in anderer Größe zeichnen: Ecken bleiben, die Mitte dehnt sich.
-## info = Knopf aus der layout.json (rect, img_rect), hit = neue Lage des Knopfs (Mockup-Punkte),
-## radius = Eckenradius im Mockup.
-func draw_button_image(ci: CanvasItem, info: Dictionary, t: Texture2D, hit: Rect2, origin: Vector2, radius: float, mod := Color.WHITE) -> void:
-	if t == null:
+# --- Tech-Werft --------------------------------------------------------------------------
+
+func _default_area() -> String:
+	for a in MetaData.TECH_AREAS:
+		for t in MetaData.tech_in_area(a):
+			if Save.can_buy_tech_id(str(t["id"])):
+				return a
+	return "schutz"
+
+
+## Erstes offenes Modul des Bereichs (günstigstes), sonst das zuletzt erforschte
+func _default_selection(a: String) -> String:
+	var mods := MetaData.tech_in_area(a)
+	for t in mods:
+		if Save.tech_state(str(t["id"])) == "open":
+			return str(t["id"])
+	var last := str(mods[0]["id"])
+	for t in mods:
+		if Save.has_tech(str(t["id"])):
+			last = str(t["id"])
+	return last
+
+
+func set_area(a: String) -> void:
+	if a == area:
 		return
-	var hr: Array = info["rect"]
-	var ir: Array = info["img_rect"]
-	var tl := Vector2(float(hr[0]) - float(ir[0]), float(hr[1]) - float(ir[1]))
-	var br := Vector2(float(ir[0]) + float(ir[2]) - float(hr[0]) - float(hr[2]), float(ir[1]) + float(ir[3]) - float(hr[1]) - float(hr[3]))
-	var dest := Rect2((hit.position - tl - origin) * s, (hit.size + tl + br) * s)
-	var ppt := t.get_size().x / float(ir[2])   # Bildpunkte je Mockup-Punkt
-	var m := [tl.x + radius, tl.y + radius, br.x + radius, br.y + radius]
-	var ts := t.get_size()
-	var sx := [0.0, m[0] * ppt, ts.x - m[2] * ppt, ts.x]
-	var sy := [0.0, m[1] * ppt, ts.y - m[3] * ppt, ts.y]
-	var dx := [dest.position.x, dest.position.x + m[0] * s, dest.end.x - m[2] * s, dest.end.x]
-	var dy := [dest.position.y, dest.position.y + m[1] * s, dest.end.y - m[3] * s, dest.end.y]
-	for i in 3:
-		for j in 3:
-			var src := Rect2(sx[i], sy[j], sx[i + 1] - sx[i], sy[j + 1] - sy[j])
-			var dst := Rect2(dx[i], dy[j], dx[i + 1] - dx[i], dy[j + 1] - dy[j])
-			if src.size.x > 0.0 and src.size.y > 0.0 and dst.size.x > 0.0 and dst.size.y > 0.0:
-				ci.draw_texture_rect_region(t, dst, src, mod)
+	area = a
+	menu.sub_tab["tech_area"] = a
+	selected = _default_selection(a)
+	if _tech:
+		_tech.queue_redraw()
 
 
-# --- Tech-Baum ---------------------------------------------------------------------------
-
-func tech_state(i: int) -> String:
-	var done := Save.tech_count()
-	if i < done:
-		return "done"
-	return "cur" if i == done else "lock"
+func select(id: String) -> void:
+	selected = id
+	if _tech:
+		_tech.queue_redraw()
 
 
-func open_pop(i: int) -> void:
-	close_pop()
-	var st := tech_state(i)
-	_pop = open_overlay({"done": "pop_done", "cur": "pop_cur", "lock": "pop_lock"}[st])
-	_pop_index = i
-	_pop.gui_input.connect(_on_pop_input)
-	if st == "lock":
-		_pop.hide_text("Erst Schildgenerator II bauen")
-	var buy := _pop.button("buy")
-	if buy:
-		buy.modulate.a = 1.0 if Save.gold() >= int(MetaData.TECH[i]["cost"]) else 0.6
-	var layer := PopLayer.new()
-	layer.tab = self
-	layer.view = _pop
-	layer.index = i
-	_pop.place_at(layer, Rect2(0, 0, W, H))
+## Mitte eines Moduls: Grundmodul unten, Äste von unten nach oben
+func module_pos(id: String) -> Vector2:
+	var t := MetaData.tech(id)
+	var br := str(t.get("branch", ""))
+	if br == "":
+		return ROOT
+	var k := 0
+	for o in MetaData.tech_in_area(str(t["area"])):
+		if str(o["id"]) == id:
+			break
+		if str(o["branch"]) == br:
+			k += 1
+	var list: Array = BRANCH_POS[br]
+	return list[mini(k, list.size() - 1)]
 
 
-func close_pop() -> void:
-	if is_instance_valid(_pop):
-		close_overlay(_pop)
-	_pop = null
-	_pop_index = -1
-
-
-func _on_pop_input(e: InputEvent) -> void:
-	if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT and is_instance_valid(_pop):
-		var r: Array = _pop.data.get("rect", [0, 0, W, H])
-		var p := (_pop.get_local_mouse_position() - off) / s
-		if not Rect2(r[0], r[1], r[2], r[3]).grow(-20.0).has_point(p):
-			close_pop()
-
-
-func _buy_tech() -> void:
-	var i := _pop_index
-	if i < 0 or i != Save.tech_count():
-		close_pop()
+func buy_selected() -> void:
+	var t := MetaData.tech(selected)
+	if t.is_empty():
 		return
-	var t: Dictionary = MetaData.TECH[i]
-	if not Save.buy_next_tech():
+	match Save.tech_state(selected):
+		"done":
+			menu.toast("%s ist schon erforscht." % t["title"])
+			return
+		"lock":
+			menu.toast("Erst %s erforschen." % MetaData.tech(str(t["needs"]))["title"])
+			return
+	if not Save.buy_tech(selected):
 		menu.toast("Nicht genug Gold.")
 		return
-	close_pop()
 	Sfx.play("levelup")
+	menu.celebrate("check", "%s erforscht!" % t["title"], Color(0.45, 1.0, 0.55))
+	selected = _default_selection(area)
 	refresh()
-	if _tree:
-		_tree.scroll_to(Save.tech_count())
-	if is_instance_valid(_bought):
-		_bought.queue_free()
-	_bought = open_overlay("bought")
-	_bought.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_bought.set_text("Schildgenerator II gebaut!", "%s gebaut!" % t["title"])
-	_bought.set_text("Schild +10 %", str(t["desc"]))
-	var b := _bought
-	var tw := b.create_tween()
-	tw.tween_interval(1.8)
-	tw.tween_property(b, "modulate:a", 0.0, 0.25)
-	tw.tween_callback(b.queue_free)
 
 
 func open_ammo() -> void:
@@ -340,29 +348,28 @@ func grid_ids() -> Array[String]:
 func cell_rect(k: int) -> Rect2:
 	var col := k % GRID_COLS
 	var row := k / GRID_COLS
-	return Rect2(GRID_RECT.position + Vector2(col * (CELL.x + GAP), row * (CELL.y + GAP)), CELL)
+	return Rect2(GRID_X + col * GRID_COL, GRID_Y + row * GRID_ROW, CARD.x, CARD.y)
 
 
-## Talentkarte zeichnen: r = Lage der Karte (Mockup-Punkte), origin wie bei draw_part
+## Talentkarte zeichnen: r = Lage der Karte (Mockup-Punkte), origin wie bei pic
 func draw_card(ci: CanvasItem, id: String, level: int, r: Rect2, origin: Vector2) -> void:
-	var k := r.size.x / CELL.x
-	var c := r.get_center()
-	draw_part(ci, self, "card", c, origin, k)
-	var idx := MetaData.TALENTS.keys().find(id)
-	var icon_id := "tic" if idx == 0 else "tic_%d" % idx
-	draw_part(ci, self, icon_id, r.position + Vector2(CELL.x * 0.5, 56.0) * k, origin, k)
-	var t: Dictionary = MetaData.TALENTS[id]
-	var title := str(t["title"])
-	var size_pt := 11.0 * k
-	while text_width(title, "Fredoka", 700, size_pt) > (CELL.x - 2.0) * k and size_pt > 7.0:
-		size_pt -= 0.5
-	label_at(ci, title, (r.position + Vector2(CELL.x * 0.5, 10.0) * k - origin) * s, "Fredoka", 700, size_pt, Color("#fff7ea"))
-	label_at(ci, "Stufe %d" % level, (r.position + Vector2(CELL.x * 0.5, 99.5) * k - origin) * s, "Nunito", 800, 11.0 * k, Color("#0f3d12"))
+	var k := r.size.x / CARD.x
+	var p := r.position
+	pic(ci, "talent_freigeschaltet", r, origin)
+	pic(ci, "talent_kopfbereich", Rect2(p + Vector2(2, 2) * k, Vector2(CARD.x - 4.0, 20.0) * k), origin)
+	var title := str(MetaData.TALENTS[id]["title"])
+	var fs := fit_size(title, "Fredoka", 700, 10.5 * k, (CARD.x - 6.0) * k)
+	text_box(ci, title, p.x, p.y + 5.0 * k + (10.5 * k - fs) * 0.6, r.size.x, origin, "Fredoka", 700, fs, Color.WHITE, 0, Color("#1d6b2a"), Vector2(0, 1) * k)
+	var icon := str(TALENT_ICON.get(id, "tal_" + id))
+	pic_fit(ci, icon, p + Vector2(CARD.x * 0.5, 44.0) * k, 44.0 * k, origin)
+	if TALENT_ICON.has(id):
+		text_box(ci, "+", p.x + (CARD.x - 24.0) * k, p.y + 20.0 * k, 14.0 * k, origin, "Nunito", 800, 15.0 * k, Color.WHITE, 0, Color("#1d6b2a"), Vector2(0, 1) * k)
+	text_box(ci, "Stufe %d" % level, p.x, p.y + (CARD.y - 17.0) * k, r.size.x, origin, "Fredoka", 700, 12.0 * k, Color("#163f12"))
 
 
 func draw_unknown(ci: CanvasItem, r: Rect2, origin: Vector2) -> void:
-	draw_part(ci, self, "unk", r.get_center(), origin)
-	label_at(ci, "?", (r.get_center() - origin) * s, "Fredoka", 700, 44.0, Color(1, 1, 1, 0.35), 0, Color(20 / 255.0, 10 / 255.0, 80 / 255.0, 0.6), Vector2(0, 2))
+	pic(ci, "talent_unbekannt", r, origin)
+	text_box(ci, "?", r.position.x, r.position.y + CARD.y * 0.5 - 21.0, r.size.x, origin, "Fredoka", 700, 36.0, Color("#d6c8ff"), 0, Color("#3d2a8a"), Vector2(0, 3))
 
 
 func _draw_talents(n: int) -> void:
@@ -402,194 +409,197 @@ func open_talent_info(id: String) -> void:
 
 # ===========================================================================================
 
-## Der Baum: Linien, Knoten, Leuchten, Nummer am aktuellen Knoten; scrollt mit dem Finger
-class TreeLayer:
+## Die Tech-Werft: Titel, Bereiche, Äste, Verbindungen, Module und Detailbox
+class TechLayer:
 	extends Control
 	var tab: UpgradesTab
-	var node0_y := FIRST_Y      # Mitte des untersten Knotens (Mockup-Punkte, ganzer Bildschirm)
-	var _press := Vector2.ZERO
-	var _pressed := false
-	var _dragged := false
-	var _t := 0.0
 
 	func _ready() -> void:
 		mouse_filter = Control.MOUSE_FILTER_STOP
-		clip_contents = true
-		node0_y = _target_for(Save.tech_count())
-		for id in ["node_done", "node_cur", "node_lock", "cur_glow", "lvl_badge"]:
-			tab.tex_in(tab, id)
-		for k in MetaData.TECH.size():
-			tab.tex_in(tab, _icon(k, false))
-			tab.tex_in(tab, _icon(k, true))
+		# Bilder vorab laden: beim allerersten Zeichnen wären sie sonst kurz weiß
+		for f in ["kopf_leiste", "bereich_angriff", "bereich_schutz", "bereich_technik", "ziel.svg", "zahnrad.svg", "symbol_schild",
+				"symbol_regeneration", "symbol_schloss", "modul_normal", "modul_ausgewaehlt", "modul_gesperrt", "marke_gold", "haekchen",
+				"detail_box", "knopf_gruen_normal", "knopf_gesperrt", "tech_crit", "tech_damage", "tech_xp", "tech_gold", "res://ui/icons/gold.webp"]:
+			tab.part(f)
 		await get_tree().process_frame
 		queue_redraw()
 
-	func _process(delta: float) -> void:
-		_t += delta
-		if Save.tech_count() < MetaData.TECH.size():
-			queue_redraw()   # Leuchten am aktuellen Knoten pulsiert
-
-	static func _icon(k: int, gray: bool) -> String:
-		var base := "gicon" if gray else "icon"
-		return base if k == 0 else "%s_%d" % [base, k]
-
-	func _max_y() -> float:
-		return maxf(FIRST_Y, TOP_Y + STEP * (MetaData.TECH.size() - 1))
-
-	func _target_for(cur: int) -> float:
-		return clampf(CUR_Y + STEP * mini(cur, MetaData.TECH.size() - 1), FIRST_Y, _max_y())
-
-	func scroll_to(cur: int) -> void:
-		var tw := create_tween()
-		tw.tween_property(self, "node0_y", _target_for(cur), 0.45).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-		tw.parallel().tween_method(func(_v: float) -> void: queue_redraw(), 0.0, 1.0, 0.45)
-
-	func center_of(i: int) -> Vector2:
-		return Vector2(TREE_X, node0_y - STEP * i)
-
 	func _draw() -> void:
-		var o := TREE_RECT.position
+		var o := TECH_RECT.position
 		var s := tab.s
-		var n := MetaData.TECH.size()
-		var done := Save.tech_count()
-		var top := center_of(n - 1)
-		var bottom := center_of(0)
-		# graue Linie durch alle Knoten, darüber der Weg bis zum aktuellen Knoten (gold → grün)
-		var sb := StyleBoxFlat.new()
-		sb.bg_color = Color(1, 1, 1, 0.35)
-		sb.set_corner_radius_all(maxi(1, roundi(5 * s)))
-		draw_style_box(sb, Rect2((Vector2(190, top.y) - o) * s, Vector2(10, bottom.y - top.y) * s))
-		if done > 0:
-			var hi := center_of(mini(done, n - 1))
-			_gradient_line(hi.y, bottom.y, Color("#ffd34d"), Color("#3fd05a"))
-		var cur := done if done < n else -1
-		for i in n:
-			var c := center_of(i)
-			if c.y < o.y - 120.0 or c.y > o.y + TREE_RECT.size.y + 120.0:
+		# Titel
+		tab.pic(self, "kopf_leiste", TITLE, o)
+		var title: String = MetaData.TECH_AREA_TITLES[tab.area]
+		var tw := tab.text_width(title, "Fredoka", 700, 22.0)
+		var x0 := 195.0 - (25.0 + 3.0 + tw) * 0.5
+		tab.pic_fit(self, AREA_ICON[tab.area], Vector2(x0 + 12.5, 78.5), 26.0, o)
+		tab.text_box(self, title, x0 + 28.0, 66.0, tw, o, "Fredoka", 700, 22.0, Color.WHITE, -1, Color("#3a1a80"), Vector2(0, 2))
+		# Bereiche
+		for a in MetaData.TECH_AREAS:
+			var r: Rect2 = AREA_TABS[a]
+			tab.pic(self, "bereich_" + a, r, o)
+			if a == "schutz":
+				tab.pic(self, "symbol_schild", Rect2(r.position + Vector2(10, 5), Vector2(16, 18)), o)
+			else:
+				tab.pic(self, AREA_ICON[a], Rect2(r.position + Vector2(10, 7), Vector2(15, 15)), o)
+			tab.text_box(self, MetaData.TECH_AREA_TITLES[a], r.position.x + 30.0, r.position.y + 6.0, r.size.x - 34.0, o, "Fredoka", 700, 13.0, Color.WHITE, -1, Color(0, 0, 0, 0.3), Vector2(0, 1))
+			if a != tab.area and _area_ready(a):
+				tab.draw_dot(self, (r.position + Vector2(r.size.x - 6.0, 2.0) - o) * s)
+		# Äste
+		var names: Array = MetaData.TECH_BRANCHES[tab.area]
+		for j in 2:
+			var cx: float = BRANCH_LABEL_X["links" if j == 0 else "rechts"]
+			var sb := StyleBoxFlat.new()
+			sb.bg_color = Color(20 / 255.0, 30 / 255.0, 80 / 255.0, 0.75)
+			sb.border_color = Color(120 / 255.0, 180 / 255.0, 1.0, 0.6)
+			sb.set_border_width_all(maxi(1, roundi(1.5 * s)))
+			sb.set_corner_radius_all(roundi(12 * s))
+			draw_style_box(sb, Rect2((Vector2(cx - 56.0, 148.0) - o) * s, Vector2(112, 24) * s))
+			tab.text_box(self, str(names[j]), cx - 56.0, 151.0, 112.0, o, "Fredoka", 700, 13.0, Color("#e8f2ff"))
+		# Verbindungen hinter den Modulen
+		var mods := MetaData.tech_in_area(tab.area)
+		for t in mods:
+			var need := str(t["needs"])
+			if need == "":
 				continue
-			var st := tab.tech_state(i)
-			tab.draw_part(self, tab, "node_" + st, c, o)
-			tab.draw_part(self, tab, _icon(i, st == "lock"), c, o)
-			if i == cur:
-				var pulse := 0.9 + 0.1 * sin(_t * TAU / 1.8)
-				tab.draw_part(self, tab, "cur_glow", c, o, pulse)
-				var bc := c + Vector2(82, 0)
-				tab.draw_part(self, tab, "lvl_badge", bc, o)
-				tab.label_at(self, str(i + 1), (bc - o) * s, "Fredoka", 700, 15.0, Color("#5a2400"))
+			var a := tab.module_pos(need)
+			var b := tab.module_pos(str(t["id"]))
+			var pts := PackedVector2Array()
+			if is_equal_approx(a.x, b.x):
+				pts.append((a - o) * s)
+				pts.append((b - o) * s)
+			else:
+				var c1 := Vector2(a.x + signf(b.x - a.x) * 60.0, a.y)
+				var c2 := Vector2(b.x, b.y + 50.0)
+				for k in 25:
+					var u := k / 24.0
+					var q := a.lerp(c1, u).lerp(c1.lerp(c2, u), u).lerp(c1.lerp(c2, u).lerp(c2.lerp(b, u), u), u)
+					pts.append((q - o) * s)
+			draw_polyline(pts, Color("#5a4aa8"), 8.0 * s, true)
+			draw_polyline(pts, Color("#a8dcff"), 4.5 * s, true)
+		# Module
+		for t in mods:
+			_module(t, o)
+		_detail(o)
 
-	func _gradient_line(y0: float, y1: float, c0: Color, c1: Color) -> void:
-		var o := TREE_RECT.position
+	func _area_ready(a: String) -> bool:
+		for t in MetaData.tech_in_area(a):
+			if Save.can_buy_tech_id(str(t["id"])):
+				return true
+		return false
+
+	## Symbol eines Moduls in seinem Feld (Mitte c, Feldgröße box)
+	func _symbol(t: Dictionary, c: Vector2, o: Vector2, box: float, alpha: float, numeral_pt: float) -> void:
+		var id := str(t["id"])
+		var col := Color(1, 1, 1, alpha)
+		if id.begins_with("shield"):
+			var sz := Vector2(44, 49) * (box / 44.0)
+			tab.pic(self, "symbol_schild", Rect2(c - sz * 0.5, sz), o, col)
+			tab.text_box(self, str(t["num"]), c.x - sz.x * 0.5, c.y - sz.y * 0.5 + 10.0 * box / 44.0, sz.x, o, "Fredoka", 700, numeral_pt, Color(1, 1, 1, alpha), 0, Color(42 / 255.0, 74 / 255.0, 154 / 255.0, alpha), Vector2(0, 1))
+		elif id == "heal":
+			tab.pic(self, "symbol_regeneration", Rect2(c - Vector2(25, 25) * box / 44.0, Vector2(50, 50) * box / 44.0), o, col)
+		else:
+			tab.pic_fit(self, TECH_ICON.get(id, "tech_crit"), c, box * 1.02, o, col)
+
+	func _module(t: Dictionary, o: Vector2) -> void:
+		var id := str(t["id"])
+		var st := Save.tech_state(id)
+		var c := tab.module_pos(id)
+		var r := Rect2(c - MOD * 0.5, MOD)
+		var key := "modul_ausgewaehlt" if id == tab.selected else ("modul_gesperrt" if st == "lock" else "modul_normal")
+		tab.pic(self, key, r, o)
+		_symbol(t, r.position + Vector2(MOD.x * 0.5, 34.5), o, 44.0, 0.6 if st == "lock" else 1.0, 19.0)
+		if st == "lock":
+			tab.pic(self, "symbol_schloss", Rect2(r.position + Vector2(MOD.x - 27.0, 24.0), Vector2(24, 24)), o)
+		if id == tab.selected:
+			var m := Rect2(r.position + Vector2(MOD.x - 22.0, -6.0), Vector2(24, 24))
+			tab.pic(self, "marke_gold", m, o)
+			var n := str(MetaData.TECH.find(t) + 1)
+			tab.text_box(self, n, m.position.x, m.position.y + 3.0, 24.0, o, "Fredoka", 700, 13.0, Color("#4a2000"))
+		if st == "done":
+			tab.pic(self, "haekchen", Rect2(r.position + Vector2(MOD.x - 32.0, MOD.y - 38.0), Vector2(26, 26)), o)
+		elif st == "open" and id != tab.selected and Save.can_buy_tech_id(id):
+			tab.draw_dot(self, (r.position + Vector2(MOD.x - 10.0, 6.0) - o) * tab.s)
+
+	func _detail(o: Vector2) -> void:
+		var t := MetaData.tech(tab.selected)
+		if t.is_empty():
+			return
 		var s := tab.s
-		var r := 5.0
-		var pts := PackedVector2Array()
-		var cols := PackedColorArray()
-		# Rechteck mit Verlauf, oben und unten halbrund
-		for j in 9:
-			var a := PI + PI * j / 8.0
-			pts.append((Vector2(195, y0) + Vector2(cos(a), sin(a)) * r - o) * s)
-			cols.append(c0)
-		for j in 9:
-			var a := PI * j / 8.0
-			pts.append((Vector2(195, y1) + Vector2(cos(a), sin(a)) * r - o) * s)
-			cols.append(c1)
-		# Reihenfolge: oben links → oben rechts, unten rechts → unten links
-		var ordered := PackedVector2Array()
-		var ocols := PackedColorArray()
-		for j in 9:
-			ordered.append(pts[j])
-			ocols.append(cols[j])
-		for j in 9:
-			ordered.append(pts[9 + j])
-			ocols.append(cols[9 + j])
-		draw_polygon(ordered, ocols)
+		var d := DETAIL
+		tab.pic(self, "detail_box", d, o)
+		var st := Save.tech_state(tab.selected)
+		_symbol(t, d.position + Vector2(41, 42), o, 50.0, 1.0, 20.0)
+		var sep := StyleBoxFlat.new()
+		sep.bg_color = Color(220 / 255.0, 210 / 255.0, 1.0, 0.5)
+		sep.set_corner_radius_all(maxi(1, roundi(1 * s)))
+		draw_style_box(sep, Rect2((d.position + Vector2(78, 14) - o) * s, Vector2(2, 52) * s))
+		var title := str(t["title"])
+		tab.text_box(self, title, d.position.x + 90.0, d.position.y + 12.0, 230.0, o, "Fredoka", 700, tab.fit_size(title, "Fredoka", 700, 17.0, 236.0), Color.WHITE, -1)
+		var line2 := "Andere Forschungswege bleiben verfügbar"
+		if st == "done":
+			line2 = "Erforscht – gilt in jedem Kampf"
+		elif st == "lock":
+			line2 = "Erst %s erforschen" % MetaData.tech(str(t["needs"]))["title"]
+		for j in 2:
+			var line := str(t["desc"]) if j == 0 else line2
+			tab.text_box(self, line, d.position.x + 90.0, d.position.y + 34.0 + 16.0 * j, 240.0, o, "Nunito", 700, tab.fit_size(line, "Nunito", 700, 11.5, 240.0), Color("#e8e2ff"), -1)
+		# Knopf
+		if st == "open":
+			var cost := int(t["cost"])
+			var can := Save.gold() >= cost
+			tab.pill(self, "knopf_gruen_normal", BUILD, o, Color(1, 1, 1, 1.0 if can else 0.6))
+			var price := MockScreen.num(cost)
+			var w1 := tab.text_width("AUSBAUEN", "Fredoka", 700, 18.0)
+			var w2 := tab.text_width(price, "Fredoka", 700, 16.0)
+			var total := w1 + 10.0 + 18.0 + 4.0 + w2
+			var x := BUILD.get_center().x - total * 0.5
+			var cy := BUILD.get_center().y
+			var ink := Color(15 / 255.0, 61 / 255.0, 18 / 255.0, 1.0 if can else 0.65)
+			tab.label_at(self, "AUSBAUEN", (Vector2(x, cy) - o) * s, "Fredoka", 700, 18.0, ink, -1)
+			var coin := tab.part("res://ui/icons/gold.webp")
+			draw_texture_rect(coin, Rect2((Vector2(x + w1 + 10.0, cy - 9.0) - o) * s, Vector2(18, 18) * s), false, Color(1, 1, 1, 1.0 if can else 0.65))
+			tab.label_at(self, price, (Vector2(x + w1 + 32.0, cy) - o) * s, "Fredoka", 700, 16.0, ink, -1)
+		else:
+			tab.pill(self, "knopf_gesperrt", BUILD, o)
+			var label := "ERFORSCHT" if st == "done" else "GESPERRT"
+			var lw := tab.text_width(label, "Fredoka", 700, 18.0)
+			var icon_w := 22.0
+			var x := BUILD.get_center().x - (icon_w + 6.0 + lw) * 0.5
+			var cy := BUILD.get_center().y
+			tab.pic(self, "haekchen" if st == "done" else "symbol_schloss", Rect2(Vector2(x, cy - icon_w * 0.5), Vector2(icon_w, icon_w)), o)
+			tab.label_at(self, label, (Vector2(x + icon_w + 6.0, cy) - o) * s, "Fredoka", 700, 18.0, Color("#d6d0f5"), -1)
 
 	func _gui_input(e: InputEvent) -> void:
-		if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT:
-			if e.pressed:
-				_pressed = true
-				_dragged = false
-				_press = e.position
-			elif _pressed:
-				_pressed = false
-				if not _dragged:
-					_tap(e.position)
-			accept_event()
-		elif e is InputEventMouseMotion and _pressed:
-			if (e.position - _press).length() > 8.0:
-				_dragged = true
-			if _dragged:
-				node0_y = clampf(node0_y + e.relative.y / tab.s, FIRST_Y, _max_y())
-				queue_redraw()
-			accept_event()
-
-	func _tap(p_local: Vector2) -> void:
-		var p := p_local / tab.s + TREE_RECT.position
-		for i in MetaData.TECH.size():
-			var c := center_of(i)
-			if Rect2(c - Vector2(52, 52), Vector2(104, 104)).has_point(p):
+		if not (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT):
+			return
+		accept_event()
+		var p: Vector2 = e.position / tab.s + TECH_RECT.position
+		for a in MetaData.TECH_AREAS:
+			if (AREA_TABS[a] as Rect2).grow(4.0).has_point(p):
 				Sfx.play("click")
-				tab.open_pop(i)
+				tab.set_area(a)
 				return
+		for t in MetaData.tech_in_area(tab.area):
+			var c := tab.module_pos(str(t["id"]))
+			if Rect2(c - MOD * 0.5, MOD).has_point(p):
+				Sfx.play("click")
+				tab.select(str(t["id"]))
+				return
+		if BUILD.grow(4.0).has_point(p):
+			Sfx.play("click")
+			tab.buy_selected()
 
 
-## Inhalt des Knoten-Fensters, der sich ändert: Symbol, Name, Beschreibung, Preis, Hinweis
-class PopLayer:
-	extends Control
-	var tab: UpgradesTab
-	var view: MockView
-	var index := 0
-
-	func _ready() -> void:
-		mouse_filter = Control.MOUSE_FILTER_IGNORE
-		tab.tex_in(view, "coin")
-		tab.tex_in(view, "need_lock")
-		await get_tree().process_frame
-		queue_redraw()
-
-	func _draw() -> void:
-		var s := tab.s
-		var t: Dictionary = MetaData.TECH[index]
-		var st := tab.tech_state(index)
-		var ic := view.live_rect("pop_icon")
-		var icon_id := TreeLayer._icon(index, false)   # im Fenster immer farbig (wie im Mockup)
-		tab.draw_part(self, tab, icon_id, ic.get_center(), Vector2.ZERO, ic.size.x / 54.0)
-		# Name und Beschreibung, gemeinsam mittig neben dem Symbol
-		var tr := view.live_rect("pop_text")
-		var lines := tab.wrap(str(t["desc"]), "Nunito", 700, 13.0, tr.size.x)
-		var h := 24.0 + 18.0 * lines.size()
-		var y := ic.get_center().y - h * 0.5
-		tab.label_at(self, str(t["title"]), Vector2(tr.position.x, y + 12.0) * s, "Fredoka", 700, 20.0, Color("#fff7ea"), -1)
-		for k in lines.size():
-			tab.label_at(self, lines[k], Vector2(tr.position.x, y + 24.0 + 9.0 + 18.0 * k) * s, "Nunito", 700, 13.0, Color("#d6d0f5"), -1)
-		# Preis rechtsbündig, Münze davor
-		var pr := view.live_rect("price")
-		var price := "%s Gold" % MockScreen.num(int(t["cost"]))
-		var tw := tab.text_width(price, "Fredoka", 700, 16.0)
-		var right := pr.end.x
-		tab.label_at(self, price, Vector2(right, pr.get_center().y) * s, "Fredoka", 700, 16.0, Color("#ffe27a"), 1)
-		tab.draw_part(self, view, "coin", Vector2(right - tw - 5.0 - 9.0, pr.get_center().y), Vector2.ZERO)
-		# gesperrt: „Erst … bauen“ mit Schloss, mittig im Kasten
-		if st == "lock" and index > 0:
-			var need := "Erst %s bauen" % MetaData.TECH[index - 1]["title"]
-			var nw := tab.text_width(need, "Fredoka", 700, 15.0)
-			var lk := view.live_rect("need_lock")
-			var x0 := TREE_X - (16.0 + 8.0 + nw) * 0.5
-			tab.draw_part(self, view, "need_lock", Vector2(x0 + 8.0, lk.get_center().y), Vector2.ZERO)
-			tab.label_at(self, need, Vector2(x0 + 24.0, lk.get_center().y - 0.5) * s, "Fredoka", 700, 15.0, Color("#d6d0f5"), -1)
-
-
-## Knopf „MUNITION“ links unten im Baum (nicht im Mockup, im Stil der Unterreiter)
+## Knopf „MUNITION“ unter dem Umschalter (im Stil des aktiven Umschalters)
 class AmmoButton:
 	extends Control
 	var tab: UpgradesTab
-	var _tex: Texture2D
 
 	func _ready() -> void:
 		mouse_filter = Control.MOUSE_FILTER_STOP
 		pivot_offset = size * 0.5
-		var b := tab.button("showTech")
-		if b:
-			_tex = b.texture
+		tab.part("knopf_violett_normal")
 		await get_tree().process_frame
 		queue_redraw()
 
@@ -598,15 +608,10 @@ class AmmoButton:
 
 	func _draw() -> void:
 		var s := tab.s
-		var b := tab.button("showTech")
-		if b and _tex:
-			# Bild des aktiven Unterreiters, auf die Größe dieses Knopfs gebracht
-			tab.draw_button_image(self, b.info, _tex, AMMO_BUTTON, AMMO_BUTTON.position, 10.0)
-		tab.label_at(self, "MUNITION", size * 0.5, "Fredoka", 700, 15.0, Color.WHITE)
+		tab.pill(self, "knopf_violett_normal", AMMO_BUTTON, AMMO_BUTTON.position)
+		tab.label_at(self, "MUNITION", size * 0.5, "Fredoka", 700, 15.0, Color.WHITE, 0, Color("#4a1a90"), Vector2(0, 1))
 		if Save.any_ammo_upgrade():
-			var p := Vector2(size.x - 4.0 * s, 2.0 * s)
-			draw_circle(p, 6.0 * s, Color.WHITE)
-			draw_circle(p, 4.0 * s, Color(1.0, 0.23, 0.19))
+			tab.draw_dot(self, Vector2(size.x - 4.0 * s, 2.0 * s))
 
 	func _gui_input(e: InputEvent) -> void:
 		if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT:
@@ -627,16 +632,9 @@ class AmmoPanel:
 	const ROW_Y := 162.0
 	const ROW_H := 84.0
 	var tab: UpgradesTab
-	var _btn: Texture2D
-	var _btn_info: Dictionary
 
 	func _ready() -> void:
 		mouse_filter = Control.MOUSE_FILTER_STOP
-		var lay: Dictionary = MockView.layout_of("upgrades_tech").get("overlays", {}).get("pop_cur", {})
-		for b in lay.get("buttons", []):
-			if str(b.get("on", "")) == "buy":
-				_btn_info = b
-				_btn = load("res://ui_mock/upgrades_tech/" + str(b["img"]))
 		modulate.a = 0.0
 		create_tween().tween_property(self, "modulate:a", 1.0, 0.15)
 		await get_tree().process_frame
@@ -717,9 +715,7 @@ class AmmoPanel:
 			return
 		var cost := MetaData.ammo_cost(u, lvl)
 		var can := Save.gold() >= cost
-		if _btn:
-			# grüner Knopf aus dem Mockup-Fenster (AUFWERTEN)
-			tab.draw_button_image(self, _btn_info, _btn, br, Vector2.ZERO, 14.0, Color(1, 1, 1, 1.0 if can else 0.55))
+		tab.pill(self, "knopf_gruen_normal", br, Vector2.ZERO, Color(1, 1, 1, 1.0 if can else 0.55))
 		var price := MockScreen.num(cost)
 		var pw := tab.text_width(price, "Fredoka", 700, 16.0)
 		var x0 := br.get_center().x - (18.0 + 5.0 + pw) * 0.5
@@ -765,11 +761,10 @@ class TalentGrid:
 
 	func _ready() -> void:
 		mouse_filter = Control.MOUSE_FILTER_STOP
-		clip_contents = true
-		tab.tex_in(tab, "card")
-		tab.tex_in(tab, "unk")
-		for k in MetaData.TALENTS.size():
-			tab.tex_in(tab, "tic" if k == 0 else "tic_%d" % k)
+		for f in ["talent_freigeschaltet", "talent_kopfbereich", "talent_unbekannt", "icon_core", "booster_medipack"]:
+			tab.part(f)
+		for id in MetaData.TALENTS.keys():
+			tab.part(str(TALENT_ICON.get(id, "tal_" + id)))
 		await get_tree().process_frame
 		queue_redraw()
 

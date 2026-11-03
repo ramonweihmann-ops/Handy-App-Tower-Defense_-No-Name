@@ -136,12 +136,19 @@ func _run() -> bool:
 			m.close_board(hb)
 			m.sub_tab["upgrades"] = "munition"
 			m.show_tab("upgrades")
-			# Tech-Baum nach Mockup: Fenster zu jedem Knotenzustand, Kaufen, Munition
-			if m._mock and m._mock.has_method("open_pop"):
-				var n: int = save.tech_count()
-				for i in [0, mini(n + 1, MetaData.TECH.size() - 1), n]:
-					m._mock.open_pop(i)
-				m._mock._buy_tech()
+			# Tech-Werft: jeden Bereich zeigen, jedes Modul wählen, das gewählte ausbauen, Munition
+			# alter Spielstand (nur Anzahl gespeichert) wird in Module übersetzt
+			var old_tech = save.data["tech"]
+			save.data["tech"] = 3
+			print("SMOKE alter tech-stand: ", save.has_tech("shield2"), " ", save.tech_state("shield3"), " ", save.tech_state("gold"))
+			save.data["tech"] = old_tech
+			if m._mock and m._mock.has_method("buy_selected"):
+				for a in MetaData.TECH_AREAS:
+					m._mock.set_area(a)
+					for t in MetaData.tech_in_area(a):
+						m._mock.select(str(t["id"]))
+				m._mock.set_area("schutz")
+				m._mock.buy_selected()
 				m._mock.close_ammo()
 				print("SMOKE tech-baum: gebaut ", save.tech_count())
 		8:

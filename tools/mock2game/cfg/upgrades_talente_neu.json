@@ -1,0 +1,3 @@
+{"board": "Upgrades-Talente-Neu.dc.html", "out": "out/upgrades_talente_neu",
+ "states": [{"name": "main", "eval": "document.querySelectorAll('#dc-root > div > a[data-on=\"talent\"], #dc-root > div > div[data-up=\"card_unknown\"]').forEach(e => e.remove());"}],
+ "live": []}

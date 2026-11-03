@@ -451,6 +451,8 @@ func _process(delta: float) -> void:
 			if parts[1] == "feier":
 				menu.celebrate("gold", "+150 Gold")
 			else:
+				if parts.size() > 2:
+					menu.sub_tab[parts[1]] = parts[2]
 				menu.show_tab(parts[1])
 		if _menu_shot_t == (25 if parts.size() > 1 and parts[1] == "feier" else 90):
 			get_viewport().get_texture().get_image().save_png(parts[0])

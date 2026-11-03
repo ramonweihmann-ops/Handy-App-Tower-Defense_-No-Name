@@ -1,0 +1,3 @@
+{"board": "Upgrades-Tech-Neu.dc.html", "out": "out/upgrades_tech_neu",
+ "states": [{"name": "main", "eval": "const root = document.querySelector('#dc-root > div'); let cut = false; [...root.children].forEach(e => { const up = e.getAttribute('data-up'); if (up === 'title') cut = true; if (up === 'switch') cut = false; if (cut) e.remove(); });"}],
+ "live": []}

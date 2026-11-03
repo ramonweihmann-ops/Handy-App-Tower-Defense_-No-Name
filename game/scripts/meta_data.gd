@@ -64,20 +64,47 @@ static func booster_cost(level: int) -> int:
 	return 200 * level
 
 
-# --- Tech-Baum: Knoten werden nacheinander gekauft ---------------------------
+# --- Tech-Werft: drei Bereiche, je ein Grundmodul und zwei Äste, die parallel ausbaubar sind ---
+# area: Bereich, branch: "" = Grundmodul, "links"/"rechts" = Ast, needs: Voraussetzung.
+# Reihenfolge = alte Kaufreihenfolge (ältere Spielstände speichern nur die Anzahl).
 
 const TECH := [
-	{"id": "shield1", "title": "Schildgenerator I", "desc": "Schild +10 % in jedem Kampf", "cost": 100},
-	{"id": "crit", "title": "Zielhilfe", "desc": "Kritische Treffer +5 %", "cost": 200},
-	{"id": "shield2", "title": "Schildgenerator II", "desc": "Schild +10 % in jedem Kampf", "cost": 350},
-	{"id": "xp", "title": "Kampfsimulator", "desc": "Erfahrung +10 % nach jedem Kampf", "cost": 550},
-	{"id": "gold", "title": "Bergungsteam", "desc": "Gold nach dem Kampf +10 %", "cost": 800},
-	{"id": "heal", "title": "Reparaturdrohne", "desc": "Schild heilt 1 % nach jeder Welle", "cost": 1100},
-	{"id": "shield3", "title": "Schildgenerator III", "desc": "Schild +15 % in jedem Kampf", "cost": 1500},
-	{"id": "crit2", "title": "Zielcomputer", "desc": "Kritische Treffer +5 %", "cost": 2000},
-	{"id": "damage", "title": "Waffenkammer", "desc": "Schaden aller Helden +5 %", "cost": 2600},
-	{"id": "xp2", "title": "Gefechtsübung", "desc": "Erfahrung +10 % nach jedem Kampf", "cost": 3300},
+	{"id": "shield1", "title": "Schildgenerator I", "desc": "Schild +10 % in jedem Kampf", "cost": 100, "area": "schutz", "branch": "", "needs": "", "num": "I"},
+	{"id": "crit", "title": "Zielhilfe", "desc": "Kritische Treffer +5 %", "cost": 200, "area": "angriff", "branch": "", "needs": "", "num": "I"},
+	{"id": "shield2", "title": "Schildgenerator II", "desc": "Schild +10 % in jedem Kampf", "cost": 350, "area": "schutz", "branch": "links", "needs": "shield1", "num": "II"},
+	{"id": "xp", "title": "Kampfsimulator", "desc": "Erfahrung +10 % nach jedem Kampf", "cost": 550, "area": "technik", "branch": "", "needs": "", "num": "I"},
+	{"id": "gold", "title": "Bergungsteam", "desc": "Gold nach dem Kampf +10 %", "cost": 800, "area": "technik", "branch": "rechts", "needs": "xp", "num": ""},
+	{"id": "heal", "title": "Reparaturdrohne", "desc": "Schild heilt 1 % nach jeder Welle", "cost": 1100, "area": "schutz", "branch": "rechts", "needs": "shield1", "num": ""},
+	{"id": "shield3", "title": "Schildgenerator III", "desc": "Schild +15 % in jedem Kampf", "cost": 1500, "area": "schutz", "branch": "links", "needs": "shield2", "num": "III"},
+	{"id": "crit2", "title": "Zielcomputer", "desc": "Kritische Treffer +5 %", "cost": 2000, "area": "angriff", "branch": "links", "needs": "crit", "num": "II"},
+	{"id": "damage", "title": "Waffenkammer", "desc": "Schaden aller Helden +5 %", "cost": 2600, "area": "angriff", "branch": "rechts", "needs": "crit", "num": ""},
+	{"id": "xp2", "title": "Gefechtsübung", "desc": "Erfahrung +10 % nach jedem Kampf", "cost": 3300, "area": "technik", "branch": "links", "needs": "xp", "num": "II"},
 ]
+
+const TECH_AREAS := ["angriff", "schutz", "technik"]
+const TECH_AREA_TITLES := {"angriff": "ANGRIFF", "schutz": "SCHUTZ", "technik": "TECHNIK"}
+## Namen der beiden Äste je Bereich (links, rechts)
+const TECH_BRANCHES := {
+	"angriff": ["Treffsicherheit", "Feuerkraft"],
+	"schutz": ["Schildstärke", "Regeneration"],
+	"technik": ["Erfahrung", "Bergung"],
+}
+
+
+static func tech(id: String) -> Dictionary:
+	for t in TECH:
+		if t["id"] == id:
+			return t
+	return {}
+
+
+## Module eines Bereichs: Grundmodul zuerst, dann die Äste von unten nach oben
+static func tech_in_area(area: String) -> Array:
+	var out: Array = []
+	for t in TECH:
+		if t["area"] == area:
+			out.append(t)
+	return out
 
 # --- Munition: dauerhafte Stufen für Plasma-Erzeuger und Energiekern -----------------------------
 

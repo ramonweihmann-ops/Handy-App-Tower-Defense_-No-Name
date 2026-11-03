@@ -1160,10 +1160,9 @@ func _tab_upgrades() -> Control:
 		_ammo_upgrades(v)
 		return page[0]
 	v.add_child(_wrap_left("Verbesserungen für die Station. Sie gelten in jedem Kampf.", 20, UiKit.C_MUTED))
-	var done := Save.tech_count()
 	for i in MetaData.TECH.size():
 		var t: Dictionary = MetaData.TECH[i]
-		var state := "done" if i < done else ("next" if i == done else "locked")
+		var state: String = {"done": "done", "open": "next", "lock": "locked"}[Save.tech_state(str(t["id"]))]
 		var p := _panel(Color(0.1, 0.18, 0.12, 0.92) if state == "done" else (Color(0.12, 0.12, 0.28, 0.95) if state == "next" else Color(0.08, 0.08, 0.14, 0.9)),
 			Color(0.35, 0.9, 0.45) if state == "done" else (UiKit.C_GOLD if state == "next" else Color(0.25, 0.27, 0.35)))
 		var h := HBoxContainer.new()
@@ -1177,7 +1176,7 @@ func _tab_upgrades() -> Control:
 		h.add_child(tv)
 		if state == "next":
 			var b := _small_button("%d Gold" % int(t["cost"]), func() -> void:
-				if Save.buy_next_tech():
+				if Save.buy_tech(str(t["id"])):
 					celebrate("check", "%s gebaut!" % t["title"], Color(0.45, 1.0, 0.55))
 				else:
 					toast("Nicht genug Gold.")
