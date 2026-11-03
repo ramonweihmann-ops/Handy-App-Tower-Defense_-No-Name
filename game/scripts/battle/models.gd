@@ -4,7 +4,9 @@ class_name Models
 ## Gegner ihre einfache Form wie bisher.
 
 const HEROES := {
-	"dusty": {"file": "heroes/Cowboy_Male", "gun": "guns/Revolver"},
+	# v2: neues Comic-Modell (GLB) mit eigener Waffe (WeaponSocket → Weapon → Muzzle) und den
+	# Animationen Idle, Shoot (beginnt im Anschlag), Victory; gebaut mit tools/heroes/build_dusty_jo.py
+	"dusty": {"file": "heroes_v2/dusty_jo", "gun": "", "v2": true},
 	"iska": {"file": "heroes/BlueSoldier_Female", "gun": "guns/AK"},
 	"brocken": {"file": "heroes/Worker_Male", "gun": "guns/RocketLauncher"},
 	"volta": {"file": "heroes/Doctor_Female_Young", "gun": ""},
@@ -36,8 +38,15 @@ static var _heights := {}
 static func _scene(file: String) -> PackedScene:
 	if not _scenes.has(file):
 		var path := "res://models/%s.gltf" % file
+		if not ResourceLoader.exists(path):
+			path = "res://models/%s.glb" % file
 		_scenes[file] = load(path) if ResourceLoader.exists(path) else null
 	return _scenes[file]
+
+
+## Neues Comic-Modell (eigene Waffe, Animationen Idle/Shoot/Victory)
+static func is_v2(id: String) -> bool:
+	return bool(HEROES.get(id, {}).get("v2", false)) and has_hero(id)
 
 
 static func has_hero(id: String) -> bool:

@@ -124,7 +124,7 @@ func set_hero(id: String) -> void:
 	_skel = null
 	# Freigegebener Entwurf (ui/heroes2d) hat Vorrang vor den alten 3D-Figuren, bis die neuen
 	# GLB-Modelle da sind
-	if ResourceLoader.exists("res://ui/heroes2d/%s.png" % id):
+	if ResourceLoader.exists("res://ui/heroes2d/%s.png" % id) and not Models.is_v2(id):
 		_show_design(id)
 		return
 	var info: Dictionary = Models.HEROES.get(id, {})
@@ -148,6 +148,9 @@ func set_hero(id: String) -> void:
 	_ap = Models.player(_model)
 	_skel = Models.skeleton(_model)
 	_pose = {"anim": "Idle", "t0": 0.0, "t1": 0.0, "yaw": 0.0} if portrait else POSES.get(id, {"anim": "Idle", "t0": 0.0, "t1": 0.0, "yaw": 0.0})
+	if Models.is_v2(id):
+		# Comic-Modell: Siegerpose auf der Heldenseite, ruhig stehend in Übersichten
+		_pose = {"anim": "Idle", "t0": 0.0, "t1": 0.0, "yaw": 0.0} if portrait else {"anim": "Victory", "t0": 0.0, "t1": 0.8, "yaw": -15.0}
 	_holder.rotation_degrees.y = float(_pose["yaw"])
 	if not portrait and _pose.has("fig"):
 		fig = float(_pose["fig"])

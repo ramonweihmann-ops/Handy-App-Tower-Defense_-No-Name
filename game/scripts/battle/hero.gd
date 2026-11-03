@@ -411,6 +411,8 @@ func _aim_at(target_pos: Vector3, delta: float) -> void:
 
 func _animate(delta: float) -> void:
 	_settle_anim()
+	if _glb_muzzle and is_instance_valid(_glb_muzzle):
+		_muzzle.global_position = _glb_muzzle.global_position
 	_body.position.y = 0.22 + sin(_t * 2.2) * 0.015
 	_recoil = maxf(0.0, _recoil - delta * 9.0)
 	var kick := 0.22 if family() == "rocket" else 0.12
@@ -818,6 +820,8 @@ func _build_model() -> void:
 	Models.recolor(_model, "Skin", data["skin"])
 	Models.recolor(_model, "Face", Color(0.1, 0.07, 0.12))
 	_anim = Models.player(_model)
+	if Models.is_v2(id):
+		_glb_muzzle = _model.find_child("Muzzle", true, false)
 	_pose_aim()
 
 
@@ -826,12 +830,24 @@ func _build_model() -> void:
 func _shot_anim() -> void:
 	if _anim == null:
 		return
+	if _glb_muzzle:
+		# Comic-Modell: „Shoot“ beginnt im Anschlag, Rückstoß und zurück (0,4 s)
+		_anim.play("Shoot")
+		_anim.seek(0.0, true)
+		_anim.speed_scale = 1.6
+		return
 	_anim.play("Shoot_OneHanded")
 	_anim.seek(AIM_TIME - 0.12, true)
 	_anim.speed_scale = 2.5
 
 
 func _settle_anim() -> void:
+	if _glb_muzzle:
+		if _anim and _anim.is_playing() and _anim.current_animation_position >= 0.38:
+			_anim.seek(0.0, true)
+			_anim.pause()
+			_anim.speed_scale = 1.0
+		return
 	if _anim and _anim.is_playing() and _anim.current_animation_position >= AIM_TIME + 0.12:
 		_anim.seek(AIM_TIME, true)
 		_anim.pause()
@@ -841,13 +857,27 @@ func _settle_anim() -> void:
 func _pose_aim() -> void:
 	if _anim == null:
 		return
+	if _glb_muzzle:
+		_anim.play("Shoot")
+		_anim.seek(0.0, true)
+		_anim.pause()
+		return
 	_anim.play("Shoot_OneHanded")
 	_anim.seek(AIM_TIME, true)
 	_anim.pause()
 
 
 ## Waffe an die Figur anpassen: fertiges Waffenmodell statt der einfachen Form, wo vorhanden.
+## Mündung des Comic-Modells (GLB-Knoten „Muzzle“); die einfache Waffe bleibt dann unsichtbar
+var _glb_muzzle: Node3D
+
+
 func _fit_weapon_to_model() -> void:
+	if _glb_muzzle:
+		for c in _weapon.get_children():
+			if c != _muzzle and c is Node3D:
+				(c as Node3D).visible = false
+		return
 	var gun_file: String = Models.HEROES[id]["gun"]
 	if gun_file != "":
 		var gun := Models.make_gun(gun_file)
