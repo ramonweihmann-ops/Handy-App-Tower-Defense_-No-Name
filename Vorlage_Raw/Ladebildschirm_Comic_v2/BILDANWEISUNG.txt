@@ -1,0 +1,33 @@
+Erstelle ein einziges hochwertiges STATISCHES Start- und Ladebild für das mobile Weltraumspiel „STATION AM WURMLOCH“. Hochformat im Seitenverhältnis des ersten Referenzbilds, ungefähr 390:844 bzw. 9:19,5, als großes scharfes PNG. Gesamte Komposition von oben bis unten, keine Collage oder mehrere Varianten.
+
+REFERENZEN:
+Bild 1: bisheriger Startbildschirm. Dient für Hochformat, Branding, den exakten deutschen Titel und die fröhliche blau-violett-goldene Weltraumstimmung. NICHT die veralteten Figurenmodelle und nicht den kleinen orangen Drachen übernehmen.
+Bild 2: aktuelle freigegebene acht Comic-Helden. Dient VERBINDLICH für Identitäten, Proportionen, Kleidung, Farben und Requisiten. Daraus genau fünf Figuren verwenden.
+Bild 3: bestehende Gegnerübersicht. Daraus als großen Boss den Wurmloch-Zombie-Koloss GANZ UNTEN RECHTS aus „Welt 10 · Herz des Wurmlochs“ verwenden. Seine markante rundliche pink-magenta Gestalt mit violetter Bauchfläche, langen kräftigen Armen, kurzen Beinen, kleinen Ohren, kurzem Haarschopf und breitem frechem Grinsen erhalten und auf eine etwas hochwertigere Poster-Darstellung übertragen. Kein neuer Drache als Boss, kein menschlicher Zombie, kein Horror.
+
+BILDSPRACHE:
+Ein aufregendes, einladendes 3D-Comic-Spielposter, einen klaren Qualitätsschritt über der normalen Spielgrafik: viel bessere Lichtführung, sanfte Tiefenstaffelung, schöne Weltraumatmosphäre, kräftige Konturen, hochwertige weiche Materialschattierung. Die Helden bleiben aber genau die sympathischen kleinen Figuren mit großen Köpfen und einfachen großen Formen aus Bild 2, etwa drei Kopfhöhen groß. Stoff, Haare und Gesicht NICHT realistisch machen. Keine Poren, keine komplexen Falten, kein düsterer Fotorealismus. Der zusätzliche Detailreichtum steckt überwiegend in Planeten, Gaswolken, Sternen, Wurmloch und Randlicht. Humorvolles spannendes Abenteuer für Erwachsene und Familien, ohne Gewaltdarstellung oder Schussereignisse.
+
+KOMPOSITION:
+Obere etwa 6–22 %: sehr gut lesbares großes Logo. Dahinter ein ruhiger dunkelblauer Himmel mit wenigen Sternen, keine Figurenköpfe hinter den Buchstaben.
+Mittlere etwa 24–60 %: ein riesiges leuchtend violett-türkis umrandetes Wurmloch mit räumlicher Tiefe. Der Wurmloch-Zombie-Koloss steigt imposant aus diesem Portal empor, deutlich MASSIVER als alle Helden, Kopf und Oberkörper groß über der Gruppe. Seine breiten Arme rahmen die Heldenkomposition seitlich ein. Er hat einen frechen entschlossenen Gesichtsausdruck mit dicken Cartoon-Augenbrauen und einigen großen stumpfen Zähnen, keine blutigen Details. Seine magentafarbene Silhouette und violette Bauchfläche sind klar zu erkennen. Der Boss bleibt HINTER den Helden, keine Figur wird gepackt oder berührt.
+Seitlich hinter Portal/Boss: ein eindrucksvoller warmer Gasriese mit Wolkenbändern links, ein etwas kleinerer türkisblauer Ringplanet rechts, violette und blaue Nebel, kleine Asteroiden, wenige schöne Sterne. Planeten als echte räumliche Himmelskörper mit leuchtender Atmosphäre, nicht flache Symbole. Planetendetails an den Seiten, sodass Boss und Logo klar bleiben.
+Vordergrund etwa 51–87 %: GENAU FÜNF aktuelle Helden als dynamische, zusammenhängende Gruppe auf einer schräg gestaffelten metallischen Space-Brücke mit dezenten türkis-goldenen Leuchtlinien. Helden in einer mutigen dramatischen Präsentationspose wie auf einem guten Abenteuer-Spielcover, unterschiedliche Höhen und Blickrichtungen, klare Gesichter und Silhouetten. Kein bloßes statisches Aufstellen in einer geraden Reihe. Unten ein wenig reflektiertes warmes Licht und wenige dekorative Funken bzw. Sterne ohne Beschädigungen.
+Unterste etwa 10–12 %: ruhiger dunkler blau-violetter Bereich für die später im Spiel eingeblendete echte Ladeanzeige. Dort KEINEN Ladebalken, KEINE Prozentzahl, KEINEN weiteren Text und keine wichtigen Füße oder Gesichter zeichnen. Auch ganz oben und an den Seiten etwas Sicherheitsabstand halten.
+
+GENAU DIESE FÜNF HELDEN:
+- Dusty Jo vorne in der Mitte als klarer Anführer: brauner Cowboyhut mit kleinem türkisfarbenem Feld, brauner Schnurrbart, rotes Halstuch, braune Jacke, blaue Hose und große braune Stiefel. Mutige leicht vorgeschobene Haltung, stilisierter silberner Revolver locker angehoben, Gesicht frei.
+- Iska links: DUNKELBRAUNE große Haarform/Pferdeschwanz, dunkelblaue Kleidung, kleines türkisfarbenes Schulterfeld und klassisches kompaktes Gewehr mit gebogenem Magazin. Lebhafte Dreiviertelhaltung, Körper leicht gedreht, klare freie Silhouette.
+- Brocken rechts hinter Dusty Jo: kräftiger kompakter Körper, GELBE Mütze, weißes Shirt, braune Latzschürze, blaue Hose, breite Stiefel, großer ROT-GRAUER dreiröhriger Launcher auf der rechten Schulter. Er wirkt entschlossen und sympathisch, sein Gesicht wird nicht vom Requisit verdeckt.
+- Volta links etwas höher hinter Iska: blonde Haare mit klar TÜRKISBLAUEN UNTEREN HAARSPITZEN, weißer kurzer Kittel und mintgrüne Kleidung; einfache graue Techniker-Pistole mit türkisfarbener Spule und kleines Diagnosegerät. Sie steht aufmerksam leicht seitlich, ihr Kopf ist gut sichtbar.
+- Fritzi rechts vorne seitlich: ORANGE Arbeitsmütze, blonde Haare, weißes Shirt, braune Arbeitsschürze mit wenigen roten Patronen, blaue knielange Hose und braune Stiefel. Seine klassische hölzerne Doppelflinte mit Messingakzent bleibt in der bestätigten hohen Anschlagpose: hinteres breites Ende an der rechten Schulter, beide Arme VOM KÖRPER WEG nach vorne, vordere Hand deutlich weiter vorne. Die parallelen grauen Röhren zeigen nach außen in Fritzi-Blickrichtung. Nicht über die Schulter nach hinten und nicht am Bauch umarmt. Ruhige Pose, kein Schuss.
+
+Alle fünf Figuren vollständig als Gruppe lesbar, keine sechste Figur, keine Tierbegleiter und keine Namensschilder. Requisiten anatomisch plausibel halten, Hände korrekt, keine überzähligen Gliedmaßen, keine gekreuzten Requisiten vor fremden Gesichtern.
+
+LOGO / EINZIGER TEXT:
+Oben zentriert exakt zwei Zeilen:
+„STATION AM“ in klarer türkis-hellblauer kräftiger Schrift,
+„WURMLOCH“ sehr groß darunter in warmem leuchtendem Goldgelb mit orangefarbener räumlicher Unterkante und dunkler Kontur.
+Der Titel muss auf einem Handydisplay sofort lesbar bleiben, an den Seiten ausreichend Abstand. Keine weiteren Schriftzüge, kein Untertitel, keine Prozentangabe, kein Wasserzeichen.
+
+Das Ergebnis soll sofort Lust auf das Spiel machen: das bekannte freundliche Comic-Portfolio als fünfköpfiges Team, ein wirklich riesiger vorhandener Wurmloch-Boss dahinter und ein spektakulärer Kosmos. Hochwertiger als die Ingame-Grafik, aber deutlich erkennbar dieselbe Designwelt.
