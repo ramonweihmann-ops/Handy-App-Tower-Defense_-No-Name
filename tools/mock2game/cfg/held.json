@@ -36,7 +36,7 @@
   {"sel": "img[style*=\"top: 172px\"]", "id": "hero"},
   {"sel": "div[aria-label^=\"Talent: \"]", "id": "talent", "img": true},
   {"sel": "button svg[width=\"56\"]", "id": "card_icon"},
-  {"sel": "button[style*=\"flex: 1; height: 46px\"] svg", "id": "coin", "img": true},
+  {"sel": "button[style*=\"flex: 1; height: 46px\"] :is(svg, span[style*=\"display:inline-block\"], img[style*=\"display:inline-block\"])", "id": "coin", "img": true},
   {"sel": "div[style*=\"height: 24px; margin-left: 14px\"]", "id": "cardbar"},
   {"sel": "div[style*=\"margin-top: -30px\"]", "id": "cardicon", "img": true},
   {"sel": "div[style*=\"height: 32px; border-radius: 8px; background: #141038\"]", "id": "stat"},

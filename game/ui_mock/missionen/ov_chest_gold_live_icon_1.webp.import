@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://hmlm7cljg83p"
-path="res://.godot/imported/iska_btn1.webp-8838616b6f81982d6994ca188408456b.ctex"
+uid="uid://ck8k1c8e2gbp7"
+path="res://.godot/imported/ov_chest_gold_live_icon_1.webp-73b5c725b00deeb9025de8421a397ac2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui_mock/held/iska_btn1.webp"
-dest_files=["res://.godot/imported/iska_btn1.webp-8838616b6f81982d6994ca188408456b.ctex"]
+source_file="res://ui_mock/missionen/ov_chest_gold_live_icon_1.webp"
+dest_files=["res://.godot/imported/ov_chest_gold_live_icon_1.webp-73b5c725b00deeb9025de8421a397ac2.ctex"]
 
 [params]
 
-compress/mode=1
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.9
 compress/uastc_level=0

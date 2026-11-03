@@ -13,7 +13,7 @@
   {"sel": "div[style*=\"font: 800 14px Nunito, sans-serif; color: #4a3a7a\"]", "id": "mtext"},
   {"sel": "span[style*=\"font:800 14px/1 Fredoka\"]", "id": "mpts"},
   {"sel": "span[style*=\"font: 800 11px Nunito, sans-serif; color: #fff\"]", "id": "mbar"},
-  {"sel": "div[role=\"dialog\"] svg", "id": "icon", "img": true},
+  {"sel": "div[role=\"dialog\"] :is(svg, span[style*=\"display:inline-block\"], img[style*=\"display:inline-block\"])", "id": "icon", "img": true},
   {"sel": "div[role=\"dialog\"] > div[aria-hidden]", "id": "arrow", "img": true},
   {"sel": "div[role=\"dialog\"] div[style*=\"flex: 1; min-width: 0\"]", "id": "item"}
  ]}

@@ -21,6 +21,6 @@
   {"sel": "div[role=\"dialog\"] svg[width=\"44\"]", "id": "pop_icon"},
   {"sel": "div[role=\"dialog\"] > div:first-child > div:nth-child(2)", "id": "pop_text"},
   {"sel": "div[role=\"dialog\"] > div:nth-child(2) > span:nth-child(2)", "id": "price"},
-  {"sel": "div[role=\"dialog\"] > div:nth-child(2) svg", "id": "coin", "img": true, "pad": 2},
+  {"sel": "div[role=\"dialog\"] > div:nth-child(2) :is(svg, span[style*=\"display:inline-block\"], img[style*=\"display:inline-block\"])", "id": "coin", "img": true, "pad": 2},
   {"sel": "div[role=\"dialog\"] > div:last-child > svg[width=\"16\"]", "id": "need_lock", "img": true, "pad": 2}
  ]}

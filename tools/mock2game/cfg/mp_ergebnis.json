@@ -21,7 +21,7 @@
    "pad": 24
   },
   {
-   "sel": "div[style*=\"height: 66px\"] > svg",
+   "sel": "div[style*=\"height: 66px\"] > :is(svg, span[style*=\"display:inline-block\"], img[style*=\"display:inline-block\"])",
    "id": "crown",
    "img": true,
    "pad": 4

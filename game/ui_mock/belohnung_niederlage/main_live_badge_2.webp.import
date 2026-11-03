@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c8p3m71xijpvx"
-path="res://.godot/imported/ov_pop_lock_live_coin.webp-87d40ad2c64a1a5e63ac0080d1963ef5.ctex"
+uid="uid://dg8kd51gub4jl"
+path="res://.godot/imported/main_live_badge_2.webp-3342d2253c201fb8ce15c4ecd482d071.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui_mock/upgrades_tech/ov_pop_lock_live_coin.webp"
-dest_files=["res://.godot/imported/ov_pop_lock_live_coin.webp-87d40ad2c64a1a5e63ac0080d1963ef5.ctex"]
+source_file="res://ui_mock/belohnung_niederlage/main_live_badge_2.webp"
+dest_files=["res://.godot/imported/main_live_badge_2.webp-3342d2253c201fb8ce15c4ecd482d071.ctex"]
 
 [params]
 

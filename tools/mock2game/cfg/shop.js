@@ -13,11 +13,14 @@ window.m2g = (() => {
       coin: g[1].firstElementChild.outerHTML,
       cards: g[2].firstElementChild.outerHTML,
       star: g[3].firstElementChild.outerHTML,
-      bolt: root().querySelector('svg path[d^="M13 2 4 14"]').closest('svg').outerHTML,
+      // Blitz: altes Vektor-Symbol oder neues Space-Comic-Symbol (Bild)
+      bolt: (root().querySelector('svg path[d^="M13 2 4 14"]')?.closest('svg') || root().querySelector('[src*="7d5fe1a2dacc479ab01f992e73ba4c53"]')).outerHTML,
       chest: area().querySelector('div[style*="width: 160px; height: 116px"]').outerHTML,
     };
   };
-  const sized = (svg, w, h) => svg.replace(/width="[\d.]+"/, `width="${w}"`).replace(/height="[\d.]+"/, `height="${h}"`);
+  // Größe setzen: bei Vektor-Symbolen über width/height, bei den neuen Bild-Symbolen über den Stil
+  const sized = (svg, w, h) => svg.replace(/width="[\d.]+"/, `width="${w}"`).replace(/height="[\d.]+"/, `height="${h}"`)
+    .replace(/width:\s*[\d.]+px/, `width:${w}px`).replace(/height:\s*[\d.]+px/, `height:${h}px`);
 
   const header = (top, text) => `<div style="position: absolute; left: 70px; right: 70px; top: ${top}px; height: 34px; border-radius: 8px; background: linear-gradient(180deg, #8a6ae0, #6a4ac0); box-shadow: inset 0 0 0 2px rgba(255,255,255,0.18); display: grid; place-items: center; font: 700 17px Fredoka, sans-serif; letter-spacing: 0.06em; color: #e8e0ff">${text}</div>`;
   const card = (top, h, inner, look, extra = '') => `<div style="position: absolute; left: 12px; right: 12px; top: ${top}px; height: ${h}px; border-radius: 18px; background: rgba(30,20,80,0.55); padding: 8px; box-sizing: border-box"><div style="position: relative; height: 100%; border-radius: 14px; overflow: hidden; ${look}">${inner}</div>${extra}</div>`;
