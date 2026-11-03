@@ -1,0 +1,30 @@
+[
+  {
+    "datei": "edelsteine.png",
+    "breite": 852,
+    "hoehe": 1846,
+    "bytes": 1529796,
+    "sha256": "6582cecda3e6bb56133673c7b238c614ab1c1367ccbfdbc2fffc36529426557e"
+  },
+  {
+    "datei": "energie.png",
+    "breite": 977,
+    "hoehe": 1609,
+    "bytes": 1591697,
+    "sha256": "9c3053c3e4160d0198019fa8f7cc77436b2ce0f80dbba4df9a2a4b84e782496d"
+  },
+  {
+    "datei": "gold.png",
+    "breite": 977,
+    "hoehe": 1609,
+    "bytes": 1575177,
+    "sha256": "599baff91cd89901072a4ab2d14bde93482acb6882eeaca4fa41860e4ff43cc8"
+  },
+  {
+    "datei": "heldenkarten_iska.png",
+    "breite": 977,
+    "hoehe": 1610,
+    "bytes": 1617555,
+    "sha256": "53c2f341d7d8cc2266c3b42c632748e11d4c998ed5ad554d2441847f58393982"
+  }
+]
