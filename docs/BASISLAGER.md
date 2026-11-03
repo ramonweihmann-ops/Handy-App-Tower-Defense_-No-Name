@@ -1,7 +1,7 @@
 # Basislager: 30 Gebäude (Vorschlag zur Prüfung)
 
-Stand 02.11.2026. Vorlage: `Vorlage_Raw/Raumbasis_30` (Gestaltung freigegeben). Werte sind ein erster
-Vorschlag; vor dem Einbau rechne ich sie mit `scripts/economy-sim.py` und dem Balance-Labor nach.
+Stand 02.11.2026. Vorlage: `Vorlage_Raw/Raumbasis_30` (Gestaltung freigegeben). Werte mit `scripts/economy-sim.py`
+geprüft (Abschnitt „Wirtschafts-Simulation“); die Kampf-Boni prüft noch das Balance-Labor.
 
 ## Grundregeln
 
@@ -65,6 +65,29 @@ werden (die Spielerprofile im Balance-Labor bekommen das Basislager dazu).
   Sterne; kein Gebäude höher als die Kommandozentrale. Erzeuger speichern 8 Stunden Ertrag
   (Kommandantenresidenz mehr). Werte und Kosten werden noch mit der Wirtschafts-Simulation geprüft.
 - Bis die Grafik mit leeren Bauplätzen da ist, zeigt der Reiter „Basis“ die Gebäude als Liste.
+
+## Wirtschafts-Simulation (03.11.2026)
+
+`python3 scripts/economy-sim.py` (Basislager) bzw. `--alt` (frühere Quartiere je Held), `--battles 4`
+für Gelegenheitsspieler. Annahmen: Erzeuger laufen 16 Stunden am Tag (Lager 8 Std., 2–3× abgeholt),
+Gold geht zuerst in Helden, Tech und Munition, der Rest ins Basislager (erst neue Gebäude, dann der
+billigste Ausbau). Sterne für Stufe 6+ sind gezählt, aber nicht begrenzt.
+
+| | 10 Kämpfe/Tag (7 Tage bis Level 50) | 4 Kämpfe/Tag (18 Tage) |
+|---|---|---|
+| Heldenstufe bei Level 50 (Ziel 20) | 21, wie ohne Basislager | 22, wie ohne Basislager |
+| Gebäude bei Level 50 / Ø Stufe | 28 / 4,2 | 30 / 7,2 |
+| Gold aus der Basis / aus Kämpfen | 59.000 / 192.000 | 230.000 / 196.000 |
+| ins Basislager gesteckt | 149.000 Gold | 322.000 Gold |
+| übriges Gold bei Level 50 | 6.400 (vorher 90.600) | 6.700 (vorher 89.200) |
+| Sterne für die Ausbauten | 5 | 98 |
+
+Ergebnis: Die Werte passen. Das Basislager verschiebt die Heldenkurve nicht (Karten kommen weiter
+vor allem aus den Kämpfen; die Werkstatt verteilt ihre Karten auf alle Helden), und es nimmt den
+bisherigen Goldüberschuss auf. Bei wenigen Kämpfen am Tag bringt die Basis mehr Gold als die Kämpfe;
+das ist gewollt (wer selten spielt, holt auf) und fließt wieder in die Basis. Ab Stufe 6 bremsen die
+Sterne den Ausbau (insgesamt 300 Sterne für alles auf Stufe 10); das ist das Langzeitziel. Noch offen:
+die Kampf-Boni der Basis (Schaden bis +22 %) im Balance-Labor gegen die Schwierigkeitskurve prüfen.
 
 ## Grafik
 
