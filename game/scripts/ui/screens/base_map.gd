@@ -23,6 +23,19 @@ var _press_pos := Vector2.ZERO
 var _moved := 0.0
 var _t := 0.0
 var _font: Font
+## Bildschirmpunkte oben/unten, die Kopfleiste und Reiterleiste verdecken (Karte lässt sich darunter hervorziehen)
+var pad_top := 0.0:
+	set(v):
+		pad_top = v
+		if not _layout.is_empty():
+			_clamp()
+			queue_redraw()
+var pad_bottom := 0.0:
+	set(v):
+		pad_bottom = v
+		if not _layout.is_empty():
+			_clamp()
+			queue_redraw()
 
 
 func _ready() -> void:
@@ -65,8 +78,8 @@ func _fit() -> void:
 	if size.x <= 0:
 		return
 	_zoom = size.x / IMG_W
-	_min_zoom = minf(_zoom, size.y / maxf(1.0, IMG_H - _active_top()))
-	_pan = Vector2(0, IMG_H - size.y / _zoom)
+	_min_zoom = minf(_zoom, (size.y - pad_top - pad_bottom) / maxf(1.0, IMG_H - _active_top()))
+	_pan = Vector2(0, IMG_H - (size.y - pad_bottom) / _zoom)
 	_clamp()
 	queue_redraw()
 
@@ -78,8 +91,8 @@ func _clamp() -> void:
 	_pan.x = clampf(_pan.x, minf(0.0, IMG_W - view.x) if view.x > IMG_W else 0.0, maxf(0.0, IMG_W - view.x))
 	if view.x > IMG_W:
 		_pan.x = (IMG_W - view.x) * 0.5
-	var lo := top
-	var hi := IMG_H - view.y
+	var lo := top - pad_top / _zoom
+	var hi := IMG_H - (size.y - pad_bottom) / _zoom
 	_pan.y = clampf(_pan.y, minf(lo, hi), maxf(lo, hi))
 
 
@@ -116,7 +129,9 @@ func _gui_input(e: InputEvent) -> void:
 		var mm := e as InputEventMouseMotion
 		_moved += mm.relative.length()
 		_pan -= mm.relative / _zoom
-		_clamp()
+		if not _layout.is_empty():
+			_clamp()
+			queue_redraw()
 		queue_redraw()
 	elif e is InputEventScreenTouch:
 		var st := e as InputEventScreenTouch

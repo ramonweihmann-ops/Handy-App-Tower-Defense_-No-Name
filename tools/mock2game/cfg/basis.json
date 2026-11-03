@@ -1,0 +1,4 @@
+{"board": "Basislager.dc.html", "out": "out/basis", "states": [{"name": "main"}],
+ "only": ["#dc-root > div > div[style*=\"top: 0; height: 150px\"]", "#dc-root > div > div[style*=\"top: 12px; height: 38px\"]",
+   "#dc-root > div > div[style*=\"top: 58px\"]", "#dc-root > div > div[style*=\"top: 94px\"]", "#dc-root > div > nav"],
+ "live": []}

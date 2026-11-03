@@ -411,8 +411,6 @@ func show_tab(id: String) -> void:
 			page = _tab_sammlung()
 		"upgrades":
 			page = _tab_upgrades()
-		"basis":
-			page = _tab_basis()
 		_:
 			page = _tab_kampf()
 	page.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -1346,30 +1344,10 @@ func _buy_energy() -> void:
 
 
 # --- Reiter: Basislager ------------------------------------------------------------
+# Die Karte mit Kopf- und Reiterleiste baut screens/tab_basis.gd (BaseTab) nach dem Mockup.
 
-## Basislager als Karte (BaseMap): Antippen eines Gebäudes öffnet sein Fenster
-var _base_map: BaseMap
-
-
-func _tab_basis() -> Control:
-	var root := Control.new()
-	_base_map = BaseMap.new()
-	_base_map.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_base_map.building_pressed.connect(_open_building)
-	root.add_child(_base_map)
-	var built := 0
-	for d in BaseData.BUILDINGS:
-		if Save.base_built(d["id"]):
-			built += 1
-	var head := UiKit.label("BASISLAGER · %d/30" % built, 26, UiKit.C_GOLD)
-	head.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	head.offset_top = 8
-	head.offset_bottom = 48
-	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	head.add_theme_color_override("font_outline_color", Color(0.1, 0.05, 0.3))
-	head.add_theme_constant_override("outline_size", 8)
-	root.add_child(head)
-	return root
+func open_building(id: String) -> void:
+	_open_building(id)
 
 
 ## Gebäudefenster: Wirkung jetzt → nächste Stufe, Lager mit „Abholen“, Ausbauen bzw. Bauen
