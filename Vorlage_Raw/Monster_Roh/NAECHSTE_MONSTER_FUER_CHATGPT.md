@@ -4,7 +4,7 @@ Zombie, Tentakler und Panzerkäfer laufen im Spiel (freigegeben). Es fehlen noch
 Welten 1 und 2. Ab Welt 3 färbt das Spiel dieselben Figuren je Welt ein; dafür braucht es keine eigenen Modelle.
 
 **Kosten: 5 Erzeugungen zu je etwa 15 Meshy-Credits, zusammen etwa 75 Credits (bezahltes Konto).
-Bitte erst starten, wenn der Nutzer die Kosten freigegeben hat.** Wenn Rigging oder Bewegungen bei Meshy extra
+Vom Nutzer am 03.11.2026 freigegeben (75 Credits).** Wenn Rigging oder Bewegungen bei Meshy extra
 kosten, das vorher sagen und nicht ungefragt buchen.
 
 ## Die fünf Monster

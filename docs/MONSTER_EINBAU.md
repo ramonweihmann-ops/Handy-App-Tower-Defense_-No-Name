@@ -38,7 +38,7 @@ Godot-Test → **Prüfbild für die Freigabe** → erst dann im Spiel aktiv.
 - Danach rigge ich die sechs Beine selbst und erzeuge einen Dreifuß-Gang (`Walk`) und einen Biss (`Attack`).
 
 **Stand:** Zombie, Tentakler und Panzerkäfer sind freigegeben und aktiv (Version 0.7.4). Auftrag für die
-übrigen fünf: `Vorlage_Raw/Monster_Roh/NAECHSTE_MONSTER_FUER_CHATGPT.md` (etwa 75 Meshy-Credits, wartet auf Freigabe).
+übrigen fünf: `Vorlage_Raw/Monster_Roh/NAECHSTE_MONSTER_FUER_CHATGPT.md` (etwa 75 Meshy-Credits, freigegeben am 03.11.2026).
 
 **Schritt 4 – restliche Gegner**, wenn die drei laufen: Schleimling, Schleimmutter (Boss), Krabbler, Brecher,
 Zombie-Koloss (Boss). Je Gegner: Bildvorlage (ChatGPT) → Meshy → mein Skript → Prüfbild → Einbau.
