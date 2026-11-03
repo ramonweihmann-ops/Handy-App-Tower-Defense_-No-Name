@@ -1,0 +1,188 @@
+{
+  "status": "Alle 30 Ausbaustufen geprüft",
+  "punkte": 61,
+  "wegabschnitte": 69,
+  "positionen_der_30_gebaeude": "unverändert aus dem bestehenden Index",
+  "pruefung": [
+    {
+      "gebaeude": 1,
+      "aktive_wegabschnitte": 3,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 2,
+      "aktive_wegabschnitte": 4,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 3,
+      "aktive_wegabschnitte": 6,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 4,
+      "aktive_wegabschnitte": 8,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 5,
+      "aktive_wegabschnitte": 10,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 6,
+      "aktive_wegabschnitte": 13,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 7,
+      "aktive_wegabschnitte": 15,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 8,
+      "aktive_wegabschnitte": 17,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 9,
+      "aktive_wegabschnitte": 20,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 10,
+      "aktive_wegabschnitte": 22,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 11,
+      "aktive_wegabschnitte": 24,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 12,
+      "aktive_wegabschnitte": 27,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 13,
+      "aktive_wegabschnitte": 29,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 14,
+      "aktive_wegabschnitte": 31,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 15,
+      "aktive_wegabschnitte": 34,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 16,
+      "aktive_wegabschnitte": 36,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 17,
+      "aktive_wegabschnitte": 38,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 18,
+      "aktive_wegabschnitte": 41,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 19,
+      "aktive_wegabschnitte": 43,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 20,
+      "aktive_wegabschnitte": 45,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 21,
+      "aktive_wegabschnitte": 48,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 22,
+      "aktive_wegabschnitte": 50,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 23,
+      "aktive_wegabschnitte": 52,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 24,
+      "aktive_wegabschnitte": 55,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 25,
+      "aktive_wegabschnitte": 57,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 26,
+      "aktive_wegabschnitte": 59,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 27,
+      "aktive_wegabschnitte": 62,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 28,
+      "aktive_wegabschnitte": 64,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 29,
+      "aktive_wegabschnitte": 66,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    },
+    {
+      "gebaeude": 30,
+      "aktive_wegabschnitte": 69,
+      "alle_aktiven_gebaeude_erreichbar": true,
+      "keine_isolierten_wegabschnitte": true
+    }
+  ]
+}

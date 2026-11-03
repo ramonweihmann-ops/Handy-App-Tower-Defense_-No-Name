@@ -1,0 +1,2324 @@
+{
+  "status": "Logischer Verbindungsplan; sichtbare Einmündungen an den Sprites fein ausrichten.",
+  "coordinate_system": {
+    "origin": "oben links",
+    "width": 724,
+    "height": 2172,
+    "unit": "Pixel der bisherigen Originalvorlage"
+  },
+  "reference_image": "raumbasis_30_gebaeude_pruefansicht.png",
+  "preview_image": "raumbasis_mit_wegen_vorschau.png",
+  "entry": "eingang",
+  "unlock_rule": "Gebäude mit ID <= Championzahl; Wege mit unlock_at <= Championzahl. Bestehende Plätze bleiben unverändert.",
+  "start_count": 5,
+  "max_count": 30,
+  "buildings": [
+    {
+      "id": "01",
+      "name": "Kommandozentrale",
+      "unlock_at": 1,
+      "row": 1,
+      "column": 1,
+      "foot": {
+        "x": 121,
+        "y": 2020
+      },
+      "source_rect": {
+        "x": 0,
+        "y": 1800,
+        "breite": 242,
+        "hoehe": 245
+      },
+      "access_node": "haus_01"
+    },
+    {
+      "id": "02",
+      "name": "Sanitätsstation",
+      "unlock_at": 2,
+      "row": 1,
+      "column": 2,
+      "foot": {
+        "x": 363,
+        "y": 2020
+      },
+      "source_rect": {
+        "x": 242,
+        "y": 1800,
+        "breite": 242,
+        "hoehe": 245
+      },
+      "access_node": "haus_02"
+    },
+    {
+      "id": "03",
+      "name": "Werkstatt",
+      "unlock_at": 3,
+      "row": 1,
+      "column": 3,
+      "foot": {
+        "x": 604,
+        "y": 2020
+      },
+      "source_rect": {
+        "x": 484,
+        "y": 1800,
+        "breite": 240,
+        "hoehe": 245
+      },
+      "access_node": "haus_03"
+    },
+    {
+      "id": "04",
+      "name": "Hologrammakademie",
+      "unlock_at": 4,
+      "row": 2,
+      "column": 1,
+      "foot": {
+        "x": 121,
+        "y": 1775
+      },
+      "source_rect": {
+        "x": 0,
+        "y": 1575,
+        "breite": 242,
+        "hoehe": 225
+      },
+      "access_node": "haus_04"
+    },
+    {
+      "id": "05",
+      "name": "Reaktorturm",
+      "unlock_at": 5,
+      "row": 2,
+      "column": 2,
+      "foot": {
+        "x": 363,
+        "y": 1775
+      },
+      "source_rect": {
+        "x": 242,
+        "y": 1575,
+        "breite": 242,
+        "hoehe": 225
+      },
+      "access_node": "haus_05"
+    },
+    {
+      "id": "06",
+      "name": "Kommunikationsstation",
+      "unlock_at": 6,
+      "row": 2,
+      "column": 3,
+      "foot": {
+        "x": 604,
+        "y": 1775
+      },
+      "source_rect": {
+        "x": 484,
+        "y": 1575,
+        "breite": 240,
+        "hoehe": 225
+      },
+      "access_node": "haus_06"
+    },
+    {
+      "id": "07",
+      "name": "Gewächshaus",
+      "unlock_at": 7,
+      "row": 3,
+      "column": 1,
+      "foot": {
+        "x": 121,
+        "y": 1550
+      },
+      "source_rect": {
+        "x": 0,
+        "y": 1380,
+        "breite": 242,
+        "hoehe": 195
+      },
+      "access_node": "haus_07"
+    },
+    {
+      "id": "08",
+      "name": "Roboterlabor",
+      "unlock_at": 8,
+      "row": 3,
+      "column": 2,
+      "foot": {
+        "x": 363,
+        "y": 1550
+      },
+      "source_rect": {
+        "x": 242,
+        "y": 1380,
+        "breite": 242,
+        "hoehe": 195
+      },
+      "access_node": "haus_08"
+    },
+    {
+      "id": "09",
+      "name": "Sternwarte",
+      "unlock_at": 9,
+      "row": 3,
+      "column": 3,
+      "foot": {
+        "x": 604,
+        "y": 1550
+      },
+      "source_rect": {
+        "x": 484,
+        "y": 1380,
+        "breite": 240,
+        "hoehe": 195
+      },
+      "access_node": "haus_09"
+    },
+    {
+      "id": "10",
+      "name": "Schiffswerft",
+      "unlock_at": 10,
+      "row": 4,
+      "column": 1,
+      "foot": {
+        "x": 121,
+        "y": 1355
+      },
+      "source_rect": {
+        "x": 0,
+        "y": 1170,
+        "breite": 242,
+        "hoehe": 210
+      },
+      "access_node": "haus_10"
+    },
+    {
+      "id": "11",
+      "name": "Schildgenerator",
+      "unlock_at": 11,
+      "row": 4,
+      "column": 2,
+      "foot": {
+        "x": 363,
+        "y": 1355
+      },
+      "source_rect": {
+        "x": 242,
+        "y": 1170,
+        "breite": 242,
+        "hoehe": 210
+      },
+      "access_node": "haus_11"
+    },
+    {
+      "id": "12",
+      "name": "Trainingshalle",
+      "unlock_at": 12,
+      "row": 4,
+      "column": 3,
+      "foot": {
+        "x": 604,
+        "y": 1355
+      },
+      "source_rect": {
+        "x": 484,
+        "y": 1170,
+        "breite": 240,
+        "hoehe": 210
+      },
+      "access_node": "haus_12"
+    },
+    {
+      "id": "13",
+      "name": "Kristallforschung",
+      "unlock_at": 13,
+      "row": 5,
+      "column": 1,
+      "foot": {
+        "x": 121,
+        "y": 1145
+      },
+      "source_rect": {
+        "x": 0,
+        "y": 985,
+        "breite": 242,
+        "hoehe": 185
+      },
+      "access_node": "haus_13"
+    },
+    {
+      "id": "14",
+      "name": "Panzerwerkstatt",
+      "unlock_at": 14,
+      "row": 5,
+      "column": 2,
+      "foot": {
+        "x": 363,
+        "y": 1145
+      },
+      "source_rect": {
+        "x": 242,
+        "y": 985,
+        "breite": 242,
+        "hoehe": 185
+      },
+      "access_node": "haus_14"
+    },
+    {
+      "id": "15",
+      "name": "Drohnenhangar",
+      "unlock_at": 15,
+      "row": 5,
+      "column": 3,
+      "foot": {
+        "x": 604,
+        "y": 1145
+      },
+      "source_rect": {
+        "x": 484,
+        "y": 985,
+        "breite": 240,
+        "hoehe": 185
+      },
+      "access_node": "haus_15"
+    },
+    {
+      "id": "16",
+      "name": "Alchemielabor",
+      "unlock_at": 16,
+      "row": 6,
+      "column": 1,
+      "foot": {
+        "x": 121,
+        "y": 960
+      },
+      "source_rect": {
+        "x": 0,
+        "y": 795,
+        "breite": 242,
+        "hoehe": 190
+      },
+      "access_node": "haus_16"
+    },
+    {
+      "id": "17",
+      "name": "Energiespeicher",
+      "unlock_at": 17,
+      "row": 6,
+      "column": 2,
+      "foot": {
+        "x": 363,
+        "y": 960
+      },
+      "source_rect": {
+        "x": 242,
+        "y": 795,
+        "breite": 242,
+        "hoehe": 190
+      },
+      "access_node": "haus_17"
+    },
+    {
+      "id": "18",
+      "name": "Navigationszentrale",
+      "unlock_at": 18,
+      "row": 6,
+      "column": 3,
+      "foot": {
+        "x": 604,
+        "y": 960
+      },
+      "source_rect": {
+        "x": 484,
+        "y": 795,
+        "breite": 240,
+        "hoehe": 190
+      },
+      "access_node": "haus_18"
+    },
+    {
+      "id": "19",
+      "name": "Eisforschung",
+      "unlock_at": 19,
+      "row": 7,
+      "column": 1,
+      "foot": {
+        "x": 121,
+        "y": 770
+      },
+      "source_rect": {
+        "x": 0,
+        "y": 610,
+        "breite": 242,
+        "hoehe": 185
+      },
+      "access_node": "haus_19"
+    },
+    {
+      "id": "20",
+      "name": "Feuerforschung",
+      "unlock_at": 20,
+      "row": 7,
+      "column": 2,
+      "foot": {
+        "x": 363,
+        "y": 770
+      },
+      "source_rect": {
+        "x": 242,
+        "y": 610,
+        "breite": 242,
+        "hoehe": 185
+      },
+      "access_node": "haus_20"
+    },
+    {
+      "id": "21",
+      "name": "Waffenwerkstatt",
+      "unlock_at": 21,
+      "row": 7,
+      "column": 3,
+      "foot": {
+        "x": 604,
+        "y": 770
+      },
+      "source_rect": {
+        "x": 484,
+        "y": 610,
+        "breite": 240,
+        "hoehe": 185
+      },
+      "access_node": "haus_21"
+    },
+    {
+      "id": "22",
+      "name": "Bibliotheksarchiv",
+      "unlock_at": 22,
+      "row": 8,
+      "column": 1,
+      "foot": {
+        "x": 121,
+        "y": 585
+      },
+      "source_rect": {
+        "x": 0,
+        "y": 435,
+        "breite": 242,
+        "hoehe": 175
+      },
+      "access_node": "haus_22"
+    },
+    {
+      "id": "23",
+      "name": "Biolabor",
+      "unlock_at": 23,
+      "row": 8,
+      "column": 2,
+      "foot": {
+        "x": 363,
+        "y": 585
+      },
+      "source_rect": {
+        "x": 242,
+        "y": 435,
+        "breite": 242,
+        "hoehe": 175
+      },
+      "access_node": "haus_23"
+    },
+    {
+      "id": "24",
+      "name": "Teleportstation",
+      "unlock_at": 24,
+      "row": 8,
+      "column": 3,
+      "foot": {
+        "x": 604,
+        "y": 585
+      },
+      "source_rect": {
+        "x": 484,
+        "y": 435,
+        "breite": 240,
+        "hoehe": 175
+      },
+      "access_node": "haus_24"
+    },
+    {
+      "id": "25",
+      "name": "Veredelungsanlage",
+      "unlock_at": 25,
+      "row": 9,
+      "column": 1,
+      "foot": {
+        "x": 121,
+        "y": 410
+      },
+      "source_rect": {
+        "x": 0,
+        "y": 255,
+        "breite": 242,
+        "hoehe": 180
+      },
+      "access_node": "haus_25"
+    },
+    {
+      "id": "26",
+      "name": "Kommandantenresidenz",
+      "unlock_at": 26,
+      "row": 9,
+      "column": 2,
+      "foot": {
+        "x": 363,
+        "y": 410
+      },
+      "source_rect": {
+        "x": 242,
+        "y": 255,
+        "breite": 242,
+        "hoehe": 180
+      },
+      "access_node": "haus_26"
+    },
+    {
+      "id": "27",
+      "name": "Reparaturdock",
+      "unlock_at": 27,
+      "row": 9,
+      "column": 3,
+      "foot": {
+        "x": 604,
+        "y": 410
+      },
+      "source_rect": {
+        "x": 484,
+        "y": 255,
+        "breite": 240,
+        "hoehe": 180
+      },
+      "access_node": "haus_27"
+    },
+    {
+      "id": "28",
+      "name": "Satellitenkontrolle",
+      "unlock_at": 28,
+      "row": 10,
+      "column": 1,
+      "foot": {
+        "x": 121,
+        "y": 230
+      },
+      "source_rect": {
+        "x": 0,
+        "y": 60,
+        "breite": 242,
+        "hoehe": 195
+      },
+      "access_node": "haus_28"
+    },
+    {
+      "id": "29",
+      "name": "Reparaturdock",
+      "unlock_at": 29,
+      "row": 10,
+      "column": 2,
+      "foot": {
+        "x": 363,
+        "y": 230
+      },
+      "source_rect": {
+        "x": 242,
+        "y": 60,
+        "breite": 242,
+        "hoehe": 195
+      },
+      "access_node": "haus_29"
+    },
+    {
+      "id": "30",
+      "name": "Heldenhalle",
+      "unlock_at": 30,
+      "row": 10,
+      "column": 3,
+      "foot": {
+        "x": 604,
+        "y": 230
+      },
+      "source_rect": {
+        "x": 484,
+        "y": 60,
+        "breite": 240,
+        "hoehe": 195
+      },
+      "access_node": "haus_30"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "eingang",
+      "x": 363,
+      "y": 2130,
+      "kind": "entry"
+    },
+    {
+      "id": "r1_L",
+      "x": 246,
+      "y": 2046,
+      "kind": "junction"
+    },
+    {
+      "id": "r1_M",
+      "x": 363,
+      "y": 2046,
+      "kind": "junction"
+    },
+    {
+      "id": "r1_R",
+      "x": 480,
+      "y": 2046,
+      "kind": "junction"
+    },
+    {
+      "id": "haus_01",
+      "x": 121,
+      "y": 2020,
+      "kind": "building"
+    },
+    {
+      "id": "haus_02",
+      "x": 363,
+      "y": 2020,
+      "kind": "building"
+    },
+    {
+      "id": "haus_03",
+      "x": 604,
+      "y": 2020,
+      "kind": "building"
+    },
+    {
+      "id": "r2_L",
+      "x": 246,
+      "y": 1801,
+      "kind": "junction"
+    },
+    {
+      "id": "r2_M",
+      "x": 363,
+      "y": 1801,
+      "kind": "junction"
+    },
+    {
+      "id": "r2_R",
+      "x": 480,
+      "y": 1801,
+      "kind": "junction"
+    },
+    {
+      "id": "haus_04",
+      "x": 121,
+      "y": 1775,
+      "kind": "building"
+    },
+    {
+      "id": "haus_05",
+      "x": 363,
+      "y": 1775,
+      "kind": "building"
+    },
+    {
+      "id": "haus_06",
+      "x": 604,
+      "y": 1775,
+      "kind": "building"
+    },
+    {
+      "id": "r3_L",
+      "x": 246,
+      "y": 1576,
+      "kind": "junction"
+    },
+    {
+      "id": "r3_M",
+      "x": 363,
+      "y": 1576,
+      "kind": "junction"
+    },
+    {
+      "id": "r3_R",
+      "x": 480,
+      "y": 1576,
+      "kind": "junction"
+    },
+    {
+      "id": "haus_07",
+      "x": 121,
+      "y": 1550,
+      "kind": "building"
+    },
+    {
+      "id": "haus_08",
+      "x": 363,
+      "y": 1550,
+      "kind": "building"
+    },
+    {
+      "id": "haus_09",
+      "x": 604,
+      "y": 1550,
+      "kind": "building"
+    },
+    {
+      "id": "r4_L",
+      "x": 246,
+      "y": 1381,
+      "kind": "junction"
+    },
+    {
+      "id": "r4_M",
+      "x": 363,
+      "y": 1381,
+      "kind": "junction"
+    },
+    {
+      "id": "r4_R",
+      "x": 480,
+      "y": 1381,
+      "kind": "junction"
+    },
+    {
+      "id": "haus_10",
+      "x": 121,
+      "y": 1355,
+      "kind": "building"
+    },
+    {
+      "id": "haus_11",
+      "x": 363,
+      "y": 1355,
+      "kind": "building"
+    },
+    {
+      "id": "haus_12",
+      "x": 604,
+      "y": 1355,
+      "kind": "building"
+    },
+    {
+      "id": "r5_L",
+      "x": 246,
+      "y": 1171,
+      "kind": "junction"
+    },
+    {
+      "id": "r5_M",
+      "x": 363,
+      "y": 1171,
+      "kind": "junction"
+    },
+    {
+      "id": "r5_R",
+      "x": 480,
+      "y": 1171,
+      "kind": "junction"
+    },
+    {
+      "id": "haus_13",
+      "x": 121,
+      "y": 1145,
+      "kind": "building"
+    },
+    {
+      "id": "haus_14",
+      "x": 363,
+      "y": 1145,
+      "kind": "building"
+    },
+    {
+      "id": "haus_15",
+      "x": 604,
+      "y": 1145,
+      "kind": "building"
+    },
+    {
+      "id": "r6_L",
+      "x": 246,
+      "y": 986,
+      "kind": "junction"
+    },
+    {
+      "id": "r6_M",
+      "x": 363,
+      "y": 986,
+      "kind": "junction"
+    },
+    {
+      "id": "r6_R",
+      "x": 480,
+      "y": 986,
+      "kind": "junction"
+    },
+    {
+      "id": "haus_16",
+      "x": 121,
+      "y": 960,
+      "kind": "building"
+    },
+    {
+      "id": "haus_17",
+      "x": 363,
+      "y": 960,
+      "kind": "building"
+    },
+    {
+      "id": "haus_18",
+      "x": 604,
+      "y": 960,
+      "kind": "building"
+    },
+    {
+      "id": "r7_L",
+      "x": 246,
+      "y": 796,
+      "kind": "junction"
+    },
+    {
+      "id": "r7_M",
+      "x": 363,
+      "y": 796,
+      "kind": "junction"
+    },
+    {
+      "id": "r7_R",
+      "x": 480,
+      "y": 796,
+      "kind": "junction"
+    },
+    {
+      "id": "haus_19",
+      "x": 121,
+      "y": 770,
+      "kind": "building"
+    },
+    {
+      "id": "haus_20",
+      "x": 363,
+      "y": 770,
+      "kind": "building"
+    },
+    {
+      "id": "haus_21",
+      "x": 604,
+      "y": 770,
+      "kind": "building"
+    },
+    {
+      "id": "r8_L",
+      "x": 246,
+      "y": 611,
+      "kind": "junction"
+    },
+    {
+      "id": "r8_M",
+      "x": 363,
+      "y": 611,
+      "kind": "junction"
+    },
+    {
+      "id": "r8_R",
+      "x": 480,
+      "y": 611,
+      "kind": "junction"
+    },
+    {
+      "id": "haus_22",
+      "x": 121,
+      "y": 585,
+      "kind": "building"
+    },
+    {
+      "id": "haus_23",
+      "x": 363,
+      "y": 585,
+      "kind": "building"
+    },
+    {
+      "id": "haus_24",
+      "x": 604,
+      "y": 585,
+      "kind": "building"
+    },
+    {
+      "id": "r9_L",
+      "x": 246,
+      "y": 436,
+      "kind": "junction"
+    },
+    {
+      "id": "r9_M",
+      "x": 363,
+      "y": 436,
+      "kind": "junction"
+    },
+    {
+      "id": "r9_R",
+      "x": 480,
+      "y": 436,
+      "kind": "junction"
+    },
+    {
+      "id": "haus_25",
+      "x": 121,
+      "y": 410,
+      "kind": "building"
+    },
+    {
+      "id": "haus_26",
+      "x": 363,
+      "y": 410,
+      "kind": "building"
+    },
+    {
+      "id": "haus_27",
+      "x": 604,
+      "y": 410,
+      "kind": "building"
+    },
+    {
+      "id": "r10_L",
+      "x": 246,
+      "y": 256,
+      "kind": "junction"
+    },
+    {
+      "id": "r10_M",
+      "x": 363,
+      "y": 256,
+      "kind": "junction"
+    },
+    {
+      "id": "r10_R",
+      "x": 480,
+      "y": 256,
+      "kind": "junction"
+    },
+    {
+      "id": "haus_28",
+      "x": 121,
+      "y": 230,
+      "kind": "building"
+    },
+    {
+      "id": "haus_29",
+      "x": 363,
+      "y": 230,
+      "kind": "building"
+    },
+    {
+      "id": "haus_30",
+      "x": 604,
+      "y": 230,
+      "kind": "building"
+    }
+  ],
+  "segments": [
+    {
+      "id": "weg_001",
+      "from": "eingang",
+      "to": "r1_M",
+      "unlock_at": 1,
+      "kind": "entry",
+      "points": [
+        [
+          363,
+          2130
+        ],
+        [
+          363,
+          2046
+        ]
+      ]
+    },
+    {
+      "id": "weg_002",
+      "from": "r1_L",
+      "to": "r1_M",
+      "unlock_at": 1,
+      "kind": "cross",
+      "points": [
+        [
+          246,
+          2046
+        ],
+        [
+          363,
+          2046
+        ]
+      ]
+    },
+    {
+      "id": "weg_003",
+      "from": "r1_M",
+      "to": "r1_R",
+      "unlock_at": 3,
+      "kind": "cross",
+      "points": [
+        [
+          363,
+          2046
+        ],
+        [
+          480,
+          2046
+        ]
+      ]
+    },
+    {
+      "id": "weg_004",
+      "from": "r1_L",
+      "to": "haus_01",
+      "unlock_at": 1,
+      "kind": "access",
+      "points": [
+        [
+          246,
+          2046
+        ],
+        [
+          121,
+          2046
+        ],
+        [
+          121,
+          2020
+        ]
+      ]
+    },
+    {
+      "id": "weg_005",
+      "from": "r1_M",
+      "to": "haus_02",
+      "unlock_at": 2,
+      "kind": "access",
+      "points": [
+        [
+          363,
+          2046
+        ],
+        [
+          363,
+          2020
+        ]
+      ]
+    },
+    {
+      "id": "weg_006",
+      "from": "r1_R",
+      "to": "haus_03",
+      "unlock_at": 3,
+      "kind": "access",
+      "points": [
+        [
+          480,
+          2046
+        ],
+        [
+          604,
+          2046
+        ],
+        [
+          604,
+          2020
+        ]
+      ]
+    },
+    {
+      "id": "weg_007",
+      "from": "r1_L",
+      "to": "r2_L",
+      "unlock_at": 4,
+      "kind": "lane",
+      "points": [
+        [
+          246,
+          2046
+        ],
+        [
+          236,
+          1923.5
+        ],
+        [
+          246,
+          1801
+        ]
+      ]
+    },
+    {
+      "id": "weg_008",
+      "from": "r1_R",
+      "to": "r2_R",
+      "unlock_at": 6,
+      "kind": "lane",
+      "points": [
+        [
+          480,
+          2046
+        ],
+        [
+          490,
+          1923.5
+        ],
+        [
+          480,
+          1801
+        ]
+      ]
+    },
+    {
+      "id": "weg_009",
+      "from": "r2_L",
+      "to": "r2_M",
+      "unlock_at": 5,
+      "kind": "cross",
+      "points": [
+        [
+          246,
+          1801
+        ],
+        [
+          363,
+          1801
+        ]
+      ]
+    },
+    {
+      "id": "weg_010",
+      "from": "r2_M",
+      "to": "r2_R",
+      "unlock_at": 6,
+      "kind": "cross",
+      "points": [
+        [
+          363,
+          1801
+        ],
+        [
+          480,
+          1801
+        ]
+      ]
+    },
+    {
+      "id": "weg_011",
+      "from": "r2_L",
+      "to": "haus_04",
+      "unlock_at": 4,
+      "kind": "access",
+      "points": [
+        [
+          246,
+          1801
+        ],
+        [
+          121,
+          1801
+        ],
+        [
+          121,
+          1775
+        ]
+      ]
+    },
+    {
+      "id": "weg_012",
+      "from": "r2_M",
+      "to": "haus_05",
+      "unlock_at": 5,
+      "kind": "access",
+      "points": [
+        [
+          363,
+          1801
+        ],
+        [
+          363,
+          1775
+        ]
+      ]
+    },
+    {
+      "id": "weg_013",
+      "from": "r2_R",
+      "to": "haus_06",
+      "unlock_at": 6,
+      "kind": "access",
+      "points": [
+        [
+          480,
+          1801
+        ],
+        [
+          604,
+          1801
+        ],
+        [
+          604,
+          1775
+        ]
+      ]
+    },
+    {
+      "id": "weg_014",
+      "from": "r2_L",
+      "to": "r3_L",
+      "unlock_at": 7,
+      "kind": "lane",
+      "points": [
+        [
+          246,
+          1801
+        ],
+        [
+          236,
+          1688.5
+        ],
+        [
+          246,
+          1576
+        ]
+      ]
+    },
+    {
+      "id": "weg_015",
+      "from": "r2_R",
+      "to": "r3_R",
+      "unlock_at": 9,
+      "kind": "lane",
+      "points": [
+        [
+          480,
+          1801
+        ],
+        [
+          490,
+          1688.5
+        ],
+        [
+          480,
+          1576
+        ]
+      ]
+    },
+    {
+      "id": "weg_016",
+      "from": "r3_L",
+      "to": "r3_M",
+      "unlock_at": 8,
+      "kind": "cross",
+      "points": [
+        [
+          246,
+          1576
+        ],
+        [
+          363,
+          1576
+        ]
+      ]
+    },
+    {
+      "id": "weg_017",
+      "from": "r3_M",
+      "to": "r3_R",
+      "unlock_at": 9,
+      "kind": "cross",
+      "points": [
+        [
+          363,
+          1576
+        ],
+        [
+          480,
+          1576
+        ]
+      ]
+    },
+    {
+      "id": "weg_018",
+      "from": "r3_L",
+      "to": "haus_07",
+      "unlock_at": 7,
+      "kind": "access",
+      "points": [
+        [
+          246,
+          1576
+        ],
+        [
+          121,
+          1576
+        ],
+        [
+          121,
+          1550
+        ]
+      ]
+    },
+    {
+      "id": "weg_019",
+      "from": "r3_M",
+      "to": "haus_08",
+      "unlock_at": 8,
+      "kind": "access",
+      "points": [
+        [
+          363,
+          1576
+        ],
+        [
+          363,
+          1550
+        ]
+      ]
+    },
+    {
+      "id": "weg_020",
+      "from": "r3_R",
+      "to": "haus_09",
+      "unlock_at": 9,
+      "kind": "access",
+      "points": [
+        [
+          480,
+          1576
+        ],
+        [
+          604,
+          1576
+        ],
+        [
+          604,
+          1550
+        ]
+      ]
+    },
+    {
+      "id": "weg_021",
+      "from": "r3_L",
+      "to": "r4_L",
+      "unlock_at": 10,
+      "kind": "lane",
+      "points": [
+        [
+          246,
+          1576
+        ],
+        [
+          236,
+          1478.5
+        ],
+        [
+          246,
+          1381
+        ]
+      ]
+    },
+    {
+      "id": "weg_022",
+      "from": "r3_R",
+      "to": "r4_R",
+      "unlock_at": 12,
+      "kind": "lane",
+      "points": [
+        [
+          480,
+          1576
+        ],
+        [
+          490,
+          1478.5
+        ],
+        [
+          480,
+          1381
+        ]
+      ]
+    },
+    {
+      "id": "weg_023",
+      "from": "r4_L",
+      "to": "r4_M",
+      "unlock_at": 11,
+      "kind": "cross",
+      "points": [
+        [
+          246,
+          1381
+        ],
+        [
+          363,
+          1381
+        ]
+      ]
+    },
+    {
+      "id": "weg_024",
+      "from": "r4_M",
+      "to": "r4_R",
+      "unlock_at": 12,
+      "kind": "cross",
+      "points": [
+        [
+          363,
+          1381
+        ],
+        [
+          480,
+          1381
+        ]
+      ]
+    },
+    {
+      "id": "weg_025",
+      "from": "r4_L",
+      "to": "haus_10",
+      "unlock_at": 10,
+      "kind": "access",
+      "points": [
+        [
+          246,
+          1381
+        ],
+        [
+          121,
+          1381
+        ],
+        [
+          121,
+          1355
+        ]
+      ]
+    },
+    {
+      "id": "weg_026",
+      "from": "r4_M",
+      "to": "haus_11",
+      "unlock_at": 11,
+      "kind": "access",
+      "points": [
+        [
+          363,
+          1381
+        ],
+        [
+          363,
+          1355
+        ]
+      ]
+    },
+    {
+      "id": "weg_027",
+      "from": "r4_R",
+      "to": "haus_12",
+      "unlock_at": 12,
+      "kind": "access",
+      "points": [
+        [
+          480,
+          1381
+        ],
+        [
+          604,
+          1381
+        ],
+        [
+          604,
+          1355
+        ]
+      ]
+    },
+    {
+      "id": "weg_028",
+      "from": "r4_L",
+      "to": "r5_L",
+      "unlock_at": 13,
+      "kind": "lane",
+      "points": [
+        [
+          246,
+          1381
+        ],
+        [
+          236,
+          1276.0
+        ],
+        [
+          246,
+          1171
+        ]
+      ]
+    },
+    {
+      "id": "weg_029",
+      "from": "r4_R",
+      "to": "r5_R",
+      "unlock_at": 15,
+      "kind": "lane",
+      "points": [
+        [
+          480,
+          1381
+        ],
+        [
+          490,
+          1276.0
+        ],
+        [
+          480,
+          1171
+        ]
+      ]
+    },
+    {
+      "id": "weg_030",
+      "from": "r5_L",
+      "to": "r5_M",
+      "unlock_at": 14,
+      "kind": "cross",
+      "points": [
+        [
+          246,
+          1171
+        ],
+        [
+          363,
+          1171
+        ]
+      ]
+    },
+    {
+      "id": "weg_031",
+      "from": "r5_M",
+      "to": "r5_R",
+      "unlock_at": 15,
+      "kind": "cross",
+      "points": [
+        [
+          363,
+          1171
+        ],
+        [
+          480,
+          1171
+        ]
+      ]
+    },
+    {
+      "id": "weg_032",
+      "from": "r5_L",
+      "to": "haus_13",
+      "unlock_at": 13,
+      "kind": "access",
+      "points": [
+        [
+          246,
+          1171
+        ],
+        [
+          121,
+          1171
+        ],
+        [
+          121,
+          1145
+        ]
+      ]
+    },
+    {
+      "id": "weg_033",
+      "from": "r5_M",
+      "to": "haus_14",
+      "unlock_at": 14,
+      "kind": "access",
+      "points": [
+        [
+          363,
+          1171
+        ],
+        [
+          363,
+          1145
+        ]
+      ]
+    },
+    {
+      "id": "weg_034",
+      "from": "r5_R",
+      "to": "haus_15",
+      "unlock_at": 15,
+      "kind": "access",
+      "points": [
+        [
+          480,
+          1171
+        ],
+        [
+          604,
+          1171
+        ],
+        [
+          604,
+          1145
+        ]
+      ]
+    },
+    {
+      "id": "weg_035",
+      "from": "r5_L",
+      "to": "r6_L",
+      "unlock_at": 16,
+      "kind": "lane",
+      "points": [
+        [
+          246,
+          1171
+        ],
+        [
+          236,
+          1078.5
+        ],
+        [
+          246,
+          986
+        ]
+      ]
+    },
+    {
+      "id": "weg_036",
+      "from": "r5_R",
+      "to": "r6_R",
+      "unlock_at": 18,
+      "kind": "lane",
+      "points": [
+        [
+          480,
+          1171
+        ],
+        [
+          490,
+          1078.5
+        ],
+        [
+          480,
+          986
+        ]
+      ]
+    },
+    {
+      "id": "weg_037",
+      "from": "r6_L",
+      "to": "r6_M",
+      "unlock_at": 17,
+      "kind": "cross",
+      "points": [
+        [
+          246,
+          986
+        ],
+        [
+          363,
+          986
+        ]
+      ]
+    },
+    {
+      "id": "weg_038",
+      "from": "r6_M",
+      "to": "r6_R",
+      "unlock_at": 18,
+      "kind": "cross",
+      "points": [
+        [
+          363,
+          986
+        ],
+        [
+          480,
+          986
+        ]
+      ]
+    },
+    {
+      "id": "weg_039",
+      "from": "r6_L",
+      "to": "haus_16",
+      "unlock_at": 16,
+      "kind": "access",
+      "points": [
+        [
+          246,
+          986
+        ],
+        [
+          121,
+          986
+        ],
+        [
+          121,
+          960
+        ]
+      ]
+    },
+    {
+      "id": "weg_040",
+      "from": "r6_M",
+      "to": "haus_17",
+      "unlock_at": 17,
+      "kind": "access",
+      "points": [
+        [
+          363,
+          986
+        ],
+        [
+          363,
+          960
+        ]
+      ]
+    },
+    {
+      "id": "weg_041",
+      "from": "r6_R",
+      "to": "haus_18",
+      "unlock_at": 18,
+      "kind": "access",
+      "points": [
+        [
+          480,
+          986
+        ],
+        [
+          604,
+          986
+        ],
+        [
+          604,
+          960
+        ]
+      ]
+    },
+    {
+      "id": "weg_042",
+      "from": "r6_L",
+      "to": "r7_L",
+      "unlock_at": 19,
+      "kind": "lane",
+      "points": [
+        [
+          246,
+          986
+        ],
+        [
+          236,
+          891.0
+        ],
+        [
+          246,
+          796
+        ]
+      ]
+    },
+    {
+      "id": "weg_043",
+      "from": "r6_R",
+      "to": "r7_R",
+      "unlock_at": 21,
+      "kind": "lane",
+      "points": [
+        [
+          480,
+          986
+        ],
+        [
+          490,
+          891.0
+        ],
+        [
+          480,
+          796
+        ]
+      ]
+    },
+    {
+      "id": "weg_044",
+      "from": "r7_L",
+      "to": "r7_M",
+      "unlock_at": 20,
+      "kind": "cross",
+      "points": [
+        [
+          246,
+          796
+        ],
+        [
+          363,
+          796
+        ]
+      ]
+    },
+    {
+      "id": "weg_045",
+      "from": "r7_M",
+      "to": "r7_R",
+      "unlock_at": 21,
+      "kind": "cross",
+      "points": [
+        [
+          363,
+          796
+        ],
+        [
+          480,
+          796
+        ]
+      ]
+    },
+    {
+      "id": "weg_046",
+      "from": "r7_L",
+      "to": "haus_19",
+      "unlock_at": 19,
+      "kind": "access",
+      "points": [
+        [
+          246,
+          796
+        ],
+        [
+          121,
+          796
+        ],
+        [
+          121,
+          770
+        ]
+      ]
+    },
+    {
+      "id": "weg_047",
+      "from": "r7_M",
+      "to": "haus_20",
+      "unlock_at": 20,
+      "kind": "access",
+      "points": [
+        [
+          363,
+          796
+        ],
+        [
+          363,
+          770
+        ]
+      ]
+    },
+    {
+      "id": "weg_048",
+      "from": "r7_R",
+      "to": "haus_21",
+      "unlock_at": 21,
+      "kind": "access",
+      "points": [
+        [
+          480,
+          796
+        ],
+        [
+          604,
+          796
+        ],
+        [
+          604,
+          770
+        ]
+      ]
+    },
+    {
+      "id": "weg_049",
+      "from": "r7_L",
+      "to": "r8_L",
+      "unlock_at": 22,
+      "kind": "lane",
+      "points": [
+        [
+          246,
+          796
+        ],
+        [
+          236,
+          703.5
+        ],
+        [
+          246,
+          611
+        ]
+      ]
+    },
+    {
+      "id": "weg_050",
+      "from": "r7_R",
+      "to": "r8_R",
+      "unlock_at": 24,
+      "kind": "lane",
+      "points": [
+        [
+          480,
+          796
+        ],
+        [
+          490,
+          703.5
+        ],
+        [
+          480,
+          611
+        ]
+      ]
+    },
+    {
+      "id": "weg_051",
+      "from": "r8_L",
+      "to": "r8_M",
+      "unlock_at": 23,
+      "kind": "cross",
+      "points": [
+        [
+          246,
+          611
+        ],
+        [
+          363,
+          611
+        ]
+      ]
+    },
+    {
+      "id": "weg_052",
+      "from": "r8_M",
+      "to": "r8_R",
+      "unlock_at": 24,
+      "kind": "cross",
+      "points": [
+        [
+          363,
+          611
+        ],
+        [
+          480,
+          611
+        ]
+      ]
+    },
+    {
+      "id": "weg_053",
+      "from": "r8_L",
+      "to": "haus_22",
+      "unlock_at": 22,
+      "kind": "access",
+      "points": [
+        [
+          246,
+          611
+        ],
+        [
+          121,
+          611
+        ],
+        [
+          121,
+          585
+        ]
+      ]
+    },
+    {
+      "id": "weg_054",
+      "from": "r8_M",
+      "to": "haus_23",
+      "unlock_at": 23,
+      "kind": "access",
+      "points": [
+        [
+          363,
+          611
+        ],
+        [
+          363,
+          585
+        ]
+      ]
+    },
+    {
+      "id": "weg_055",
+      "from": "r8_R",
+      "to": "haus_24",
+      "unlock_at": 24,
+      "kind": "access",
+      "points": [
+        [
+          480,
+          611
+        ],
+        [
+          604,
+          611
+        ],
+        [
+          604,
+          585
+        ]
+      ]
+    },
+    {
+      "id": "weg_056",
+      "from": "r8_L",
+      "to": "r9_L",
+      "unlock_at": 25,
+      "kind": "lane",
+      "points": [
+        [
+          246,
+          611
+        ],
+        [
+          236,
+          523.5
+        ],
+        [
+          246,
+          436
+        ]
+      ]
+    },
+    {
+      "id": "weg_057",
+      "from": "r8_R",
+      "to": "r9_R",
+      "unlock_at": 27,
+      "kind": "lane",
+      "points": [
+        [
+          480,
+          611
+        ],
+        [
+          490,
+          523.5
+        ],
+        [
+          480,
+          436
+        ]
+      ]
+    },
+    {
+      "id": "weg_058",
+      "from": "r9_L",
+      "to": "r9_M",
+      "unlock_at": 26,
+      "kind": "cross",
+      "points": [
+        [
+          246,
+          436
+        ],
+        [
+          363,
+          436
+        ]
+      ]
+    },
+    {
+      "id": "weg_059",
+      "from": "r9_M",
+      "to": "r9_R",
+      "unlock_at": 27,
+      "kind": "cross",
+      "points": [
+        [
+          363,
+          436
+        ],
+        [
+          480,
+          436
+        ]
+      ]
+    },
+    {
+      "id": "weg_060",
+      "from": "r9_L",
+      "to": "haus_25",
+      "unlock_at": 25,
+      "kind": "access",
+      "points": [
+        [
+          246,
+          436
+        ],
+        [
+          121,
+          436
+        ],
+        [
+          121,
+          410
+        ]
+      ]
+    },
+    {
+      "id": "weg_061",
+      "from": "r9_M",
+      "to": "haus_26",
+      "unlock_at": 26,
+      "kind": "access",
+      "points": [
+        [
+          363,
+          436
+        ],
+        [
+          363,
+          410
+        ]
+      ]
+    },
+    {
+      "id": "weg_062",
+      "from": "r9_R",
+      "to": "haus_27",
+      "unlock_at": 27,
+      "kind": "access",
+      "points": [
+        [
+          480,
+          436
+        ],
+        [
+          604,
+          436
+        ],
+        [
+          604,
+          410
+        ]
+      ]
+    },
+    {
+      "id": "weg_063",
+      "from": "r9_L",
+      "to": "r10_L",
+      "unlock_at": 28,
+      "kind": "lane",
+      "points": [
+        [
+          246,
+          436
+        ],
+        [
+          236,
+          346.0
+        ],
+        [
+          246,
+          256
+        ]
+      ]
+    },
+    {
+      "id": "weg_064",
+      "from": "r9_R",
+      "to": "r10_R",
+      "unlock_at": 30,
+      "kind": "lane",
+      "points": [
+        [
+          480,
+          436
+        ],
+        [
+          490,
+          346.0
+        ],
+        [
+          480,
+          256
+        ]
+      ]
+    },
+    {
+      "id": "weg_065",
+      "from": "r10_L",
+      "to": "r10_M",
+      "unlock_at": 29,
+      "kind": "cross",
+      "points": [
+        [
+          246,
+          256
+        ],
+        [
+          363,
+          256
+        ]
+      ]
+    },
+    {
+      "id": "weg_066",
+      "from": "r10_M",
+      "to": "r10_R",
+      "unlock_at": 30,
+      "kind": "cross",
+      "points": [
+        [
+          363,
+          256
+        ],
+        [
+          480,
+          256
+        ]
+      ]
+    },
+    {
+      "id": "weg_067",
+      "from": "r10_L",
+      "to": "haus_28",
+      "unlock_at": 28,
+      "kind": "access",
+      "points": [
+        [
+          246,
+          256
+        ],
+        [
+          121,
+          256
+        ],
+        [
+          121,
+          230
+        ]
+      ]
+    },
+    {
+      "id": "weg_068",
+      "from": "r10_M",
+      "to": "haus_29",
+      "unlock_at": 29,
+      "kind": "access",
+      "points": [
+        [
+          363,
+          256
+        ],
+        [
+          363,
+          230
+        ]
+      ]
+    },
+    {
+      "id": "weg_069",
+      "from": "r10_R",
+      "to": "haus_30",
+      "unlock_at": 30,
+      "kind": "access",
+      "points": [
+        [
+          480,
+          256
+        ],
+        [
+          604,
+          256
+        ],
+        [
+          604,
+          230
+        ]
+      ]
+    }
+  ],
+  "areas": [
+    {
+      "id": 1,
+      "building_ids": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06"
+      ]
+    },
+    {
+      "id": 2,
+      "building_ids": [
+        "07",
+        "08",
+        "09",
+        "10",
+        "11",
+        "12"
+      ]
+    },
+    {
+      "id": 3,
+      "building_ids": [
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18"
+      ]
+    },
+    {
+      "id": 4,
+      "building_ids": [
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24"
+      ]
+    },
+    {
+      "id": 5,
+      "building_ids": [
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "30"
+      ]
+    }
+  ],
+  "style": {
+    "main_width": 26,
+    "access_width": 16,
+    "edge_color": "#c9a252",
+    "surface_color": "#726c92",
+    "light_color": "#75dce8",
+    "use": "Farbrichtwerte für Wege unter den Gebäudesprites; kein neues Gebäudedesign."
+  },
+  "camera": {
+    "overview": "Aktive Gebäudeflächen und Eingang mit Rand vollständig einpassen.",
+    "normal": "Auf Lagerbreite einpassen; leichtes Schieben nach oben.",
+    "focus": "Gewähltes Gebäude samt Ausrüstung einpassen.",
+    "gesture": "Ziehen und Zwei-Finger-Zoom; Zoom am Fingerpunkt halten.",
+    "position_rule": "Nur Kamera ändern, nicht alle Gebäude bei neuem Champion verschieben oder verkleinern."
+  }
+}

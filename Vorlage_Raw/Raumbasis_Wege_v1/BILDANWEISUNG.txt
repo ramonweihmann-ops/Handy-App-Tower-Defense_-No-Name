@@ -1,0 +1,19 @@
+Bearbeite die beigefügte EXISTIERENDE Raumbasis mit genau 30 Gebäuden. Dies ist ausdrücklich KEIN Auftrag für neue Gebäude, ein neues Lager oder eine neue Anordnung. Ergänze ausschließlich die VERBINDUNGSWEGE und die dafür unmittelbar nötigen Bodenflächen zwischen den vorhandenen Gebäuden. Gebäudedesigns, Dächer, Antennen, Größen, Standorte, Reihenfolge, Landschaftsstil, Planet und Eingang unten beibehalten.
+
+Das originale langgezogene Hochformat im Verhältnis 1:3 erhalten. Genau drei Gebäude nebeneinander und zehn Reihen von unten nach oben. Alle 30 vorhandenen Gebäude an denselben Plätzen vollständig sichtbar. Kein zusätzliches Gebäude, keine Verschiebung und keine Verkleinerung einzelner Gebäude. Die Kontrollnummern 01 bis 30 gehören zur Entwurfsvorschau; die zweite Reihe von oben muss 25,26,27 heißen. Eine einzelne 6 zwischen 25 und 27 ist 26. Keine neuen Bildrahmen, kein Menü.
+
+Ziel: Aus der vorhandenen Gebäudesammlung ein zusammenhängendes lebendiges LAGER machen, indem die Wege deutlich sichtbar miteinander verbunden sind. Es braucht mehrere sinnvoll verknüpfte Wegvarianten, nicht nur eine schnurgerade Linie an nebeneinanderstehenden Häusern.
+
+WEGENETZ:
+- Vom bestehenden Brückeneingang ganz unten führt ein klarer gemeinsamer Zugangsweg zum kleinen Vorplatz vor 01–03.
+- Dahinter zweigt er in ZWEI durchgehende Lagerwege ab: ungefähr durch die Zwischenräume zwischen linker und mittlerer Gebäudespalte sowie zwischen mittlerer und rechter Spalte. Sie verlaufen leicht geschwungen bzw. mit weichen Knicken nach oben, weichen den bestehenden Gebäudesockeln aus und enden bei 28–30. NICHT mitten durch die mittlere Gebäudespalte führen.
+- Vor jeder Gebäudereihe verbinden kurze QUERWEGE diese beiden Längswege und die Zugänge der linken und rechten Gebäude. Dadurch entstehen kleine miteinander verbundene Rundwege / Schleifen und mehrere Möglichkeiten, durch das Lager zu gehen.
+- Jedes der 30 Gebäude bekommt einen sichtbar angeschlossenen kurzen individuellen Stichweg bis zu seiner vorhandenen Eingangstreppe oder seinem vorhandenen Sockelzugang. Keine Wege, die unverbunden kurz vor einem Gebäude enden.
+- Die fünf Ausbaubereiche 01–06, 07–12, 13–18, 19–24, 25–30 erhalten jeweils einen kleinen unaufdringlichen Verzweigungsbereich in den ohnehin freien Zwischenräumen, keine neuen großen Plätze und keine neue Plattform. Reihen und Gebäudepositionen bleiben unverändert.
+- Kleine weiche Kurven, T-Abzweige, Kreuzungen und kurze Eingangsrampen variieren; Wege sollen wirklich als begehbare Fläche funktionieren, keine leuchtenden Fäden, keine schwebenden Brücken und keine Wege über Gebäudedächer.
+- Wo im direkten Wegraum ein kleiner Stein oder Busch liegt, darf nur dieses kleine Hindernis an den Wegrand rücken. Keine Gebäude, große Felsen oder ganzen Landschaftsteile versetzen.
+
+WEGESTIL:
+Passend zur bisherigen liebevollen stilisierten 3D-Weltraumbasis: matte violettgraue Stein-/Metallplatten, dezente goldene Einfassungen und einzelne ruhige türkisfarbene Randlichter. Hauptwege etwas breiter als Hauszugänge. Verbindungspunkte sauber und sichtbar zusammenhängend, sanfte Bodenschatten und niveaugleiche Einmündungen. Die Wege sind deutlich erkennbar, bleiben aber den Gebäuden visuell untergeordnet. Nicht überall grelle Neonstreifen, keine Straßenfahrbahn mit Autospuren. Vorhandene kleinere Lampen und Grüninseln harmonisch an den Wegrändern erhalten.
+
+Dies ist eine Gesamtvorschau der maximalen Ausbaustufe. Sie wird später über einzelne Gebäudefreischaltungen und Wegabschnitte aufgebaut; dafür ist das konsistente Layout wichtig. Keine Figuren, keine Fahrzeuge, keine Pfeile oder schematischen Linien, keine weiteren Beschriftungen außer den vorhandenen Kontrollnummern. Der gesamte Charakter der EXISTIERENDEN Basis muss sofort wiedererkennbar sein.
