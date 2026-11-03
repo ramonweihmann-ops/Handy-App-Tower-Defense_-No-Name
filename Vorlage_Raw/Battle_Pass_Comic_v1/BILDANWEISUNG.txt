@@ -1,0 +1,20 @@
+Anwendungsfall: ui-mockup. Erzeuge EINEN vollständigen Handybildschirm im schmalen Hochformat etwa 852×1846 für das süße Space-Comic-Handyspiel „Station am Wurmloch“. Referenz 1 ist ausschließlich die bisherige Funktions- und Wertevorlage mit zwei nebeneinanderstehenden Screenshots: NICHT zwei Screenshots ausgeben. Referenz 2 ist die neue Goldmünze mit weichem vierzackigem Stern, Referenz 3 der rosa Edelstein mit wenigen großen Facetten, Referenz 4 der freigegebene Main-Bildschirm mit Raumtiefe, runden Comicbuttons und schwebenden Stationen. Übernimm diese künstlerische Familie.
+
+Gestalte einen kreativen, hochwertigen, sofort verständlichen BATTLE PASS als kleine Expedition durch das Universum. KEINE lange Tabelle und keine endlosen gleichförmigen Balken. Dunkelblaues, glattes Universum mit subtilen violetten Nebeln und detaillierten, aber vereinfachten runden Planeten am Rand. Große saubere Formen, charmante weiche 3D-Comicmaterialien, dezente Cyanlichter und warme Goldkanten, keine realistischen Mikrotexturen. Premium soll begehrenswert wirken durch besondere goldene Stationsgestaltung, nicht durch erfundene Vorteile.
+
+Oben kompakter schöner saisonaler Kopf mit kleinem Sternwappen und exaktem Text: „BATTLE PASS“, „Saison 1 · Schleim-Welt“, „Endet in 24 T · 9 Std“. Darunter ein klarer Fortschrittsbalken „Stufe 2 · 60/100“.
+Nächster Abschnitt „Tägliche Missionen“ mit drei kompakten gut lesbaren Missionszeilen:
+„Überstehe 25 Wellen“ — „1/25 · +50 Pass-Punkte“
+„Wähle 12 Fähigkeitskarten“ — „0/12 · +40 Pass-Punkte“
+„Besiege 1 Boss“ — „0/1 · +80 Pass-Punkte“
+Jeweils kleiner grauer deaktivierter Knopf „Abholen“.
+
+Der große Hauptbereich ist eine geschwungene leuchtende Raumroute mit nummerierten runden kleinen Knoten 1,2,3,4,5 von oben nach unten, nur diese fünf sichtbaren Stufen, nach unten fortsetzbar. Links „Kostenlos“ in Cyan, rechts „Premium“ in Gold. Beide Belohnungen jeder Stufe sind erkennbar mit demselben mittigen Stufenknoten verbunden. Asymmetrische schwebende ovale Belohnungskapseln und kleine kreisförmige Plattformen statt Tabellenzeilen, genug Abstand und dunkle ruhige Flächen hinter Zahlen. Keine sich kreuzenden Pfade, klare Zuordnung. Die Route darf sich leicht schlängeln, links und rechts bleiben konsistent.
+Stufe 1 links Stern-Goldmünze „150“ mit grünem Häkchen, rechts goldene Kapsel mit Stern-Goldmünze „300“ und Schloss.
+Stufe 2 AKTUELL links rosa Edelstein „10“ mit hellem grünem oder goldenem Knopf „Holen“, rechts Edelstein „20“ und Schloss. Aktueller Knoten mit Cyanring hervorgehoben.
+Stufe 3 links süße blaue Astronauten-Heldenkarte „4“ mit Schloss, rechts Heldenkarten „8“ mit Schloss.
+Stufe 4 links ein goldener Stern „1“ und Schloss, rechts Sterne „2“ und Schloss.
+Stufe 5 links Stern-Goldmünze „150“ und Schloss, rechts Stern-Goldmünze „300“ und Schloss.
+Zeige die Münze und Edelstein wirklich als kleine Ausgaben der neuen Ressourcen aus den Referenzen, nicht die alten flachen Standardsymbole.
+Unter dem scrollbaren Routenbereich ein attraktiver fester breiter goldener Knopf „Premium freischalten“, daneben oder darunter klarer Knopf „Alles beanspruchen“ und kleiner „Zurück“. Knöpfe schließen mit sinnvoll kleinem Sicherheitsabstand unten ab, keine große leere violette Fläche.
+Alle Texte deutsch, außer dem vorgegebenen Spielbegriff BATTLE PASS und Premium. Keine Preise, keine zusätzlichen Geschenkbelohnungen, keine Kauf-Rabatte, keine ausgedachten exklusiven Skins, keine neue Bottomnavigation. Keine Hände, kein Handymockuprahmen, kein Wasserzeichen. Ergebnis ein fertiger polierter Designentwurf, niedlich und keck, hochwertig aber bewusst einfach und gut in Godot nachbaubar.
