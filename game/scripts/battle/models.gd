@@ -25,6 +25,8 @@ const GUN_LENGTH := {"guns/Revolver": 0.42, "guns/AK": 0.78, "guns/RocketLaunche
 const ENEMIES := {
 	"schleimling": {"file": "enemies/GreenBlob", "height": 0.95, "walk": "Walk", "attack": "Bite_Front"},
 	"tentakler": {"file": "enemies/Squidle", "height": 1.35, "walk": "Flying_Idle", "attack": "Headbutt", "lift": 0.2},
+	# Comic-Tentakler (tools/monsters/build_tentakler.py), wird nach der Freigabe aktiv:
+	# "tentakler": {"file": "enemies_v2/tentakler", "height": 1.2, "walk": "Fly", "attack": "Attack", "lift": 0.45, "v2": true},
 	"panzerkaefer": {"file": "enemies/GreenSpikyBlob", "height": 1.25, "walk": "Walk", "attack": "Bite_Front"},
 	"schleimmutter": {"file": "enemies/PinkBlob", "height": 2.6, "walk": "Walk", "attack": "Bite_Front"},
 	"krabbler": {"file": "enemies/Zombie_Female", "height": 1.45, "walk": "Run", "attack": "Punch"},
