@@ -19,8 +19,10 @@ const TEMPO_SCALE := {1: 0.68, 2: 1.2, 3: 1.8}
 const MAX_ASPECT := 0.62
 ## Energiekern entladen: so lange feuern alle Helden doppelt so schnell
 const OVERDRIVE_TIME := 6.0
-## Tempo im Multiplayer: fest, für alle gleich (kein Tempo-Knopf), etwas flotter als x1
+## Tempo im Multiplayer: x1 etwas flotter als im Abenteuer. In der Testphase per Knopf x1/x2/x3;
+## später ein festes Tempo für alle (etwa das 2- bis 2,3-Fache des Abenteuer-x1), im Balance-Labor bestimmt.
 const MP_SPEED := 1.0
+const MP_TEMPO_SCALE := {1: MP_SPEED, 2: MP_SPEED * 2.0, 3: MP_SPEED * 3.0}
 
 var battle: Battle
 var plasma: PlasmaCore
@@ -98,7 +100,10 @@ func _ready() -> void:
 ## Setzt das Spieltempo (x1 oder x2). Die Physik bleibt bei 60 Schritten pro Spielsekunde,
 ## weniger Schritte lassen schnelle Kugeln durch die Wände der Kugelbahn rutschen.
 func _apply_speed(t: int) -> void:
-	Engine.time_scale = MP_SPEED if mp and state in ["battle", "cards", "paused"] else float(TEMPO_SCALE.get(t, BASE_SPEED * float(t)))
+	if mp and state in ["battle", "cards", "paused"]:
+		Engine.time_scale = float(MP_TEMPO_SCALE.get(t, MP_SPEED))
+	else:
+		Engine.time_scale = float(TEMPO_SCALE.get(t, BASE_SPEED * float(t)))
 
 
 ## Ladebildschirm: Jede Figur und jeder Effekt wird einmal unsichtbar dahinter gezeigt,
@@ -1030,9 +1035,7 @@ func _mp_player(out: bool) -> Dictionary:
 
 
 func _toggle_tempo() -> void:
-	if mp:
-		return
-	# x3 nur für die Testphase
+	# x3 und der Tempo-Knopf im Multiplayer nur für die Testphase
 	tempo = tempo % 3 + 1
 	_apply_speed(tempo)
 	hud.set_tempo(tempo)
