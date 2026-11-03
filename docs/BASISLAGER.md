@@ -51,8 +51,8 @@ geprüft (Abschnitt „Wirtschafts-Simulation“); die Kampf-Boni prüft noch da
 | 29 | Satellitenkontrolle | Level 45 · 9.000 Gold | Verstärker | Luftschlag-Booster 3 % → 12 % stärker |
 | 30 | Heldenmonument | Level 47 · 9.400 Gold | Verstärker | Schaden aller Helden +1 % → +5 % |
 
-Kampfstärke aus allen Verstärkern zusammen bei voller Stufe: Schaden etwa +11 %, Schild +5 %,
-Krit +2,5 % (am 03.11.2026 halbiert, siehe Balance-Labor unten). Grundsatz: Die Basis ist ein Bonus
+Kampfstärke aus allen Verstärkern zusammen bei voller Stufe: Schaden etwa +5,5 %, Schild +2,5 %,
+Krit +1,25 % (am 03.11.2026 zweimal halbiert, siehe Balance-Labor unten). Grundsatz: Die Basis ist ein Bonus
 für alle; sie ersetzt weder das Aufwerten der Helden noch das Sammeln der Karten, und Käufe lohnen sich
 weiter.
 
@@ -105,6 +105,20 @@ Die Basis ersetzte das Leveln nicht (Anfänger mit Basis gewinnt trotzdem nicht)
 Durchschnittsspieler um gut 20 Punkte über das Ziel, fast auf Höhe der Zahlenden ohne Basis. Darum
 sind alle Kampfwerte halbiert, auch die Erfahrung im Kampf (sie bringt mehr Kartenwahlen); Komfort-Boni
 wie Gold, Karten, Pass, Energie und Lager nicht.
+
+Auch halbiert brachte die Basis noch etwa +25 Punkte (38 % → 63 %, 10 Läufe je Level, Level 25–50): zusammen
+rund 7 % Kampfkraft, etwa eine Heldenstufe, und die späten Level stehen auf der Kippe. Darum noch einmal
+halbiert (Schaden aus allen Gebäuden zusammen höchstens etwa +5,5 %). Ergebnis (Level 25, 30, 34, 40, 44, 50,
+je 10 Läufe):
+
+| | ohne Basis | mit Basis |
+|---|---|---|
+| Durchschnitt | 32 % | 28 % |
+| Zahlend | 65 % | 78 % |
+
+Die Basis hebt den Durchschnittsspieler nicht mehr messbar (Unterschied im Zufallsrauschen), Zahlende liegen
+mit und ohne Basis klar vorn. Offen: Die Schwierigkeit ab Level 21 ist auch ohne Basis zu hoch (Durchschnitt
+etwa 30 % statt 35–75 %) und wird neu abgestimmt.
 
 ## Grafik
 
