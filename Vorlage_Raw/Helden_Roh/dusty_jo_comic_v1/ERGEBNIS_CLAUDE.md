@@ -36,5 +36,10 @@ genügt also, solange Meshy es so liefert. Für weitere Helden: Rohmodell mit Sm
 die drei Ansichten. Das Skript wird je Held angepasst (Waffe, Posen); die Seitenbestimmung über die
 Textur braucht ein eindeutiges Merkmal auf einer Seite, sonst kurz angeben, welche Seite rechts ist.
 
-**Grenzen:** Die Hände haben keine Finger, der Revolver sitzt in der Faust. Die Siegerpose ist bewusst
-einfach. Bilder der Posen aus Godot: `claude_godot_posen.png` (Idle, Anschlag, Rückstoß, Sieg, Seite, Rücken).
+**Griff (korrigiert 03.11.2026, freigegeben):** Die rechte Hand wird über die Fingerknochen des Smart Rigs
+zur Faust gekrümmt (Finger `Bone_035`/`034`/`033`, Daumen `Bone_038`/`037`/`036`). Der Anker
+`WeaponSocket` wird in der Zielpose aus der Faust berechnet: Griff in der Faust, Lauf nach vorn, Griff nach
+unten. Er hängt starr an der Hand, so sitzt der Revolver in jeder Pose in der Faust. Für weitere Helden
+gilt dasselbe; die Fingerknochen heißen je Modell anders und werden im Skript eingetragen.
+
+**Grenzen:** Die Siegerpose ist bewusst einfach. Prüfbild aus Godot: `claude_godot_posen.png` (alle Posen, Nahaufnahmen der Hand, Faust ohne Waffe).

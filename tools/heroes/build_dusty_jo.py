@@ -96,10 +96,7 @@ scene.collection.objects.link(socket)
 socket.parent = arm
 socket.parent_type = 'BONE'
 socket.parent_bone = "mixamorig:RightHand"
-# Griff in der Faust: etwas vor dem Handgelenk (Knochen-Y), kein Versatz quer
-socket.matrix_parent_inverse = Matrix.Identity(4)
-socket.location = (0.0, -0.06, 0.0)      # Bone-Parent: Ursprung an der Knochenspitze; zurück in die Faust
-socket.rotation_euler = (0.0, 0.0, 0.0)
+socket.matrix_parent_inverse = Matrix.Identity(4)   # Lage wird nach den Posen aus der Faust berechnet (unten)
 weapon.parent = socket
 weapon.matrix_parent_inverse = Matrix.Identity(4)
 weapon.location = (0, 0, 0)
@@ -168,6 +165,20 @@ def apply_dirs(dirs, spine_tilt=0.0, hips_up=0.0):
         m = Matrix.Translation(cur.translation) @ q.to_matrix().to_4x4() @ Matrix.Translation(-cur.translation) @ cur
         pb.matrix = m
         bpy.context.view_layer.update()
+    fist()
+
+# Rechte Hand zur Faust: Finger (Bone_035 → 034 → 033) und Daumen (Bone_038 → 037 → 036) zur
+# Handfläche krümmen. Achse in der Ruhehaltung: Finger zeigen nach unten, Handfläche zum Körper (+X),
+# also Drehung um −Y; in Knochenkoordinaten umgerechnet, damit sie in jeder Pose gleich wirkt.
+CURL = [("Bone_035", 80), ("Bone_034", 85), ("Bone_033", 60), ("Bone_038", 35), ("Bone_037", 40), ("Bone_036", 30)]
+CURL_AXIS = Vector((0, -1, 0))
+
+def fist():
+    aw = arm.matrix_world.to_3x3().normalized().inverted()
+    for name, deg in CURL:
+        local = (bones[name].matrix_local.to_3x3().inverted() @ (aw @ CURL_AXIS)).normalized()
+        pose.bones[name].rotation_quaternion = Quaternion(local, math.radians(deg))
+    bpy.context.view_layer.update()
 
 def keyall(frame):
     for pb in pose.bones:
@@ -191,6 +202,40 @@ make("Idle", [(int(i * 15), (lambda t=i / 4.0: apply_dirs(idle_dirs(t), 0.03 * m
 make("Shoot", [(0, lambda: apply_dirs(aim_dirs(0.0))), (2, lambda: apply_dirs(aim_dirs(1.0), -0.06)),
                (6, lambda: apply_dirs(aim_dirs(0.35), -0.02)), (12, lambda: apply_dirs(aim_dirs(0.0)))])
 make("Victory", [(int(i * 12), (lambda t=i / 4.0: apply_dirs(victory_dirs(t), -0.05, 0.06 * abs(math.sin(t * 2 * math.pi))))) for i in range(5)])
+
+# --- Griffpunkt: Revolver sitzt in der Faust ---------------------------------------------------
+# In der Zielpose (Shoot, Bild 0) wird die Faust vermessen: Mitte aller Punkte, die fast nur an der
+# rechten Hand hängen. Dort sitzt die Griffmitte; Lauf zeigt nach vorn, Griff nach unten. Der Anker
+# hängt starr an der Hand, so folgt die Waffe in jeder Pose der Faust.
+GRIP = Vector((0.0, -0.13, -0.085))   # Griffmitte im Waffenraum (nach dem Skalieren)
+apply_dirs(aim_dirs(0.0))
+dg = bpy.context.evaluated_depsgraph_get()
+ev = body.evaluated_get(dg)
+me = ev.to_mesh()
+# nur die gekrümmten Finger: um sie legt sich der Griff (die Handgruppe reicht bis ins Handgelenk)
+hand_groups = {body.vertex_groups[n].index for n in ["Bone_035", "Bone_033"]}
+pts = []
+for v in body.data.vertices:
+    if sum(g.weight for g in v.groups if g.group in hand_groups) > 0.6:
+        pts.append(body.matrix_world @ me.vertices[v.index].co)
+ev.to_mesh_clear()
+fist = sum(pts, Vector()) / len(pts)
+# Die Fingerpunkte liegen an den Knöcheln; die Höhlung der Faust, in der der Griff steckt, sitzt
+# weiter vorn (in Godot an Nahaufnahmen von der Seite abgelesen).
+fist += Vector((0.02, -0.08, -0.01))
+lo = Vector((min(p.x for p in pts), min(p.y for p in pts), min(p.z for p in pts)))
+hi = Vector((max(p.x for p in pts), max(p.y for p in pts), max(p.z for p in pts)))
+print("FAUST", len(pts), "Mitte", tuple(round(c, 3) for c in fist), "Größe", tuple(round(c, 3) for c in hi - lo))
+fwd = Vector((0, -1, 0))
+up = Vector((0, 0, 1))
+rot = Matrix((fwd.cross(up), fwd, up)).transposed()   # Spalten: X, Y (Lauf), Z (oben)
+want = Matrix.Translation(fist - rot @ GRIP) @ rot.to_4x4()
+pb = pose.bones["mixamorig:RightHand"]
+tail = arm.matrix_world @ pb.matrix @ Matrix.Translation((0, pb.bone.length, 0))
+socket.matrix_basis = tail.inverted() @ want
+bpy.context.view_layer.update()
+print("WAFFE an", tuple(round(c, 3) for c in weapon.matrix_world.translation))
+
 arm.animation_data.action = None
 for pb in pose.bones:
     pb.rotation_quaternion = Quaternion()
