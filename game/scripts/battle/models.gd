@@ -28,9 +28,8 @@ const ENEMIES := {
 	"panzerkaefer": {"file": "enemies/GreenSpikyBlob", "height": 1.25, "walk": "Walk", "attack": "Bite_Front"},
 	"schleimmutter": {"file": "enemies/PinkBlob", "height": 2.6, "walk": "Walk", "attack": "Bite_Front"},
 	"krabbler": {"file": "enemies/Zombie_Female", "height": 1.45, "walk": "Run", "attack": "Punch"},
-	"zombie": {"file": "enemies/Zombie_Male", "height": 1.6, "walk": "Walk", "attack": "Punch"},
-	# Comic-Zombie (tools/monsters/build_zombie.py), wird nach der Freigabe aktiv:
-	# "zombie": {"file": "enemies_v2/zombie", "height": 1.6, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.68},
+	# Comic-Zombie (tools/monsters/build_zombie.py), freigegeben 03.11.2026
+	"zombie": {"file": "enemies_v2/zombie", "height": 1.6, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.68},
 	"brecher": {"file": "enemies/Orc", "height": 2.0, "walk": "Walk", "attack": "Punch"},
 	"koloss": {"file": "enemies/Yeti", "height": 3.0, "walk": "Walk", "attack": "Punch"},
 }
