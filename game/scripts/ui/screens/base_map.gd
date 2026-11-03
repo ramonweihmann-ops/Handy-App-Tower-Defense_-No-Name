@@ -27,6 +27,10 @@ var _t := 0.0
 var _font: Font
 var _lock_tex: Texture2D
 var _hammer_tex: Texture2D
+var _cache := {}        # Platz -> zwischengespeicherter Zustand (siehe _refresh_cache)
+var _cache_t := 0.0
+var _animated := false
+var _vig: Texture2D
 ## Mockup-Punkte je Bildpunkt (Mockup zeigt das 724 Punkte breite Bild auf 390 Punkten)
 const K := 390.0 / 724.0
 ## Bildschirmpunkte oben/unten, die Kopfleiste und Reiterleiste verdecken (Karte lässt sich darunter hervorziehen)
@@ -182,22 +186,72 @@ func overview() -> void:
 
 func _process(delta: float) -> void:
 	_t += delta
+	_cache_t -= delta
+	if _cache_t <= 0.0:
+		_refresh_cache()
+	# Nur neu zeichnen, wenn sich etwas bewegt (Bauen-Knöpfe und Blasen wippen) oder die Karte bewegt wurde
+	if _animated:
+		queue_redraw()
+
+
+## Spielstand je Platz zwischenspeichern (einmal pro Sekunde statt in jedem Bild für alle 30 Plätze)
+func _refresh_cache() -> void:
+	_cache_t = 1.0
+	_cache.clear()
+	_animated = false
+	for d in BaseData.BUILDINGS:
+		var id: String = d["id"]
+		var st := Save.base_state(id)
+		var e := {"st": st}
+		if st == "built":
+			e["plaque"] = "St. %d" % Save.base_level(id)
+			e["ready"] = d["kind"] == "prod" and Save.base_stock(id) >= 1.0
+			_animated = _animated or e["ready"]
+		elif st == "buildable":
+			_animated = true
+		else:
+			e["lock"] = _lock_text(id)
+		_cache[id] = e
 	queue_redraw()
+
+
+## Abdunkelung eines Bauplatzes als vorberechnetes Bild (radialer Verlauf wie im Mockup)
+func _vignette_tex() -> Texture2D:
+	if _vig == null:
+		var g := Gradient.new()
+		var c := Color(14 / 255.0, 10 / 255.0, 40 / 255.0)
+		g.offsets = PackedFloat32Array([0.0, 0.7, 1.0])
+		g.colors = PackedColorArray([Color(c, 0.62), Color(c, 0.52), Color(c, 0.0)])
+		var t := GradientTexture2D.new()
+		t.gradient = g
+		t.fill = GradientTexture2D.FILL_RADIAL
+		t.fill_from = Vector2(0.5, 0.5)
+		t.fill_to = Vector2(1.0, 0.5)
+		t.width = 128
+		t.height = 128
+		_vig = t
+	return _vig
 
 
 func _draw() -> void:
 	if _bg == null:
 		return
 	draw_texture_rect(_bg, Rect2(_to_screen(Vector2.ZERO), Vector2(IMG_W, IMG_H) * _zoom), false)
+	if _cache.is_empty():
+		_refresh_cache()
 	var m := _zoom / K   # Bildschirmpunkte je Mockup-Punkt
+	var view := Rect2(Vector2.ZERO, size).grow(120.0 * _zoom)
 	for d in BaseData.BUILDINGS:
 		var id: String = d["id"]
 		var foot: Array = _layout[id]["foot"]
 		var fp := _to_screen(Vector2(foot[0], foot[1]))
-		var st := Save.base_state(id)
+		if not view.has_point(fp + Vector2(0, -100) * _zoom):
+			continue   # außerhalb des sichtbaren Ausschnitts
+		var e: Dictionary = _cache[id]
+		var st: String = e["st"]
 		if st == "built":
-			_plaque(fp + Vector2(-89, -23) * _zoom, "St. %d" % Save.base_level(id), m)
-			if d["kind"] == "prod" and Save.base_stock(id) >= 1.0:
+			_plaque(fp + Vector2(-89, -23) * _zoom, str(e["plaque"]), m)
+			if e["ready"]:
 				_bubble(fp + Vector2(26, -207) * _zoom, str(d["item"]), m)
 			continue
 		var vc := fp + Vector2(0, -90) * _zoom
@@ -205,7 +259,7 @@ func _draw() -> void:
 		if st == "buildable":
 			_build_button(vc + Vector2(0, 7.5 + sin(_t * TAU / 1.4) * 1.5) * m, m)
 		else:
-			_lock(vc + Vector2(0, 11.5) * m, _lock_text(id), m)
+			_lock(vc + Vector2(0, 11.5) * m, str(e["lock"]), m)
 
 
 ## Bedingung wie im Mockup: „ab Level 19“, „mit 7. Champion“, „erst Nr. 13 bauen“
@@ -222,18 +276,7 @@ func _lock_text(id: String) -> String:
 func _vignette(c: Vector2, sz: Vector2) -> void:
 	if sz.x < 2.0 or sz.y < 2.0:
 		return
-	var n := 40
-	var col0 := Color(14 / 255.0, 10 / 255.0, 40 / 255.0, 0.62)
-	var col1 := Color(14 / 255.0, 10 / 255.0, 40 / 255.0, 0.52)
-	var col2 := Color(14 / 255.0, 10 / 255.0, 40 / 255.0, 0.0)
-	var half := sz * 0.5
-	for k in n:
-		var a0 := TAU * k / n
-		var a1 := TAU * (k + 1) / n
-		var d0 := Vector2(cos(a0), sin(a0)) * half
-		var d1 := Vector2(cos(a1), sin(a1)) * half
-		draw_polygon(PackedVector2Array([c, c + d0 * 0.7, c + d1 * 0.7]), PackedColorArray([col0, col1, col1]))
-		draw_polygon(PackedVector2Array([c + d0 * 0.7, c + d0, c + d1, c + d1 * 0.7]), PackedColorArray([col1, col2, col2, col1]))
+	draw_texture_rect(_vignette_tex(), Rect2(c - sz * 0.5, sz), false)
 
 
 ## Stufen-Schild „St. 2“ (oben links an p): Verlauf #6a5ad8 → #43349e, weißer Rand, Schatten 0 2px
