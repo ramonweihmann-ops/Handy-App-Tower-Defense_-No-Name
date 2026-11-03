@@ -1,0 +1,390 @@
+{
+  "figuren": [
+    {
+      "datei": "figuren/brocken.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "89d42b76c5ba399c19d41e908fe47726c58e262b91c1864e878dcd238de7f3c6",
+      "motiv_grenzen": [
+        32,
+        33,
+        480,
+        479
+      ]
+    },
+    {
+      "datei": "figuren/dusty_jo.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "bc9ed182c9563d59d5d3a5546ec290d48de507f941f543ccddbc2ec1a90f2b16",
+      "motiv_grenzen": [
+        50,
+        32,
+        462,
+        480
+      ]
+    },
+    {
+      "datei": "figuren/iska.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "3d3239ad5fae63cea495f7730dd9bcd287edce3fab106ea3d213bd2ea93d82b4",
+      "motiv_grenzen": [
+        40,
+        32,
+        471,
+        480
+      ]
+    },
+    {
+      "datei": "figuren/lynx.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "526a5fefb586740cbcec5ba786920cd7dc331d044badf35799f9d034f9dfaf8b",
+      "motiv_grenzen": [
+        32,
+        47,
+        480,
+        464
+      ]
+    },
+    {
+      "datei": "figuren/margot.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "e69dd85b9589ea2ea2d782aa81df351ad2c6a64b3f0d1340d053775c956cf6b8",
+      "motiv_grenzen": [
+        65,
+        32,
+        447,
+        480
+      ]
+    },
+    {
+      "datei": "figuren/schleimmutter_gesperrt.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "3d968d2ba9cd417331949ad213ed3aa8e31a800ebc29b48230bb8479e6076597",
+      "motiv_grenzen": [
+        33,
+        32,
+        479,
+        480
+      ]
+    },
+    {
+      "datei": "figuren/volta.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "5014887de5028c31468e5c603fab9b1f73eb068edb7278d59d095de14822f9d7",
+      "motiv_grenzen": [
+        49,
+        32,
+        462,
+        480
+      ]
+    }
+  ],
+  "bauteile": [
+    {
+      "datei": "ui_png/banner_gruen.png",
+      "breite": 1024,
+      "hoehe": 160,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "bc274344727e55ea900934757d4a5353218d02b2fce2ea5bb8a839c728eacdfe"
+    },
+    {
+      "datei": "ui_png/banner_rot.png",
+      "breite": 1024,
+      "hoehe": 160,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "688fb5c6cdc04133554548e8af178136e1c071bde113518c021bef317718be30"
+    },
+    {
+      "datei": "ui_png/fortschritt_cyan.png",
+      "breite": 512,
+      "hoehe": 80,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "bc65e6872abb9ec46d9c595eea18f99d14cac806c19510bb6da6d2ed5cb367bc"
+    },
+    {
+      "datei": "ui_png/fortschritt_gold.png",
+      "breite": 512,
+      "hoehe": 80,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "384d1b54160558e1000351c450ffb55b9ec438bee911489540841f7d30a4df58"
+    },
+    {
+      "datei": "ui_png/fortschritt_gruen.png",
+      "breite": 512,
+      "hoehe": 80,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "9a58f8697085d87880095b91cc4dee340393855b44f7813ca3e5b4126c14a461"
+    },
+    {
+      "datei": "ui_png/fortschritt_schiene.png",
+      "breite": 512,
+      "hoehe": 80,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "7187d458af90f1abb3781a46d37c97581bd4cac117b8fe295e633817e82d21ab"
+    },
+    {
+      "datei": "ui_png/haekchen.png",
+      "breite": 64,
+      "hoehe": 64,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "5998574da30e8a501a545dc140135a11db79905e5341c60e3b89a1797c0f2354"
+    },
+    {
+      "datei": "ui_png/hinweispunkt.png",
+      "breite": 64,
+      "hoehe": 64,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "6c3968e6d1e5d74af8a3f17155b848ca8bf6c42ebeb0249d8904b5dade6bfa3e"
+    },
+    {
+      "datei": "ui_png/kampf_knopf.png",
+      "breite": 192,
+      "hoehe": 192,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "c31524c27f968f4a1416d088d4d3addd6397b5f4092afdabd1853592e5ba4036"
+    },
+    {
+      "datei": "ui_png/kartenkoerper.png",
+      "breite": 512,
+      "hoehe": 900,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "df38e7a9e9743d276ebef0212975a6f8cad466308353b9d70c31b921a98b61ee"
+    },
+    {
+      "datei": "ui_png/knopf_gesperrt.png",
+      "breite": 512,
+      "hoehe": 128,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "f352bca09839affa9acb542d4e02bb710e9d189049f43bdc23ae06b5634a4393"
+    },
+    {
+      "datei": "ui_png/knopf_gruen_gedrueckt.png",
+      "breite": 512,
+      "hoehe": 128,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "936418e0cad2c7a4eb3eb4691642c9faf0e92022af00531f589b282da807de27"
+    },
+    {
+      "datei": "ui_png/knopf_gruen_hover.png",
+      "breite": 512,
+      "hoehe": 128,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "aca047185ec631583d434e99521bb7c255732b68f71a7966b65af1c9b5c8b9c4"
+    },
+    {
+      "datei": "ui_png/knopf_gruen_normal.png",
+      "breite": 512,
+      "hoehe": 128,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "35ef690c32f7b6d52738d86334144e1d895be3b2da08d4d7078f6a357bdd631e"
+    },
+    {
+      "datei": "ui_png/nav_aktiv.png",
+      "breite": 192,
+      "hoehe": 160,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "ebc05210c52c89263d769f044dc2047ca1a95cfda62536f113e5c0275ad46aac"
+    },
+    {
+      "datei": "ui_png/nav_hintergrund.png",
+      "breite": 1024,
+      "hoehe": 200,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "236ad4f7c2d5dbbacd3d18cb08696ab62b87acc3a41cdb58a0e95aee452498d3"
+    },
+    {
+      "datei": "ui_png/plus.png",
+      "breite": 64,
+      "hoehe": 64,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "06e4c8f8ca80ac743a90c75fff6413c7274838958335e7c098b3ee6650cc8288"
+    },
+    {
+      "datei": "ui_png/portrait_hintergrund_cyan.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "e537c0ce534576475b79db5f0283ea0879e99015330dec5cec12078f69f41dfe"
+    },
+    {
+      "datei": "ui_png/portrait_hintergrund_gold.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "8353808cd9f2f261f00b64a6948c913571e7cd87d8d69b01510e87f37e4610ac"
+    },
+    {
+      "datei": "ui_png/portrait_hintergrund_rosa.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "d1a5684e0fe3c258a422c97db11992b1c4922561c30ad778793586818dd5c462"
+    },
+    {
+      "datei": "ui_png/portrait_hintergrund_violett.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "6c8a2d2374d8eee81b77841b32eab515fdb2a87b809ff857e58850ccf8689199"
+    },
+    {
+      "datei": "ui_png/portrait_maske.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "2e16a87d78124c3f537026730516f2d77b544773451e6a4c0758c0e02bfba854"
+    },
+    {
+      "datei": "ui_png/portrait_rahmen_gold.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "1c0c2698adfe3f9e89e4d284642480241c592e5e560eaef11bcc97e3715e61a7"
+    },
+    {
+      "datei": "ui_png/stufe_plakette.png",
+      "breite": 256,
+      "hoehe": 96,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "c3b9e54760257cec8042c512888a6900c6477a4dbe9a5d9977c8867e51eec326"
+    },
+    {
+      "datei": "ui_png/zaehler_dunkel.png",
+      "breite": 192,
+      "hoehe": 96,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "2206f8b95d2c270ff25d68d1c8869d5e034907517d28919b6b8a3c236db5de65"
+    },
+    {
+      "datei": "ui_png/zeit_plakette.png",
+      "breite": 320,
+      "hoehe": 96,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "35fde3577307f0b0ae43fd621af87344fcf75ad78580b19e113693641284176f"
+    }
+  ],
+  "uebrige_bilder": [
+    {
+      "datei": "helden_design_freigegeben.png",
+      "breite": 934,
+      "hoehe": 1684,
+      "modus": "RGB",
+      "icc_profil": false,
+      "sha256": "f4bc4131e8533f62f5a6a8f43aae02e7a694649af69f69196b125238af58f524"
+    },
+    {
+      "datei": "helden_modular_vorschau.png",
+      "breite": 934,
+      "hoehe": 1684,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "ab22f55f40ede8c1e79df560cdd061d5c844868a4c8a3d941811734e0be742fc"
+    },
+    {
+      "datei": "hintergrund/helden_hintergrund.png",
+      "breite": 934,
+      "hoehe": 1685,
+      "modus": "RGB",
+      "icc_profil": false,
+      "sha256": "e0e87ace12c5c62bba79fb6b4279b262cc077cb68ff48b2305a49b3210344fd3"
+    },
+    {
+      "datei": "symbole/icon_clock.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "5a79d9182b343e6e8e516a227435101605c28150c0ba17fff711537dd739a4ab"
+    },
+    {
+      "datei": "symbole/nav_base.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "e677a975d9c74226ab2dbc8f69696400b7d05b660f654fd6df2ad992636872c8"
+    },
+    {
+      "datei": "symbole/nav_battle.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "95a58fd8769884430044d46eeef755cfbe510f90c9a9066f5e7be99237fb8f12"
+    },
+    {
+      "datei": "symbole/nav_heroes.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "e4f974184847176c75234109ca46eb382127bb450ddb2ce1c1ec87c7c4208aa8"
+    },
+    {
+      "datei": "symbole/nav_shop.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "c0885dfb60783282f79a5d3766bafb3319f1d39e6b2731dac52ce08c13317304"
+    },
+    {
+      "datei": "symbole/nav_upgrades.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "icc_profil": true,
+      "sha256": "88495aac3c3bb923985204a76d22d4375843c624f859ef6e480d8a2bab0adae2"
+    }
+  ],
+  "figurenanzahl": 7,
+  "ui_bauteile": 26,
+  "symbolanzahl": 6,
+  "beschreibung": "Technische Dateipruefung und offline aus Einzelteilen zusammengesetzte Vorschau; kein Godot-Laufzeittest."
+}
