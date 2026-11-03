@@ -1,0 +1,598 @@
+[
+  {
+    "datei": "zombie_rig_roh.glb",
+    "beispiele": [
+      {
+        "aktion": "Attack",
+        "anteil": 0,
+        "grenzen_blender": [
+          [
+            -0.4651756286621094,
+            0.4296519160270691
+          ],
+          [
+            -0.48876750469207764,
+            0.29511758685112
+          ],
+          [
+            0.0008454083581455052,
+            1.5414836406707764
+          ]
+        ]
+      },
+      {
+        "aktion": "Attack",
+        "anteil": 0.25,
+        "grenzen_blender": [
+          [
+            -0.25719332695007324,
+            0.4488258361816406
+          ],
+          [
+            -0.3823297321796417,
+            0.28066113591194153
+          ],
+          [
+            -0.06772219389677048,
+            1.642675757408142
+          ]
+        ]
+      },
+      {
+        "aktion": "Attack",
+        "anteil": 0.5,
+        "grenzen_blender": [
+          [
+            -0.3348587155342102,
+            0.3913140892982483
+          ],
+          [
+            -0.9034624695777893,
+            0.2991221845149994
+          ],
+          [
+            -0.04769707843661308,
+            1.359645128250122
+          ]
+        ]
+      },
+      {
+        "aktion": "Attack",
+        "anteil": 0.75,
+        "grenzen_blender": [
+          [
+            -0.35787779092788696,
+            0.4379025101661682
+          ],
+          [
+            -0.7091518044471741,
+            0.3024427592754364
+          ],
+          [
+            -0.002898361999541521,
+            1.4932563304901123
+          ]
+        ]
+      },
+      {
+        "aktion": "Attack",
+        "anteil": 1,
+        "grenzen_blender": [
+          [
+            -0.4650507867336273,
+            0.42974334955215454
+          ],
+          [
+            -0.48884618282318115,
+            0.2950775921344757
+          ],
+          [
+            0.0008637520368210971,
+            1.54171621799469
+          ]
+        ]
+      },
+      {
+        "aktion": "Dead",
+        "anteil": 0,
+        "grenzen_blender": [
+          [
+            -0.4651756286621094,
+            0.4296512007713318
+          ],
+          [
+            -0.4887668490409851,
+            0.29511743783950806
+          ],
+          [
+            -0.008797382935881615,
+            1.5318419933319092
+          ]
+        ]
+      },
+      {
+        "aktion": "Dead",
+        "anteil": 0.25,
+        "grenzen_blender": [
+          [
+            -0.4266265630722046,
+            0.4957570433616638
+          ],
+          [
+            -0.1769089251756668,
+            0.5191783905029297
+          ],
+          [
+            -0.02108602039515972,
+            1.626876711845398
+          ]
+        ]
+      },
+      {
+        "aktion": "Dead",
+        "anteil": 0.5,
+        "grenzen_blender": [
+          [
+            -0.41669946908950806,
+            0.5462614297866821
+          ],
+          [
+            -0.2611696124076843,
+            0.38926923274993896
+          ],
+          [
+            -0.06576457619667053,
+            1.3984291553497314
+          ]
+        ]
+      },
+      {
+        "aktion": "Dead",
+        "anteil": 0.75,
+        "grenzen_blender": [
+          [
+            -0.2419564127922058,
+            0.8187325596809387
+          ],
+          [
+            -1.353476881980896,
+            0.40620100498199463
+          ],
+          [
+            -0.12711691856384277,
+            0.4510711133480072
+          ]
+        ]
+      },
+      {
+        "aktion": "Dead",
+        "anteil": 1,
+        "grenzen_blender": [
+          [
+            -0.19601406157016754,
+            0.8112688064575195
+          ],
+          [
+            -1.3781404495239258,
+            0.3918692469596863
+          ],
+          [
+            -0.10131168365478516,
+            0.467490017414093
+          ]
+        ]
+      },
+      {
+        "aktion": "Hit_Reaction",
+        "anteil": 0,
+        "grenzen_blender": [
+          [
+            -0.5386959910392761,
+            0.20975497364997864
+          ],
+          [
+            -0.5998512506484985,
+            0.2526753544807434
+          ],
+          [
+            -0.029813412576913834,
+            1.6586211919784546
+          ]
+        ]
+      },
+      {
+        "aktion": "Hit_Reaction",
+        "anteil": 0.25,
+        "grenzen_blender": [
+          [
+            -0.23959232866764069,
+            0.5359789133071899
+          ],
+          [
+            -0.7362083792686462,
+            0.24924296140670776
+          ],
+          [
+            -0.03525685891509056,
+            1.6059998273849487
+          ]
+        ]
+      },
+      {
+        "aktion": "Hit_Reaction",
+        "anteil": 0.5,
+        "grenzen_blender": [
+          [
+            -0.08396962285041809,
+            1.0027281045913696
+          ],
+          [
+            -0.30993205308914185,
+            0.3528519868850708
+          ],
+          [
+            -0.02342991717159748,
+            1.6144133806228638
+          ]
+        ]
+      },
+      {
+        "aktion": "Hit_Reaction",
+        "anteil": 0.75,
+        "grenzen_blender": [
+          [
+            0.08870649337768555,
+            0.8273066878318787
+          ],
+          [
+            -0.5522782802581787,
+            0.3685014247894287
+          ],
+          [
+            -0.029499109834432602,
+            1.6415140628814697
+          ]
+        ]
+      },
+      {
+        "aktion": "Hit_Reaction",
+        "anteil": 1,
+        "grenzen_blender": [
+          [
+            0.07761049270629883,
+            0.8260924816131592
+          ],
+          [
+            -0.6004279851913452,
+            0.2526227831840515
+          ],
+          [
+            -0.02976122498512268,
+            1.6583267450332642
+          ]
+        ]
+      },
+      {
+        "aktion": "Running",
+        "anteil": 0,
+        "grenzen_blender": [
+          [
+            -0.30093705654144287,
+            0.30510419607162476
+          ],
+          [
+            -0.5105445384979248,
+            0.3569152355194092
+          ],
+          [
+            -0.07704389840364456,
+            1.6779078245162964
+          ]
+        ]
+      },
+      {
+        "aktion": "Running",
+        "anteil": 0.25,
+        "grenzen_blender": [
+          [
+            -0.2768562436103821,
+            0.3260398805141449
+          ],
+          [
+            -0.4823647141456604,
+            0.6021654605865479
+          ],
+          [
+            0.03197000175714493,
+            1.7058967351913452
+          ]
+        ]
+      },
+      {
+        "aktion": "Running",
+        "anteil": 0.5,
+        "grenzen_blender": [
+          [
+            -0.3559725284576416,
+            0.31324511766433716
+          ],
+          [
+            -0.46809640526771545,
+            0.4071090519428253
+          ],
+          [
+            -0.05819987133145332,
+            1.6741604804992676
+          ]
+        ]
+      },
+      {
+        "aktion": "Running",
+        "anteil": 0.75,
+        "grenzen_blender": [
+          [
+            -0.3644598126411438,
+            0.30150100588798523
+          ],
+          [
+            -0.516899049282074,
+            0.6046385169029236
+          ],
+          [
+            0.03402718901634216,
+            1.7147328853607178
+          ]
+        ]
+      },
+      {
+        "aktion": "Running",
+        "anteil": 1,
+        "grenzen_blender": [
+          [
+            -0.30093705654144287,
+            0.30510395765304565
+          ],
+          [
+            -0.5105446577072144,
+            0.35691535472869873
+          ],
+          [
+            -0.07704415172338486,
+            1.6779078245162964
+          ]
+        ]
+      },
+      {
+        "aktion": "Walking",
+        "anteil": 0,
+        "grenzen_blender": [
+          [
+            -0.32345330715179443,
+            0.29695895314216614
+          ],
+          [
+            -0.31872057914733887,
+            0.23432539403438568
+          ],
+          [
+            -0.03097613714635372,
+            1.739807367324829
+          ]
+        ]
+      },
+      {
+        "aktion": "Walking",
+        "anteil": 0.25,
+        "grenzen_blender": [
+          [
+            -0.3468693494796753,
+            0.34930163621902466
+          ],
+          [
+            -0.5298870205879211,
+            0.3738184869289398
+          ],
+          [
+            -0.06324387341737747,
+            1.7027353048324585
+          ]
+        ]
+      },
+      {
+        "aktion": "Walking",
+        "anteil": 0.5,
+        "grenzen_blender": [
+          [
+            -0.3302583694458008,
+            0.3457242548465729
+          ],
+          [
+            -0.2846313714981079,
+            0.27014443278312683
+          ],
+          [
+            -0.039279140532016754,
+            1.7305384874343872
+          ]
+        ]
+      },
+      {
+        "aktion": "Walking",
+        "anteil": 0.75,
+        "grenzen_blender": [
+          [
+            -0.3132811486721039,
+            0.29072004556655884
+          ],
+          [
+            -0.5369031429290771,
+            0.3681493401527405
+          ],
+          [
+            -0.034355856478214264,
+            1.7008110284805298
+          ]
+        ]
+      },
+      {
+        "aktion": "Walking",
+        "anteil": 1,
+        "grenzen_blender": [
+          [
+            -0.3234528601169586,
+            0.29695895314216614
+          ],
+          [
+            -0.31872057914733887,
+            0.2343253791332245
+          ],
+          [
+            -0.030976196750998497,
+            1.7398072481155396
+          ]
+        ]
+      }
+    ],
+    "gewichtete_punkte_je_knochen": {
+      "mixamorig:Hips": 606,
+      "mixamorig:Spine": 885,
+      "mixamorig:Spine1": 993,
+      "mixamorig:Spine2": 70,
+      "mixamorig:Neck": 1115,
+      "mixamorig:Head": 3285,
+      "mixamorig:HeadTop_End": 0,
+      "headfront": 0,
+      "mixamorig:LeftShoulder": 1017,
+      "mixamorig:LeftArm": 537,
+      "mixamorig:LeftForeArm": 566,
+      "mixamorig:LeftHand": 760,
+      "Bone_053": 0,
+      "mixamorig:LeftHandMiddle1": 440,
+      "mixamorig:LeftHandMiddle2": 15,
+      "mixamorig:LeftHandMiddle3": 299,
+      "mixamorig:LeftHandMiddle4": 0,
+      "mixamorig:RightShoulder": 959,
+      "mixamorig:RightArm": 516,
+      "mixamorig:RightForeArm": 347,
+      "mixamorig:RightHand": 685,
+      "Bone_054": 0,
+      "mixamorig:RightHandMiddle1": 199,
+      "mixamorig:RightHandMiddle2": 49,
+      "mixamorig:RightHandMiddle3": 60,
+      "mixamorig:RightHandMiddle4": 0,
+      "mixamorig:RightHandThumb1": 345,
+      "mixamorig:RightHandThumb2": 206,
+      "mixamorig:RightHandThumb3": 98,
+      "mixamorig:RightHandThumb4": 0,
+      "mixamorig:RightHandRing1": 73,
+      "mixamorig:RightHandRing2": 40,
+      "mixamorig:RightHandRing3": 72,
+      "mixamorig:RightHandRing4": 0,
+      "mixamorig:RightHandPinky1": 263,
+      "mixamorig:RightHandPinky2": 148,
+      "mixamorig:RightHandPinky3": 154,
+      "mixamorig:RightHandPinky4": 0,
+      "mixamorig:LeftUpLeg": 480,
+      "mixamorig:LeftLeg": 614,
+      "mixamorig:LeftFoot": 480,
+      "mixamorig:LeftToeBase": 228,
+      "mixamorig:LeftToe_End": 0,
+      "mixamorig:RightUpLeg": 518,
+      "mixamorig:RightLeg": 602,
+      "mixamorig:RightFoot": 496,
+      "mixamorig:RightToeBase": 285,
+      "mixamorig:RightToe_End": 0
+    },
+    "hinweis": "Bewegung nur beim Zombie vorhanden. Fünf Stichproben je Clip, keine Godot- oder Handy-Freigabe. Die beiden anderen Vorschauen zeigen die Ruhepose."
+  },
+  {
+    "datei": "tentakler_rig_roh.glb",
+    "beispiele": [],
+    "gewichtete_punkte_je_knochen": {
+      "Bone_000": 1824,
+      "Bone_001": 2832,
+      "Bone_003": 65,
+      "Bone_002": 235,
+      "Bone_005": 329,
+      "Bone_004": 463,
+      "Bone_009": 683,
+      "Bone_008": 338,
+      "Bone_007": 180,
+      "Bone_006": 203,
+      "Bone_013": 717,
+      "Bone_012": 312,
+      "Bone_011": 207,
+      "Bone_010": 200,
+      "Bone_017": 1961,
+      "Bone_016": 1062,
+      "Bone_015": 677,
+      "Bone_014": 576,
+      "Bone_021": 2282,
+      "Bone_020": 1036,
+      "Bone_019": 701,
+      "Bone_018": 591,
+      "Bone_026": 1551,
+      "Bone_025": 1130,
+      "Bone_024": 1132,
+      "Bone_023": 937,
+      "Bone_022": 526,
+      "Bone_031": 1689,
+      "Bone_030": 1089,
+      "Bone_029": 1087,
+      "Bone_028": 1018,
+      "Bone_027": 433
+    },
+    "hinweis": "Bewegung nur beim Zombie vorhanden. Fünf Stichproben je Clip, keine Godot- oder Handy-Freigabe. Die beiden anderen Vorschauen zeigen die Ruhepose."
+  },
+  {
+    "datei": "panzerkaefer_rig_roh.glb",
+    "beispiele": [],
+    "gewichtete_punkte_je_knochen": {
+      "Bone_000": 33,
+      "Bone_001": 2465,
+      "Bone_004": 856,
+      "Bone_003": 14,
+      "Bone_002": 172,
+      "Bone_006": 2791,
+      "Bone_005": 1011,
+      "Bone_040": 37,
+      "Bone_039": 73,
+      "Bone_043": 1585,
+      "Bone_042": 0,
+      "Bone_041": 405,
+      "Bone_010": 1159,
+      "Bone_009": 381,
+      "Bone_008": 178,
+      "Bone_007": 238,
+      "Bone_014": 1204,
+      "Bone_013": 379,
+      "Bone_012": 5,
+      "Bone_011": 204,
+      "Bone_018": 1009,
+      "Bone_017": 394,
+      "Bone_016": 0,
+      "Bone_015": 216,
+      "Bone_022": 997,
+      "Bone_021": 370,
+      "Bone_020": 166,
+      "Bone_019": 195,
+      "Bone_026": 1611,
+      "Bone_025": 430,
+      "Bone_024": 224,
+      "Bone_023": 246,
+      "Bone_030": 1580,
+      "Bone_029": 403,
+      "Bone_028": 59,
+      "Bone_027": 221,
+      "Bone_034": 890,
+      "Bone_033": 395,
+      "Bone_032": 9,
+      "Bone_031": 214,
+      "Bone_038": 887,
+      "Bone_037": 390,
+      "Bone_036": 28,
+      "Bone_035": 216
+    },
+    "hinweis": "Bewegung nur beim Zombie vorhanden. Fünf Stichproben je Clip, keine Godot- oder Handy-Freigabe. Die beiden anderen Vorschauen zeigen die Ruhepose."
+  }
+]
