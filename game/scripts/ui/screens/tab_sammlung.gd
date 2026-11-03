@@ -15,6 +15,9 @@ const LOCK_COL := 118.0    # Kartenbreite gesperrt (3 Spalten)
 const LOCK_H := 195.0
 const GAP := 6.0
 const LEFT := 12.0
+## Sichtbarer Bereich über der Reiterleiste (Mockup: Leiste 58 hoch am unteren Rand); darin scrollt die Liste
+const VIEW_H := 786.0
+const BOTTOM_PAD := 24.0
 ## Farbverlauf des Bilderrahmens je Held (oben, unten); aus dem Mockup, fehlende passend ergänzt
 const FRAME := {
 	"lynx": ["#7a4bff", "#3a1f9a"], "dusty": ["#ffd34d", "#e8960f"], "iska": ["#6fb4ff", "#3a64d8"],
@@ -36,6 +39,12 @@ var _views := {}           # Held -> HeroView3D
 var _tex := {}
 var _armed := ""           # Held, dessen Freischalten einmal angetippt wurde
 var _armed_t := 0.0
+var _scroller: Control     # schneidet die Liste über der Reiterleiste ab
+var _scroll := 0.0         # Mockup-Punkte
+var _content_h := 0.0
+var _press := Vector2.ZERO
+var _dragged := 0.0
+var _pressed := false
 
 
 func _init(m: MainMenu) -> void:
@@ -44,18 +53,25 @@ func _init(m: MainMenu) -> void:
 
 func _ready() -> void:
 	super()
+	# Liste unter der Reiterleiste: Kopf, Karten und Figuren liegen in einem abgeschnittenen Bereich,
+	# die Reiterleiste (Hintergrundbild und Knöpfe) bleibt immer davor sichtbar
+	_scroller = Control.new()
+	_scroller.clip_contents = true
+	_scroller.mouse_filter = Control.MOUSE_FILTER_PASS
+	place_at(_scroller, Rect2(0, 0, W, VIEW_H))
+	_scroller.resized.connect(_fit_scroll)
 	_back = Layer.new()
 	_back.tab = self
-	place_at(_back, Rect2(0, 0, W, H))
+	_scroller.add_child(_back)
 	_figs = Control.new()
 	_figs.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_figs.resized.connect(_place_views)
-	place_at(_figs, Rect2(0, 0, W, H))
+	_scroller.add_child(_figs)
 	_front = Layer.new()
 	_front.tab = self
 	_front.front = true
 	_front.mouse_filter = Control.MOUSE_FILTER_PASS
-	place_at(_front, Rect2(0, 0, W, H))
+	_scroller.add_child(_front)
 	# Bilder vorab laden; frisch geladene Bilder sind im ersten Bild noch nicht bereit
 	for id in ["banner", "banner_1", "dot", "shine"]:
 		_live_tex(id)
@@ -122,9 +138,26 @@ func bind() -> void:
 			v.feet = 1.12
 			_figs.add_child(v)
 			_views[id] = v
+	_content_h = (y + ceili(_locked.size() / 3.0) * (LOCK_H + GAP) if not _locked.is_empty() else _lock_y - 20.0) + BOTTOM_PAD
+	_fit_scroll()
 	_place_views()
 	_back.queue_redraw()
 	_front.queue_redraw()
+
+
+## Liste verschieben (Mockup-Punkte), begrenzt auf den Inhalt
+func scroll_to(v: float) -> void:
+	_scroll = clampf(v, 0.0, maxf(0.0, _content_h - VIEW_H))
+	_fit_scroll()
+
+
+func _fit_scroll() -> void:
+	if _scroller == null:
+		return
+	_scroll = clampf(_scroll, 0.0, maxf(0.0, _content_h - VIEW_H))
+	for c in [_back, _figs, _front]:
+		c.position = Vector2(0, -_scroll * s)
+		c.size = Vector2(W, maxf(VIEW_H, _content_h)) * s
 
 
 func _place_views() -> void:
@@ -366,7 +399,30 @@ class Layer:
 		else:
 			tab._draw_back(self)
 
+	# Ziehen scrollt die Liste, kurzes Antippen öffnet eine Karte
 	func _gui_input(e: InputEvent) -> void:
-		if front and e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
-			if tab._tap((e as InputEventMouseButton).position / tab.s):
+		if not front:
+			return
+		if e is InputEventMouseButton:
+			var mb := e as InputEventMouseButton
+			if mb.button_index == MOUSE_BUTTON_WHEEL_UP and mb.pressed:
+				tab.scroll_to(tab._scroll - 40.0)
 				accept_event()
+			elif mb.button_index == MOUSE_BUTTON_WHEEL_DOWN and mb.pressed:
+				tab.scroll_to(tab._scroll + 40.0)
+				accept_event()
+			elif mb.button_index == MOUSE_BUTTON_LEFT:
+				if mb.pressed:
+					tab._pressed = true
+					tab._press = mb.position
+					tab._dragged = 0.0
+				elif tab._pressed:
+					tab._pressed = false
+					if tab._dragged < 10.0 and tab._tap(mb.position / tab.s):
+						accept_event()
+		elif e is InputEventMouseMotion and tab._pressed:
+			var mm := e as InputEventMouseMotion
+			tab._dragged += mm.relative.length()
+			if tab._dragged >= 10.0:
+				tab.scroll_to(tab._scroll - mm.relative.y / tab.s)
+			accept_event()
