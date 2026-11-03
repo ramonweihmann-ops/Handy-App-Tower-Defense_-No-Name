@@ -1,0 +1,666 @@
+{
+  "symbole": 38,
+  "drehboegen": 4,
+  "modelle": [
+    {
+      "datei": "modelle/icon_energy.glb",
+      "dreiecke": 312,
+      "texturen": 1,
+      "texturmass": [
+        512,
+        512
+      ],
+      "animation": "Spin",
+      "dauer_sekunden": 1.2,
+      "sha256": "dff191adb876ab7cde9b26994e5b3572c0be9493a525ecda0b0f53875935a3b1"
+    },
+    {
+      "datei": "modelle/icon_gems.glb",
+      "dreiecke": 456,
+      "texturen": 1,
+      "texturmass": [
+        512,
+        512
+      ],
+      "animation": "Spin",
+      "dauer_sekunden": 1.2,
+      "sha256": "29d80e26f62240e79148a5869aa5947e553de840455e38c5b0951a29f92b7a52"
+    },
+    {
+      "datei": "modelle/icon_gold.glb",
+      "dreiecke": 324,
+      "texturen": 1,
+      "texturmass": [
+        512,
+        512
+      ],
+      "animation": "Spin",
+      "dauer_sekunden": 1.2,
+      "sha256": "73695d60c0e79049428d7ef13275b9540c065ebb2d5583ddbb8060dbaf07aeb5"
+    },
+    {
+      "datei": "modelle/icon_stars.glb",
+      "dreiecke": 352,
+      "texturen": 1,
+      "texturmass": [
+        512,
+        512
+      ],
+      "animation": "Spin",
+      "dauer_sekunden": 1.2,
+      "sha256": "e919c0844b030f9b2d9f5fcf1fcb8f59bb10485bc1c7704f34ef60d754daec89"
+    }
+  ],
+  "bilder": [
+    {
+      "datei": "act_daily.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        58,
+        480,
+        453
+      ],
+      "sha256": "605e7544bb5e9bb3f02202348e7c3b74522c6aff88a7e7c620ac30dcb33924ed"
+    },
+    {
+      "datei": "act_missions.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        40,
+        480,
+        471
+      ],
+      "sha256": "cdac3f5d71345f7f1e23f999db99b873d40cd92666e130b7e711b9427c61f75d"
+    },
+    {
+      "datei": "act_modes.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        81,
+        480,
+        470
+      ],
+      "sha256": "02b5f97badab2863a00dd8f3d454a04a9c4caa590c0aa91e06152255cdd8c004"
+    },
+    {
+      "datei": "act_profile.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        51,
+        32,
+        460,
+        480
+      ],
+      "sha256": "932491dc9fbbc9cd08efa50fd4472830c68480f07323a1ee0b5e97348afa5a19"
+    },
+    {
+      "datei": "act_settings.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        36,
+        480,
+        476
+      ],
+      "sha256": "cab83d0c06d30c4c2c1bd31339e41b0c1d26af2f716fbb4c8c865026e788c2e4"
+    },
+    {
+      "datei": "act_shop.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        58,
+        480,
+        470
+      ],
+      "sha256": "c0885dfb60783282f79a5d3766bafb3319f1d39e6b2731dac52ce08c13317304"
+    },
+    {
+      "datei": "act_wheel.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        62,
+        32,
+        450,
+        470
+      ],
+      "sha256": "8cee45e3485e858a6b266cdbe4bf7d8ec3b474e9dffd7dbe7eb1f2fc65a2a5fc"
+    },
+    {
+      "datei": "booster_kuppel.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        57,
+        480,
+        455
+      ],
+      "sha256": "a48de42456afea77fe3ff0b2fdd5102282737165ce359abdf4f6a4bb3d476112"
+    },
+    {
+      "datei": "booster_luftangriff.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        34,
+        32,
+        478,
+        480
+      ],
+      "sha256": "b518533d43315873fb1745b6f2c78097f09c2af9367bf3532c626a13f8e6a7cd"
+    },
+    {
+      "datei": "booster_medipack.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        41,
+        32,
+        470,
+        480
+      ],
+      "sha256": "b7ebf66ab7150aa74d599e6fbb51878c8e29d9721c8145e5b5460c53d0f96110"
+    },
+    {
+      "datei": "booster_munition.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        50,
+        480,
+        462
+      ],
+      "sha256": "16896b9c8c7083124dc3ec0f074f278a96a6d70e6d6886da4693057be13466b6"
+    },
+    {
+      "datei": "booster_zeitlupe.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        82,
+        32,
+        430,
+        480
+      ],
+      "sha256": "a744189327f7fc5a268964dbfa57cbd3133003661985c313bf15f84124a55c2f"
+    },
+    {
+      "datei": "chest_cosmic.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        115,
+        480,
+        470
+      ],
+      "sha256": "16c72f83e27a62da36e5b8d8e0f2a309ccb8f7ad298a16feeb56a3d6ef439bc8"
+    },
+    {
+      "datei": "chest_epic.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        101,
+        480,
+        470
+      ],
+      "sha256": "f76434a98baf32a3d9b6b090dd534bcc17fa64cc0b7d41f3eda1c57cda86fce0"
+    },
+    {
+      "datei": "chest_gold.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        120,
+        480,
+        470
+      ],
+      "sha256": "a1b0b46cdc8a6a496a91ee6c34e1becd97a56c376b95fccfd9aeba4022de5674"
+    },
+    {
+      "datei": "chest_iron.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        130,
+        480,
+        470
+      ],
+      "sha256": "a98b0fce477433b3c8d18fa50d46e5a32b6e7f764bed7a12205209212f58d615"
+    },
+    {
+      "datei": "chest_platinum.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        87,
+        480,
+        470
+      ],
+      "sha256": "68b7066f14b97808f7cf7590ac9f1aab19a7421e673267aa46688d1e9e98cc86"
+    },
+    {
+      "datei": "chest_silver.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        124,
+        480,
+        470
+      ],
+      "sha256": "55c27901c88dbaab60b65708d9221f9d4dd769b86c84fb5b0e870c40c94fb2f0"
+    },
+    {
+      "datei": "chest_wood.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        87,
+        480,
+        470
+      ],
+      "sha256": "3914b79409211dfb68db8daf9e01f0a37cb33e960729c113b7bdfdb443c97280"
+    },
+    {
+      "datei": "icon_cards.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        49,
+        32,
+        463,
+        480
+      ],
+      "sha256": "e4f974184847176c75234109ca46eb382127bb450ddb2ce1c1ec87c7c4208aa8"
+    },
+    {
+      "datei": "icon_clock.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        36,
+        32,
+        475,
+        480
+      ],
+      "sha256": "5a79d9182b343e6e8e516a227435101605c28150c0ba17fff711537dd739a4ab"
+    },
+    {
+      "datei": "icon_core.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        80,
+        32,
+        431,
+        480
+      ],
+      "sha256": "7df23d5ea0d971f6ce5dddb11161a79e730f8d23bc809d3a65f76033758257ba"
+    },
+    {
+      "datei": "icon_crown.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        77,
+        480,
+        435
+      ],
+      "sha256": "529363694877c0e734758e2c0c37ee05dfdf89ca56d030acfec532b0fbddeb36"
+    },
+    {
+      "datei": "icon_energy.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        88,
+        32,
+        422,
+        480
+      ],
+      "sha256": "a1f1da57d50971daae6d9f78308d2ea86f44796208acfd89053a8a647b46b242"
+    },
+    {
+      "datei": "icon_gems.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        49,
+        480,
+        463
+      ],
+      "sha256": "5430fac2a04e7b63e5a6aa357f4f00c375d191688b3c3e7242d16dd5f0bc0df9"
+    },
+    {
+      "datei": "icon_gold.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        39,
+        32,
+        473,
+        480
+      ],
+      "sha256": "1b67817616f5790109d8f71ea5ce214e857dea9a643a3cdd8b9826c323506404"
+    },
+    {
+      "datei": "icon_league.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        63,
+        32,
+        448,
+        480
+      ],
+      "sha256": "ced18e09898406a9c1f2db640a8809d1f0c221fb5326d99edb231ffd4ad1d44b"
+    },
+    {
+      "datei": "icon_medal.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        95,
+        32,
+        417,
+        480
+      ],
+      "sha256": "ff5235f2810ecb4473cb2004ec2ec9d1cb558b6f688732255a2986e23718ada4"
+    },
+    {
+      "datei": "icon_pass.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        106,
+        480,
+        405
+      ],
+      "sha256": "c8e110353da52f35e63556d46b282a4b71486f948d0e90455e3ca1f6b3bb58ce"
+    },
+    {
+      "datei": "icon_shield.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        63,
+        32,
+        449,
+        480
+      ],
+      "sha256": "df58a3b1fedefe6cf5962972653de08c2bdad173331d5963b9b3dc3e2ec0b71b"
+    },
+    {
+      "datei": "icon_skull.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        34,
+        480,
+        478
+      ],
+      "sha256": "c27c2a9997e83c6f2036d8921b7a1b05e0815bcf371e459f2230bcae41ff2bd7"
+    },
+    {
+      "datei": "icon_stars.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        36,
+        479,
+        475
+      ],
+      "sha256": "ad54d5b86f39238a9ccbdafd61a7548314acdc4f777915cf5710849f964b0dfa"
+    },
+    {
+      "datei": "icon_trophy.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        53,
+        480,
+        470
+      ],
+      "sha256": "c22dca574b29155e3b2651a5682c2d6590218f415435a36e6ff3aa5925f48e78"
+    },
+    {
+      "datei": "nav_base.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        48,
+        480,
+        470
+      ],
+      "sha256": "e677a975d9c74226ab2dbc8f69696400b7d05b660f654fd6df2ad992636872c8"
+    },
+    {
+      "datei": "nav_battle.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        61,
+        480,
+        450
+      ],
+      "sha256": "95a58fd8769884430044d46eeef755cfbe510f90c9a9066f5e7be99237fb8f12"
+    },
+    {
+      "datei": "nav_heroes.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        49,
+        32,
+        463,
+        480
+      ],
+      "sha256": "e4f974184847176c75234109ca46eb382127bb450ddb2ce1c1ec87c7c4208aa8"
+    },
+    {
+      "datei": "nav_shop.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        32,
+        58,
+        480,
+        470
+      ],
+      "sha256": "c0885dfb60783282f79a5d3766bafb3319f1d39e6b2731dac52ce08c13317304"
+    },
+    {
+      "datei": "nav_upgrades.png",
+      "breite": 512,
+      "hoehe": 512,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": [
+        87,
+        32,
+        425,
+        470
+      ],
+      "sha256": "88495aac3c3bb923985204a76d22d4375843c624f859ef6e480d8a2bab0adae2"
+    },
+    {
+      "datei": "spin_energy.png",
+      "breite": 1024,
+      "hoehe": 768,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": null,
+      "sha256": "0fe9463ec1ada769369337586f8293b72bc7e7ff5380b302ce7cbe04e26f0d41"
+    },
+    {
+      "datei": "spin_gems.png",
+      "breite": 1024,
+      "hoehe": 768,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": null,
+      "sha256": "83ddcebd81a08593087fd043529ad6b44710058bf745f9114582791230c22c68"
+    },
+    {
+      "datei": "spin_gold.png",
+      "breite": 1024,
+      "hoehe": 768,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": null,
+      "sha256": "d4fd0bc08ce80e54796aa7a1292eb93efc0f9fc99773b43d22e97ab30caedec1"
+    },
+    {
+      "datei": "spin_stars.png",
+      "breite": 1024,
+      "hoehe": 768,
+      "rgba_32_bit": true,
+      "sRGB": true,
+      "echte_transparenz": true,
+      "motiv_grenzen": null,
+      "sha256": "87eff4d2c84aaa4e86acbb0ce0192e47801b9b1b6f46342e426f97748fdf693a"
+    }
+  ]
+}
