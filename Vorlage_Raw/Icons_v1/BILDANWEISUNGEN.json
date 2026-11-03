@@ -1,0 +1,188 @@
+{
+  "allgemein": "Anwendungsfall: stylized-concept. Ein einziges freigestelltes Spielsymbol, 512×512 Pixel PNG mit echtem transparentem Hintergrund. Referenz 1 ist der bereits freigegebene Hauptbildschirm v4, Referenz 2 die Symbolübersicht als inhaltliche Zuordnung. Übernimm die vorhandene neue Symbolfamilie: plastischer süßer Space-Comic, kräftige Farben, wenige große klare Flächen, abgerundete Kanten, dunkle violettblaue Kontur etwa 3 Prozent der Motivbreite, weiche Lichtkante von oben links, leichte orthografische Aufsicht von vorn etwa 15 Grad. Muss auch bei 20×20 Pixeln klar erkennbar sein. EIN Motiv allein, groß und mittig, auf allen Seiten freie transparente Ränder. Kein Text, keine Zahlen, kein Buchstabe, kein UI-Kachelrahmen, keine Hintergrundfarbe, keine zusätzlichen Sterne oder Glitzerpartikel, kein roter Hinweispunkt, kein äußerer Schein, kein äußerer Schatten, keine schwebende separate Präsentationsplattform. Helligkeit und Glanz nur AUF dem Gegenstand. Kein Fotorealismus oder Mikrodetails. Die neue Symbolfamilie nicht neu erfinden. ",
+  "motive": [
+    {
+      "name": "icon_pass",
+      "category": "Währungen",
+      "subject": "Ein kräftig violetter abgerundeter Eintritts-Coupon mit zwei symmetrischen seitlichen Kerben und einem großen goldenen fünfzackigen Stern als aufgeprägtem Symbol. Kanten in dunklem Indigo."
+    },
+    {
+      "name": "icon_cards",
+      "category": "Währungen",
+      "subject": "Die vorhandene süße cyan-blaue Astronauten-Heldenkarte aus der unteren Navigation der Referenz exakt als freigestelltes Motiv. Weiße stilisierte Astronautenfigur mit großer dunkelblauer verspiegelter Visierfläche und kleinem gelbem Knopf auf cyanfarbener abgerundeter Karte. Keine Schrift, kein Porträt eines konkreten Champions. Nur Karte, kein Hintergrund."
+    },
+    {
+      "name": "icon_trophy",
+      "category": "Währungen",
+      "subject": "Ein goldener Siegespokal mit breiten runden seitlichen Henkeln, kurzem Stiel und breitem Fuß, ein kleiner eingearbeiteter Stern auf der Schale. Gold mit honigfarbenen Schatten, eine kleine cyanfarbene Einlage am Fuß, kompakt und klar."
+    },
+    {
+      "name": "icon_league",
+      "category": "Währungen",
+      "subject": "Ein dickes schildförmiges Liga-Wappen aus bronzefarbener und goldener Metallfassung, dunkelvioletter Innenfläche und großem goldenen fünfzackigen Stern. Keine Bänder, keine Krone."
+    },
+    {
+      "name": "icon_medal",
+      "category": "Währungen",
+      "subject": "Eine runde dicke Goldmedaille mit dunkelblauer Innenscheibe und einem kleinen goldenen Ringplaneten als Relief. Zwei kurze korallrote Bandstücke oben. Kein äußerer Glanz. Klare einfache Silhouette."
+    },
+    {
+      "name": "chest_wood",
+      "category": "Truhen",
+      "subject": "Eine geschlossene runde Raumfahrt-Schatztruhe aus warmen kastanienbraunen großen Holzpaneelen mit zwei breiten orangegoldenen Metallbändern, schlichtem zentralem Goldverschluss und ganz kleiner cyanfarbener Einlage im Verschluss. Sichtbare Vorderseite und etwas rechte Seite, Standfläche gerade, kein Podest. Keine Münzen außen."
+    },
+    {
+      "name": "chest_iron",
+      "category": "Truhen",
+      "subject": "Eine geschlossene kompakte futuristische Eisenschatztruhe, robuste rundliche dunkelgraue Schale mit breiten matten stahlgrauen Metallbändern und zentralem quadratischem Schloss, kleine cyanfarbene Einlage. Keine Goldbänder. Sichtbare Vorderseite und etwas rechte Seite. Keine Münzen außen."
+    },
+    {
+      "name": "chest_silver",
+      "category": "Truhen",
+      "subject": "Eine geschlossene hochwertige silberne Raumschatztruhe, rundliche helle silberweiße Schale mit violettblauen Schatten, breiten dunkleren Silberbändern, cyanfarbener Einlage am zentralen Schloss. Deutlich heller als Eisen, keine goldene Schale. Sichtbare Vorderseite und etwas rechte Seite, keine Münzen."
+    },
+    {
+      "name": "chest_gold",
+      "category": "Truhen",
+      "subject": "Eine geschlossene wertvolle goldene Raumschatztruhe, rundliche honiggoldene Schale mit breiten sonnengoldenen Bändern, große einfache Goldverriegelung mit winziger cyanfarbener Einlage. Deutlich ganz Gold, kein Holz. Sichtbare Vorderseite und etwas rechte Seite, keine Münzen."
+    },
+    {
+      "name": "chest_epic",
+      "category": "Truhen",
+      "subject": "Eine geschlossene epische Raumschatztruhe, kräftig violett-lila rundliche Schale, breite goldene Bänder und zentrales Schloss mit großem rosa Kristall. Wertvoll aber einfach, keine Partikel und kein Schein. Sichtbare Vorderseite und etwas rechte Seite."
+    },
+    {
+      "name": "chest_platinum",
+      "category": "Truhen – Vorschlag",
+      "subject": "Eine geschlossene Platin-Raumschatztruhe als höhere Seltenheit: perlmuttweiße und platinhelle rundliche Schale, breite türkise und silberne Metallbänder, zentraler türkisblauer Kristallverschluss. Wenige große Formen. Sichtbare Vorderseite und etwas rechte Seite."
+    },
+    {
+      "name": "chest_cosmic",
+      "category": "Truhen – Vorschlag",
+      "subject": "Eine geschlossene kosmische Raumschatztruhe als höchste Designvariante: dunkle indigoblaue rundliche Schale, breite warme Goldbänder, kräftig rosa zentraler Ringplanet als Schlossrelief, wenige cyanfarbene Metalleinlagen. Keine außerhalb schwebenden Planeten oder Sterne. Sichtbare Vorderseite und etwas rechte Seite."
+    },
+    {
+      "name": "booster_luftangriff",
+      "category": "Booster",
+      "subject": "Ein kleines kompaktes Space-Luftangriffspaket: drei gedrungene orange-korallrote Raketen mit hellen Nasenkegeln und dunklen Indigoheckflossen, fest als enges diagonal nach rechts oben gerichtetes Bündel zusammengehalten. Keine Flammen, keine Bewegungslinien, kein Explosionseffekt."
+    },
+    {
+      "name": "booster_medipack",
+      "category": "Booster",
+      "subject": "Ein rundlicher weiß-cremefarbener Science-Fiction-Medizinkoffer mit kurzen breiten hellblauen Eckschützern und kleinem Griff, großes aufgeprägtes korallrotes Herz vorn, eine kleine mintgrüne Verschlussfläche. Keine fremden Logos oder Beschriftungen."
+    },
+    {
+      "name": "booster_zeitlupe",
+      "category": "Booster",
+      "subject": "Eine kompakte rundliche violette Zeitlupen-Stoppuhr, großer cyanfarbener Glasbereich mit zwei schlichten weißen senkrechten Pausebalken, ein einzelner goldener oberer Drücker. Keine Zahlen, keine Teilstrichorgie, keine Außenringe oder Effekte."
+    },
+    {
+      "name": "booster_kuppel",
+      "category": "Booster",
+      "subject": "Eine kleine Schutzkuppel als Booster: eine dicke klare türkisfarbene halbkreisförmige Kuppelschale auf einem integrierten niedrigen violettblauen technischen Rand, großer heller Schild als Relief auf der Vorderseite. Kein Boden unter dem Gegenstand, kein Umgebungsschein. Das transparente Motiv muss auch klein klar lesbar sein."
+    },
+    {
+      "name": "booster_munition",
+      "category": "Booster",
+      "subject": "Ein kompakter abgerundeter violettblauer Munitionskasten mit kräftigen orangegoldenen Eckschützern, zwei kurzen dicken goldfarbenen Patronen auf der Vorderseite als großes geprägtes Bildsymbol und einfacher cyanfarbener Verriegelung. Keine Schrift, keine Krone, keine Anzahl."
+    },
+    {
+      "name": "icon_core",
+      "category": "Kampf",
+      "subject": "Ein eigenständiger kompakter Energiekern: dicke rundliche blauviolette Batteriekapsel mit silberweißem oberen Kontakt und großem grünem Blitzrelief auf der Vorderseite. Keine Münze vor dem Kern. Ein klarer einzelner Gegenstand, große Farbflächen."
+    },
+    {
+      "name": "icon_shield",
+      "category": "Kampf",
+      "subject": "Ein kräftig grüner einfacher schützender Schild mit dickem dunklem indigoblauem Außenrand, hellmintfarbener weicher Reflexkante oben links und einer großen helleren inneren Schildfläche. Keine weiteren Symbole, kein Kreuz, keine Effekte."
+    },
+    {
+      "name": "icon_skull",
+      "category": "Kampf",
+      "subject": "Ein freundlicher stark vereinfachter cremeweißer Comic-Totenkopf mit dunkler violetter Außenkante, zwei großen runden dunkelvioletten Augenhöhlen, kleiner dreieckiger Nase und drei breiten kurzen Zähnen. Keine Knochen, keine Gruselelemente oder Texturen, keine Hintergründe."
+    },
+    {
+      "name": "icon_clock",
+      "category": "Kampf",
+      "subject": "Eine runde Space-Uhr mit dickem cyanblauem Rand, cremeweißem Zifferblatt und nur zwei dicken dunkelvioletten Zeigern, die ungefähr zehn nach zehn zeigen. Keine Ziffern, keine kleinteiligen Striche, kein Uhrenarmband, kein Außenring."
+    },
+    {
+      "name": "icon_crown",
+      "category": "Kampf",
+      "subject": "Eine einfache hochwertige abgerundete goldene dreizackige Krone mit breitem honigfarbenem unteren Reif und einem großen rosa runden Kristall auf der Vorderseite. Keine weiteren Juwelen, keine Schrift, keine Glitzerpartikel."
+    },
+    {
+      "name": "act_daily",
+      "category": "Aktionen",
+      "subject": "EXAKT das vorhandene neue Geschenk-Symbol rechts oben im Hauptbildschirm: runde rosa-violette Geschenkbox, goldene Schleife mit zwei breiten geschwungenen Schlaufen, breite goldene Bänder, kleine cyanfarbene Einlage am unteren Boxrand. Nur Geschenk, roten Hinweispunkt entfernen, kein neu erfundenes Design."
+    },
+    {
+      "name": "act_wheel",
+      "category": "Aktionen",
+      "subject": "EXAKT das vorhandene neue Glücksrad-Symbol rechts im Hauptbildschirm: rundes violettes Rad mit sechs großen abwechselnd rosa, gelben und cyanfarbigen Segmenten, goldene Mitte und goldener dreieckiger Zeiger oben, kleiner violetter integrierter Fuß. Roten Hinweispunkt entfernen, keine Zahlen und keine weiteren Effekte."
+    },
+    {
+      "name": "act_missions",
+      "category": "Aktionen",
+      "subject": "EXAKT die neue mint-türkise Missionskonsole rechts im Hauptbildschirm: rundliches kompaktes Klemmbrett mit dickem türkisgrünem Rand, großem weißen Haken auf dunklerem mintgrünem Display, zwei runden kleinen oben integrierten Stiften und einer cyanfarbenen unteren breiten Taste. Roten Hinweispunkt entfernen. Kein neues Design."
+    },
+    {
+      "name": "act_shop",
+      "category": "Aktionen",
+      "subject": "EXAKT das vorhandene neue Shop-Gebäude aus dem Hauptbildschirm: kleine rundliche violettblaue Ladenkapsel mit rotorange-weiß gestreiftem gebogenem Markisendach, blauer kleiner Kuppel oben, großer cyanfarbener Eingangstür und zwei kurzen cyanfarbigen Fenstern am integrierten unteren Baukörper. Kein Podest unter dem Gebäude und kein roter Punkt. Nicht neu erfinden."
+    },
+    {
+      "name": "act_modes",
+      "category": "Aktionen",
+      "subject": "EXAKT der vorhandene neue blaue Modi-Pokal rechts im Hauptbildschirm: kleine rundliche königsblaue Trophäe mit kurzen breiten seitlichen Henkeln, großem goldenen Stern auf der Schale, kurzer cyanfarbener Stiel und integrierter runder violettblauer Fuß. Roten Hinweispunkt entfernen. Nicht in goldenen Pokal umgestalten."
+    },
+    {
+      "name": "nav_battle",
+      "category": "Reiter",
+      "subject": "EXAKT die vorhandene neue Plasmapistole auf dem gelben Kampf-Reiter unten im Hauptbildschirm. Nur die Pistole freistellen, KEIN gelber Button oder Hintergrund. Kompakte lila Spacepistole mit dunkelviolettem nach unten gerichtetem Griff, cyanblauem kurzem dicken Lauf nach rechts oben, zwei breiten cremeweißen Laufringen und großer grüner rechteckiger Energieanzeige seitlich. Keine Schussflamme, kein Schein außen, keine Projektilpartikel. Keine langen Gewehre."
+    },
+    {
+      "name": "nav_upgrades",
+      "category": "Reiter",
+      "subject": "EXAKT das vorhandene neue Upgrades-Motiv unten im Hauptbildschirm: ein großer dicker mintgrüner nach oben gerichteter Pfeil, direkt in einem kleinen integrierten runden violettblauen technischen Sockel mit zwei kurzen cyanfarbenen Einlagen steckend. Der Sockel IST Teil des Motivs. Kein roter Hinweispunkt, keine Kachel, kein Schein außen."
+    },
+    {
+      "name": "nav_base",
+      "category": "Reiter",
+      "subject": "EXAKT das vorhandene neue Basis-Gebäude unten rechts im Hauptbildschirm: kleine abgerundete weiß-violette Raumstation mit goldgelbem halbkugeligem Dach, kurzer goldener Antenne mit runder Spitze, großem cyanfarbigem Tor und zwei kleinen violetten Fenstern. Kein Boden, kein getrennter Plattformteller, kein roter Punkt. Nicht neu erfinden."
+    },
+    {
+      "name": "act_settings",
+      "category": "Aktionen – Ergänzung",
+      "subject": "Ein kompaktes dickes abgerundetes cremeweißes Zahnrad mit acht breiten kurzen Zähnen, dunkelvioletter Seitenfläche und großem rundem dunkelblauem Loch mit cyanfarbiger Innenkante. Keine weitere Kachel, keine technischen Mikrodetails."
+    },
+    {
+      "name": "act_profile",
+      "category": "Aktionen – Ergänzung",
+      "subject": "Ein kleines menschliches neutrales Profil-Bildzeichen: cremeweißes rundes Kopfoval und eine breite runde Schulter-Büste als zusammengehöriges Symbol, kurze dicke violettblaue Seitenkante, sehr vereinfachtes Space-Comic-Relief. Keine Gesichtszüge und kein konkreter Held, keine Hintergrundscheibe, kein Ring."
+    }
+  ],
+  "waehrungen": [
+    {
+      "datei": "icon_gold.png",
+      "vorlage": "Neue Erfolgsmeldung: Gold",
+      "anweisung": "Nur die dicke Goldmuenze mit vierzackigem Stern freistellen; Farbe, Form und Detailgrad erhalten. Plattform, Schrift, Umgebung, Partikel und aeusseren Schein entfernen."
+    },
+    {
+      "datei": "icon_gems.png",
+      "vorlage": "Neue Erfolgsmeldung: Edelsteine",
+      "anweisung": "Nur den rosa Edelstein mit wenigen grossen weichen Facetten freistellen; Form, Farbe und Detailgrad erhalten. Plattform, Schrift, Umgebung, Partikel und aeusseren Schein entfernen."
+    },
+    {
+      "datei": "icon_energy.png",
+      "vorlage": "Neue Erfolgsmeldung: Energie",
+      "anweisung": "Nur den gruenen Blitz mit mintfarbenem Kern und abgerundeten Ecken freistellen; Form, Farbe und Detailgrad erhalten. Plattform, Schrift, Umgebung, Partikel und aeusseren Schein entfernen."
+    },
+    {
+      "datei": "icon_stars.png",
+      "vorlage": "Neue Erfolgsmeldung: Gold als Materialvorlage",
+      "anweisung": "Ein goldener fuenfzackiger Talent-Stern: weich abgerundete dicke Zacken, Gelbgold mit Honigkante, dunkle violette Kontur, wenige grosse Flaechen. Nur das freigestellte Symbol."
+    }
+  ],
+  "technische_aufbereitung": "Einzeln erzeugte freigestellte Motive; danach nur transparente Raender, Skalierung, Platzierung und sRGB-Ausgabe vereinheitlicht. Waehrungen als texturierte konturierte Koerper gebaut und fuer die Drehfolgen gerendert."
+}

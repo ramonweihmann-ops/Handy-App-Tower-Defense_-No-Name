@@ -1,0 +1,66 @@
+[
+  {
+    "motiv": "gold",
+    "dreiecke": 324,
+    "texturen": 1,
+    "texturmass": [
+      512,
+      512
+    ],
+    "animation": "Spin",
+    "dauer_sekunden": 1.2,
+    "drehachse_glb": "Y",
+    "vorderseite_glb": "+Z",
+    "bilder": 12,
+    "winkelabstand_grad": 30,
+    "modellart": "Einfacher Symbolkörper mit eingebetteter Motivtextur; Kristall mit gefalteten Flächen, übrige Symbole als Extrusionen"
+  },
+  {
+    "motiv": "gems",
+    "dreiecke": 456,
+    "texturen": 1,
+    "texturmass": [
+      512,
+      512
+    ],
+    "animation": "Spin",
+    "dauer_sekunden": 1.2,
+    "drehachse_glb": "Y",
+    "vorderseite_glb": "+Z",
+    "bilder": 12,
+    "winkelabstand_grad": 30,
+    "modellart": "Einfacher Symbolkörper mit eingebetteter Motivtextur; Kristall mit gefalteten Flächen, übrige Symbole als Extrusionen"
+  },
+  {
+    "motiv": "energy",
+    "dreiecke": 312,
+    "texturen": 1,
+    "texturmass": [
+      512,
+      512
+    ],
+    "animation": "Spin",
+    "dauer_sekunden": 1.2,
+    "drehachse_glb": "Y",
+    "vorderseite_glb": "+Z",
+    "bilder": 12,
+    "winkelabstand_grad": 30,
+    "modellart": "Einfacher Symbolkörper mit eingebetteter Motivtextur; Kristall mit gefalteten Flächen, übrige Symbole als Extrusionen"
+  },
+  {
+    "motiv": "stars",
+    "dreiecke": 352,
+    "texturen": 1,
+    "texturmass": [
+      512,
+      512
+    ],
+    "animation": "Spin",
+    "dauer_sekunden": 1.2,
+    "drehachse_glb": "Y",
+    "vorderseite_glb": "+Z",
+    "bilder": 12,
+    "winkelabstand_grad": 30,
+    "modellart": "Einfacher Symbolkörper mit eingebetteter Motivtextur; Kristall mit gefalteten Flächen, übrige Symbole als Extrusionen"
+  }
+]
