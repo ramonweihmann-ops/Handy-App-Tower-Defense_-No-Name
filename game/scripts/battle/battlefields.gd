@@ -13,11 +13,15 @@ const FIELDS := {
 	"lava_asteroid": {"name": "Lava-Asteroid", "file": "res://fields/lava_asteroid.webp", "rim": Color(1.0, 0.5, 0.25)},
 	"nebula_portal": {"name": "Nebelportal", "file": "res://fields/nebula_portal.webp", "rim": Color(0.8, 0.5, 1.0)},
 	"ringed_planet": {"name": "Ringplanet", "file": "res://fields/ringed_planet.webp", "rim": Color(0.55, 0.95, 0.8)},
+	# Arenen (Vorlage Arena_Karten_v1, 977 × 1610): auf 1688 hoch skaliert, links und rechts je 122 Punkte
+	# Tribüne abgeschnitten; Brücke und Plattform liegen dann wie bei den Planeten.
+	"universums_arena": {"name": "Universums-Arena", "file": "res://fields/universums_arena.webp", "rim": Color(0.85, 0.55, 1.0)},
+	"multiplayer_arena": {"name": "Multiplayer-Arena", "file": "res://fields/multiplayer_arena.webp", "rim": Color(0.6, 0.8, 1.0)},
 }
 ## Planeten im Abenteuer, je 10 Level
 const ADVENTURE := ["space_dock", "ice_world", "desert_outpost", "lava_asteroid", "nebula_portal"]
-## Felder der Spielmodi
-const MODES := {"mp": "ringed_planet"}
+## Felder der Spielmodi („universe“: Universumsode, sobald es den Modus gibt)
+const MODES := {"mp": "multiplayer_arena", "universe": "universums_arena"}
 
 
 static func for_level(level: int) -> String:
