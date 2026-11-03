@@ -1,0 +1,16 @@
+[
+  {
+    "datei": "multiplayer_arena.png",
+    "breite": 977,
+    "hoehe": 1610,
+    "bytes": 2426412,
+    "sha256": "a45d02152c03636c357f6b95015ac8b7b02cc5df8d5acf625683cca5d4890b1b"
+  },
+  {
+    "datei": "universums_arena.png",
+    "breite": 977,
+    "hoehe": 1610,
+    "bytes": 2485802,
+    "sha256": "83ff4361893fbbaa236a052bd63c343a561c6d94c38b731dbe48088f22e79111"
+  }
+]
