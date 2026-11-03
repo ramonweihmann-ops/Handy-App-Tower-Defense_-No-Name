@@ -17,6 +17,7 @@ BOSS_EVERY = 5
 
 # Zielkurve: (von, bis) Siegquote beim ersten Versuch; None = keine Vorgabe.
 def target(level, profile):
+    profile = profile.split("+")[0]   # „+basis“: gleiche Vorgabe, zum Vergleich mit und ohne Basislager
     boss = level % BOSS_EVERY == 0
     if level <= 20:
         return {"anfaenger": (0.70, 1.0), "durchschnitt": (0.85, 1.0), "zahlend": (0.95, 1.0)}[profile]

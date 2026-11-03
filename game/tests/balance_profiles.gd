@@ -12,7 +12,26 @@ extends RefCounted
 const PROFILES := ["anfaenger", "durchschnitt", "zahlend"]
 
 
+## Profil mit Endung „+basis“ (z. B. „durchschnitt+basis“): dazu ein Basislager, wie es ein Spieler
+## mit wenigen Kämpfen am Tag bis zu diesem Level hat (der großzügige Fall aus scripts/economy-sim.py,
+## docs/BASISLAGER.md): alle bis dahin baubaren Gebäude, alle auf Stufe 3 + (Level − 1) / 12.
+## Ohne Endung bleibt das Basislager wie in einem neuen Spielstand (nur die Startgebäude auf Stufe 1).
 static func apply(save: Node, profile: String, level: int) -> void:
+	var with_base := profile.ends_with("+basis")
+	profile = profile.trim_suffix("+basis")
+	_apply(save, profile, level)
+	var done := level - 1
+	var b := {}
+	if with_base:
+		var lvl := clampi(3 + done / 12, 1, BaseData.MAX_LEVEL)
+		for d in BaseData.BUILDINGS:
+			var id: String = d["id"]
+			if BaseData.by_champion(id) or level >= int(d["level"]):
+				b[id] = {"level": lvl, "stock": 0.0, "time": 0}
+	save.data["base"] = b
+
+
+static func _apply(save: Node, profile: String, level: int) -> void:
 	var done := level - 1
 	var d: Dictionary = save.data
 	var won: Array = []
