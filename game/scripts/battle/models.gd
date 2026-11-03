@@ -20,6 +20,8 @@ const GUN_LENGTH := {"guns/Revolver": 0.42, "guns/AK": 0.78, "guns/RocketLaunche
 	"guns/Shotgun": 0.8, "guns/Sniper": 1.05}
 
 ## height: Höhe in Gegner-Einheiten (vor VIS_SCALE); walk/attack: Namen der Animationen.
+## stride: Tempo, bei dem die Laufbewegung ohne Rutschen passt, in Körperhöhen pro Sekunde (nur neue
+## Modelle, gemessen in Blender). Dann läuft die Bewegung so schnell wie der Gegner wirklich ist.
 const ENEMIES := {
 	"schleimling": {"file": "enemies/GreenBlob", "height": 0.95, "walk": "Walk", "attack": "Bite_Front"},
 	"tentakler": {"file": "enemies/Squidle", "height": 1.35, "walk": "Flying_Idle", "attack": "Headbutt", "lift": 0.2},
@@ -27,6 +29,8 @@ const ENEMIES := {
 	"schleimmutter": {"file": "enemies/PinkBlob", "height": 2.6, "walk": "Walk", "attack": "Bite_Front"},
 	"krabbler": {"file": "enemies/Zombie_Female", "height": 1.45, "walk": "Run", "attack": "Punch"},
 	"zombie": {"file": "enemies/Zombie_Male", "height": 1.6, "walk": "Walk", "attack": "Punch"},
+	# Comic-Zombie (tools/monsters/build_zombie.py), wird nach der Freigabe aktiv:
+	# "zombie": {"file": "enemies_v2/zombie", "height": 1.6, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.68},
 	"brecher": {"file": "enemies/Orc", "height": 2.0, "walk": "Walk", "attack": "Punch"},
 	"koloss": {"file": "enemies/Yeti", "height": 3.0, "walk": "Walk", "attack": "Punch"},
 }

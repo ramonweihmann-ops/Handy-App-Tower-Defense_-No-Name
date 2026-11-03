@@ -204,7 +204,12 @@ func _animate(_delta: float, moving: bool) -> void:
 		var d: Dictionary = Models.ENEMIES[kind]
 		_play(String(d["attack"]) if attacking else String(d["walk"]))
 		if _anim:
-			_anim.speed_scale = (1.0 - _slow) * (1.0 if moving else 0.6)
+			if d.has("stride") and moving and not attacking:
+				# Schritte passend zum echten Tempo: schnelle Gegner laufen sichtbar schneller
+				var natural := float(d["stride"]) * float(d["height"]) * VIS_SCALE
+				_anim.speed_scale = clampf(speed * (1.0 - _slow) / natural, 0.5, 2.2)
+			else:
+				_anim.speed_scale = (1.0 - _slow) * (1.0 if moving else 0.6)
 		return
 	var t := _t
 	match kind:
@@ -417,7 +422,7 @@ func _build_model() -> void:
 	_model = Models.make(String(d["file"]), float(d["height"]), false)
 	_model.position.y = float(d.get("lift", 0.0))
 	_visual.add_child(_model)
-	if kind == "krabbler" or kind == "zombie":
+	if (kind == "krabbler" or kind == "zombie") and not bool(d.get("v2", false)):
 		Models.recolor(_model, "Skin", Color(0.52, 0.66, 0.42))
 	if tint != Color(1, 1, 1):
 		Models.tint_all(_model, tint)
