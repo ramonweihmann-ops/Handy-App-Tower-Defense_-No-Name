@@ -11,7 +11,8 @@ vorn links/rechts, Mitte links/rechts, hinten links/rechts. Vorn in der Mitte ra
 - Skelett: Root → Body → Head, je Bein Hüfte (bis zum Knie) und Unterschenkel (bis zum Fuß),
   Gewichte selbst berechnet (Körper, Kopf, Beine mit weichem Übergang an Knie und Panzerrand)
 - Walk (0,8 s, Schleife): Dreifuß-Gang, abwechselnd vorn links/Mitte rechts/hinten links und die anderen
-  drei; Bein hebt sich, schwingt nach vorn, setzt auf, schiebt nach hinten; Körper wippt leicht
+  drei; Vor und zurück als weiche Schwingung, Heben nur beim Vorschwingen (weich ab und auf), jedes Bild ein
+  Schlüssel; Körper wippt nur leicht nach oben, damit die Füße nicht in den Boden sinken
 - Attack (0,9 s, Schleife): bäumt sich vorn auf (Kopf hoch, Vorderbeine zur Seite, damit das Gesicht frei
   bleibt), schnappt nach vorn unten zu
 """
@@ -40,7 +41,7 @@ ZOFF = 0.0   # nach dem Absenken auf den Boden: um so viel liegen die Punkte hö
 
 def leg_of(co):
     e = math.hypot(co.x / A, co.y / B)
-    if e <= 0.92 or co.z - ZOFF > 0.02:
+    if e <= 0.84 or co.z - ZOFF > 0.02:
         return None, e
     a = math.degrees(math.atan2(co.y, co.x))
     for n, (lo, hi) in LEGS.items():
@@ -185,7 +186,7 @@ for v in me.vertices:
         p = np.array([co.x, co.y, co.z])
         knee_t = float(np.dot(g["knee"] - g["root"], g["tip"] - g["root"]) / np.dot(g["tip"] - g["root"], g["tip"] - g["root"]))
         tt = float(np.dot(p - g["root"], g["tip"] - g["root"]) / np.dot(g["tip"] - g["root"], g["tip"] - g["root"]))
-        on_leg = smooth(0.92, 1.06, e)
+        on_leg = smooth(0.86, 1.10, e)   # breiter Übergang am Panzerrand: Haut dehnt sich weniger
         lo = smooth(knee_t - 0.1, knee_t + 0.1, tt)
         w["Leg%s_Up" % n] = on_leg * (1 - lo)
         w["Leg%s_Lo" % n] = on_leg * lo
@@ -198,6 +199,43 @@ for v in me.vertices:
     for k, val in w.items():
         if val > 0.001:
             groups[k].add([v.index], val, 'REPLACE')
+
+# Gewichte glätten: weichere Übergänge an Hüfte und Knie, die Haut dehnt sich weniger
+names = list(groups.keys())
+nv = len(me.vertices)
+Wt = np.zeros((nv, len(names)))
+for v in me.vertices:
+    for g in v.groups:
+        Wt[v.index, g.group] = g.weight
+E = np.array([e.vertices[:] for e in me.edges])
+deg = np.bincount(E.ravel(), minlength=nv).astype(float)[:, None]
+Pv0 = np.array([v.co[:] for v in me.vertices])
+_, inv0 = np.unique(np.round(Pv0 / 0.0005).astype(np.int64), axis=0, return_inverse=True)
+inv0 = inv0.ravel()
+for _ in range(8):
+    # Nahtpunkte vor jeder Runde angleichen, damit die Glättung über Nähte hinweg wirkt
+    acc0 = np.zeros((inv0.max() + 1, Wt.shape[1]))
+    np.add.at(acc0, inv0, Wt)
+    Wt = (acc0 / np.bincount(inv0)[:, None])[inv0]
+    nb = np.zeros_like(Wt)
+    np.add.at(nb, E[:, 0], Wt[E[:, 1]])
+    np.add.at(nb, E[:, 1], Wt[E[:, 0]])
+    Wt = 0.5 * Wt + 0.5 * nb / np.maximum(deg, 1.0)
+# Punkte an derselben Stelle (Textur-Nähte) bekommen dieselben Gewichte, sonst reißt die Haut auf
+Pv = np.array([v.co[:] for v in me.vertices])
+key = np.round(Pv / 0.0005).astype(np.int64)
+_, inv = np.unique(key, axis=0, return_inverse=True)
+inv = inv.ravel()
+acc = np.zeros((inv.max() + 1, Wt.shape[1]))
+np.add.at(acc, inv, Wt)
+cnt = np.bincount(inv)[:, None]
+Wt = acc[inv] / cnt[inv]
+Wt /= np.maximum(Wt.sum(1, keepdims=True), 1e-6)
+for gi, name in enumerate(names):
+    g = body.vertex_groups[name]
+    g.remove(list(range(nv)))
+    for vi in np.nonzero(Wt[:, gi] > 0.001)[0]:
+        g.add([int(vi)], float(Wt[vi, gi]), 'REPLACE')
 
 mod = body.modifiers.new("Armature", 'ARMATURE')
 mod.object = arm
@@ -241,7 +279,8 @@ def leg(n, swing, lift, bend=None):
     d = Vector((float(g["d"][0]), float(g["d"][1]), 0.0)).normalized()
     ax = d.cross(Vector((0, 0, 1)))
     rot("Leg%s_Up" % n, ax, lift)
-    rot("Leg%s_Lo" % n, ax, -lift * 0.45 if bend is None else bend)
+    knee = 0.25 if n in ("ML", "MR") else 0.45   # Mittelbeine: Unterschenkel weniger einknicken, Fuß hebt sich frei
+    rot("Leg%s_Lo" % n, ax, -lift * knee if bend is None else bend)
 
 
 def keyall(frame):
@@ -269,29 +308,28 @@ SWING = 14.0
 LIFT = 22.0
 
 
-def gait(p):
-    """Bein im Dreifuß-Gang zum Zeitpunkt p (0..1): (swing, lift)"""
-    if p < 0.5:   # Schwungphase: hoch und nach vorn
-        k = p / 0.5
-        s = k * k * (3 - 2 * k)
-        return -SWING + 2 * SWING * s, LIFT * math.sin(math.pi * k)
-    k = (p - 0.5) / 0.5   # Standphase: Fuß am Boden, schiebt nach hinten
-    return SWING - 2 * SWING * k, 0.0
+def gait(p, lift=LIFT):
+    """Bein im Dreifuß-Gang zum Zeitpunkt p (0..1): (swing, lift). Vor und zurück als weiche Schwingung
+    (keine Sprünge in der Geschwindigkeit beim Wechsel); gehoben wird nur, solange das Bein nach vorn
+    schwingt, mit weichem Abheben und Aufsetzen (sin²)."""
+    sw = -SWING * math.cos(2 * math.pi * p)
+    s = math.sin(2 * math.pi * p)
+    return sw, lift * s * s if s > 0 else 0.0
 
 
 def walk(t):
     def f():
         for n in LEGS:
             p = (t + (0.0 if n in TRIPOD_A else 0.5)) % 1.0
-            sw, li = gait(p)
+            sw, li = gait(p, 27.0 if n in ("ML", "MR") else LIFT)
             leg(n, sw, li)
-        move("Body", (0, 0, 0.012 * math.cos(4 * math.pi * t)))
-        rot("Body", (0, 1, 0), 2.0 * math.sin(2 * math.pi * t))
-        rot("Head", (1, 0, 0), 3.0 * math.sin(4 * math.pi * t))
+        # Körper wippt nur nach oben (Füße bleiben auf dem Boden), Kopf nickt im Schritt
+        move("Body", (0, 0, 0.004 * (1 + math.cos(4 * math.pi * t)) * 0.5))
+        rot("Head", (1, 0, 0), 2.5 * math.sin(4 * math.pi * t))
     return f
 
 
-make("Walk", [(int(round(i * 2)), walk(i / 12.0)) for i in range(13)])
+make("Walk", [(i, walk(i / 24.0)) for i in range(25)])   # jedes Bild ein Schlüssel: gleichmäßig
 
 
 def attack(t):
