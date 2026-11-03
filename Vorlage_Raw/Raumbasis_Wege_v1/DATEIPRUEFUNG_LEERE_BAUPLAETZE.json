@@ -1,0 +1,12 @@
+{
+  "datei": "raumbasis_leere_bauplaetze.png",
+  "breite": 724,
+  "hoehe": 2172,
+  "farbmodus": "RGB",
+  "bytes": 2824731,
+  "sha256": "10e47a799aedbe3f9ccf5bdb6f0dbbc1d0551ab9794100c465f1caf45a388b82",
+  "git_blob_sha": "505f29533d15adfab14aa0cb65e440dc60b5bfaa",
+  "bauplaetze_sichtpruefung": 30,
+  "spalten": 3,
+  "reihen": 10
+}
