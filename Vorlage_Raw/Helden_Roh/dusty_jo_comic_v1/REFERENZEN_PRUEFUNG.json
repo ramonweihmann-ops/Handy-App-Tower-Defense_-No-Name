@@ -1,0 +1,53 @@
+[
+  {
+    "datei": "dusty_jo_vorn.png",
+    "abmessungen": [
+      1254,
+      1254
+    ],
+    "alpha_bereich": [
+      0,
+      255
+    ],
+    "silhouette": [
+      236,
+      49,
+      1016,
+      1209
+    ]
+  },
+  {
+    "datei": "dusty_jo_hinten.png",
+    "abmessungen": [
+      1254,
+      1254
+    ],
+    "alpha_bereich": [
+      0,
+      255
+    ],
+    "silhouette": [
+      235,
+      44,
+      1018,
+      1212
+    ]
+  },
+  {
+    "datei": "dusty_jo_links.png",
+    "abmessungen": [
+      1254,
+      1254
+    ],
+    "alpha_bereich": [
+      0,
+      255
+    ],
+    "silhouette": [
+      356,
+      43,
+      898,
+      1209
+    ]
+  }
+]

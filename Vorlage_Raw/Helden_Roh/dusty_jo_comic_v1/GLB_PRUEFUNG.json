@@ -1,0 +1,187 @@
+[
+  {
+    "datei": "dusty_jo_original_statisch.glb",
+    "bytes": 17053532,
+    "sha256": "c4632dff18f4d31dea6b8ac9ad47f45e22002a1cf053c0531ad549b01ed19f18",
+    "git_blob_sha": "c4afed47f173f72055ecb8c5597be05b448cba7a",
+    "glTF_version": 2,
+    "dreiecke": 412566,
+    "materialien": 1,
+    "texturen": [
+      {
+        "name": null,
+        "eingebettet": true,
+        "breite": 2048,
+        "hoehe": 2048
+      },
+      {
+        "name": null,
+        "eingebettet": true,
+        "breite": 2048,
+        "hoehe": 2048
+      },
+      {
+        "name": null,
+        "eingebettet": true,
+        "breite": 2048,
+        "hoehe": 2048
+      }
+    ],
+    "skelette": 0,
+    "knochen": [],
+    "animationen": [],
+    "knoten": [
+      ""
+    ]
+  },
+  {
+    "datei": "dusty_jo_reduziert_statisch.glb",
+    "bytes": 9455184,
+    "sha256": "ca969dc6e4f183b1efd8690610c6b55409f7c490e7695994703a4d1fdfc875ee",
+    "git_blob_sha": "a7c2a8758f4c9889ea22cc620b07159c323fc389",
+    "glTF_version": 2,
+    "dreiecke": 10269,
+    "materialien": 1,
+    "texturen": [
+      {
+        "name": "normal",
+        "eingebettet": true,
+        "breite": 2048,
+        "hoehe": 2048
+      },
+      {
+        "name": "texture_0",
+        "eingebettet": true,
+        "breite": 2048,
+        "hoehe": 2048
+      },
+      {
+        "name": "texture_0_metallic_roughness",
+        "eingebettet": true,
+        "breite": 2048,
+        "hoehe": 2048
+      }
+    ],
+    "skelette": 0,
+    "knochen": [],
+    "animationen": [],
+    "knoten": [
+      "output_unwrapped"
+    ]
+  },
+  {
+    "datei": "dusty_jo_smart_rig_roh.glb",
+    "bytes": 9690656,
+    "sha256": "5a8f85ce236592723ec3a80822359379235a94d3b202fe23b5e481772b48399b",
+    "git_blob_sha": "49555ac0fec8c21beba140e3c6c210e1b391b892",
+    "glTF_version": 2,
+    "dreiecke": 10269,
+    "materialien": 1,
+    "texturen": [
+      {
+        "name": "normal",
+        "eingebettet": true,
+        "breite": 2048,
+        "hoehe": 2048
+      },
+      {
+        "name": "texture_0",
+        "eingebettet": true,
+        "breite": 2048,
+        "hoehe": 2048
+      },
+      {
+        "name": "texture_0_metallic_roughness",
+        "eingebettet": true,
+        "breite": 2048,
+        "hoehe": 2048
+      }
+    ],
+    "skelette": 1,
+    "knochen": [
+      "Bone_007",
+      "Bone_008",
+      "Bone_009",
+      "Bone_010",
+      "Bone_011",
+      "Bone_012",
+      "Bone_013",
+      "Bone_014",
+      "Bone_002",
+      "Bone_003",
+      "Bone_015",
+      "Bone_016",
+      "Bone_027",
+      "Bone_028",
+      "Bone_029",
+      "Bone_030",
+      "Bone_031",
+      "Bone_032",
+      "Bone_017",
+      "Bone_018",
+      "Bone_019",
+      "Bone_020",
+      "Bone_021",
+      "Bone_033",
+      "Bone_034",
+      "Bone_035",
+      "Bone_036",
+      "Bone_037",
+      "Bone_038",
+      "Bone_022",
+      "Bone_023",
+      "Bone_024",
+      "Bone_025",
+      "Bone_026",
+      "Bone_004",
+      "Bone_005",
+      "Bone_006",
+      "Bone_001",
+      "Bone_000"
+    ],
+    "animationen": [],
+    "knoten": [
+      "Bone_007",
+      "Bone_008",
+      "Bone_009",
+      "Bone_010",
+      "Bone_011",
+      "Bone_012",
+      "Bone_013",
+      "Bone_014",
+      "Bone_002",
+      "Bone_003",
+      "Bone_015",
+      "Bone_016",
+      "Bone_027",
+      "Bone_028",
+      "Bone_029",
+      "Bone_030",
+      "Bone_031",
+      "Bone_032",
+      "Bone_017",
+      "Bone_018",
+      "Bone_019",
+      "Bone_020",
+      "Bone_021",
+      "Bone_033",
+      "Bone_034",
+      "Bone_035",
+      "Bone_036",
+      "Bone_037",
+      "Bone_038",
+      "Bone_022",
+      "Bone_023",
+      "Bone_024",
+      "Bone_025",
+      "Bone_026",
+      "Bone_004",
+      "Bone_005",
+      "Bone_006",
+      "Bone_001",
+      "Bone_000",
+      "output_unwrapped",
+      "SmartRigArmature"
+    ]
+  }
+]
