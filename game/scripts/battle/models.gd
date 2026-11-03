@@ -26,7 +26,9 @@ const ENEMIES := {
 	"schleimling": {"file": "enemies/GreenBlob", "height": 0.95, "walk": "Walk", "attack": "Bite_Front"},
 	# Comic-Tentakler (tools/monsters/build_tentakler.py), freigegeben 03.11.2026
 	"tentakler": {"file": "enemies_v2/tentakler", "height": 1.2, "walk": "Fly", "attack": "Attack", "lift": 0.45, "v2": true},
-	"panzerkaefer": {"file": "enemies/GreenSpikyBlob", "height": 1.25, "walk": "Walk", "attack": "Bite_Front"},
+	# Comic-Panzerkäfer (tools/monsters/build_panzerkaefer.py), freigegeben 03.11.2026; flach und breit,
+	# daher geringere Höhe; Schrittlänge 0,075 je 0,8 s bei 0,416 hohem Rohmodell
+	"panzerkaefer": {"file": "enemies_v2/panzerkaefer", "height": 0.85, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.23},
 	"schleimmutter": {"file": "enemies/PinkBlob", "height": 2.6, "walk": "Walk", "attack": "Bite_Front"},
 	"krabbler": {"file": "enemies/Zombie_Female", "height": 1.45, "walk": "Run", "attack": "Punch"},
 	# Comic-Zombie (tools/monsters/build_zombie.py), freigegeben 03.11.2026
