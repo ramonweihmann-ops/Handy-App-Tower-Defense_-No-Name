@@ -51,7 +51,7 @@ func handle(_b: Dictionary) -> bool:
 
 func refresh_top() -> void:
 	if top_texts.has("energy"):
-		set_text(top_texts["energy"], "%d/%d" % [Save.energy(), MetaData.ENERGY_MAX])
+		set_text(top_texts["energy"], "%d/%d" % [Save.energy(), Save.energy_max()])
 	if top_texts.has("gold"):
 		set_text(top_texts["gold"], num(Save.gold()))
 	if top_texts.has("gems"):

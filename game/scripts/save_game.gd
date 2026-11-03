@@ -27,9 +27,6 @@ func default_data() -> Dictionary:
 	var heroes := {}
 	for id in GameData.HERO_IDS:
 		heroes[id] = {"level": 1, "cards": 0}
-	var buildings := {}
-	for id in GameData.HERO_IDS:
-		buildings[id] = {"level": 1, "stock": 0.0, "time": _now()}
 	return {
 		"name": "Kommandant",
 		"gold": 300,
@@ -43,7 +40,7 @@ func default_data() -> Dictionary:
 		"heroes": heroes,
 		"tech": 0,
 		"talents": {},
-		"buildings": buildings,
+		"base": {},
 		"missions": {"date": "", "ids": [], "progress": {}, "claimed": {}},
 		"pass_points": 0,
 		"pass_claimed": [],
@@ -126,6 +123,11 @@ func full_data() -> Dictionary:
 	for id in MetaData.BOOSTERS.keys():
 		bl[id] = MetaData.BOOSTER_MAX
 	d["boosters"] = bl
+	# Basislager: alle 30 Gebäude gebaut, Stufe 5
+	var bs := {}
+	for b in BaseData.BUILDINGS:
+		bs[b["id"]] = {"level": 5, "stock": 0.0, "time": _now()}
+	d["base"] = bs
 	var won := []
 	for n in range(1, GameData.LEVEL_COUNT):
 		won.append("N" + str(n))
@@ -162,8 +164,6 @@ func _ensure_heroes() -> void:
 	for id in GameData.HERO_IDS:
 		if not data["heroes"].has(id):
 			data["heroes"][id] = {"level": 1, "cards": 0}
-		if not data["buildings"].has(id):
-			data["buildings"][id] = {"level": 1, "stock": 0.0, "time": _now()}
 
 
 static func _now() -> int:
@@ -218,15 +218,15 @@ func _update_energy() -> void:
 	var now := _now()
 	var e := int(data["energy"])
 	var t := int(data["energy_time"])
-	if e >= MetaData.ENERGY_MAX:
+	if e >= energy_max():
 		data["energy_time"] = now
 		return
 	var gained := (now - t) / MetaData.ENERGY_REGEN
 	if gained > 0:
-		e = mini(MetaData.ENERGY_MAX, e + gained)
+		e = mini(energy_max(), e + gained)
 		t += gained * MetaData.ENERGY_REGEN
 		data["energy"] = e
-		data["energy_time"] = now if e >= MetaData.ENERGY_MAX else t
+		data["energy_time"] = now if e >= energy_max() else t
 
 
 func energy() -> int:
@@ -237,7 +237,7 @@ func energy() -> int:
 ## Sekunden bis zum nächsten Energiepunkt (0, wenn voll).
 func energy_next() -> int:
 	_update_energy()
-	if int(data["energy"]) >= MetaData.ENERGY_MAX:
+	if int(data["energy"]) >= energy_max():
 		return 0
 	return MetaData.ENERGY_REGEN - (_now() - int(data["energy_time"]))
 
@@ -248,7 +248,7 @@ func use_energy(amount: int) -> bool:
 	_update_energy()
 	if int(data["energy"]) < amount:
 		return false
-	if int(data["energy"]) >= MetaData.ENERGY_MAX:
+	if int(data["energy"]) >= energy_max():
 		data["energy_time"] = _now()
 	data["energy"] = int(data["energy"]) - amount
 	save_game()
@@ -494,8 +494,11 @@ func any_hero_ready() -> bool:
 
 
 func any_building_ready() -> bool:
-	for id in unlocked_heroes():
-		if float(building(id)["stock"]) >= 1.0:
+	for d in BaseData.BUILDINGS:
+		var id: String = d["id"]
+		if base_state(id) == "buildable" and gold() >= int(d["gold"]):
+			return true
+		if d["kind"] == "prod" and base_built(id) and base_stock(id) >= maxf(1.0, base_store_cap(id) * 0.5):
 			return true
 	return false
 
@@ -546,35 +549,143 @@ func draw_talent() -> String:
 
 # --- Basislager --------------------------------------------------------------
 
-func building(id: String) -> Dictionary:
-	var b: Dictionary = data["buildings"][id]
-	var now := _now()
-	var lvl := int(b["level"])
-	var hours := (now - int(b["time"])) / 3600.0
-	b["stock"] = minf(float(MetaData.building_cap(lvl)), float(b["stock"]) + hours * MetaData.building_rate(lvl))
-	b["time"] = now
-	return b
+# --- Basislager (BaseData): 30 Gebäude ------------------------------------------------
+
+func base() -> Dictionary:
+	if not data.has("base") or not data["base"] is Dictionary:
+		data["base"] = {}
+		# Früher hatte jeder Held ein Quartier, das Heldenkarten herstellt: das geht in der Werkstatt auf
+		var old: Dictionary = data.get("buildings", {})
+		if not old.is_empty():
+			var lv := 0
+			var stock := 0.0
+			for k in old.keys():
+				lv = maxi(lv, int(old[k].get("level", 1)))
+				stock += float(old[k].get("stock", 0.0))
+			data["base"]["03"] = {"level": clampi(lv, 1, BaseData.MAX_LEVEL), "stock": stock, "time": _now()}
+	return data["base"]
 
 
-func collect_building(id: String) -> int:
-	var b := building(id)
-	var n := int(floor(float(b["stock"])))
-	if n <= 0:
-		return 0
-	b["stock"] = float(b["stock"]) - n
-	add_hero_cards(id, n)
-	save_game()
-	return n
+## Champions zählen für die Gebäude 01–12 (mindestens die fünf Startgebäude)
+func base_champions() -> int:
+	return maxi(BaseData.START_COUNT, unlocked_heroes().size())
 
 
-func upgrade_building(id: String) -> bool:
-	var b := building(id)
-	var lvl := int(b["level"])
-	if lvl >= MetaData.BUILDING_MAX_LEVEL or not spend("gold", MetaData.building_cost(lvl)):
+func base_built(id: String) -> bool:
+	if BaseData.by_champion(id):
+		return int(id) <= base_champions()
+	return base().has(id)
+
+
+func _base_entry(id: String) -> Dictionary:
+	var b := base()
+	if not b.has(id):
+		b[id] = {"level": 1, "stock": 0.0, "time": _now()}
+	return b[id]
+
+
+func base_level(id: String) -> int:
+	return int(_base_entry(id)["level"]) if base_built(id) else 0
+
+
+## Zustand eines Bauplatzes: built, buildable (Level und Vorgänger erfüllt), locked
+func base_state(id: String) -> String:
+	if base_built(id):
+		return "built"
+	if BaseData.by_champion(id):
+		return "locked"
+	var d := BaseData.info(id)
+	var prev := "%02d" % (int(id) - 1)
+	if base_built(prev) and max_level() >= int(d["level"]):
+		return "buildable"
+	return "locked"
+
+
+## Warum ein Platz noch gesperrt ist (für die Anzeige)
+func base_lock_text(id: String) -> String:
+	if BaseData.by_champion(id):
+		return "mit dem %d. Champion" % int(id)
+	var d := BaseData.info(id)
+	if max_level() < int(d["level"]):
+		return "ab Level %d" % int(d["level"])
+	return "erst Gebäude %02d bauen" % (int(id) - 1)
+
+
+func base_build(id: String) -> bool:
+	if base_state(id) != "buildable" or not spend("gold", int(BaseData.info(id)["gold"])):
 		return false
-	b["level"] = lvl + 1
+	base()[id] = {"level": 1, "stock": 0.0, "time": _now()}
 	save_game()
 	return true
+
+
+func base_store_cap(id: String) -> float:
+	var bonus := 0.0
+	if base_built("27"):
+		bonus = BaseData.value("27", base_level("27"))
+	return BaseData.value(id, base_level(id)) * BaseData.STORE_HOURS * (1.0 + bonus)
+
+
+## Lager eines Erzeugers auf den aktuellen Stand bringen
+func base_stock(id: String) -> float:
+	if not base_built(id) or BaseData.info(id)["kind"] != "prod":
+		return 0.0
+	var b := _base_entry(id)
+	var now := _now()
+	var hours := maxf(0.0, (now - int(b["time"])) / 3600.0)
+	b["stock"] = minf(base_store_cap(id), float(b["stock"]) + hours * BaseData.value(id, int(b["level"])))
+	b["time"] = now
+	return float(b["stock"])
+
+
+## Lager abholen: {type, amount} (amount 0 = nichts da)
+func base_collect(id: String) -> Dictionary:
+	var n := int(floor(base_stock(id)))
+	var item := str(BaseData.info(id).get("item", "gold"))
+	if n <= 0:
+		return {"type": item, "amount": 0}
+	_base_entry(id)["stock"] = base_stock(id) - n
+	add(item, n)
+	save_game()
+	return {"type": item, "amount": n}
+
+
+## Ausbau: Gold (ab Stufe 6 auch Sterne); kein Gebäude höher als die Kommandozentrale
+func base_can_upgrade(id: String) -> bool:
+	var lvl := base_level(id)
+	if lvl <= 0 or lvl >= BaseData.MAX_LEVEL:
+		return false
+	if id != "01" and lvl >= base_level("01"):
+		return false
+	var c := BaseData.upgrade_cost(id, lvl)
+	return gold() >= int(c[0]) and stars() >= int(c[1])
+
+
+func base_upgrade(id: String) -> bool:
+	if not base_can_upgrade(id):
+		return false
+	var c := BaseData.upgrade_cost(id, base_level(id))
+	base_stock(id)
+	data["gold"] = gold() - int(c[0])
+	data["stars"] = stars() - int(c[1])
+	_base_entry(id)["level"] = base_level(id) + 1
+	save_game()
+	return true
+
+
+## Summe der Kampf- und Spielboni aller gebauten Verstärker
+func base_bonus() -> Dictionary:
+	var out := {}
+	for d in BaseData.BUILDINGS:
+		var id: String = d["id"]
+		if d["kind"] == "boost" and base_built(id):
+			var k: String = d["bonus"]
+			out[k] = float(out.get(k, 0.0)) + BaseData.value(id, base_level(id))
+	return out
+
+
+func energy_max() -> int:
+	return MetaData.ENERGY_MAX + int(round(float(base_bonus().get("energy_max", 0.0))))
 
 
 # --- Missionen und Battle Pass -------------------------------------------------
@@ -857,7 +968,8 @@ func battle_bonus() -> Dictionary:
 		gates.append("plus3")
 	if ammo_level("gate") >= 2:
 		gates.append("x2")
-	return {
+	var bb := base_bonus()
+	var out := {
 		"shield": shield,
 		"start_ammo": 5 * ammo_level("start"),
 		"lever": 1.5 * ammo_level("lever"),
@@ -874,3 +986,11 @@ func battle_bonus() -> Dictionary:
 		"damage": 0.03 * talent_level("feuerkraft") + (0.05 if has_tech("damage") else 0.0),
 		"lucky": 0.04 * talent_level("glueckspilz"),
 	}
+	# Basislager: Verstärker kommen dazu (ganze Zahlen bei Plasma-Werten)
+	for k in bb.keys():
+		var v: float = bb[k]
+		if k in ["start_ammo", "cap"]:
+			out[k] = int(out.get(k, 0)) + int(round(v))
+		else:
+			out[k] = float(out.get(k, 0.0)) + v
+	return out

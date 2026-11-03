@@ -76,13 +76,13 @@ func bind() -> void:
 			set_text("ABHOLEN", "ABHOLEN" if gift else "MORGEN")
 			_dim("#geschenk", not gift)
 		"aufladen":
-			set_text("Sofort wieder voll: 30/30", "Sofort wieder voll: %d/%d" % [MetaData.ENERGY_MAX, MetaData.ENERGY_MAX])
+			set_text("Sofort wieder voll: 30/30", "Sofort wieder voll: %d/%d" % [Save.energy_max(), Save.energy_max()])
 			set_text("20", str(MetaData.SHOP_ENERGY_COST))
 			# „25/30“ steht zweimal da: oben in der Kopfleiste und auf der Energie-Karte
 			var card := _nth_text("25/30", 1)
 			if card >= 0:
-				set_text(card, "%d/%d" % [Save.energy(), MetaData.ENERGY_MAX])
-			_dim("#energie", Save.gems() < MetaData.SHOP_ENERGY_COST or Save.energy() >= MetaData.ENERGY_MAX)
+				set_text(card, "%d/%d" % [Save.energy(), Save.energy_max()])
+			_dim("#energie", Save.gems() < MetaData.SHOP_ENERGY_COST or Save.energy() >= Save.energy_max())
 			var shown := [["×80", "1,99 €"], ["×500", "9,99 €"], ["×1.200", "19,99 €"]]
 			for k in mini(shown.size(), MetaData.GEM_PACKS.size()):
 				var pack: Dictionary = MetaData.GEM_PACKS[k]
@@ -95,7 +95,7 @@ func refresh_top() -> void:
 	if page == "aufladen":
 		var card := _nth_text("25/30", 1)
 		if card >= 0:
-			set_text(card, "%d/%d" % [Save.energy(), MetaData.ENERGY_MAX])
+			set_text(card, "%d/%d" % [Save.energy(), Save.energy_max()])
 
 
 func handle(b: Dictionary) -> bool:
@@ -173,14 +173,14 @@ func _claim_gift() -> void:
 
 
 func _buy_energy() -> void:
-	if Save.energy() >= MetaData.ENERGY_MAX:
+	if Save.energy() >= Save.energy_max():
 		menu.toast("Deine Energie ist schon voll")
 		return
 	if not Save.spend("gems", MetaData.SHOP_ENERGY_COST):
 		menu.toast("Dir fehlen noch %d Edelsteine" % (MetaData.SHOP_ENERGY_COST - Save.gems()))
 		return
-	var refill := MetaData.ENERGY_MAX - Save.energy()
-	Save.data["energy"] = MetaData.ENERGY_MAX
+	var refill := Save.energy_max() - Save.energy()
+	Save.data["energy"] = Save.energy_max()
 	Save.save_game()
 	menu.reward_success([{"type": "energy", "amount": refill}], "Energie aufgefüllt")
 	refresh()

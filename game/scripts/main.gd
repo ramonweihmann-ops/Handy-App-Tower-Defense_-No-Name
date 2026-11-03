@@ -386,16 +386,16 @@ func _use_booster(i: int) -> void:
 	var power := MetaData.booster_power(lvl)
 	match id:
 		"luftangriff":
-			battle.booster_air_strike(power)
+			battle.booster_air_strike(power * (1.0 + float(bonus.get("airstrike", 0.0))))
 		"medipack":
-			battle.repair_fence(0.25 * power, 0.0)
+			battle.repair_fence(0.25 * power * (1.0 + float(bonus.get("medipack", 0.0))), 0.0)
 		"zeitlupe":
 			battle.booster_slow(power)
 		"kuppel":
 			battle.booster_dome(power)
 		"munition":
 			ammo.add("normal", int(25 * power))
-	_booster_cd[i] = MetaData.booster_cd(id, lvl)
+	_booster_cd[i] = MetaData.booster_cd(id, lvl) * (1.0 - float(bonus.get("booster_cd", 0.0)))
 	Sfx.play("whoosh", 0.05)
 	hud.show_banner(String(MetaData.BOOSTERS[id]["title"]) + "!")
 
@@ -593,6 +593,9 @@ func _start(n: int, hard_mode: bool, multi: bool, found: MpMatch = null) -> void
 	battle.hp_scale = 1.5 if hard else 1.0
 	battle.bonus_crit = float(bonus["crit"])
 	battle.bonus_reload = float(bonus["reload"])
+	battle.heavy_bonus = float(bonus.get("heavy_dmg", 0.0))
+	battle.frost_bonus = float(bonus.get("frost", 0.0))
+	battle.burn_bonus = float(bonus.get("burn", 0.0))
 	battle.hero_damage = {}
 	for id in GameData.HERO_IDS:
 		battle.hero_damage[id] = MetaData.hero_damage_mult(Save.hero_level(id)) * (1.0 + float(bonus["damage"]))
@@ -921,7 +924,7 @@ func _card_repair() -> Dictionary:
 		"title": "Schild flicken", "desc": "Schild +35 % und Maximum +10 %.",
 		"stars": int(card_levels.get("station:repair", 0)), "max": 3, "emblem": "+",
 		"weight": 2.5 if low else 0.5,
-		"apply": func() -> void: battle.repair_fence(0.35, 0.1),
+		"apply": func() -> void: battle.repair_fence(0.35 * (1.0 + float(bonus.get("repair_card", 0.0))), 0.1),
 	}
 
 
@@ -1166,12 +1169,13 @@ func _grant_mp_rewards(place: int) -> Dictionary:
 	var mult := 1.0 + float(bonus.get("gold", 0.0))
 	var gold := int(round(MetaData.win_gold(level) * float(MpData.GOLD_SHARE[i]) * mult))
 	Save.data["gold"] = Save.gold() + gold
-	var out := {"gold": gold, "pass": int(MpData.PASS_POINTS[i]), "cards": []}
+	var pass_pts := int(MpData.PASS_POINTS[i]) + int(round(float(bonus.get("pass_bonus", 0.0))))
+	var out := {"gold": gold, "pass": pass_pts, "cards": []}
 	for h in battle.heroes:
-		var n := int(round(MetaData.win_cards(level) * float(MpData.CARD_SHARE[i])))
+		var n := int(round(MetaData.win_cards(level) * float(MpData.CARD_SHARE[i]) * (1.0 + float(bonus.get("cards_bonus", 0.0)))))
 		Save.add_hero_cards(h.id, n)
 		out["cards"].append({"hero": h.id, "amount": n})
-	Save.add_pass_points(int(MpData.PASS_POINTS[i]))
+	Save.add_pass_points(pass_pts)
 	if place == 1:
 		Save.track("wins")
 	Save.save_game()
@@ -1224,7 +1228,7 @@ func _grant_rewards(won: bool) -> Dictionary:
 	Save.data["gold"] = Save.gold() + gold
 	out["gold"] = gold
 	for h in battle.heroes:
-		var n := MetaData.win_cards(level) if won else MetaData.win_cards(level) / 2
+		var n := int(round((MetaData.win_cards(level) if won else MetaData.win_cards(level) / 2) * (1.0 + float(bonus.get("cards_bonus", 0.0)))))
 		Save.add_hero_cards(h.id, n)
 		out["cards"].append({"hero": h.id, "amount": n})
 	if won:
@@ -1233,7 +1237,8 @@ func _grant_rewards(won: bool) -> Dictionary:
 		Save.data["stars"] = Save.stars() + stars
 		out["stars"] = stars
 		Save.track("wins")
-		Save.add_pass_points(MetaData.PASS_WIN_POINTS)
-		out["pass"] = MetaData.PASS_WIN_POINTS
+		var pass_pts := MetaData.PASS_WIN_POINTS + int(round(float(bonus.get("pass_bonus", 0.0))))
+		Save.add_pass_points(pass_pts)
+		out["pass"] = pass_pts
 	Save.save_game()
 	return out

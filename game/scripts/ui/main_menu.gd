@@ -233,7 +233,7 @@ func _refresh_top() -> void:
 	if _energy_label == null:
 		return
 	_update_badges()
-	_energy_label.text = "%d/%d" % [Save.energy(), MetaData.ENERGY_MAX]
+	_energy_label.text = "%d/%d" % [Save.energy(), Save.energy_max()]
 	_gold_label.text = _short(Save.gold())
 	_gems_label.text = _short(Save.gems())
 
@@ -1310,7 +1310,7 @@ func _tab_shop() -> Control:
 				Save.add("cards", chest)
 				reward_success([{"type": "cards", "amount": chest}], "Heldentruhe")
 			show_tab("shop")))
-	v.add_child(_shop_item("energy", "Energie auffüllen", "Energie sofort auf %d" % MetaData.ENERGY_MAX, "%d Edelsteine" % MetaData.SHOP_ENERGY_COST,
+	v.add_child(_shop_item("energy", "Energie auffüllen", "Energie sofort auf %d" % Save.energy_max(), "%d Edelsteine" % MetaData.SHOP_ENERGY_COST,
 		Save.gems() >= MetaData.SHOP_ENERGY_COST, _buy_energy))
 	v.add_child(UiKit.label("Edelsteine", 28, UiKit.C_GOLD, HORIZONTAL_ALIGNMENT_LEFT))
 	for pack in MetaData.GEM_PACKS:
@@ -1339,7 +1339,7 @@ func _shop_item(icon: String, title: String, desc: String, button: String, enabl
 
 func _buy_energy() -> void:
 	if Save.spend("gems", MetaData.SHOP_ENERGY_COST):
-		Save.data["energy"] = MetaData.ENERGY_MAX
+		Save.data["energy"] = Save.energy_max()
 		Save.save_game()
 		celebrate("energy", "Energie aufgefüllt!", Color(0.5, 1.0, 0.5))
 	show_tab(current_tab)
@@ -1347,84 +1347,110 @@ func _buy_energy() -> void:
 
 # --- Reiter: Basislager ------------------------------------------------------------
 
+## Basislager (BaseData): vorläufig als Liste, bis die Grafik mit den leeren Bauplätzen da ist
+## (dann zoombare Karte nach Vorlage_Raw/Raumbasis_Wege_v1).
 func _tab_basis() -> Control:
 	var page := _scroll_page()
 	var v: VBoxContainer = page[1]
 	v.add_child(UiKit.label("Basislager", 32, UiKit.C_GOLD, HORIZONTAL_ALIGNMENT_LEFT))
-	v.add_child(_wrap_left("Jedes Crewmitglied hat ein Quartier, das Heldenkarten herstellt – auch wenn du nicht spielst.", 20, UiKit.C_MUTED))
-	for id in GameData.HERO_IDS:
+	var built := 0
+	for d in BaseData.BUILDINGS:
+		if Save.base_built(d["id"]):
+			built += 1
+	v.add_child(_wrap_left("%d von 30 Gebäuden. Gebäude 01–12 kommen mit deinen Champions, ab 13 baust du sie der Reihe nach mit Gold." % built, 20, UiKit.C_MUTED))
+	var shown_locked := 0
+	for d in BaseData.BUILDINGS:
+		var id: String = d["id"]
+		var st := Save.base_state(id)
+		if st == "locked":
+			shown_locked += 1
+			if shown_locked > 2:
+				continue
 		v.add_child(_building_row(id))
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 10)
-	for t in ["Überfall", "Rache"]:
-		var b := _small_button(t + " – bald", func() -> void:
-			_info(t, "Überfälle auf andere Stationen brauchen einen Spielserver und kommen später.")
-		, 200, false)
-		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row.add_child(b)
-	v.add_child(row)
 	return page[0]
 
 
 func _building_row(id: String) -> Control:
-	var d: Dictionary = GameData.HEROES[id]
-	var unlocked := Save.hero_unlocked(id)
-	var p := _panel(Color(0.1, 0.12, 0.25, 0.92) if unlocked else Color(0.08, 0.08, 0.14, 0.9), d["color"] if unlocked else Color(0.25, 0.27, 0.35))
+	var d := BaseData.info(id)
+	var st := Save.base_state(id)
+	var on := st == "built"
+	var col := Color(0.55, 0.45, 0.95) if d["kind"] == "boost" else Color(0.95, 0.7, 0.25)
+	var p := _panel(Color(0.1, 0.12, 0.25, 0.92) if on else Color(0.08, 0.08, 0.14, 0.9), col if on else Color(0.25, 0.27, 0.35))
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", 12)
 	p.add_child(h)
 	var em := HeroBadge.new()
-	em.color = d["color"] if unlocked else Color(0.3, 0.3, 0.35)
-	em.text = String(d["name"]).left(1)
+	em.color = col if on else Color(0.3, 0.3, 0.35)
+	em.text = id
 	em.custom_minimum_size = Vector2(80, 80)
 	h.add_child(em)
 	var tv := VBoxContainer.new()
 	tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	h.add_child(tv)
-	tv.add_child(UiKit.label(MetaData.BUILDINGS[id], 22, UiKit.C_TEXT if unlocked else UiKit.C_MUTED, HORIZONTAL_ALIGNMENT_LEFT))
-	if not unlocked:
-		tv.add_child(_wrap_left("Kommt mit %s (Level %d gewinnen)." % [d["name"], int(MetaData.HERO_UNLOCK[id])], 18, UiKit.C_MUTED))
-		h.add_child(Icon.make("lock", 44))
-		return p
-	var b := Save.building(id)
-	var lvl := int(b["level"])
-	var cap := MetaData.building_cap(lvl)
-	var stock := int(floor(float(b["stock"])))
-	tv.add_child(UiKit.label("Stufe %d · %d Karten pro Stunde" % [lvl, int(MetaData.building_rate(lvl))], 18, UiKit.C_MUTED, HORIZONTAL_ALIGNMENT_LEFT))
-	var bar := ProgressBar.new()
-	bar.show_percentage = false
-	bar.custom_minimum_size = Vector2(0, 20)
-	bar.max_value = cap
-	bar.value = float(b["stock"])
-	bar.add_theme_stylebox_override("fill", UiKit.box(d["color"], 8))
-	tv.add_child(bar)
-	var bl := UiKit.label("%d/%d bereit" % [stock, cap], 15)
-	bl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	bl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	bar.add_child(bl)
+	var lvl := Save.base_level(id)
+	tv.add_child(UiKit.label(String(d["name"]) + (" · Stufe %d" % lvl if on else ""), 22, UiKit.C_TEXT if on else UiKit.C_MUTED, HORIZONTAL_ALIGNMENT_LEFT))
+	var now_text := BaseData.value_text(id, maxi(1, lvl))
+	tv.add_child(_wrap_left("%s: %s" % [d["text"], now_text] + ("  →  %s" % BaseData.value_text(id, lvl + 1) if on and lvl < BaseData.MAX_LEVEL else ""), 17, UiKit.C_MUTED))
 	var btns := VBoxContainer.new()
 	btns.add_theme_constant_override("separation", 6)
 	h.add_child(btns)
-	var collect := _small_button("Sammeln", func() -> void:
-		var n := Save.collect_building(id)
-		if n > 0:
-			celebrate("cards", "+%d %s-Karten" % [n, d["name"]], d["color"])
-		else:
-			toast("Noch nichts bereit.")
-		show_tab("basis")
-	, 150)
-	collect.disabled = stock <= 0
-	if not collect.disabled:
-		_dot(collect)
-	btns.add_child(collect)
-	var up_text := "Max." if lvl >= MetaData.BUILDING_MAX_LEVEL else "Ausbauen\n%d Gold" % MetaData.building_cost(lvl)
+	if st == "locked":
+		tv.add_child(UiKit.label("Gesperrt: " + Save.base_lock_text(id), 17, UiKit.C_MUTED, HORIZONTAL_ALIGNMENT_LEFT))
+		h.add_child(Icon.make("lock", 44))
+		return p
+	if st == "buildable":
+		var b := _small_button("Bauen\n%s Gold" % MockScreen.num(int(d["gold"])), func() -> void:
+			if Save.base_build(id):
+				celebrate("camp", "%s gebaut!" % d["name"])
+			else:
+				toast("Nicht genug Gold.")
+			show_tab("basis")
+		, 150)
+		b.custom_minimum_size = Vector2(150, 70)
+		b.disabled = Save.gold() < int(d["gold"])
+		if not b.disabled:
+			_mark(b)
+		btns.add_child(b)
+		return p
+	if d["kind"] == "prod":
+		var stock := Save.base_stock(id)
+		var cap := Save.base_store_cap(id)
+		var bar := ProgressBar.new()
+		bar.show_percentage = false
+		bar.custom_minimum_size = Vector2(0, 20)
+		bar.max_value = cap
+		bar.value = stock
+		bar.add_theme_stylebox_override("fill", UiKit.box(col, 8))
+		tv.add_child(bar)
+		var bl := UiKit.label("%d/%d bereit" % [int(floor(stock)), int(floor(cap))], 15)
+		bl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		bl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		bar.add_child(bl)
+		var collect := _small_button("Abholen", func() -> void:
+			var r := Save.base_collect(id)
+			if int(r["amount"]) > 0:
+				reward_success([r], "Basislager · %s" % d["name"])
+			else:
+				toast("Noch nichts bereit.")
+			show_tab("basis")
+		, 150)
+		collect.disabled = stock < 1.0
+		if not collect.disabled:
+			_dot(collect)
+		btns.add_child(collect)
+	var up_text := "Max."
+	if lvl < BaseData.MAX_LEVEL:
+		var c := BaseData.upgrade_cost(id, lvl)
+		up_text = "Ausbauen\n%s Gold" % MockScreen.num(int(c[0])) + (" · %d ★" % int(c[1]) if int(c[1]) > 0 else "")
+		if id != "01" and lvl >= Save.base_level("01"):
+			up_text = "Erst Zentrale\nausbauen"
 	var up := _small_button(up_text, func() -> void:
-		if Save.upgrade_building(id):
-			celebrate("camp", "Ausgebaut auf Stufe %d!" % (lvl + 1))
+		if Save.base_upgrade(id):
+			celebrate("camp", "%s auf Stufe %d!" % [d["name"], lvl + 1])
 		show_tab("basis")
 	, 150, false)
 	up.custom_minimum_size = Vector2(150, 70)
-	up.disabled = lvl >= MetaData.BUILDING_MAX_LEVEL or Save.gold() < MetaData.building_cost(lvl)
+	up.disabled = not Save.base_can_upgrade(id)
 	if not up.disabled:
 		_mark(up)
 	btns.add_child(up)
@@ -1528,7 +1554,7 @@ func _open_energy() -> void:
 	buy.disabled = Save.gems() < MetaData.SHOP_ENERGY_COST
 	v.add_child(buy)
 	v.add_child(UiKit.secondary(UiKit.button("Testphase: kostenlos auffüllen", func() -> void:
-		Save.data["energy"] = MetaData.ENERGY_MAX
+		Save.data["energy"] = Save.energy_max()
 		Save.save_game()
 		_close_modal()
 		toast("Energie aufgefüllt (Testphase)")

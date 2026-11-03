@@ -55,12 +55,16 @@ Kampfstärke aus allen Verstärkern zusammen bei voller Stufe: Schaden etwa +22 
 Krit +5 %. Das ist so viel wie 2–3 Heldenstufen und muss in die Schwierigkeitskurve eingerechnet
 werden (die Spielerprofile im Balance-Labor bekommen das Basislager dazu).
 
-## Fragen zur Entscheidung
+## Entschieden (03.11.2026)
 
-1. Sollen die heutigen 8 Quartiere (je Held Heldenkarten) wegfallen und durch Werkstatt (03) und
-   Veredelungsanlage (26) ersetzt werden? Vorschlag: ja, Karten kommen dann für zufällige oder den
-   gerade gewählten Helden.
-2. „Überfall“ und „Rache“ (Angriffe auf andere Basen) bleiben später, sie brauchen einen Server.
+- Wirkungen wie in der Tabelle. Die früheren Quartiere je Held gehen in der **Werkstatt (03)** auf
+  (ein alter Spielstand übernimmt die höchste Quartier-Stufe und die gesammelten Karten).
+- Gebäude 09–12 kommen mit dem 9. bis 12. Champion (Level/Gold in der Tabelle gelten dafür nicht).
+- Im Spiel: `scripts/base_data.gd` (Werte), `save_game.gd` (`base_*`), Wirkungen über
+  `Save.battle_bonus()`. Ausbaukosten: Gold 150 × Stufe × (1 + 0,1 × Nummer), ab Stufe 6 dazu
+  Sterne; kein Gebäude höher als die Kommandozentrale. Erzeuger speichern 8 Stunden Ertrag
+  (Kommandantenresidenz mehr). Werte und Kosten werden noch mit der Wirtschafts-Simulation geprüft.
+- Bis die Grafik mit leeren Bauplätzen da ist, zeigt der Reiter „Basis“ die Gebäude als Liste.
 
 ## Grafik
 

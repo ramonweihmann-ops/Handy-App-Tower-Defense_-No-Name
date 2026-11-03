@@ -59,6 +59,10 @@ var _mp_rng := RandomNumberGenerator.new()
 var hp_scale := 1.0
 var bonus_crit := 0.0
 var bonus_reload := 0.0
+## Basislager: mehr Schaden gegen starke Gegner und Bosse, stärkerer Frost und Brand
+var heavy_bonus := 0.0
+var frost_bonus := 0.0
+var burn_bonus := 0.0
 var hero_damage := {}
 ## Schadensbonus für alle Helden durch dazugerufene Verstärkungs-Helden.
 var team_aura := 0.0
@@ -542,7 +546,7 @@ func flame(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type: Stri
 			continue
 		if Vector2(e.position.x - center.x, e.position.z - center.z).length() <= radius + e.radius():
 			apply_hit(e, dmg, crit, ammo_type)
-			e.apply_burn(dmg * 0.6, 2.5)
+			e.apply_burn(dmg * 0.6 * (1.0 + burn_bonus), 2.5)
 	_flame_tick += 1
 	if _flame_tick % 3 == 0:
 		var mid := from.lerp(target.aim_point(), 0.7)
@@ -580,11 +584,13 @@ func apply_hit(e: Enemy, dmg: float, crit: bool, ammo_type: String) -> void:
 	if not is_instance_valid(e) or not e.alive:
 		return
 	var at := e.aim_point()
+	if heavy_bonus > 0.0 and e.data["tier"] in ["stark", "boss"]:
+		dmg *= 1.0 + heavy_bonus
 	var dealt := e.take_damage(dmg)
 	if ammo_type == "fire":
-		e.apply_burn(dmg * 0.35, 3.0)
+		e.apply_burn(dmg * 0.35 * (1.0 + burn_bonus), 3.0)
 	elif ammo_type == "ice":
-		e.apply_slow(0.45, 2.0)
+		e.apply_slow(minf(0.85, 0.45 * (1.0 + frost_bonus)), 2.0)
 	damage_dealt.emit(at, dealt, crit)
 	if crit:
 		Fx.burst(self, at, Projectile.AMMO_COLORS.get(ammo_type, Color.WHITE), 5, 2.5, 0.06, 0.3)

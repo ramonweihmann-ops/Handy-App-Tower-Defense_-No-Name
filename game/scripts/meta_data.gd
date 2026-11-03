@@ -110,37 +110,7 @@ const TALENTS := {
 }
 const TALENT_SLOTS := 12
 
-# --- Basislager: jeder Held hat ein Gebäude, das Heldenkarten herstellt -------
-
-const BUILDINGS := {
-	"dusty": "Dustys Frachtcontainer",
-	"iska": "Iskas Wachturm",
-	"brocken": "Brockens Bohrturm",
-	"volta": "Voltas Labor",
-	"kalle": "Kalles Kühlhaus",
-	"margot": "Margots Kapitänskajüte",
-	"lynx": "Lynx' Ausguck",
-	"fritzi": "Fritzis Feuerwache",
-	"fuenkchen": "Fünkchens Sternenhort",
-	"pip": "Pips Schraubwerkstatt",
-	"rollo": "Rollos Garage",
-	"nova": "Novas Exo-Hangar",
-}
-const BUILDING_MAX_LEVEL := 10
-
-
-## Karten pro Stunde (in der Testphase bewusst schnell)
-static func building_rate(level: int) -> float:
-	return 0.5 * level
-
-
-static func building_cap(level: int) -> int:
-	return 4 + level * 3
-
-
-static func building_cost(level: int) -> int:
-	return 150 * level
-
+# --- Basislager: siehe base_data.gd (30 Gebäude) -----------------------------------
 
 # --- Missionen und Battle Pass -------------------------------------------------
 
