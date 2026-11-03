@@ -1,0 +1,323 @@
+{
+  "status": "Vom Nutzer am 03.11.2026 freigegebene Gestaltung",
+  "referenzflaeche": [
+    978,
+    1608
+  ],
+  "referenzdatei": "talente_freigegeben.png",
+  "aktive_seite": "Upgrades",
+  "aktiver_unterreiter": "TALENTE",
+  "gitter": {
+    "spalten": 4,
+    "zeilen": 4,
+    "felder": [
+      {
+        "id": "talent_01",
+        "zeile": 0,
+        "spalte": 0,
+        "rechteck": [
+          76,
+          150,
+          198,
+          204
+        ],
+        "zustand": "freigeschaltet",
+        "titel": "Schnelllader",
+        "stufe": 1,
+        "symbol": "symbole/icon_core.png"
+      },
+      {
+        "id": "talent_02",
+        "zeile": 0,
+        "spalte": 1,
+        "rechteck": [
+          286,
+          150,
+          198,
+          204
+        ],
+        "zustand": "freigeschaltet",
+        "titel": "Sanitätskoffer",
+        "stufe": 1,
+        "symbol": "symbole/booster_medipack.png"
+      },
+      {
+        "id": "talent_03",
+        "zeile": 0,
+        "spalte": 2,
+        "rechteck": [
+          496,
+          150,
+          198,
+          204
+        ],
+        "zustand": "unbekannt",
+        "titel": null,
+        "stufe": null,
+        "symbol": null
+      },
+      {
+        "id": "talent_04",
+        "zeile": 0,
+        "spalte": 3,
+        "rechteck": [
+          706,
+          150,
+          198,
+          204
+        ],
+        "zustand": "unbekannt",
+        "titel": null,
+        "stufe": null,
+        "symbol": null
+      },
+      {
+        "id": "talent_05",
+        "zeile": 1,
+        "spalte": 0,
+        "rechteck": [
+          76,
+          363,
+          198,
+          204
+        ],
+        "zustand": "unbekannt",
+        "titel": null,
+        "stufe": null,
+        "symbol": null
+      },
+      {
+        "id": "talent_06",
+        "zeile": 1,
+        "spalte": 1,
+        "rechteck": [
+          286,
+          363,
+          198,
+          204
+        ],
+        "zustand": "unbekannt",
+        "titel": null,
+        "stufe": null,
+        "symbol": null
+      },
+      {
+        "id": "talent_07",
+        "zeile": 1,
+        "spalte": 2,
+        "rechteck": [
+          496,
+          363,
+          198,
+          204
+        ],
+        "zustand": "unbekannt",
+        "titel": null,
+        "stufe": null,
+        "symbol": null
+      },
+      {
+        "id": "talent_08",
+        "zeile": 1,
+        "spalte": 3,
+        "rechteck": [
+          706,
+          363,
+          198,
+          204
+        ],
+        "zustand": "unbekannt",
+        "titel": null,
+        "stufe": null,
+        "symbol": null
+      },
+      {
+        "id": "talent_09",
+        "zeile": 2,
+        "spalte": 0,
+        "rechteck": [
+          76,
+          576,
+          198,
+          204
+        ],
+        "zustand": "unbekannt",
+        "titel": null,
+        "stufe": null,
+        "symbol": null
+      },
+      {
+        "id": "talent_10",
+        "zeile": 2,
+        "spalte": 1,
+        "rechteck": [
+          286,
+          576,
+          198,
+          204
+        ],
+        "zustand": "unbekannt",
+        "titel": null,
+        "stufe": null,
+        "symbol": null
+      },
+      {
+        "id": "talent_11",
+        "zeile": 2,
+        "spalte": 2,
+        "rechteck": [
+          496,
+          576,
+          198,
+          204
+        ],
+        "zustand": "unbekannt",
+        "titel": null,
+        "stufe": null,
+        "symbol": null
+      },
+      {
+        "id": "talent_12",
+        "zeile": 2,
+        "spalte": 3,
+        "rechteck": [
+          706,
+          576,
+          198,
+          204
+        ],
+        "zustand": "unbekannt",
+        "titel": null,
+        "stufe": null,
+        "symbol": null
+      },
+      {
+        "id": "talent_13",
+        "zeile": 3,
+        "spalte": 0,
+        "rechteck": [
+          76,
+          789,
+          198,
+          204
+        ],
+        "zustand": "unbekannt",
+        "titel": null,
+        "stufe": null,
+        "symbol": null
+      },
+      {
+        "id": "talent_14",
+        "zeile": 3,
+        "spalte": 1,
+        "rechteck": [
+          286,
+          789,
+          198,
+          204
+        ],
+        "zustand": "unbekannt",
+        "titel": null,
+        "stufe": null,
+        "symbol": null
+      },
+      {
+        "id": "talent_15",
+        "zeile": 3,
+        "spalte": 2,
+        "rechteck": [
+          496,
+          789,
+          198,
+          204
+        ],
+        "zustand": "unbekannt",
+        "titel": null,
+        "stufe": null,
+        "symbol": null
+      },
+      {
+        "id": "talent_16",
+        "zeile": 3,
+        "spalte": 3,
+        "rechteck": [
+          706,
+          789,
+          198,
+          204
+        ],
+        "zustand": "unbekannt",
+        "titel": null,
+        "stufe": null,
+        "symbol": null
+      }
+    ]
+  },
+  "ziehbox": {
+    "rechteck": [
+      89,
+      1024,
+      800,
+      274
+    ],
+    "titel": "Neues Talent erhalten",
+    "aktionen": [
+      {
+        "text": "ÖFFNEN",
+        "art": "video",
+        "anzeige": "3/3",
+        "rechteck": [
+          120,
+          1074,
+          361,
+          105
+        ]
+      },
+      {
+        "text": "ÖFFNEN",
+        "art": "talent_stern",
+        "anzeige": "1",
+        "rechteck": [
+          499,
+          1074,
+          360,
+          105
+        ]
+      },
+      {
+        "text": "5 STERNE AUF EINMAL ZIEHEN",
+        "art": "fuenffach",
+        "rechteck": [
+          120,
+          1189,
+          739,
+          90
+        ]
+      }
+    ]
+  },
+  "unterreiter": {
+    "rechteck": [
+      149,
+      1325,
+      679,
+      87
+    ],
+    "links": "TECH-WERFT",
+    "rechts": "TALENTE"
+  },
+  "navigation": {
+    "oben": 1450,
+    "unterkante": 1608,
+    "aktiv": "Upgrades"
+  },
+  "kopf_beispiel": {
+    "profilstufe": 12,
+    "talent_sterne": 3,
+    "gold": 4573,
+    "edelsteine": 350
+  },
+  "texte_dynamisch": true,
+  "fragezeichen_als_label": true,
+  "layout_hinweis": "Pixelpositionen sind ungefähre Referenzwerte; responsiv mit sicheren Bildschirmrändern umsetzen. Beispielwerte sind keine neue Spielbalance."
+}

@@ -1,0 +1,147 @@
+{
+  "status": "Gestaltung am 03.11.2026 freigegeben; Strukturbeispiel zur Umsetzung, keine neue Spielbalance",
+  "referenzdatei": "tech_werft_freigegeben.png",
+  "referenzflaeche": [
+    978,
+    1608
+  ],
+  "aktive_seite": "Upgrades",
+  "aktiver_unterreiter": "TECH-WERFT",
+  "aktiver_bereich": "schutz",
+  "bereiche": [
+    {
+      "id": "angriff",
+      "text": "ANGRIFF"
+    },
+    {
+      "id": "schutz",
+      "text": "SCHUTZ"
+    },
+    {
+      "id": "technik",
+      "text": "TECHNIK"
+    }
+  ],
+  "prinzip": "Forschungsbereiche und die beiden Schutz-Aeste sind parallel ausbaubar; keine exklusive Wahl, die andere Bereiche dauerhaft sperrt.",
+  "aeste": [
+    {
+      "id": "schildstaerke",
+      "text": "Schildstärke"
+    },
+    {
+      "id": "regeneration",
+      "text": "Regeneration"
+    }
+  ],
+  "knoten": [
+    {
+      "id": "schild_1",
+      "symbol": "ui_png/symbol_schild.png",
+      "zeichen": "I",
+      "position_relativ": [
+        0.5,
+        0.515
+      ],
+      "zustand": "erforscht"
+    },
+    {
+      "id": "schild_2",
+      "symbol": "ui_png/symbol_schild.png",
+      "zeichen": "II",
+      "position_relativ": [
+        0.27,
+        0.405
+      ],
+      "zustand": "ausgewaehlt",
+      "voraussetzungen": [
+        "schild_1"
+      ],
+      "marke": "3"
+    },
+    {
+      "id": "schild_3",
+      "symbol": "ui_png/symbol_schild.png",
+      "zeichen": "III",
+      "position_relativ": [
+        0.27,
+        0.295
+      ],
+      "zustand": "gesperrt",
+      "voraussetzungen": [
+        "schild_2"
+      ]
+    },
+    {
+      "id": "regeneration_1",
+      "symbol": "ui_png/symbol_regeneration.png",
+      "position_relativ": [
+        0.73,
+        0.405
+      ],
+      "zustand": "verfuegbar",
+      "voraussetzungen": [
+        "schild_1"
+      ]
+    },
+    {
+      "id": "regeneration_2",
+      "symbol": "ui_png/symbol_regeneration.png",
+      "position_relativ": [
+        0.73,
+        0.295
+      ],
+      "zustand": "gesperrt",
+      "voraussetzungen": [
+        "regeneration_1"
+      ]
+    }
+  ],
+  "verbindungen": [
+    [
+      "schild_1",
+      "schild_2"
+    ],
+    [
+      "schild_2",
+      "schild_3"
+    ],
+    [
+      "schild_1",
+      "regeneration_1"
+    ],
+    [
+      "regeneration_1",
+      "regeneration_2"
+    ]
+  ],
+  "detailbox": {
+    "auswahl": "schild_2",
+    "titel": "Schild II",
+    "beschreibung": "Mehr Schildstärke",
+    "zusatz": "Andere Forschungswege bleiben verfügbar",
+    "aktion": "AUSBAUEN"
+  },
+  "beispielressourcen": {
+    "profilstufe": 12,
+    "energie": [
+      25,
+      30
+    ],
+    "gold": 4573,
+    "edelsteine": 350
+  },
+  "nicht_festgelegt": [
+    "Preise und Kosten",
+    "Konkrete Zahlenwerte der Wirkungen",
+    "Anzahl weiterer Ausbaustufen",
+    "Vollständige Bäume von Angriff und Technik"
+  ],
+  "renderhinweise": {
+    "texte_dynamisch": true,
+    "zeichen_auf_schild_als_label": true,
+    "kein_aeusserer_schein": true,
+    "randstaerke": "Eine dünne Kontur, keine mehrfachen Goldränder",
+    "knopf": "Weiche Grün-Kapsel mit dunklem grünen Text",
+    "navigation_am_unteren_rand": true
+  }
+}

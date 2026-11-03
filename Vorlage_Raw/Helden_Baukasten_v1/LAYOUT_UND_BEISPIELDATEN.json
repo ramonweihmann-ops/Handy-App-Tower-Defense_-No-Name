@@ -1,0 +1,161 @@
+{
+  "entwurfsflaeche": {
+    "breite": 934,
+    "hoehe": 1684
+  },
+  "aufbau": "Hintergrund, danach skalierbare UI-Flächen, freigestellte Figuren, Text und Fortschritt, zuletzt Navigation. Keine Ausschnitte aus dem freigegebenen Gesamtbild verwenden.",
+  "texte_als_ui": true,
+  "schrift": "Vorhandene lizenzierte Spielschrift verwenden; keine Schriftdatei beigelegt.",
+  "figuren_format": {
+    "pixel": [
+      512,
+      512
+    ],
+    "farbraum": "sRGB",
+    "alpha": true,
+    "freier_rand_minimum": 32
+  },
+  "neunfeld_raster_empfehlung": {
+    "portrait_hintergrund": [
+      48,
+      48,
+      48,
+      48
+    ],
+    "kartenkoerper": [
+      48,
+      48,
+      48,
+      48
+    ],
+    "portrait_rahmen_gold": [
+      48,
+      48,
+      48,
+      48
+    ],
+    "knopf": [
+      42,
+      42,
+      42,
+      42
+    ]
+  },
+  "freigeschaltet": {
+    "zaehler": "4/7",
+    "banner": [
+      88,
+      67,
+      758,
+      120
+    ],
+    "portrait_zeile_y": 220,
+    "portrait_groesse": [
+      210,
+      230
+    ],
+    "karten": [
+      {
+        "id": "lynx",
+        "name": "LYNX",
+        "figur": "figuren/lynx.png",
+        "hintergrund": "violett",
+        "stufe": 3,
+        "karten": 40,
+        "karten_ziel": 40,
+        "status": "bereit",
+        "hinweis": true
+      },
+      {
+        "id": "dusty_jo",
+        "name": "DUSTY JO",
+        "figur": "figuren/dusty_jo.png",
+        "hintergrund": "gold",
+        "stufe": 6,
+        "karten": 15,
+        "karten_ziel": 25
+      },
+      {
+        "id": "iska",
+        "name": "ISKA",
+        "figur": "figuren/iska.png",
+        "hintergrund": "cyan",
+        "stufe": 5,
+        "karten": 7,
+        "karten_ziel": 20
+      },
+      {
+        "id": "margot",
+        "name": "MARGOT",
+        "figur": "figuren/margot.png",
+        "hintergrund": "rosa",
+        "stufe": 4,
+        "karten": 18,
+        "karten_ziel": 20
+      }
+    ]
+  },
+  "gesperrt": {
+    "zaehler": "3",
+    "banner": [
+      42,
+      621,
+      850,
+      104
+    ],
+    "karten_zeile_y": 760,
+    "karten_groesse": [
+      286,
+      530
+    ],
+    "karten": [
+      {
+        "id": "volta",
+        "name": "VOLTA",
+        "figur": "figuren/volta.png",
+        "hintergrund": "cyan",
+        "karten": 2,
+        "karten_ziel": 10,
+        "zeit": "5 Std.",
+        "plus": true,
+        "aktion": "KAUFEN"
+      },
+      {
+        "id": "brocken",
+        "name": "BROCKEN",
+        "figur": "figuren/brocken.png",
+        "hintergrund": "cyan",
+        "karten": 0,
+        "karten_ziel": 10,
+        "bedingung": "Starterpaket · 3 Tage",
+        "sperre_saettigung": 0,
+        "aktion": "ANSEHEN"
+      },
+      {
+        "id": "schleimmutter",
+        "name": "SCHLEIMMUTTER",
+        "figur": "figuren/schleimmutter_gesperrt.png",
+        "hintergrund": "rosa",
+        "karten": 0,
+        "karten_ziel": 10,
+        "bedingung": "Boss Welt 1 besiegen",
+        "zusatz": "Level 5 nötig",
+        "plus": true,
+        "aktion": "GESPERRT",
+        "deaktiviert": true
+      }
+    ]
+  },
+  "navigation": {
+    "aktiv": "heroes",
+    "unterer_rand": 0,
+    "symbole": [
+      "nav_shop",
+      "nav_heroes",
+      "nav_battle",
+      "nav_upgrades",
+      "nav_base"
+    ]
+  },
+  "hinweis": "Koordinaten sind Referenzwerte des Entwurfs, keine fest vorgeschriebene Handyauflösung. Auf kleineren Displays mit Containern/Skalierung anpassen; Labels und Touchflächen lesbar halten."
+}

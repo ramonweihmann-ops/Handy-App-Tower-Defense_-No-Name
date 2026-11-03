@@ -1,0 +1,593 @@
+{
+  "dateien": [
+    {
+      "datei": "bauteile_erstellen.py",
+      "bytes": 7028,
+      "sha256": "3f7715889b274568f25b8467284b1c3fe6b0bce341dd91ac6e0e1c3e4438db69"
+    },
+    {
+      "datei": "BAUTEILE_UEBERSICHT.jpg",
+      "bytes": 98913,
+      "sha256": "64b9a74d8bae96d04c1f5ea69884d9ed566ead703aa38c0611e62ad886d8ff29"
+    },
+    {
+      "datei": "BILDANWEISUNG_GESTALTUNG.txt",
+      "bytes": 4062,
+      "sha256": "78a64223313469bfcd63e3574cb1224be337460b5c4bdfd7673af8e3a5da730b"
+    },
+    {
+      "datei": "BILDANWEISUNG_HINTERGRUND.txt",
+      "bytes": 983,
+      "sha256": "2fa14ad13bb93f8f88ac3fdd26cd67159e664c6dc7783d0e674876d3a8a71752"
+    },
+    {
+      "datei": "FORSCHUNGSWEGE_UND_LAYOUT.json",
+      "bytes": 3247,
+      "sha256": "8182fb0838204609f2b5e21861565f9c457a7c8d98222f05137f042c39e38d47"
+    },
+    {
+      "datei": "hintergrund/tech_werft_hintergrund.png",
+      "bytes": 1432561,
+      "sha256": "7d7b9427e251b3527669cec91efa3130410ca9e74bc394b6bc9490f3421ba160",
+      "masse": [
+        1001,
+        1572
+      ],
+      "modus": "RGB",
+      "srgb_profil": false
+    },
+    {
+      "datei": "LIESMICH_CLAUDE.md",
+      "bytes": 4626,
+      "sha256": "19fd96c9781ab8e4cb9933d8d613387c013749aa780a762af107433a8d490d5c"
+    },
+    {
+      "datei": "raster.cjs",
+      "bytes": 566,
+      "sha256": "afae497450168ab4f175a02573ea18ba1bb5908d8d7baaf32caa2e7378c6307c"
+    },
+    {
+      "datei": "symbole/act_profile.png",
+      "bytes": 148896,
+      "sha256": "932491dc9fbbc9cd08efa50fd4472830c68480f07323a1ee0b5e97348afa5a19",
+      "masse": [
+        512,
+        512
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "symbole/act_settings.png",
+      "bytes": 185446,
+      "sha256": "cab83d0c06d30c4c2c1bd31339e41b0c1d26af2f716fbb4c8c865026e788c2e4",
+      "masse": [
+        512,
+        512
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "symbole/icon_energy.png",
+      "bytes": 130450,
+      "sha256": "a1f1da57d50971daae6d9f78308d2ea86f44796208acfd89053a8a647b46b242",
+      "masse": [
+        512,
+        512
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "symbole/icon_gems.png",
+      "bytes": 153887,
+      "sha256": "5430fac2a04e7b63e5a6aa357f4f00c375d191688b3c3e7242d16dd5f0bc0df9",
+      "masse": [
+        512,
+        512
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "symbole/icon_gold.png",
+      "bytes": 196845,
+      "sha256": "1b67817616f5790109d8f71ea5ce214e857dea9a643a3cdd8b9826c323506404",
+      "masse": [
+        512,
+        512
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "symbole/nav_base.png",
+      "bytes": 170441,
+      "sha256": "e677a975d9c74226ab2dbc8f69696400b7d05b660f654fd6df2ad992636872c8",
+      "masse": [
+        512,
+        512
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "symbole/nav_battle.png",
+      "bytes": 144528,
+      "sha256": "95a58fd8769884430044d46eeef755cfbe510f90c9a9066f5e7be99237fb8f12",
+      "masse": [
+        512,
+        512
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "symbole/nav_heroes.png",
+      "bytes": 229076,
+      "sha256": "e4f974184847176c75234109ca46eb382127bb450ddb2ce1c1ec87c7c4208aa8",
+      "masse": [
+        512,
+        512
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "symbole/nav_shop.png",
+      "bytes": 205644,
+      "sha256": "c0885dfb60783282f79a5d3766bafb3319f1d39e6b2731dac52ce08c13317304",
+      "masse": [
+        512,
+        512
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "symbole/nav_upgrades.png",
+      "bytes": 151094,
+      "sha256": "88495aac3c3bb923985204a76d22d4375843c624f859ef6e480d8a2bab0adae2",
+      "masse": [
+        512,
+        512
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "tech_werft_freigegeben.png",
+      "bytes": 1737105,
+      "sha256": "a86aa4a9cc9b061eb191ef4c68a05ae3ad3d40f4043a54f0cef435913173cf1e",
+      "masse": [
+        978,
+        1608
+      ],
+      "modus": "RGB",
+      "srgb_profil": false
+    },
+    {
+      "datei": "ui/bereich_angriff.svg",
+      "bytes": 529,
+      "sha256": "f1931c39303896507ce80d290966aca65ae2feb6b09dcbe710e497f792466a84"
+    },
+    {
+      "datei": "ui/bereich_schutz.svg",
+      "bytes": 529,
+      "sha256": "358e988234d08bcbeadfc497925ce0801d70106837615e605ed02b74ee865482"
+    },
+    {
+      "datei": "ui/bereich_technik.svg",
+      "bytes": 529,
+      "sha256": "2f19a3e196f61b320bb7d917b7753bd0eb8c07a37a3766ffce201b0e498cc154"
+    },
+    {
+      "datei": "ui/detail_box.svg",
+      "bytes": 345,
+      "sha256": "b811c1d2b1e1b55ba7599f32c784680cd136266bfdb7d0f74196dd310aa43d8b"
+    },
+    {
+      "datei": "ui/haekchen.svg",
+      "bytes": 274,
+      "sha256": "c54b2fc891f923ed354202a5b8baeeed6a9fb292a611b875971c4e8f73c6c3cc"
+    },
+    {
+      "datei": "ui/kampf_knopf.svg",
+      "bytes": 489,
+      "sha256": "51622dc971793ba0cc6319b5fe11fa9cfb66335311368f6d0b33cdefd25ab890"
+    },
+    {
+      "datei": "ui/knopf_gesperrt.svg",
+      "bytes": 508,
+      "sha256": "fd084976765f0f757f427eaa490be2da8c8c59de63f37771b0711b84e579581b"
+    },
+    {
+      "datei": "ui/knopf_gruen_gedrueckt.svg",
+      "bytes": 508,
+      "sha256": "4241f6491b50bc6362f56e8f7690d76e45b175ffea17ad92d47fdf41fc7aca24"
+    },
+    {
+      "datei": "ui/knopf_gruen_hover.svg",
+      "bytes": 508,
+      "sha256": "c7d24f2cc5be2fb6a5786ecacd21fc93cc96ec6c2074fe22f230e939685c0a12"
+    },
+    {
+      "datei": "ui/knopf_gruen_normal.svg",
+      "bytes": 508,
+      "sha256": "32323ad8524df8b5aa81af4968220955713835cda037b8b6b7fde38432a28cc1"
+    },
+    {
+      "datei": "ui/kopf_leiste.svg",
+      "bytes": 531,
+      "sha256": "f46dee28c42c4c56154162f89e39fd148991b4838ae389e739e910d54b7daf06"
+    },
+    {
+      "datei": "ui/marke_gold.svg",
+      "bytes": 322,
+      "sha256": "d0e538c430b97dd1acdfdfc7fb123940c8f3e5103b7fdf1f3023474e593dd1a2"
+    },
+    {
+      "datei": "ui/modul_ausgewaehlt.svg",
+      "bytes": 586,
+      "sha256": "4415e751416ea91ed1d879c392f5617d75abbc4607ee0277bb5a282844bd8072"
+    },
+    {
+      "datei": "ui/modul_gesperrt.svg",
+      "bytes": 586,
+      "sha256": "5e8b5e91326529ef397b51f853585a988cf656d6a618e53f6f296c5bd516350b"
+    },
+    {
+      "datei": "ui/modul_normal.svg",
+      "bytes": 586,
+      "sha256": "a5e8a0d1416074db7d9ceb895b2973ce41c4762bb36392919de20db0351457b9"
+    },
+    {
+      "datei": "ui/nav_aktiv.svg",
+      "bytes": 342,
+      "sha256": "1f8fe3825550968d3e7044c272cc68ac0a10a11fc58fb0bfc15ebb97c9df3a41"
+    },
+    {
+      "datei": "ui/nav_hintergrund.svg",
+      "bytes": 351,
+      "sha256": "2b8129a50873dbc12756ca21e84f7beab3b6595780590cc68e1a91283a3cdbfc"
+    },
+    {
+      "datei": "ui/symbol_regeneration.svg",
+      "bytes": 616,
+      "sha256": "05d570aa958dbee7ed760f66faa2eba180ef0776778c0871504b75602413c1fd"
+    },
+    {
+      "datei": "ui/symbol_schild.svg",
+      "bytes": 516,
+      "sha256": "c7617bb437caa41fe0c04ef343013cd051d32be6f40ccd0433ddd7d331d376cc"
+    },
+    {
+      "datei": "ui/symbol_schloss.svg",
+      "bytes": 657,
+      "sha256": "45384afc1fecc4db5077cf3531926abd096f5713124e80cf518d0d0ddfd98eeb"
+    },
+    {
+      "datei": "ui/umschalter_aktiv.svg",
+      "bytes": 529,
+      "sha256": "43f9de10be0cbfb32f59ca6429ee34bb6d9ac429af08dffb980269f60b14fe3d"
+    },
+    {
+      "datei": "ui/umschalter_grund.svg",
+      "bytes": 533,
+      "sha256": "1537026a53b92db3be88b90dbe3063c512b5de31c24fb5dc92651cadf7c0dd3a"
+    },
+    {
+      "datei": "ui/verbinder_gebogen.svg",
+      "bytes": 328,
+      "sha256": "b12335190f9ee362683d1a96a573d395e376668698e41bcac47c6a48534860fe"
+    },
+    {
+      "datei": "ui/verbinder_gerade.svg",
+      "bytes": 288,
+      "sha256": "e2950575becb2bd73343cec95ea5199c1bd13448e0599d5a72cc9972fa27aea0"
+    },
+    {
+      "datei": "ui_png/bereich_angriff.png",
+      "bytes": 6643,
+      "sha256": "b84f286f329337da25d9f2720fc72ffb9310346372ee1c5d177a77c3d6c44c9b",
+      "masse": [
+        512,
+        128
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/bereich_schutz.png",
+      "bytes": 6778,
+      "sha256": "5fe738e36c518e112e125e15d892681c46e4da26d81156046e524bd683b65bb3",
+      "masse": [
+        512,
+        128
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/bereich_technik.png",
+      "bytes": 6431,
+      "sha256": "c8802c53ff15822749747fde63764f0cac31dda7dbacbae79067df9af161985e",
+      "masse": [
+        512,
+        128
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/detail_box.png",
+      "bytes": 12315,
+      "sha256": "c5770570b4ccf8138284a440f443cd5980c3bb474ab4267f8f78068a4f3b99f7",
+      "masse": [
+        1024,
+        340
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/haekchen.png",
+      "bytes": 1719,
+      "sha256": "5998574da30e8a501a545dc140135a11db79905e5341c60e3b89a1797c0f2354",
+      "masse": [
+        64,
+        64
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/kampf_knopf.png",
+      "bytes": 4687,
+      "sha256": "c31524c27f968f4a1416d088d4d3addd6397b5f4092afdabd1853592e5ba4036",
+      "masse": [
+        192,
+        192
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/knopf_gesperrt.png",
+      "bytes": 5287,
+      "sha256": "f352bca09839affa9acb542d4e02bb710e9d189049f43bdc23ae06b5634a4393",
+      "masse": [
+        512,
+        128
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/knopf_gruen_gedrueckt.png",
+      "bytes": 5372,
+      "sha256": "936418e0cad2c7a4eb3eb4691642c9faf0e92022af00531f589b282da807de27",
+      "masse": [
+        512,
+        128
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/knopf_gruen_hover.png",
+      "bytes": 5417,
+      "sha256": "aca047185ec631583d434e99521bb7c255732b68f71a7966b65af1c9b5c8b9c4",
+      "masse": [
+        512,
+        128
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/knopf_gruen_normal.png",
+      "bytes": 5587,
+      "sha256": "35ef690c32f7b6d52738d86334144e1d895be3b2da08d4d7078f6a357bdd631e",
+      "masse": [
+        512,
+        128
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/kopf_leiste.png",
+      "bytes": 9816,
+      "sha256": "3ed6523032c1c6e793b938e4733f215915435afa2d3a42cdd89660a018c2257e",
+      "masse": [
+        1024,
+        160
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/marke_gold.png",
+      "bytes": 3970,
+      "sha256": "85082f5d0b776e53201aecf2867785ec9f1d9c46d55059fd502fa71b88acb8a6",
+      "masse": [
+        128,
+        128
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/modul_ausgewaehlt.png",
+      "bytes": 9427,
+      "sha256": "11672c384bcc1b0c029a362b1d3dd11a23d06ebc5c21051881bac7636cd5b873",
+      "masse": [
+        256,
+        224
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/modul_gesperrt.png",
+      "bytes": 9106,
+      "sha256": "c684238b5c00c5ff924bface8c1f5144a7da15fd9e03beeef3203745e49c134b",
+      "masse": [
+        256,
+        224
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/modul_normal.png",
+      "bytes": 9293,
+      "sha256": "970ddd775bd96d1ceb8b760d77a857067aa531b02c17215fccdcc45a417927c6",
+      "masse": [
+        256,
+        224
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/nav_aktiv.png",
+      "bytes": 3684,
+      "sha256": "ebc05210c52c89263d769f044dc2047ca1a95cfda62536f113e5c0275ad46aac",
+      "masse": [
+        192,
+        160
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/nav_hintergrund.png",
+      "bytes": 7080,
+      "sha256": "236ad4f7c2d5dbbacd3d18cb08696ab62b87acc3a41cdb58a0e95aee452498d3",
+      "masse": [
+        1024,
+        200
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/symbol_regeneration.png",
+      "bytes": 15100,
+      "sha256": "4f6c63b4e33690c8f94bd9bec7e9cd908c18a8d2ba578b76487e7a23fa6b3e22",
+      "masse": [
+        512,
+        512
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/symbol_schild.png",
+      "bytes": 17012,
+      "sha256": "3f19380727c3f2027bdcbd2b3a56c25330c0ee21c5aa5488817864a555fa0076",
+      "masse": [
+        512,
+        512
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/symbol_schloss.png",
+      "bytes": 21953,
+      "sha256": "669564d602606a25b9ad6b7810a82e0768ea6a318871259bbbf9b80168c14cc8",
+      "masse": [
+        512,
+        512
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/umschalter_aktiv.png",
+      "bytes": 6688,
+      "sha256": "cd20490c9ef01bc124acf1f9f77e8f1eeae19fbf67aae591f19b0e85bbca4ef0",
+      "masse": [
+        512,
+        128
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/umschalter_grund.png",
+      "bytes": 8139,
+      "sha256": "439077acfe9f6efd6cb26aaf8c6105ac69ea04525e27de8cb4a96799b63c0ae1",
+      "masse": [
+        1024,
+        128
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/verbinder_gebogen.png",
+      "bytes": 7900,
+      "sha256": "fd0398c62acf63d3930461804c633cd7b39628313781955263b447ef7f6a7cdd",
+      "masse": [
+        256,
+        256
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    },
+    {
+      "datei": "ui_png/verbinder_gerade.png",
+      "bytes": 908,
+      "sha256": "7254acd03a8e8d74510431c6b18c962fe53a0083c546451a7e66451cbc255016",
+      "masse": [
+        256,
+        64
+      ],
+      "modus": "RGBA",
+      "srgb_profil": true,
+      "echte_transparenz": true
+    }
+  ],
+  "svg_png_paare": 24,
+  "pruefung": "Öffnen, Maße, Transparenz, SVG-Textfreiheit und Prüfsummen bestanden",
+  "godot_laufzeit_geprueft": false,
+  "graph": "Fünf Knoten, vier Verbindungen, keine Zyklen; zwei unabhängige Äste"
+}
