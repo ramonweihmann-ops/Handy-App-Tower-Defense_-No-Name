@@ -1347,114 +1347,97 @@ func _buy_energy() -> void:
 
 # --- Reiter: Basislager ------------------------------------------------------------
 
-## Basislager (BaseData): vorläufig als Liste, bis die Grafik mit den leeren Bauplätzen da ist
-## (dann zoombare Karte nach Vorlage_Raw/Raumbasis_Wege_v1).
+## Basislager als Karte (BaseMap): Antippen eines Gebäudes öffnet sein Fenster
+var _base_map: BaseMap
+
+
 func _tab_basis() -> Control:
-	var page := _scroll_page()
-	var v: VBoxContainer = page[1]
-	v.add_child(UiKit.label("Basislager", 32, UiKit.C_GOLD, HORIZONTAL_ALIGNMENT_LEFT))
+	var root := Control.new()
+	_base_map = BaseMap.new()
+	_base_map.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_base_map.building_pressed.connect(_open_building)
+	root.add_child(_base_map)
 	var built := 0
 	for d in BaseData.BUILDINGS:
 		if Save.base_built(d["id"]):
 			built += 1
-	v.add_child(_wrap_left("%d von 30 Gebäuden. Gebäude 01–12 kommen mit deinen Champions, ab 13 baust du sie der Reihe nach mit Gold." % built, 20, UiKit.C_MUTED))
-	var shown_locked := 0
-	for d in BaseData.BUILDINGS:
-		var id: String = d["id"]
-		var st := Save.base_state(id)
-		if st == "locked":
-			shown_locked += 1
-			if shown_locked > 2:
-				continue
-		v.add_child(_building_row(id))
-	return page[0]
+	var head := UiKit.label("BASISLAGER · %d/30" % built, 26, UiKit.C_GOLD)
+	head.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	head.offset_top = 8
+	head.offset_bottom = 48
+	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	head.add_theme_color_override("font_outline_color", Color(0.1, 0.05, 0.3))
+	head.add_theme_constant_override("outline_size", 8)
+	root.add_child(head)
+	return root
 
 
-func _building_row(id: String) -> Control:
+## Gebäudefenster: Wirkung jetzt → nächste Stufe, Lager mit „Abholen“, Ausbauen bzw. Bauen
+func _open_building(id: String) -> void:
 	var d := BaseData.info(id)
 	var st := Save.base_state(id)
-	var on := st == "built"
-	var col := Color(0.55, 0.45, 0.95) if d["kind"] == "boost" else Color(0.95, 0.7, 0.25)
-	var p := _panel(Color(0.1, 0.12, 0.25, 0.92) if on else Color(0.08, 0.08, 0.14, 0.9), col if on else Color(0.25, 0.27, 0.35))
-	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 12)
-	p.add_child(h)
-	var em := HeroBadge.new()
-	em.color = col if on else Color(0.3, 0.3, 0.35)
-	em.text = id
-	em.custom_minimum_size = Vector2(80, 80)
-	h.add_child(em)
-	var tv := VBoxContainer.new()
-	tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	h.add_child(tv)
 	var lvl := Save.base_level(id)
-	tv.add_child(UiKit.label(String(d["name"]) + (" · Stufe %d" % lvl if on else ""), 22, UiKit.C_TEXT if on else UiKit.C_MUTED, HORIZONTAL_ALIGNMENT_LEFT))
-	var now_text := BaseData.value_text(id, maxi(1, lvl))
-	tv.add_child(_wrap_left("%s: %s" % [d["text"], now_text] + ("  →  %s" % BaseData.value_text(id, lvl + 1) if on and lvl < BaseData.MAX_LEVEL else ""), 17, UiKit.C_MUTED))
-	var btns := VBoxContainer.new()
-	btns.add_theme_constant_override("separation", 6)
-	h.add_child(btns)
+	var v := _modal_box(String(d["name"]))
+	var sub := ("Erzeuger" if d["kind"] == "prod" else "Verstärker") + (" · Stufe %d" % lvl if st == "built" else " · noch nicht gebaut")
+	v.add_child(UiKit.label(sub, 21, UiKit.C_MUTED))
+	var pic := TextureRect.new()
+	pic.texture = load("res://ui/base/bild_%s.webp" % id)
+	pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	pic.custom_minimum_size = Vector2(320, 260)
+	if st != "built":
+		pic.modulate = Color(0.55, 0.55, 0.65)
+	v.add_child(pic)
+	var eff := "%s: %s" % [d["text"], BaseData.value_text(id, maxi(1, lvl))]
+	if st == "built" and lvl < BaseData.MAX_LEVEL:
+		eff += "  →  " + BaseData.value_text(id, lvl + 1)
+	v.add_child(UiKit.wrap_label(eff, 21))
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 12)
+	v.add_child(row)
 	if st == "locked":
-		tv.add_child(UiKit.label("Gesperrt: " + Save.base_lock_text(id), 17, UiKit.C_MUTED, HORIZONTAL_ALIGNMENT_LEFT))
-		h.add_child(Icon.make("lock", 44))
-		return p
-	if st == "buildable":
-		var b := _small_button("Bauen\n%s Gold" % MockScreen.num(int(d["gold"])), func() -> void:
+		v.add_child(UiKit.wrap_label("Gesperrt: " + Save.base_lock_text(id), 20, UiKit.C_MUTED))
+	elif st == "buildable":
+		var b := _small_button("Bauen · %s Gold" % MockScreen.num(int(d["gold"])), func() -> void:
 			if Save.base_build(id):
+				_close_modal()
 				celebrate("camp", "%s gebaut!" % d["name"])
+				show_tab("basis")
 			else:
 				toast("Nicht genug Gold.")
-			show_tab("basis")
-		, 150)
-		b.custom_minimum_size = Vector2(150, 70)
+		, 300)
 		b.disabled = Save.gold() < int(d["gold"])
-		if not b.disabled:
-			_mark(b)
-		btns.add_child(b)
-		return p
-	if d["kind"] == "prod":
-		var stock := Save.base_stock(id)
-		var cap := Save.base_store_cap(id)
-		var bar := ProgressBar.new()
-		bar.show_percentage = false
-		bar.custom_minimum_size = Vector2(0, 20)
-		bar.max_value = cap
-		bar.value = stock
-		bar.add_theme_stylebox_override("fill", UiKit.box(col, 8))
-		tv.add_child(bar)
-		var bl := UiKit.label("%d/%d bereit" % [int(floor(stock)), int(floor(cap))], 15)
-		bl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		bl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		bar.add_child(bl)
-		var collect := _small_button("Abholen", func() -> void:
-			var r := Save.base_collect(id)
-			if int(r["amount"]) > 0:
-				reward_success([r], "Basislager · %s" % d["name"])
-			else:
-				toast("Noch nichts bereit.")
-			show_tab("basis")
-		, 150)
-		collect.disabled = stock < 1.0
-		if not collect.disabled:
-			_dot(collect)
-		btns.add_child(collect)
-	var up_text := "Max."
-	if lvl < BaseData.MAX_LEVEL:
-		var c := BaseData.upgrade_cost(id, lvl)
-		up_text = "Ausbauen\n%s Gold" % MockScreen.num(int(c[0])) + (" · %d ★" % int(c[1]) if int(c[1]) > 0 else "")
-		if id != "01" and lvl >= Save.base_level("01"):
-			up_text = "Erst Zentrale\nausbauen"
-	var up := _small_button(up_text, func() -> void:
-		if Save.base_upgrade(id):
-			celebrate("camp", "%s auf Stufe %d!" % [d["name"], lvl + 1])
-		show_tab("basis")
-	, 150, false)
-	up.custom_minimum_size = Vector2(150, 70)
-	up.disabled = not Save.base_can_upgrade(id)
-	if not up.disabled:
-		_mark(up)
-	btns.add_child(up)
-	return p
+		row.add_child(b)
+	else:
+		if d["kind"] == "prod":
+			var stock := Save.base_stock(id)
+			v.add_child(UiKit.label("Lager: %d von %d" % [int(floor(stock)), int(floor(Save.base_store_cap(id)))], 20, UiKit.C_MUTED))
+			var c := _small_button("Abholen", func() -> void:
+				var r := Save.base_collect(id)
+				_close_modal()
+				if int(r["amount"]) > 0:
+					reward_success([r], "Basislager · %s" % d["name"])
+				else:
+					toast("Noch nichts bereit.")
+				show_tab("basis")
+			, 190)
+			c.disabled = stock < 1.0
+			row.add_child(c)
+		if lvl < BaseData.MAX_LEVEL:
+			var cost := BaseData.upgrade_cost(id, lvl)
+			var txt := "Ausbauen · %s Gold" % MockScreen.num(int(cost[0])) + (" · %d ★" % int(cost[1]) if int(cost[1]) > 0 else "")
+			if id != "01" and lvl >= Save.base_level("01"):
+				txt = "Erst Kommandozentrale ausbauen"
+			var u := _small_button(txt, func() -> void:
+				if Save.base_upgrade(id):
+					_close_modal()
+					celebrate("camp", "%s auf Stufe %d!" % [d["name"], lvl + 1])
+					show_tab("basis")
+			, 300, false)
+			u.disabled = not Save.base_can_upgrade(id)
+			row.add_child(u)
+	v.add_child(_small_button("Schließen", _close_modal, 190, false))
 
 
 # --- Dialoge ---------------------------------------------------------------------

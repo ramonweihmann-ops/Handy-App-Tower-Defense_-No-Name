@@ -1,0 +1,398 @@
+{
+ "size": [
+  724,
+  2172
+ ],
+ "buildings": {
+  "01": {
+   "rect": [
+    0,
+    1794,
+    246,
+    237
+   ],
+   "foot": [
+    121,
+    2020
+   ],
+   "name": "Kommandozentrale"
+  },
+  "02": {
+   "rect": [
+    238,
+    1794,
+    250,
+    233
+   ],
+   "foot": [
+    363,
+    2020
+   ],
+   "name": "Sanitätsstation"
+  },
+  "03": {
+   "rect": [
+    480,
+    1794,
+    225,
+    217
+   ],
+   "foot": [
+    604,
+    2020
+   ],
+   "name": "Werkstatt"
+  },
+  "04": {
+   "rect": [
+    7,
+    1569,
+    239,
+    219
+   ],
+   "foot": [
+    121,
+    1775
+   ],
+   "name": "Hologrammakademie"
+  },
+  "05": {
+   "rect": [
+    253,
+    1569,
+    235,
+    218
+   ],
+   "foot": [
+    363,
+    1775
+   ],
+   "name": "Reaktorturm"
+  },
+  "06": {
+   "rect": [
+    488,
+    1569,
+    228,
+    220
+   ],
+   "foot": [
+    604,
+    1775
+   ],
+   "name": "Kommunikationsstation"
+  },
+  "07": {
+   "rect": [
+    14,
+    1384,
+    232,
+    183
+   ],
+   "foot": [
+    121,
+    1550
+   ],
+   "name": "Gewächshaus"
+  },
+  "08": {
+   "rect": [
+    266,
+    1374,
+    222,
+    191
+   ],
+   "foot": [
+    363,
+    1550
+   ],
+   "name": "Roboterlabor"
+  },
+  "09": {
+   "rect": [
+    480,
+    1375,
+    236,
+    189
+   ],
+   "foot": [
+    604,
+    1550
+   ],
+   "name": "Sternwarte"
+  },
+  "10": {
+   "rect": [
+    13,
+    1182,
+    233,
+    187
+   ],
+   "foot": [
+    121,
+    1355
+   ],
+   "name": "Schiffswerft"
+  },
+  "11": {
+   "rect": [
+    261,
+    1187,
+    227,
+    183
+   ],
+   "foot": [
+    363,
+    1355
+   ],
+   "name": "Schildgenerator"
+  },
+  "12": {
+   "rect": [
+    492,
+    1179,
+    228,
+    189
+   ],
+   "foot": [
+    604,
+    1355
+   ],
+   "name": "Trainingshalle"
+  },
+  "13": {
+   "rect": [
+    6,
+    979,
+    240,
+    205
+   ],
+   "foot": [
+    121,
+    1145
+   ],
+   "name": "Kristallforschung"
+  },
+  "14": {
+   "rect": [
+    258,
+    1000,
+    220,
+    184
+   ],
+   "foot": [
+    363,
+    1145
+   ],
+   "name": "Panzerwerkstatt"
+  },
+  "15": {
+   "rect": [
+    485,
+    979,
+    231,
+    204
+   ],
+   "foot": [
+    604,
+    1145
+   ],
+   "name": "Drohnenhangar"
+  },
+  "16": {
+   "rect": [
+    10,
+    789,
+    236,
+    194
+   ],
+   "foot": [
+    121,
+    960
+   ],
+   "name": "Alchemielabor"
+  },
+  "17": {
+   "rect": [
+    261,
+    789,
+    214,
+    192
+   ],
+   "foot": [
+    363,
+    960
+   ],
+   "name": "Energiespeicher"
+  },
+  "18": {
+   "rect": [
+    485,
+    789,
+    231,
+    192
+   ],
+   "foot": [
+    604,
+    960
+   ],
+   "name": "Navigationszentrale"
+  },
+  "19": {
+   "rect": [
+    1,
+    604,
+    245,
+    176
+   ],
+   "foot": [
+    121,
+    770
+   ],
+   "name": "Eisforschung"
+  },
+  "20": {
+   "rect": [
+    260,
+    604,
+    213,
+    178
+   ],
+   "foot": [
+    363,
+    770
+   ],
+   "name": "Feuerforschung"
+  },
+  "21": {
+   "rect": [
+    482,
+    604,
+    240,
+    176
+   ],
+   "foot": [
+    604,
+    770
+   ],
+   "name": "Waffenwerkstatt"
+  },
+  "22": {
+   "rect": [
+    11,
+    429,
+    235,
+    171
+   ],
+   "foot": [
+    121,
+    585
+   ],
+   "name": "Bibliotheksarchiv"
+  },
+  "23": {
+   "rect": [
+    258,
+    429,
+    221,
+    172
+   ],
+   "foot": [
+    363,
+    585
+   ],
+   "name": "Biolabor"
+  },
+  "24": {
+   "rect": [
+    480,
+    429,
+    236,
+    171
+   ],
+   "foot": [
+    604,
+    585
+   ],
+   "name": "Teleportstation"
+  },
+  "25": {
+   "rect": [
+    16,
+    249,
+    230,
+    171
+   ],
+   "foot": [
+    121,
+    410
+   ],
+   "name": "Veredelungsanlage"
+  },
+  "26": {
+   "rect": [
+    260,
+    249,
+    207,
+    171
+   ],
+   "foot": [
+    363,
+    410
+   ],
+   "name": "Kommandantenresidenz"
+  },
+  "27": {
+   "rect": [
+    480,
+    249,
+    230,
+    201
+   ],
+   "foot": [
+    604,
+    410
+   ],
+   "name": "Reparaturdock"
+  },
+  "28": {
+   "rect": [
+    22,
+    87,
+    224,
+    167
+   ],
+   "foot": [
+    121,
+    230
+   ],
+   "name": "Satellitenkontrolle"
+  },
+  "29": {
+   "rect": [
+    238,
+    54,
+    250,
+    200
+   ],
+   "foot": [
+    363,
+    230
+   ],
+   "name": "Reparaturdock"
+  },
+  "30": {
+   "rect": [
+    480,
+    54,
+    227,
+    216
+   ],
+   "foot": [
+    604,
+    230
+   ],
+   "name": "Heldenhalle"
+  }
+ }
+}

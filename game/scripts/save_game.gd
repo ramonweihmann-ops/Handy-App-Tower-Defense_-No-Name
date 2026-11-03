@@ -621,8 +621,8 @@ func base_build(id: String) -> bool:
 
 func base_store_cap(id: String) -> float:
 	var bonus := 0.0
-	if base_built("27"):
-		bonus = BaseData.value("27", base_level("27"))
+	if base_built("28"):
+		bonus = BaseData.value("28", base_level("28"))
 	return BaseData.value(id, base_level(id)) * BaseData.STORE_HOURS * (1.0 + bonus)
 
 

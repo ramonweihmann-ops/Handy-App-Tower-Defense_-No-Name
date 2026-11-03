@@ -46,9 +46,9 @@ Vorschlag; vor dem Einbau rechne ich sie mit `scripts/economy-sim.py` und dem Ba
 | 24 | Teleportstation | Level 35 · 7.000 Gold | Verstärker | Plasma-Speicher +3 → +15 |
 | 25 | Versorgungsdepot | Level 37 · 7.400 Gold | Erzeuger | Gold 100 → 1.000 pro Stunde |
 | 26 | Veredelungsanlage | Level 39 · 7.800 Gold | Erzeuger | Heldenkarten 1 → 8 pro Stunde |
-| 27 | Kommandantenresidenz | Level 41 · 8.200 Gold | Verstärker | Lager aller Erzeuger +10 % → +50 % |
-| 28 | Satellitenkontrolle | Level 43 · 8.600 Gold | Verstärker | Luftschlag-Booster 5 % → 25 % stärker |
-| 29 | Reparaturdock | Level 45 · 9.000 Gold | Verstärker | Schild-Reparatur (Karte) 5 % → 25 % stärker |
+| 27 | Reparaturdock | Level 41 · 8.200 Gold | Verstärker | Schild-Reparatur (Karte) 5 % → 25 % stärker |
+| 28 | Kommandantenresidenz | Level 43 · 8.600 Gold | Verstärker | Lager aller Erzeuger +10 % → +50 % |
+| 29 | Satellitenkontrolle | Level 45 · 9.000 Gold | Verstärker | Luftschlag-Booster 5 % → 25 % stärker |
 | 30 | Heldenmonument | Level 47 · 9.400 Gold | Verstärker | Schaden aller Helden +2 % → +10 % |
 
 Kampfstärke aus allen Verstärkern zusammen bei voller Stufe: Schaden etwa +22 %, Schild +10 %,
