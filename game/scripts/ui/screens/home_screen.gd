@@ -5,7 +5,8 @@ extends MockScreen
 ## Die Level-Knoten zeichnet das Spiel selbst (geschafft, ausgewählt, gesperrt) mit den Bildern
 ## aus dem Mockup.
 
-const BOSS_RECT := Rect2(168, 236, 64, 64)
+## Boss-Marker im Mockup „1 · Abenteuer-Pfad (neu, Comic v4)“ (Mitte 200, 256)
+const BOSS_RECT := Rect2(168, 224, 64, 64)
 
 var _path: PathLayer
 
