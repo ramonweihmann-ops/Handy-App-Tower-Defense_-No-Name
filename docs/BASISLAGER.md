@@ -21,39 +21,40 @@ geprüft (Abschnitt „Wirtschafts-Simulation“); die Kampf-Boni prüft noch da
 | Nr. | Gebäude | frei ab | Art | Wirkung (Stufe 1 → Stufe 10) |
 |---|---|---|---|---|
 | 01 | Kommandozentrale | Start | Erzeuger | Gold 40 → 400 pro Stunde; Stufe der Zentrale begrenzt alle anderen Stufen |
-| 02 | Sanitätsstation | Start | Verstärker | Schild heilt nach jeder Welle 2 % → 6 % |
+| 02 | Sanitätsstation | Start | Verstärker | Schild heilt nach jeder Welle 1 % → 3 % |
 | 03 | Werkstatt | Start | Erzeuger | Heldenkarten 0,5 → 5 pro Stunde (wie die heutigen Quartiere) |
 | 04 | Hologrammakademie | Start | Verstärker | Erfahrung im Kampf +3 % → +15 % |
 | 05 | Reaktorturm | Start | Erzeuger | Energie: 1 Punkt alle 3 Std. → alle 1 Std. |
 | 06 | Kommunikationsstation | 6. Champion | Verstärker | Pass-Punkte je Sieg +2 → +10 |
 | 07 | Gewächshaus | 7. Champion | Erzeuger | Gold 60 → 600 pro Stunde |
-| 08 | Roboterlabor | 8. Champion | Verstärker | Plasma lädt +2 % → +10 % schneller |
-| 09 | Sternwarte | Level 5 · 1.000 Gold | Verstärker | Krit-Chance +1 % → +5 % |
-| 10 | Schiffswerft | Level 7 · 1.400 Gold | Verstärker | Booster laden 3 % → 15 % schneller |
-| 11 | Schildgenerator | Level 9 · 1.800 Gold | Verstärker | Schild +2 % → +10 % |
-| 12 | Trainingshalle | Level 11 · 2.200 Gold | Verstärker | Schaden aller Helden +1 % → +6 % |
+| 08 | Roboterlabor | 8. Champion | Verstärker | Plasma lädt +1 % → +5 % schneller |
+| 09 | Sternwarte | Level 5 · 1.000 Gold | Verstärker | Krit-Chance +0,5 % → +2,5 % |
+| 10 | Schiffswerft | Level 7 · 1.400 Gold | Verstärker | Booster laden 2 % → 8 % schneller |
+| 11 | Schildgenerator | Level 9 · 1.800 Gold | Verstärker | Schild +1 % → +5 % |
+| 12 | Trainingshalle | Level 11 · 2.200 Gold | Verstärker | Schaden aller Helden +0,5 % → +3 % |
 | 13 | Kristallforschung | Level 13 · 2.600 Gold | Erzeuger | Edelsteine 2 → 10 pro Tag |
-| 14 | Panzerwerkstatt | Level 15 · 3.000 Gold | Verstärker | Schaden gegen starke Gegner und Bosse +2 % → +10 % |
-| 15 | Drohnenhangar | Level 17 · 3.400 Gold | Verstärker | Start-Plasma +2 → +10 |
+| 14 | Panzerwerkstatt | Level 15 · 3.000 Gold | Verstärker | Schaden gegen starke Gegner und Bosse +1 % → +5 % |
+| 15 | Drohnenhangar | Level 17 · 3.400 Gold | Verstärker | Start-Plasma +1 → +5 |
 | 16 | Alchemielabor | Level 19 · 3.800 Gold | Erzeuger | Talent-Sterne: 1 alle 24 Std. → alle 8 Std. |
 | 17 | Energiespeicher | Level 21 · 4.200 Gold | Verstärker | Energie-Maximum +2 → +10 |
 | 18 | Navigationszentrale | Level 23 · 4.600 Gold | Verstärker | Gold aus Kämpfen +3 % → +15 % |
-| 19 | Eisforschung | Level 25 · 5.000 Gold | Verstärker | Frost (Kalle) verlangsamt 5 % → 25 % stärker |
-| 20 | Feuerforschung | Level 27 · 5.400 Gold | Verstärker | Brand (Fritzi) 5 % → 25 % stärker |
-| 21 | Waffenwerkstatt | Level 29 · 5.800 Gold | Verstärker | Schaden aller Helden +1 % → +6 % |
+| 19 | Eisforschung | Level 25 · 5.000 Gold | Verstärker | Frost (Kalle) verlangsamt 3 % → 12 % stärker |
+| 20 | Feuerforschung | Level 27 · 5.400 Gold | Verstärker | Brand (Fritzi) 3 % → 12 % stärker |
+| 21 | Waffenwerkstatt | Level 29 · 5.800 Gold | Verstärker | Schaden aller Helden +0,5 % → +3 % |
 | 22 | Bibliotheksarchiv | Level 31 · 6.200 Gold | Verstärker | Heldenkarten aus Kämpfen +5 % → +25 % |
-| 23 | Biolabor | Level 33 · 6.600 Gold | Verstärker | Medipack-Booster heilt 5 % → 25 % mehr |
-| 24 | Teleportstation | Level 35 · 7.000 Gold | Verstärker | Plasma-Speicher +3 → +15 |
+| 23 | Biolabor | Level 33 · 6.600 Gold | Verstärker | Medipack-Booster heilt 3 % → 12 % mehr |
+| 24 | Teleportstation | Level 35 · 7.000 Gold | Verstärker | Plasma-Speicher +2 → +8 |
 | 25 | Versorgungsdepot | Level 37 · 7.400 Gold | Erzeuger | Gold 100 → 1.000 pro Stunde |
 | 26 | Veredelungsanlage | Level 39 · 7.800 Gold | Erzeuger | Heldenkarten 1 → 8 pro Stunde |
-| 27 | Reparaturdock | Level 41 · 8.200 Gold | Verstärker | Schild-Reparatur (Karte) 5 % → 25 % stärker |
+| 27 | Reparaturdock | Level 41 · 8.200 Gold | Verstärker | Schild-Reparatur (Karte) 3 % → 12 % stärker |
 | 28 | Kommandantenresidenz | Level 43 · 8.600 Gold | Verstärker | Lager aller Erzeuger +10 % → +50 % |
-| 29 | Satellitenkontrolle | Level 45 · 9.000 Gold | Verstärker | Luftschlag-Booster 5 % → 25 % stärker |
-| 30 | Heldenmonument | Level 47 · 9.400 Gold | Verstärker | Schaden aller Helden +2 % → +10 % |
+| 29 | Satellitenkontrolle | Level 45 · 9.000 Gold | Verstärker | Luftschlag-Booster 3 % → 12 % stärker |
+| 30 | Heldenmonument | Level 47 · 9.400 Gold | Verstärker | Schaden aller Helden +1 % → +5 % |
 
-Kampfstärke aus allen Verstärkern zusammen bei voller Stufe: Schaden etwa +22 %, Schild +10 %,
-Krit +5 %. Das ist so viel wie 2–3 Heldenstufen und muss in die Schwierigkeitskurve eingerechnet
-werden (die Spielerprofile im Balance-Labor bekommen das Basislager dazu).
+Kampfstärke aus allen Verstärkern zusammen bei voller Stufe: Schaden etwa +11 %, Schild +5 %,
+Krit +2,5 % (am 03.11.2026 halbiert, siehe Balance-Labor unten). Grundsatz: Die Basis ist ein Bonus
+für alle; sie ersetzt weder das Aufwerten der Helden noch das Sammeln der Karten, und Käufe lohnen sich
+weiter.
 
 ## Entschieden (03.11.2026)
 
@@ -86,8 +87,23 @@ Ergebnis: Die Werte passen. Das Basislager verschiebt die Heldenkurve nicht (Kar
 vor allem aus den Kämpfen; die Werkstatt verteilt ihre Karten auf alle Helden), und es nimmt den
 bisherigen Goldüberschuss auf. Bei wenigen Kämpfen am Tag bringt die Basis mehr Gold als die Kämpfe;
 das ist gewollt (wer selten spielt, holt auf) und fließt wieder in die Basis. Ab Stufe 6 bremsen die
-Sterne den Ausbau (insgesamt 300 Sterne für alles auf Stufe 10); das ist das Langzeitziel. Noch offen:
-die Kampf-Boni der Basis (Schaden bis +22 %) im Balance-Labor gegen die Schwierigkeitskurve prüfen.
+Sterne den Ausbau (insgesamt 300 Sterne für alles auf Stufe 10); das ist das Langzeitziel.
+
+## Balance-Labor (03.11.2026)
+
+Profile mit „+basis“ (`game/tests/balance_profiles.gd`) bekommen das großzügige Basislager aus der
+Simulation (alle baubaren Gebäude auf Stufe 3 + (Level − 1) / 12). Erster Lauf mit den alten Werten,
+Boss-Level 25–50, 6 Läufe je Level und Profil, Ø Siegquote:
+
+| | ohne Basis | mit Basis |
+|---|---|---|
+| Anfänger | 0 % | 0 % |
+| Durchschnitt (Ziel 35–55 %) | 50 % | 72 % |
+| Zahlend | 75 % | 94 % |
+
+Die Basis ersetzte das Leveln nicht (Anfänger mit Basis gewinnt trotzdem nicht), hob aber den
+Durchschnittsspieler um gut 20 Punkte über das Ziel, fast auf Höhe der Zahlenden ohne Basis. Darum
+sind alle Kampfwerte halbiert (Komfort-Boni wie Erfahrung, Gold, Karten, Pass, Energie, Lager nicht).
 
 ## Grafik
 
