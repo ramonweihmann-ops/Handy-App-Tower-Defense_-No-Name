@@ -1,0 +1,56 @@
+{
+ "board": "Basislager-Bauplatz.dc.html",
+ "size": [
+  390,
+  844
+ ],
+ "scale": 3,
+ "states": {
+  "main": {
+   "texts": [],
+   "buttons": [],
+   "live": [
+    {
+     "id": "lock",
+     "rect": [
+      170,
+      262,
+      54,
+      54
+     ],
+     "rot": 0,
+     "img": "main_live_lock.webp",
+     "pad": 4,
+     "img_rect": [
+      166,
+      258,
+      62,
+      62
+     ]
+    },
+    {
+     "id": "hammer",
+     "rect": [
+      184,
+      679,
+      22,
+      22
+     ],
+     "rot": 0,
+     "img": "main_live_hammer.webp",
+     "pad": 3,
+     "img_rect": [
+      181,
+      676,
+      28,
+      28
+     ]
+    }
+   ],
+   "bg": ""
+  }
+ },
+ "transparent": true,
+ "lossy_alpha": false,
+ "overlays": {}
+}

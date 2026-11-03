@@ -13,6 +13,9 @@ class_name BaseData
 const MAX_LEVEL := 10
 ## Lager der Erzeuger: so viele Stunden Ertrag passen hinein
 const STORE_HOURS := 8.0
+## Seltene Dinge erzeugen weniger als eins in acht Stunden: deren Lager fasst einen ganzen Tag,
+## sonst ließe sich auf den ersten Stufen nie etwas abholen
+const STORE_HOURS_BY_ITEM := {"gems": 24.0, "stars": 24.0}
 const START_COUNT := 5
 
 const BUILDINGS := [
@@ -130,3 +133,85 @@ static func _num(v: float) -> String:
 	if absf(r - roundf(r)) < 0.05:
 		return str(int(roundf(r)))
 	return ("%.1f" % r).replace(".", ",")
+
+
+# --- Texte für das Gebäudefenster (Mockup „Basislager · Gebäude“ / „Bauplatz“) ----------------
+
+## Kurzer Name der Wirkung für die Wertezeile
+const ROW_LABELS := {
+	"gold": "Gold pro Stunde", "cards": "Heldenkarten pro Stunde", "energy": "Energie pro Tag",
+	"gems": "Edelsteine pro Tag", "stars": "Talent-Sterne pro Tag",
+	"heal": "Schild-Heilung je Welle", "xp": "Erfahrung im Kampf", "pass_bonus": "Pass-Punkte je Sieg",
+	"rate": "Plasma lädt schneller", "crit": "Krit-Chance", "booster_cd": "Booster laden schneller",
+	"shield": "Schildstärke", "damage": "Schaden aller Helden", "heavy_dmg": "Schaden gegen Bosse",
+	"start_ammo": "Plasma zum Kampfbeginn", "energy_max": "Energie-Maximum", "frost": "Frost bremst stärker",
+	"cards_bonus": "Karten aus Kämpfen", "medipack": "Medipack heilt mehr", "cap": "Plasma-Speicher",
+	"repair_card": "Schild-Reparatur", "store_bonus": "Lager aller Erzeuger", "airstrike": "Luftschlag",
+	"burn": "Brandschaden",
+}
+## Einheit im Lager der Erzeuger
+const STORE_UNITS := {"gold": "Gold", "cards": "Karten", "energy": "Energie", "gems": "Edelsteine", "stars": "Sterne"}
+
+## Beschreibung unter den Werten
+const DESCRIPTIONS := {
+	"01": "Das Herz deiner Station: Sie bringt Gold, und ihre Stufe gibt vor, wie weit alle anderen Gebäude wachsen können.",
+	"02": "Die Sanitätsstation flickt den Schild nach jeder Welle ein Stück. Wirkt dauerhaft in jedem Kampf.",
+	"03": "Die Werkstatt stellt Heldenkarten her, auch wenn du nicht spielst. Abholen, bevor das Lager voll ist.",
+	"04": "Im Hologramm üben deine Helden weiter: Jeder Kampf bringt etwas mehr Erfahrung.",
+	"05": "Der Reaktorturm lädt langsam Energie nach, auch wenn du nicht spielst. Abholen, bevor das Lager voll ist.",
+	"06": "Die Kommunikationsstation meldet deine Siege weiter: Jeder Sieg bringt zusätzliche Pass-Punkte.",
+	"07": "Im Gewächshaus wächst Gold nach, auch wenn du nicht spielst. Abholen, bevor das Lager voll ist.",
+	"08": "Die Roboter im Labor helfen beim Nachladen: Plasma lädt in jedem Kampf etwas schneller.",
+	"09": "Die Sternwarte späht Schwachstellen aus: Alle Helden treffen öfter kritisch. Wirkt dauerhaft in jedem Kampf.",
+	"10": "Die Schiffswerft wartet deine Booster: Sie sind im Kampf schneller wieder bereit.",
+	"11": "Der Schildgenerator verstärkt die Mauer vor deiner Station. Wirkt dauerhaft in jedem Kampf.",
+	"12": "In der Trainingshalle üben alle Helden zusammen: Sie machen etwas mehr Schaden.",
+	"13": "Die Kristallforschung züchtet Edelsteine, auch wenn du nicht spielst. Abholen, bevor das Lager voll ist.",
+	"14": "Die Panzerwerkstatt baut schwere Munition: mehr Schaden gegen starke Gegner und Bosse.",
+	"15": "Die Drohnen bringen Plasma schon vor dem ersten Schuss: Jeder Kampf beginnt mit etwas Vorrat.",
+	"16": "Im Alchemielabor entstehen Talent-Sterne, auch wenn du nicht spielst. Abholen, bevor das Lager voll ist.",
+	"17": "Der Energiespeicher fasst mehr: Dein Energie-Maximum steigt.",
+	"18": "Die Navigationszentrale findet lohnende Wege: Kämpfe bringen mehr Gold.",
+	"19": "Die Eisforschung macht den Frost kälter: Gegner werden stärker gebremst.",
+	"20": "Die Feuerforschung macht den Brand heißer: Brennende Gegner verlieren mehr Leben.",
+	"21": "Die Waffenwerkstatt schleift an allen Waffen: Alle Helden machen etwas mehr Schaden.",
+	"22": "Im Archiv liegen alte Heldenberichte: Kämpfe bringen mehr Heldenkarten.",
+	"23": "Das Biolabor verbessert die Medipacks: Sie heilen den Schild stärker.",
+	"24": "Die Teleportstation schafft Platz: Der Plasma-Speicher im Kampf wird größer.",
+	"25": "Das Versorgungsdepot sammelt Gold, auch wenn du nicht spielst. Abholen, bevor das Lager voll ist.",
+	"26": "Die Veredelungsanlage stellt viele Heldenkarten her, auch wenn du nicht spielst. Abholen, bevor das Lager voll ist.",
+	"27": "Im Reparaturdock lernen die Mechaniker dazu: Die Schild-Reparatur aus den Karten wirkt stärker.",
+	"28": "Die Kommandantenresidenz lässt anbauen: Alle Erzeuger bekommen ein größeres Lager.",
+	"29": "Die Satellitenkontrolle zielt genauer: Der Luftschlag macht mehr Schaden.",
+	"30": "Das Heldenmonument erinnert an deine größten Siege: Alle Helden kämpfen etwas stärker.",
+}
+
+
+static func row_label(id: String) -> String:
+	var d: Dictionary = info(id)
+	return str(ROW_LABELS.get(str(d.get("item", d.get("bonus", ""))), d["text"]))
+
+
+## Wert für die Wertezeile, ohne Einheit bei den Erzeugern („1,5“), Stufe 0 = noch nicht gebaut
+static func row_value(id: String, level: int) -> String:
+	var d: Dictionary = info(id)
+	var v := value(id, level) if level > 0 else 0.0
+	if d["kind"] == "prod":
+		if str(d["item"]) in ["energy", "gems", "stars"]:
+			v *= 24.0
+		return _num(v)
+	if str(d["bonus"]) in ["pass_bonus", "start_ammo", "energy_max", "cap"]:
+		return "+%d" % roundi(v) if level > 0 else "0"
+	return "+%s %%" % _num(v * 100.0) if level > 0 else "0 %"
+
+
+static func store_hours(id: String) -> float:
+	return float(STORE_HOURS_BY_ITEM.get(str(info(id).get("item", "")), STORE_HOURS))
+
+
+static func store_unit(id: String) -> String:
+	return str(STORE_UNITS.get(str(info(id).get("item", "gold")), ""))
+
+
+static func description(id: String) -> String:
+	return str(DESCRIPTIONS.get(id, info(id)["text"]))

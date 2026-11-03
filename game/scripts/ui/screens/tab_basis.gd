@@ -6,9 +6,9 @@ extends MockScreen
 
 const TOP := {"energy": "25/30", "gold": "4.674", "gems": "350"}
 const COUNT_TEXT := "6 von 30 Gebäuden · 3 baubar"
-## Karte unter Kopfleiste und Titel bzw. über der Reiterleiste (Mockup-Punkte)
+## Karte unter Kopfleiste und Titel; unten läuft sie wie im Mockup bis unter die Reiterleiste (Mockup-Punkte)
 const MAP_TOP := 118.0
-const MAP_BOTTOM := 64.0
+const MAP_BOTTOM := 0.0
 
 var map: BaseMap
 
@@ -27,7 +27,7 @@ func _ready() -> void:
 	move_child(map, 0)
 	resized.connect(_fit_map)
 	_fit_map()
-	_copy_nav_badges()
+	copy_nav_badges(self)
 	bind()
 
 
@@ -50,7 +50,7 @@ func bind() -> void:
 
 
 ## Rote Punkte der Reiterleiste an derselben Stelle wie auf dem Abenteuer-Pfad
-func _copy_nav_badges() -> void:
+static func copy_nav_badges(v: MockView) -> void:
 	var home: Dictionary = MockView.layout_of("home").get("states", {}).get("main", {})
 	var home_btns := {}
 	for hb in home.get("buttons", []):
@@ -60,7 +60,7 @@ func _copy_nav_badges() -> void:
 			continue
 		var hb: Dictionary = home_btns[int(l["button"])]
 		var href := str(hb.get("href", ""))
-		var mine := button(href) if href != "" else null
+		var mine := v.button(href) if href != "" else null
 		if mine == null:
 			continue
 		var hr: Array = hb["rect"]

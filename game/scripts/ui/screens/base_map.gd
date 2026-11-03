@@ -1,10 +1,12 @@
 class_name BaseMap
 extends Control
-## Basislager als Karte (Vorlage_Raw/Raumbasis_Wege_v1): leere Bauplätze mit Wegen als Hintergrund,
-## gebaute Gebäude als freigestellte Bilder darüber (ui/base, tools/base_cutout.py). Gesperrte Plätze
-## bleiben leer; das nächste Ausbauziel bekommt einen Knopf „Bauen“ bzw. ein Schloss mit Bedingung.
-## Ziehen verschiebt, zwei Finger oder Mausrad zoomen (am Fingerpunkt), Antippen öffnet das Gebäude.
-## Verschieben endet an der obersten aktiven Reihe, damit man nicht in leere Flächen scrollt.
+## Basislager als Karte nach dem abgenommenen Mockup „Basislager · Übersicht“: das ganze Bild der Basis mit
+## allen 30 Gebäuden und Nummernschildern (Vorlage_Raw/Raumbasis_30, wie im Mockup) als Hintergrund. Noch nicht
+## gebaute Plätze sind abgedunkelt und zeigen ein Schloss mit Bedingung („ab Level 19“, „mit 7. Champion“)
+## oder, wenn baubar, den goldenen Knopf „BAUEN“. Gebaute Gebäude bekommen das Stufen-Schild („St. 2“) und,
+## wenn ihr Lager etwas bereit hat, eine Blase mit dem Symbol. Lage und Größen wie im Mockup (Mockup-Punkte
+## bei voller Breite = 390 Punkte für 724 Bildpunkte). Ziehen verschiebt, zwei Finger oder Mausrad zoomen,
+## Antippen öffnet das Gebäudefenster (BuildingWindow).
 
 signal building_pressed(id: String)
 
@@ -23,6 +25,10 @@ var _press_pos := Vector2.ZERO
 var _moved := 0.0
 var _t := 0.0
 var _font: Font
+var _lock_tex: Texture2D
+var _hammer_tex: Texture2D
+## Mockup-Punkte je Bildpunkt (Mockup zeigt das 724 Punkte breite Bild auf 390 Punkten)
+const K := 390.0 / 724.0
 ## Bildschirmpunkte oben/unten, die Kopfleiste und Reiterleiste verdecken (Karte lässt sich darunter hervorziehen)
 var pad_top := 0.0:
 	set(v):
@@ -41,44 +47,36 @@ var pad_bottom := 0.0:
 func _ready() -> void:
 	clip_contents = true
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	_bg = load("res://ui/base/basis_leer.webp")
+	_bg = load("res://ui/base/basis_voll.webp")
+	for item in ["gold", "cards", "energy", "gems", "stars"]:
+		_icon(item)
+	_lock_tex = _bauplatz_tex("lock")
+	_hammer_tex = _bauplatz_tex("hammer")
 	_layout = JSON.parse_string(FileAccess.get_file_as_string("res://ui/base/layout.json"))["buildings"]
 	_font = MockFonts.font("Fredoka", 700)
 	resized.connect(_fit)
 	_fit.call_deferred()
 
 
-func _tex_of(id: String) -> Texture2D:
-	if not _tex.has(id):
-		var p := "res://ui/base/geb_%s.png" % id
-		_tex[id] = load(p) if ResourceLoader.exists(p) else null
-	return _tex[id]
+func _icon(item: String) -> Texture2D:
+	if not _tex.has(item):
+		var p := "res://ui/icons/%s.webp" % item
+		_tex[item] = load(p) if ResourceLoader.exists(p) else null
+	return _tex[item]
 
 
-## Oberste Kante des aktiven Bereichs (gebaute Gebäude und das nächste Ziel) in Vorlagen-Punkten
-func _active_top() -> float:
-	var top := IMG_H
-	for d in BaseData.BUILDINGS:
-		var id: String = d["id"]
-		if Save.base_state(id) != "locked" or id == _next_locked():
-			var r: Array = _layout[id]["rect"]
-			top = minf(top, float(r[1]))
-	return maxf(0.0, top - 90.0)
-
-
-## Nächster gesperrter Platz (wird als Ausbauziel mit Schloss gezeigt)
-func _next_locked() -> String:
-	for d in BaseData.BUILDINGS:
-		if Save.base_state(d["id"]) == "locked":
-			return d["id"]
-	return ""
+func _bauplatz_tex(live_id: String) -> Texture2D:
+	for l in MockView.layout_of("bauplatz").get("states", {}).get("main", {}).get("live", []):
+		if str(l["id"]) == live_id:
+			return load("res://ui_mock/bauplatz/" + str(l["img"]))
+	return null
 
 
 func _fit() -> void:
 	if size.x <= 0:
 		return
 	_zoom = size.x / IMG_W
-	_min_zoom = minf(_zoom, (size.y - pad_top - pad_bottom) / maxf(1.0, IMG_H - _active_top()))
+	_min_zoom = _zoom
 	_pan = Vector2(0, IMG_H - (size.y - pad_bottom) / _zoom)
 	_clamp()
 	queue_redraw()
@@ -87,7 +85,7 @@ func _fit() -> void:
 func _clamp() -> void:
 	_zoom = clampf(_zoom, _min_zoom, MAX_ZOOM)
 	var view := size / _zoom
-	var top := _active_top()
+	var top := 0.0
 	_pan.x = clampf(_pan.x, minf(0.0, IMG_W - view.x) if view.x > IMG_W else 0.0, maxf(0.0, IMG_W - view.x))
 	if view.x > IMG_W:
 		_pan.x = (IMG_W - view.x) * 0.5
@@ -163,9 +161,8 @@ func _tap(p: Vector2) -> void:
 		var id: String = d["id"]
 		var r: Array = _layout[id]["rect"]
 		if Rect2(r[0], r[1], r[2], r[3]).has_point(ip):
-			if Save.base_state(id) != "locked" or id == _next_locked():
-				Sfx.play("click")
-				building_pressed.emit(id)
+			Sfx.play("click")
+			building_pressed.emit(id)
 			return
 
 
@@ -192,86 +189,106 @@ func _draw() -> void:
 	if _bg == null:
 		return
 	draw_texture_rect(_bg, Rect2(_to_screen(Vector2.ZERO), Vector2(IMG_W, IMG_H) * _zoom), false)
-	var next := _next_locked()
+	var m := _zoom / K   # Bildschirmpunkte je Mockup-Punkt
 	for d in BaseData.BUILDINGS:
 		var id: String = d["id"]
-		var r: Array = _layout[id]["rect"]
-		var rect := Rect2(_to_screen(Vector2(r[0], r[1])), Vector2(r[2], r[3]) * _zoom)
 		var foot: Array = _layout[id]["foot"]
 		var fp := _to_screen(Vector2(foot[0], foot[1]))
 		var st := Save.base_state(id)
 		if st == "built":
-			var tex := _tex_of(id)
-			if tex:
-				draw_texture_rect(tex, rect, false)
-			_plaque(fp + Vector2(0, -6 * _zoom), "St. %d" % Save.base_level(id), Color("#6a5ad8"), Color("#43349e"))
+			_plaque(fp + Vector2(-89, -23) * _zoom, "St. %d" % Save.base_level(id), m)
 			if d["kind"] == "prod" and Save.base_stock(id) >= 1.0:
-				_bubble(rect, str(d["item"]))
-		elif st == "buildable":
-			var bob := sin(_t * 4.0) * 3.0
-			var c := rect.get_center() + Vector2(0, bob)
-			_button(c, "BAUEN", "%s Gold" % MockScreen.num(int(d["gold"])), Save.gold() >= int(d["gold"]))
-		elif id == next:
-			_lock(rect.get_center(), Save.base_lock_text(id))
+				_bubble(fp + Vector2(26, -207) * _zoom, str(d["item"]), m)
+			continue
+		var vc := fp + Vector2(0, -90) * _zoom
+		_vignette(vc, Vector2(114, 80) * m)
+		if st == "buildable":
+			_build_button(vc + Vector2(0, 7.5 + sin(_t * TAU / 1.4) * 1.5) * m, m)
+		else:
+			_lock(vc + Vector2(0, 11.5) * m, _lock_text(id), m)
 
 
-func _plaque(c: Vector2, txt: String, c1: Color, c2: Color) -> void:
-	var fs := maxi(8, roundi(11 * _zoom))
-	var w := _font.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 14 * _zoom
-	var r := Rect2(c - Vector2(w * 0.5, 9 * _zoom), Vector2(w, 18 * _zoom))
-	MockPaint.rrect(self, Rect2(r.position + Vector2(0, 2 * _zoom), r.size), 9 * _zoom, Color(0.1, 0.05, 0.3, 0.8))
-	MockPaint.rrect(self, r, 9 * _zoom, c1, c2)
-	MockPaint.border(self, r, 9 * _zoom, Color.WHITE, maxf(1.0, 1.5 * _zoom))
-	draw_string(_font, Vector2(r.position.x + 7 * _zoom, r.position.y + 13.5 * _zoom), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color.WHITE)
+## Bedingung wie im Mockup: „ab Level 19“, „mit 7. Champion“, „erst Nr. 13 bauen“
+func _lock_text(id: String) -> String:
+	if BaseData.by_champion(id):
+		return "mit %d. Champion" % int(id)
+	var lv := int(BaseData.info(id)["level"])
+	if Save.max_level() < lv:
+		return "ab Level %d" % lv
+	return "erst Nr. %02d bauen" % (int(id) - 1)
 
 
-func _bubble(rect: Rect2, item: String) -> void:
-	var bob := sin(_t * 3.5 + rect.position.x) * 3.0 * _zoom
-	var c := Vector2(rect.position.x + rect.size.x * 0.72, rect.position.y + 18 * _zoom + bob)
-	var r := 17.0 * _zoom
-	draw_circle(c + Vector2(0, 2 * _zoom), r, Color(0.1, 0.05, 0.3, 0.6))
-	draw_circle(c, r, Color(1, 1, 1, 0.95))
-	draw_arc(c, r, 0, TAU, 32, Color("#7a5ad8"), 2.0 * _zoom, true)
-	var k := r * 1.1 / 12.0
-	var o := c - Vector2(12, 12) * k
-	match item:
-		"gold":
-			Gem3D.draw_coin(self, o, k, _t)
-		"gems":
-			Gem3D.draw_gem(self, o, k, _t)
-		"energy":
-			Gem3D.draw_bolt(self, o, k, _t)
-		"cards":
-			for k2 in 2:
-				var cr := Rect2(c + Vector2(-7 + k2 * 4, -9 + k2 * 2) * _zoom, Vector2(11, 15) * _zoom)
-				MockPaint.rrect(self, cr, 2 * _zoom, Color("#8fd0ff") if k2 == 1 else Color("#6fb4ff"))
-				MockPaint.border(self, cr, 2 * _zoom, Color("#1a3a80"), maxf(1.0, 1.2 * _zoom))
-		_:
-			MockPaint.star(self, Rect2(c - Vector2(r, r) * 0.6, Vector2(r, r) * 1.2), Color("#ffd34d"), Color("#a86a00"), 1.5 * _zoom)
+## Abdunkeln eines Bauplatzes: radialer Verlauf (Mitte 62 %, bei 70 % noch 52 %, Rand durchsichtig)
+func _vignette(c: Vector2, sz: Vector2) -> void:
+	if sz.x < 2.0 or sz.y < 2.0:
+		return
+	var n := 40
+	var col0 := Color(14 / 255.0, 10 / 255.0, 40 / 255.0, 0.62)
+	var col1 := Color(14 / 255.0, 10 / 255.0, 40 / 255.0, 0.52)
+	var col2 := Color(14 / 255.0, 10 / 255.0, 40 / 255.0, 0.0)
+	var half := sz * 0.5
+	for k in n:
+		var a0 := TAU * k / n
+		var a1 := TAU * (k + 1) / n
+		var d0 := Vector2(cos(a0), sin(a0)) * half
+		var d1 := Vector2(cos(a1), sin(a1)) * half
+		draw_polygon(PackedVector2Array([c, c + d0 * 0.7, c + d1 * 0.7]), PackedColorArray([col0, col1, col1]))
+		draw_polygon(PackedVector2Array([c + d0 * 0.7, c + d0, c + d1, c + d1 * 0.7]), PackedColorArray([col1, col2, col2, col1]))
 
 
-func _button(c: Vector2, title: String, sub: String, ok: bool) -> void:
-	var r := Rect2(c - Vector2(52, 20) * _zoom, Vector2(104, 40) * _zoom)
-	MockPaint.rrect(self, Rect2(r.position + Vector2(0, 4 * _zoom), r.size), 14 * _zoom, Color("#a86a00"))
-	MockPaint.rrect(self, r, 14 * _zoom, Color("#ffe27a") if ok else Color("#d0c8a0"), Color("#f0a81f") if ok else Color("#a89870"))
-	var fs := maxi(8, roundi(15 * _zoom))
-	var tw := _font.get_string_size(title, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-	draw_string(_font, Vector2(c.x - tw * 0.5, r.position.y + 18 * _zoom), title, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("#4a2000"))
+## Stufen-Schild „St. 2“ (oben links an p): Verlauf #6a5ad8 → #43349e, weißer Rand, Schatten 0 2px
+func _plaque(p: Vector2, txt: String, m: float) -> void:
+	var fs := maxi(6, roundi(11 * m))
+	var w := _font.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 14 * m + 3 * m
+	var h := 11 * 1.2 * m + 2 * m + 3 * m
+	var r := Rect2(p, Vector2(w, h))
+	MockPaint.rrect(self, Rect2(r.position + Vector2(0, 2 * m), r.size), 9 * m, Color("#241a66"))
+	MockPaint.rrect(self, r, 9 * m, Color("#6a5ad8"), Color("#43349e"))
+	MockPaint.border(self, r, 9 * m, Color.WHITE, maxf(1.0, 1.5 * m))
+	var base := r.position.y + (h + _font.get_ascent(fs) - _font.get_descent(fs)) * 0.5
+	draw_string(_font, Vector2(r.position.x + 8.5 * m, base), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("#fff7ea"))
+
+
+## Blase „Lager hat etwas“ (oben links an p), 30 Punkte, wippt wie im Mockup (bob 1,6 s)
+func _bubble(p: Vector2, item: String, m: float) -> void:
+	var c := p + Vector2(15, 15 - absf(sin(_t * PI / 1.6)) * 3.0) * m
+	var r := 15.0 * m
+	for k in 4:
+		draw_circle(c, r + (6 - k * 1.5) * m, Color(1.0, 226 / 255.0, 122 / 255.0, 0.08 + k * 0.05))
+	draw_circle(c + Vector2(0, 3 * m), r, Color(0, 0, 0, 0.3))
+	draw_circle(c, r, Color("#7a5ad8"))
+	draw_circle(c, r - 2 * m, Color("#f2efff"))
+	draw_circle(c + Vector2(-3, -4) * m, r * 0.5, Color(1, 1, 1, 0.7))
+	var tex := _icon(item)
+	if tex:
+		draw_texture_rect(tex, Rect2(c - Vector2(8, 8) * m, Vector2(16, 16) * m), false)
+
+
+## Goldener Knopf „BAUEN“ mit Hammer (Mitte c), 84 × 30 Punkte
+func _build_button(c: Vector2, m: float) -> void:
+	var r := Rect2(c - Vector2(42, 15) * m, Vector2(84, 30) * m)
+	MockPaint.rrect(self, Rect2(r.position + Vector2(0, 8 * m), r.size), 16 * m, Color(0, 0, 0, 0.25))
+	MockPaint.rrect(self, Rect2(r.position + Vector2(0, 5 * m), r.size), 16 * m, Color("#a86a00"))
+	MockPaint.rrect(self, r, 16 * m, Color("#ffe27a"), Color("#f0a81f"))
+	MockPaint.rrect(self, Rect2(r.position + Vector2(10, 1.5) * m, Vector2(64, 3) * m), 1.5 * m, Color(1, 1, 1, 0.45))
+	var fs := maxi(6, roundi(14 * m))
+	var tw := _font.get_string_size("BAUEN", HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+	var total := 15 * m + 4 * m + tw
+	var x := c.x - total * 0.5
+	if _hammer_tex:
+		draw_texture_rect(_hammer_tex, Rect2(Vector2(x - 3 * m, c.y - 10.5 * m), Vector2(21, 21) * m), false)
+	var base := c.y + (_font.get_ascent(fs) - _font.get_descent(fs)) * 0.5
+	draw_string(_font, Vector2(x + 19 * m, base), "BAUEN", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("#4a2000"))
+
+
+## Schloss mit Bedingung darunter (Mitte des Blocks c), Schrift 10 Punkte mit Schatten
+func _lock(c: Vector2, txt: String, m: float) -> void:
 	var f2 := MockFonts.font("Nunito", 800)
-	var fs2 := maxi(7, roundi(10 * _zoom))
-	var tw2 := f2.get_string_size(sub, HORIZONTAL_ALIGNMENT_LEFT, -1, fs2).x
-	draw_string(f2, Vector2(c.x - tw2 * 0.5, r.position.y + 32 * _zoom), sub, HORIZONTAL_ALIGNMENT_LEFT, -1, fs2, Color("#4a2000"))
-
-
-func _lock(c: Vector2, txt: String) -> void:
-	var r := 18.0 * _zoom
-	draw_circle(c, r + 3 * _zoom, Color(0.06, 0.04, 0.16, 0.75))
-	var body := Rect2(c + Vector2(-9, -2) * _zoom, Vector2(18, 14) * _zoom)
-	draw_arc(c + Vector2(0, -3) * _zoom, 6 * _zoom, PI, TAU, 16, Color("#e8e2ff"), 3 * _zoom, true)
-	MockPaint.rrect(self, body, 3 * _zoom, Color("#ffe27a"), Color("#e8960f"))
-	var f2 := MockFonts.font("Nunito", 800)
-	var fs := maxi(7, roundi(11 * _zoom))
+	var fs := maxi(6, roundi(10 * m))
+	var top := c.y - 18 * m
+	if _lock_tex:
+		draw_texture_rect(_lock_tex, Rect2(Vector2(c.x - 11 * m, top - 1 * m), Vector2(22, 22) * m), false)
 	var tw := f2.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-	var tr := Rect2(Vector2(c.x - tw * 0.5 - 8 * _zoom, c.y + r + 6 * _zoom), Vector2(tw + 16 * _zoom, 18 * _zoom))
-	MockPaint.rrect(self, tr, 8 * _zoom, Color(0.06, 0.04, 0.16, 0.8))
-	draw_string(f2, Vector2(tr.position.x + 8 * _zoom, tr.position.y + 13 * _zoom), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("#e8e2ff"))
+	var base := top + 22 * m + 10 * m
+	draw_string(f2, Vector2(c.x - tw * 0.5, base + 1 * m), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color.BLACK)
+	draw_string(f2, Vector2(c.x - tw * 0.5, base), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("#e8e2ff"))

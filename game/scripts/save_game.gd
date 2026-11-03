@@ -623,7 +623,7 @@ func base_store_cap(id: String) -> float:
 	var bonus := 0.0
 	if base_built("28"):
 		bonus = BaseData.value("28", base_level("28"))
-	return BaseData.value(id, base_level(id)) * BaseData.STORE_HOURS * (1.0 + bonus)
+	return BaseData.value(id, base_level(id)) * BaseData.store_hours(id) * (1.0 + bonus)
 
 
 ## Lager eines Erzeugers auf den aktuellen Stand bringen

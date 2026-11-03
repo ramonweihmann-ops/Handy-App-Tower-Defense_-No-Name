@@ -70,6 +70,17 @@ func _run() -> bool:
 			save.base()["03"]["time"] = int(Time.get_unix_time_from_system()) - 7200
 			print("SMOKE basislager werkstatt abholen: ", save.base_collect("03"), " zentrale ausbauen: ", save.base_upgrade("01"),
 				" werkstatt ausbauen: ", save.base_upgrade("03"), " gebaut: ", save.base_built("05"), " boni: ", save.base_bonus())
+			# Gebäudefenster (Mockup „Basislager · Gebäude“/„Bauplatz“): alle Zustände öffnen, Knöpfe drücken
+			m.show_tab("basis")
+			for bid in ["01", "03", "02", "09", "13", "16"]:
+				m.open_building(bid)
+				var bw: BuildingWindow = m._boards.back()
+				var act: Dictionary = bw.action()
+				print("SMOKE gebäudefenster ", bid, " ", bw.state, " ", bw.subtitle(), " | ", act["text"], " ", act["gold"], " | ", bw.requirement(), " ", bw.hint())
+				bw.handle({"on": "collect"})
+				bw.handle({"on": "main"})
+				for b in m._boards.duplicate():
+					m.close_board(b)
 			save.add_pass_points(250)
 			print("SMOKE pass stufe ", save.pass_level(), " holbar ", save.pass_claimable())
 			print("SMOKE pass holen: ", save.claim_pass(1))

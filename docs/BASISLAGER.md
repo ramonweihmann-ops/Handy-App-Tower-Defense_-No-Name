@@ -63,9 +63,9 @@ weiter.
 - Gebäude 09–12 kommen mit dem 9. bis 12. Champion (Level/Gold in der Tabelle gelten dafür nicht).
 - Im Spiel: `scripts/base_data.gd` (Werte), `save_game.gd` (`base_*`), Wirkungen über
   `Save.battle_bonus()`. Ausbaukosten: Gold 150 × Stufe × (1 + 0,1 × Nummer), ab Stufe 6 dazu
-  Sterne; kein Gebäude höher als die Kommandozentrale. Erzeuger speichern 8 Stunden Ertrag
-  (Kommandantenresidenz mehr). Werte und Kosten werden noch mit der Wirtschafts-Simulation geprüft.
-- Bis die Grafik mit leeren Bauplätzen da ist, zeigt der Reiter „Basis“ die Gebäude als Liste.
+  Sterne; kein Gebäude höher als die Kommandozentrale. Erzeuger speichern 8 Stunden Ertrag,
+  Kristallforschung und Alchemielabor einen ganzen Tag (sonst passt dort auf den ersten Stufen nicht
+  einmal eins hinein); die Kommandantenresidenz vergrößert alle Lager. Werte und Kosten werden noch mit der Wirtschafts-Simulation geprüft.
 
 ## Wirtschafts-Simulation (03.11.2026)
 
@@ -122,6 +122,15 @@ etwa 30 % statt 35–75 %) und wird neu abgestimmt.
 
 ## Grafik
 
-Gebäude einzeln freigestellt (Variante B), Boden aus einer zweiten Vorlage mit denselben, aber leeren
-Bauplätzen (bei ChatGPT angefragt). Gesperrte Plätze: Baustelle mit Schloss. Antippen öffnet das
-Gebäudefenster (Name, Stufe, Wirkung jetzt → nächste Stufe, Lager mit „Abholen“, „Ausbauen“ mit Kosten).
+Wie im abgenommenen Mockup „Basislager · Übersicht“: Hintergrund ist das ganze Bild mit allen 30
+Gebäuden und Nummernschildern (`Vorlage_Raw/Raumbasis_30`, im Spiel `ui/base/basis_voll.webp`). Nicht
+gebaute Plätze sind abgedunkelt und zeigen Schloss und Bedingung („ab Level 19“, „mit 7. Champion“) oder
+den goldenen Knopf „BAUEN“; gebaute zeigen das Stufen-Schild und, wenn ihr Lager etwas bereit hat, eine
+Blase mit dem Symbol (`scripts/ui/screens/base_map.gd`). Die Lage der Plätze kommt weiter aus
+`ui/base/layout.json` (`tools/base_cutout.py`); die freigestellten Einzelbilder braucht das Spiel nicht mehr. Antippen öffnet das
+Gebäudefenster nach den abgenommenen Mockups „Basislager · Gebäude“ und „Basislager · Bauplatz“
+(`scripts/ui/screens/building_window.gd`, Export `tools/mock2game/cfg/gebaeude.json` und `bauplatz.json`):
+Name, Art und Stufe, Bild (noch nicht gebaut: grau mit Schloss), Wertezeile jetzt → nächste Stufe,
+bei Erzeugern das Lager mit Balken und „Abholen“, bei Bauplätzen der Hinweis (grün: baubar, rot: was
+noch fehlt), Beschreibung und der große Knopf „Ausbauen“ bzw. „Bauen“ mit Preis. Geht der Ausbau wegen
+der Kommandozentrale nicht, steht der Grund über dem Knopf. Champion-Gebäude (06–12) führen zu den Helden.
