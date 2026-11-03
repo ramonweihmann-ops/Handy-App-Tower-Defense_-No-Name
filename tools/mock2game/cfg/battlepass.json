@@ -1,0 +1,3 @@
+{"board": "Battle-Pass-Comic.dc.html", "out": "out/battlepass",
+ "states": [{"name": "main", "eval": "document.querySelectorAll('#dc-root [data-bp]').forEach(e => { const t = e.getAttribute('data-bp'); if (!['bar', 'mission'].includes(t)) e.remove(); }); document.querySelectorAll('#dc-root [data-bp=\"mission\"]').forEach(r => { r.querySelectorAll(':scope > div').forEach(d => d.remove()); r.querySelector('a').textContent = ''; });"}],
+ "live": []}

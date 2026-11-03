@@ -1,0 +1,290 @@
+{
+ "board": "Battle-Pass-Comic.dc.html",
+ "size": [
+  390,
+  844
+ ],
+ "scale": 3,
+ "states": {
+  "main": {
+   "texts": [],
+   "buttons": [],
+   "live": [
+    {
+     "id": "cap_free",
+     "rect": [
+      34,
+      442,
+      118,
+      52
+     ],
+     "rot": 0,
+     "img": "main_live_cap_free.webp",
+     "pad": 14,
+     "img_rect": [
+      20,
+      428,
+      146,
+      80
+     ]
+    },
+    {
+     "id": "cap_prem",
+     "rect": [
+      240,
+      442,
+      118,
+      52
+     ],
+     "rot": 0,
+     "img": "main_live_cap_prem.webp",
+     "pad": 14,
+     "img_rect": [
+      226,
+      428,
+      146,
+      80
+     ]
+    },
+    {
+     "id": "plat_free",
+     "rect": [
+      48,
+      482,
+      90,
+      16
+     ],
+     "rot": 0,
+     "img": "main_live_plat_free.webp",
+     "pad": 4,
+     "img_rect": [
+      44,
+      478,
+      98,
+      24
+     ]
+    },
+    {
+     "id": "plat_prem",
+     "rect": [
+      254,
+      482,
+      90,
+      16
+     ],
+     "rot": 0,
+     "img": "main_live_plat_prem.webp",
+     "pad": 4,
+     "img_rect": [
+      250,
+      478,
+      98,
+      24
+     ]
+    },
+    {
+     "id": "check",
+     "rect": [
+      134,
+      287,
+      18,
+      24
+     ],
+     "rot": 0,
+     "img": "main_live_check.webp",
+     "pad": 2,
+     "img_rect": [
+      132,
+      285,
+      22,
+      28
+     ]
+    },
+    {
+     "id": "lock_free",
+     "rect": [
+      132,
+      433,
+      20,
+      26
+     ],
+     "rot": 0,
+     "img": "main_live_lock_free.webp",
+     "pad": 3,
+     "img_rect": [
+      129,
+      430,
+      26,
+      32
+     ]
+    },
+    {
+     "id": "lock_prem",
+     "rect": [
+      338,
+      433,
+      20,
+      26
+     ],
+     "rot": 0,
+     "img": "main_live_lock_prem.webp",
+     "pad": 3,
+     "img_rect": [
+      335,
+      430,
+      26,
+      32
+     ]
+    },
+    {
+     "id": "holen",
+     "rect": [
+      57,
+      402,
+      70,
+      22
+     ],
+     "rot": 0,
+     "img": "main_live_holen.webp",
+     "pad": 5,
+     "img_rect": [
+      52,
+      397,
+      80,
+      32
+     ]
+    },
+    {
+     "id": "node",
+     "rect": [
+      183,
+      448,
+      40,
+      38
+     ],
+     "rot": 0,
+     "img": "main_live_node.webp",
+     "pad": 6,
+     "img_rect": [
+      177,
+      442,
+      52,
+      50
+     ]
+    },
+    {
+     "id": "node_cur",
+     "rect": [
+      171,
+      374,
+      40,
+      38
+     ],
+     "rot": 0,
+     "img": "main_live_node_cur.webp",
+     "pad": 18,
+     "img_rect": [
+      153,
+      356,
+      76,
+      74
+     ]
+    },
+    {
+     "id": "node_plat",
+     "rect": [
+      175,
+      478,
+      54,
+      18
+     ],
+     "rot": 0,
+     "img": "main_live_node_plat.webp",
+     "pad": 4,
+     "img_rect": [
+      171,
+      474,
+      62,
+      26
+     ]
+    },
+    {
+     "id": "conn_free",
+     "rect": [
+      150,
+      467,
+      33,
+      2
+     ],
+     "rot": 0,
+     "img": "main_live_conn_free.webp",
+     "pad": 1,
+     "img_rect": [
+      149,
+      466,
+      35,
+      4
+     ]
+    },
+    {
+     "id": "conn_prem",
+     "rect": [
+      219,
+      467,
+      19,
+      2
+     ],
+     "rot": 0,
+     "img": "main_live_conn_prem.webp",
+     "pad": 1,
+     "img_rect": [
+      218,
+      466,
+      21,
+      4
+     ]
+    },
+    {
+     "id": "mbtn_ok",
+     "rect": [
+      297,
+      171,
+      66,
+      21
+     ],
+     "rot": 0,
+     "img": "main_live_mbtn_ok.webp",
+     "pad": 3,
+     "img_rect": [
+      294,
+      168,
+      72,
+      27
+     ]
+    },
+    {
+     "id": "mbtn",
+     "rect": [
+      297,
+      206,
+      66,
+      21
+     ],
+     "rot": 0,
+     "img": "main_live_mbtn.webp",
+     "pad": 3,
+     "img_rect": [
+      294,
+      203,
+      72,
+      27
+     ]
+    }
+   ],
+   "bg": ""
+  }
+ },
+ "transparent": true,
+ "lossy_alpha": false,
+ "overlays": {}
+}

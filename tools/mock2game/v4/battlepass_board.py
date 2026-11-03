@@ -48,6 +48,7 @@ STAGES = [
     (('gold', '150'), ('gold', '300'), 'locked'),
 ]
 Y0, STEP = 322, 74
+K = [0]   # aktuelle Stufe für die Kennzeichen data-k
 NODE_X = [195, 195, 195, 195, 195]
 WIGGLE = [0, -6, 6, -6, 6]
 
@@ -66,26 +67,27 @@ def capsule(x, y, kind, amount, premium, state):
         lights = '#6ff0ff'
     out = []
     # Plattform darunter
-    out.append('<div aria-hidden="true" style="position:absolute;left:%dpx;top:%dpx;width:%dpx;height:14px;border-radius:50%%;'
+    side = 'prem' if premium else 'free'
+    out.append('<div aria-hidden="true" data-bp="plat-%s" data-k="%d" style="position:absolute;left:%dpx;top:%dpx;width:%dpx;height:14px;border-radius:50%%;'
                'background:radial-gradient(closest-side, rgba(90,70,190,0.95), rgba(40,30,110,0.95));border:1.5px solid rgba(190,170,255,0.6);'
                'box-shadow:0 3px 0 rgba(20,10,60,0.8)"><span style="position:absolute;left:18px;right:18px;top:5px;height:3px;border-radius:2px;'
                'background:repeating-linear-gradient(90deg, %s 0 14px, transparent 14px 34px);opacity:.9"></span></div>'
-               % (x + 14, y + h - 10, w - 28, lights))
-    out.append('<div style="position:absolute;left:%dpx;top:%dpx;width:%dpx;height:%dpx;border-radius:26px;background:%s;border:%s;'
+               % (side, K[0], x + 14, y + h - 10, w - 28, lights))
+    out.append('<div data-bp="cap-%s" data-k="%d" style="position:absolute;left:%dpx;top:%dpx;width:%dpx;height:%dpx;border-radius:26px;background:%s;border:%s;'
                'box-shadow:%s, inset 0 2px 0 rgba(255,255,255,0.18);backdrop-filter:blur(2px);display:flex;align-items:center;'
-               'justify-content:center;gap:8px;font:700 18px Fredoka, sans-serif;color:#fff;text-shadow:0 2px 0 rgba(20,10,60,0.6)">%s<span>%s</span></div>'
-               % (x, y, w, h, bg, border, glow, icon(kind, 36), amount))
+               'justify-content:center;gap:8px;font:700 18px Fredoka, sans-serif;color:#fff;text-shadow:0 2px 0 rgba(20,10,60,0.6)"><span data-bp="content" style="display:contents">%s<span>%s</span></span></div>'
+               % (side, K[0], x, y, w, h, bg, border, glow, icon(kind, 36), amount))
     if state == 'done':
-        out.append('<span style="position:absolute;left:%dpx;top:%dpx">%s</span>' % (x + w - 16, y - 7, CHECK))
+        out.append('<span data-bp="check" data-k="%d" style="position:absolute;left:%dpx;top:%dpx">%s</span>' % (K[0], x + w - 16, y - 7, CHECK))
     elif state == 'locked':
         col = ('#ffe27a', '#7a4a00', '#fff3c4', '#7a4a00') if premium else ('#c9d0f0', '#3a4280', '#e8ecff', '#3a4280')
-        out.append('<span style="position:absolute;left:%dpx;top:%dpx;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))">%s</span>'
-                   % (x + w - 18, y - 9, LOCK % ((20, 20) + col)))
+        out.append('<span data-bp="lock-%s" data-k="%d" style="position:absolute;left:%dpx;top:%dpx;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))">%s</span>'
+                   % (side, K[0], x + w - 18, y - 9, LOCK % ((20, 20) + col)))
     if state == 'ready':
-        out.append('<a href="#holen" data-on="claim" style="position:absolute;left:%dpx;top:%dpx;width:70px;height:22px;border-radius:11px;'
+        out.append('<a href="#holen" data-on="claim" data-bp="holen" data-k="%d" style="position:absolute;left:%dpx;top:%dpx;width:70px;height:22px;border-radius:11px;'
                    'text-decoration:none;color:#0f3d12;background:linear-gradient(180deg,#b6ff8a 0%%,#5fd83f 60%%,#3fbf3a 100%%);'
                    'box-shadow:0 3px 0 #23802a, inset 0 2px 0 rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;'
-                   'font:700 13px Fredoka, sans-serif">Holen</a>' % (x + w / 2 - 35, y + h - 16))
+                   'font:700 13px Fredoka, sans-serif">Holen</a>' % (K[0], x + w / 2 - 35, y + h - 16))
     return ''.join(out)
 
 
@@ -120,10 +122,10 @@ for side in (68, 304):
 body.append('<div style="position:absolute;left:0;right:0;top:78px;text-align:center;font:600 15px Fredoka, sans-serif;color:#fff;text-shadow:0 2px 0 #1a0f3a">Saison 1 · Schleim-Welt</div>')
 body.append('<div style="position:absolute;left:0;right:0;top:98px;text-align:center;font:700 11px Nunito, sans-serif;color:#b9b4e8">Endet in 24 T · 9 Std</div>')
 # Fortschritt
-body.append('<div style="position:absolute;left:55px;top:116px;width:280px;height:18px;border-radius:10px;background:rgba(10,6,30,0.7);'
-            'border:2px solid #7a5ad8;overflow:hidden"><div style="width:60%;height:100%;border-radius:8px;'
+body.append('<div data-bp="bar" style="position:absolute;left:55px;top:116px;width:280px;height:18px;border-radius:10px;background:rgba(10,6,30,0.7);'
+            'border:2px solid #7a5ad8;overflow:hidden"><div data-bp="bar-fill" style="width:60%;height:100%;border-radius:8px;'
             'background:linear-gradient(180deg,#ffe27a,#f0a81f);box-shadow:inset 0 2px 0 rgba(255,255,255,.5)"></div></div>')
-body.append('<div style="position:absolute;left:55px;top:116px;width:168px;height:22px;display:flex;align-items:center;justify-content:center;'
+body.append('<div data-bp="bar-text" style="position:absolute;left:55px;top:116px;width:168px;height:22px;display:flex;align-items:center;justify-content:center;'
             'font:700 11.5px Fredoka, sans-serif;color:#4a2000">Stufe 2 · 60/100</div>')
 # Tägliche Missionen
 body.append('<div style="position:absolute;left:26px;top:144px;font:700 15px Fredoka, sans-serif;color:#ffc93a;text-shadow:0 2px 0 #1a0f3a">Tägliche Missionen</div>')
@@ -131,7 +133,7 @@ MISSIONS = [('Überstehe 25 Wellen', '1/25 · +50 Pass-Punkte'), ('Wähle 12 Fä
             ('Besiege 1 Boss', '0/1 · +80 Pass-Punkte')]
 for k, (t, sub) in enumerate(MISSIONS):
     y = 166 + k * 35
-    body.append('<div style="position:absolute;left:22px;top:%dpx;width:346px;height:31px;border-radius:10px;'
+    body.append('<div data-bp="mission" style="position:absolute;left:22px;top:%dpx;width:346px;height:31px;border-radius:10px;'
                 'background:linear-gradient(180deg,rgba(70,50,150,0.75),rgba(40,28,100,0.75));border:1.5px solid rgba(169,140,255,0.45)">'
                 '<span aria-hidden="true" style="position:absolute;left:9px;top:8px;width:20px;height:14px;border-radius:3px;background:linear-gradient(180deg,#ffe27a,#f0a81f);'
                 'box-shadow:0 1px 0 #a86a00"><svg width="10" height="10" viewBox="0 0 24 24" style="position:absolute;left:5px;top:2px"><path d="m12 2 3 6.3 6.9 1-5 4.8 1.2 6.9L12 17.8 5.9 21l1.2-6.9-5-4.8 6.9-1z" fill="#fff"></path></svg></span>'
@@ -155,30 +157,31 @@ for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
     off = 26 if (y0 // STEP) % 2 == 0 else -26
     d += ' C %d %d, %d %d, %d %d' % (x0 + off, mid - 6, x1 + off, mid + 6, x1, y1)
 d += ' C %d %d, %d %d, %d %d' % (pts[-1][0] - 24, pts[-1][1] + 30, 196, pts[-1][1] + 50, 186, 670)
-body.append('<svg width="390" height="844" viewBox="0 0 390 844" aria-hidden="true" style="position:absolute;left:0;top:0;pointer-events:none">'
+body.append('<svg data-bp="route" width="390" height="844" viewBox="0 0 390 844" aria-hidden="true" style="position:absolute;left:0;top:0;pointer-events:none">'
             '<path d="%s" fill="none" stroke="rgba(150,80,255,0.55)" stroke-width="14" stroke-linecap="round"></path>'
             '<path d="%s" fill="none" stroke="#8a4cff" stroke-width="7" stroke-linecap="round"></path>'
             '<path d="%s" fill="none" stroke="#bdf8ff" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="6 6" style="animation:bpdash 1.2s linear infinite"></path></svg>'
             % (d, d, d))
 for k, (free, prem, state) in enumerate(STAGES):
     x, y = pts[k]
+    K[0] = k + 1
     body.append(capsule(34, y - 28, free[0], free[1], False, state))
     body.append(capsule(240, y - 28, prem[0], prem[1], True, 'locked'))
     # Verbindung zum Knoten
-    body.append('<span aria-hidden="true" style="position:absolute;left:150px;top:%dpx;width:%dpx;height:2px;background:linear-gradient(90deg,rgba(111,240,255,0),rgba(111,240,255,.7))"></span>'
-                % (y - 3, x - 168))
-    body.append('<span aria-hidden="true" style="position:absolute;left:%dpx;top:%dpx;width:%dpx;height:2px;background:linear-gradient(90deg,rgba(255,200,60,.7),rgba(255,200,60,0))"></span>'
-                % (x + 18, y - 3, 238 - x - 18))
+    body.append('<span aria-hidden="true" data-bp="conn-free" data-k="%d" style="position:absolute;left:150px;top:%dpx;width:%dpx;height:2px;background:linear-gradient(90deg,rgba(111,240,255,0),rgba(111,240,255,.7))"></span>'
+                % (K[0], y - 3, x - 168))
+    body.append('<span aria-hidden="true" data-bp="conn-prem" data-k="%d" style="position:absolute;left:%dpx;top:%dpx;width:%dpx;height:2px;background:linear-gradient(90deg,rgba(255,200,60,.7),rgba(255,200,60,0))"></span>'
+                % (K[0], x + 18, y - 3, 238 - x - 18))
     # Knoten auf Plattform
-    body.append('<div aria-hidden="true" style="position:absolute;left:%dpx;top:%dpx;width:52px;height:16px;border-radius:50%%;'
+    body.append('<div aria-hidden="true" data-bp="node-plat" data-k="%d" style="position:absolute;left:%dpx;top:%dpx;width:52px;height:16px;border-radius:50%%;'
                 'background:radial-gradient(closest-side,#6a54c8,#3a2a90);border:1.5px solid rgba(190,170,255,.7);box-shadow:0 3px 0 #1e1460">'
                 '<span style="position:absolute;left:18px;top:6px;width:16px;height:3px;border-radius:2px;background:#6ff0ff;box-shadow:0 0 5px #6ff0ff"></span></div>'
-                % (x - 26, y + 8))
+                % (K[0], x - 26, y + 8))
     ring = 'animation:bpglow 1.6s ease-in-out infinite;' if state == 'ready' else ''
-    body.append('<div style="position:absolute;left:%dpx;top:%dpx;width:36px;height:34px;border-radius:50%%;'
+    body.append('<div data-bp="%s" data-k="%d" style="position:absolute;left:%dpx;top:%dpx;width:36px;height:34px;border-radius:50%%;'
                 'background:radial-gradient(circle at 40%% 30%%,#9dffa8,#2fc25a 60%%,#178a3a);border:2px solid #d8ffe0;'
                 'box-shadow:0 4px 0 #0e6a2a;%sdisplay:flex;align-items:center;justify-content:center;font:700 20px Fredoka, sans-serif;'
-                'color:#fff;text-shadow:0 2px 0 #0e6a2a">%d</div>' % (x - 18, y - 22, ring, k + 1))
+                'color:#fff;text-shadow:0 2px 0 #0e6a2a"><span data-bp="num">%d</span></div>' % ('node-cur' if state == 'ready' else 'node', K[0], x - 18, y - 22, ring, k + 1))
 # Horizont
 body.append('<img src="/_blob/%s" alt="" aria-hidden="true" style="position:absolute;left:0;top:650px;width:390px;height:24px;opacity:.85">' % B['horizon'])
 body.append('<div aria-hidden="true" style="position:absolute;left:-60px;right:-60px;top:668px;height:240px;border-radius:50% 50% 0 0 / 40px 40px 0 0;background:linear-gradient(180deg,#a65ae8 0%,#6a2fc0 12%,#3c1a8a 45%,#1e1050 100%);box-shadow:0 -6px 22px rgba(230,150,255,0.55), inset 0 3px 0 rgba(255,220,255,0.7)"></div>')

@@ -33,6 +33,7 @@ const FOOT_BONES := ["Foot.L", "Foot.R"]
 
 var hero_id := ""
 var portrait := false     # Standbild von vorn ohne Waffe
+var head_crop := false    # Porträt: Kopf mittig aus dem Entwurfsbild (kleine Boxen wie in den Mockups)
 var grayscale := false    # gesperrt: grau und dunkler (wie im Mockup grayscale(1) brightness(0.55))
 var px := 512             # Auflösung des 3D-Fensters (Höhe)
 var aspect := 1.0         # Breite / Höhe des Fensters
@@ -66,6 +67,8 @@ func _ready() -> void:
 	expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	stretch_mode = TextureRect.STRETCH_SCALE
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if portrait and head_crop and _head_crop(hero_id):
+		return
 
 	_vp = SubViewport.new()
 	_vp.size = Vector2i(roundi(px * aspect), px)
@@ -111,10 +114,54 @@ func _frame_camera() -> void:
 	_cam.look_at(Vector3(0, center_y, 0))
 
 
+## Porträt mit dem freigegebenen Entwurfsbild: kein 3D-Fenster, sondern das Bild selbst, auf den
+## Kopf ausgeschnitten (Shader held_kopf). Augenmitte und Gesichtsbreite je Held aus FACE.
+## Gibt false zurück, wenn es für den Helden kein Entwurfsbild gibt (dann 3D wie bisher).
+const FACE := {
+	"dusty": Vector3(0.506, 0.283, 0.375), "iska": Vector3(0.55, 0.256, 0.45), "brocken": Vector3(0.755, 0.233, 0.40),
+	"volta": Vector3(0.61, 0.245, 0.41), "kalle": Vector3(0.55, 0.242, 0.46), "margot": Vector3(0.55, 0.286, 0.35),
+	"lynx": Vector3(0.475, 0.228, 0.40), "fritzi": Vector3(0.41, 0.222, 0.33), "nova": Vector3(0.50, 0.20, 0.33),
+	"pip": Vector3(0.62, 0.298, 0.40), "rollo": Vector3(0.59, 0.267, 0.42), "fuenkchen": Vector3(0.66, 0.24, 0.45),
+}
+
+
+func _head_crop(id: String) -> bool:
+	var path := "res://ui/heroes2d/%s.png" % id
+	if id == "" or not ResourceLoader.exists(path) or not FACE.has(id):
+		return false
+	texture = load(path)
+	var m := ShaderMaterial.new()
+	m.shader = load("res://shaders/held_kopf.gdshader")
+	m.set_shader_parameter("img", texture.get_size())
+	m.set_shader_parameter("face", FACE[id])
+	if grayscale:
+		m.set_shader_parameter("grey", 1.0)
+		m.set_shader_parameter("bright", 0.55)
+	material = m
+	if not resized.is_connected(_fit_crop):
+		resized.connect(_fit_crop)
+	_fit_crop()
+	return true
+
+
+func _fit_crop() -> void:
+	var m := material as ShaderMaterial
+	if m == null or size.x <= 0.0 or size.y <= 0.0:
+		return
+	m.set_shader_parameter("box", size)
+	# runde/quadratische Boxen: Gesicht etwas größer, Augen tiefer; hohe Karten: Schultern sichtbar
+	var square := absf(size.x - size.y) < size.x * 0.12
+	m.set_shader_parameter("face_frac", minf(0.66, 0.66 * size.y / size.x) if square else minf(0.62, 0.56 * size.y / size.x))
+	m.set_shader_parameter("eye_y", 0.47 if square else 0.40)
+	m.set_shader_parameter("radius", 6.0 * size.y / 88.0)
+
+
 ## Anderen Helden zeigen
 func set_hero(id: String) -> void:
 	hero_id = id
 	if _vp == null:
+		if portrait and head_crop:
+			_head_crop(id)
 		return
 	if is_instance_valid(_holder):
 		_holder.queue_free()

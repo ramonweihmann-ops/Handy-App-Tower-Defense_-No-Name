@@ -1,0 +1,20 @@
+{"board": "Battle-Pass-Comic.dc.html", "out": "out/battlepass_teile",
+ "states": [{"name": "main", "eval": "document.querySelectorAll('#dc-root [data-bp=\"content\"], #dc-root [data-bp=\"num\"]').forEach(e => e.remove()); const b = document.querySelector('#dc-root [data-bp=\"mission\"] a'); b.style.background = 'linear-gradient(180deg,#b6ff8a 0%,#5fd83f 60%,#3fbf3a 100%)'; b.style.boxShadow = '0 2px 0 #23802a, inset 0 2px 0 rgba(255,255,255,0.6)'; b.style.color = '#0f3d12'; b.setAttribute('data-bp', 'mbtn-ok'); b.textContent = ''; const g = document.querySelectorAll('#dc-root [data-bp=\"mission\"] a')[1]; g.setAttribute('data-bp', 'mbtn'); g.textContent = ''; document.querySelectorAll('#dc-root a').forEach(a => { a.removeAttribute('href'); a.removeAttribute('data-on'); });"}],
+ "only": ["[data-bp]"],
+ "live": [
+  {"sel": "[data-bp=\"cap-free\"][data-k=\"3\"]", "id": "cap_free", "img": true, "pad": 14},
+  {"sel": "[data-bp=\"cap-prem\"][data-k=\"3\"]", "id": "cap_prem", "img": true, "pad": 14},
+  {"sel": "[data-bp=\"plat-free\"][data-k=\"3\"]", "id": "plat_free", "img": true, "pad": 4},
+  {"sel": "[data-bp=\"plat-prem\"][data-k=\"3\"]", "id": "plat_prem", "img": true, "pad": 4},
+  {"sel": "[data-bp=\"check\"]", "id": "check", "img": true, "pad": 2},
+  {"sel": "[data-bp=\"lock-free\"][data-k=\"3\"]", "id": "lock_free", "img": true, "pad": 3},
+  {"sel": "[data-bp=\"lock-prem\"][data-k=\"3\"]", "id": "lock_prem", "img": true, "pad": 3},
+  {"sel": "[data-bp=\"holen\"]", "id": "holen", "img": true, "pad": 5},
+  {"sel": "[data-bp=\"node\"][data-k=\"3\"]", "id": "node", "img": true, "pad": 6},
+  {"sel": "[data-bp=\"node-cur\"]", "id": "node_cur", "img": true, "pad": 18},
+  {"sel": "[data-bp=\"node-plat\"][data-k=\"3\"]", "id": "node_plat", "img": true, "pad": 4},
+  {"sel": "[data-bp=\"conn-free\"][data-k=\"3\"]", "id": "conn_free", "img": true, "pad": 1},
+  {"sel": "[data-bp=\"conn-prem\"][data-k=\"3\"]", "id": "conn_prem", "img": true, "pad": 1},
+  {"sel": "[data-bp=\"mbtn-ok\"]", "id": "mbtn_ok", "img": true, "pad": 3},
+  {"sel": "[data-bp=\"mbtn\"]", "id": "mbtn", "img": true, "pad": 3}
+ ]}

@@ -104,7 +104,16 @@ func _run() -> bool:
 			print("SMOKE kopfleiste breite ", top.size.x, " rahmen ", m._frame.size.x, " teile ", parts)
 			m._fit()
 			m.open_battle_pass()
+			var bp = m._boards.back()
+			print("SMOKE battle pass: stufe ", save.pass_level(), " leuchtet ", bp.current_level(), " scroll bis ", bp.max_scroll())
+			bp.claim(1)
+			bp.handle({"on": "claim_all"})
+			bp.handle({"on": "mission"})
+			bp._scroll = bp.max_scroll()
+			bp.queue_redraw_all()
 		4:
+			for b in m._boards.duplicate():
+				m.close_board(b)
 			m._open_daily()
 		5:
 			m._open_wheel()

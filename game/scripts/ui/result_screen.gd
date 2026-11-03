@@ -142,6 +142,7 @@ func _build_heroes() -> void:
 			r.position.x = slots[1].position.x + (k - (n - 1) * 0.5) * dx
 		var e := {"hero": str(c["hero"]), "amount": int(c["amount"]), "rect": r}
 		var v := HeroView3D.make(e["hero"], true)
+		v.head_crop = true   # Kopf mittig in der Karte, Hut am Rand abgeschnitten (Mockup)
 		var inner := _frame(r).grow(-3.0)
 		v.aspect = inner.size.x / inner.size.y
 		v.fig = 1.0
