@@ -1,37 +1,45 @@
 extends MockScreen
-## Reiter „Helden“ (Mockup „Helden-Übersicht“, Artboard-seqx): oben die freigeschalteten Helden
-## mit Stufe und Kartenfortschritt, darunter die noch gesperrten mit Freischalt-Bedingung und
-## Knopf zum Freischalten mit Edelsteinen. Antippen eines Helden öffnet „Held aufleveln“.
+## Reiter „Helden“ nach dem freigegebenen Helden-Baukasten (Mockup „Helden (neu, freigegeben)“,
+## Vorlage_Raw/Helden_Baukasten_v1): oben die freigeschalteten Helden mit Stufe und Kartenfortschritt,
+## darunter die noch gesperrten mit Freischalt-Bedingung und Knopf zum Freischalten mit Edelsteinen.
+## Antippen eines Helden öffnet „Held aufleveln“.
 ##
-## Hintergrund, Bänder, roter Punkt und Glanz kommen als Bilder aus dem Mockup (ui_mock/helden);
-## die Karten zeichnet das Spiel selbst, weil Anzahl und Werte sich ändern. Alle Maße in
-## Mockup-Punkten (390 × 844), gemessen im Mockup.
+## Hintergrund und Reiterleiste kommen aus dem Mockup (ui_mock/helden_neu); Bänder, Karten, Bildrahmen,
+## Plaketten, Balken und Knöpfe sind die Bauteile aus dem Baukasten (ui/helden_v2). Die Karten zeichnet
+## das Spiel selbst, weil Anzahl und Werte sich ändern. Alle Maße in Mockup-Punkten (390 × 844).
 
 const NAV := {"Shop": "shop", "Helden": "sammlung", "Kampf": "kampf", "Upgrades": "upgrades", "Basis": "basis"}
-const BANNER_Y := 14.0
-const OPEN_COL := 87.0     # Kartenbreite freigeschaltet (4 Spalten)
-const OPEN_H := 143.0
-const LOCK_COL := 118.0    # Kartenbreite gesperrt (3 Spalten)
-const LOCK_H := 195.0
-const GAP := 6.0
-const LEFT := 12.0
-## Sichtbarer Bereich über der Reiterleiste (Mockup: Leiste 58 hoch am unteren Rand); darin scrollt die Liste
-const VIEW_H := 786.0
+const PART := "res://ui/helden_v2/%s.webp"
+## Bänder (Breite, Höhe) und Lage des ersten Bands
+const BANNER_TOP := 32.0
+const BANNER_OK := Vector2(316.5, 50.1)
+const BANNER_LOCK := Vector2(355.0, 43.4)
+## Freigeschaltet: 4 Spalten, Bildfeld 87,7 × 96, darunter Name, Balken, Kartenstand
+const OPEN_X := 10.9
+const OPEN_COL := 93.5
+const PORTRAIT := Vector2(87.7, 96.0)
+const OPEN_H := 156.0
+const OPEN_GAP := 12.0
+## Gesperrt: 3 Spalten, Karte 119,4 × 221
+const LOCK_X := 7.9
+const LOCK_COL := 127.4
+const LOCK_CARD := Vector2(119.4, 221.0)
+const LOCK_GAP := 12.0
+const LEFT := 10.9
+## Sichtbarer Bereich über der Reiterleiste; darin scrollt die Liste
+const VIEW_H := 772.0
 const BOTTOM_PAD := 24.0
-## Farbverlauf des Bilderrahmens je Held (oben, unten); aus dem Mockup, fehlende passend ergänzt
-const FRAME := {
-	"lynx": ["#7a4bff", "#3a1f9a"], "dusty": ["#ffd34d", "#e8960f"], "iska": ["#6fb4ff", "#3a64d8"],
-	"margot": ["#ff9fc3", "#c2508f"], "brocken": ["#ff8a7a", "#c0303a"], "kalle": ["#8fe8ff", "#2a9ad8"],
-	"fritzi": ["#ffb070", "#e0602a"], "volta": ["#6fe8d0", "#1f8f9a"],
+## Farbe des Bildfelds je Held (Baukasten: violett, gold, cyan, rosa)
+const BG := {
+	"lynx": "violett", "dusty": "gold", "iska": "cyan", "margot": "rosa", "brocken": "cyan", "kalle": "cyan",
+	"fritzi": "gold", "volta": "cyan", "nova": "violett", "pip": "cyan", "rollo": "gold", "fuenkchen": "rosa",
 }
-const LOCK_FRAME := ["#4a63e6", "#23267a"]
-const TITLE_SHADOW_OK := "rgb(29, 107, 42) 0px 2px 0px, rgba(255, 214, 90, 0.5) 0px 0px 10px"
-const TITLE_SHADOW_LOCK := "rgb(122, 16, 32) 0px 2px 0px, rgba(255, 214, 90, 0.35) 0px 0px 8px"
 
 var _open: Array[String] = []
 var _locked: Array[String] = []
 var _cards := {}           # Held -> Rect2 der Karte (Mockup-Punkte)
 var _lock_y := 0.0         # Lage des zweiten Bands
+var _parts := {}
 var _back: Layer
 var _figs: Control
 var _front: Layer
@@ -48,7 +56,7 @@ var _pressed := false
 
 
 func _init(m: MainMenu) -> void:
-	super("helden", m)
+	super("helden_neu", m)
 
 
 func _ready() -> void:
@@ -73,8 +81,11 @@ func _ready() -> void:
 	_front.mouse_filter = Control.MOUSE_FILTER_PASS
 	_scroller.add_child(_front)
 	# Bilder vorab laden; frisch geladene Bilder sind im ersten Bild noch nicht bereit
-	for id in ["banner", "banner_1", "dot", "shine"]:
-		_live_tex(id)
+	for id in ["banner_gruen", "banner_rot", "zaehler_dunkel", "portrait_rahmen_gold", "stufe_plakette", "hinweispunkt",
+			"fortschritt_schiene", "fortschritt_gruen", "fortschritt_gold", "fortschritt_cyan", "kartenkoerper",
+			"knopf_gruen_normal", "knopf_gesperrt", "plus", "portrait_hintergrund_cyan", "portrait_hintergrund_gold",
+			"portrait_hintergrund_rosa", "portrait_hintergrund_violett"]:
+		part(id)
 	bind()
 	await get_tree().process_frame
 	_front.queue_redraw()
@@ -114,15 +125,15 @@ func bind() -> void:
 	for b in buttons():
 		b.visible = int(b.info["rect"][1]) > 700
 	_cards.clear()
-	var y := BANNER_Y + 48.0 + 8.0
+	var y := BANNER_TOP + BANNER_OK.y + 24.0
 	for k in _open.size():
-		_cards[_open[k]] = Rect2(LEFT + (k % 4) * (OPEN_COL + GAP), y + floorf(k / 4.0) * (OPEN_H + GAP), OPEN_COL, OPEN_H)
+		_cards[_open[k]] = Rect2(OPEN_X + (k % 4) * OPEN_COL, y + floorf(k / 4.0) * (OPEN_H + OPEN_GAP), PORTRAIT.x, OPEN_H)
 	var rows := ceili(_open.size() / 4.0)
-	y += rows * OPEN_H + maxi(0, rows - 1) * GAP
-	_lock_y = y + 8.0 + 20.0
-	y = _lock_y + 48.0 + 8.0
+	y += rows * OPEN_H + maxi(0, rows - 1) * OPEN_GAP
+	_lock_y = y + 20.0
+	y = _lock_y + BANNER_LOCK.y + 24.0
 	for k in _locked.size():
-		_cards[_locked[k]] = Rect2(LEFT + (k % 3) * (LOCK_COL + GAP), y + floorf(k / 3.0) * (LOCK_H + GAP), LOCK_COL, LOCK_H)
+		_cards[_locked[k]] = Rect2(LOCK_X + (k % 3) * LOCK_COL, y + floorf(k / 3.0) * (LOCK_CARD.y + LOCK_GAP), LOCK_CARD.x, LOCK_CARD.y)
 	# 3D-Figuren: nur neu bauen, wenn sich etwas geändert hat
 	for id in _views.keys():
 		var v: HeroView3D = _views[id]
@@ -132,13 +143,12 @@ func bind() -> void:
 	for id in _cards.keys():
 		if not _views.has(id):
 			var v := HeroView3D.make(id, true, _locked.has(id))
-			var inner := _portrait(id).grow(-2.0)
-			v.aspect = inner.size.x / inner.size.y
-			v.fig = 1.07
-			v.feet = 1.12
+			v.head_crop = true
+			v.crop_face = 0.34      # Brustbild wie im Baukasten: Kopf und Oberkörper
+			v.crop_eye = 0.30
 			_figs.add_child(v)
 			_views[id] = v
-	_content_h = (y + ceili(_locked.size() / 3.0) * (LOCK_H + GAP) if not _locked.is_empty() else _lock_y - 20.0) + BOTTOM_PAD
+	_content_h = (y + ceili(_locked.size() / 3.0) * (LOCK_CARD.y + LOCK_GAP) if not _locked.is_empty() else _lock_y - 20.0) + BOTTOM_PAD
 	_fit_scroll()
 	_place_views()
 	_back.queue_redraw()
@@ -163,31 +173,34 @@ func _fit_scroll() -> void:
 func _place_views() -> void:
 	for id in _views.keys():
 		var v: HeroView3D = _views[id]
-		var inner := _portrait(id).grow(-2.0)
+		var inner := _portrait(id).grow(-1.5)
 		v.position = inner.position * s
 		v.size = inner.size * s
 
 
-## Bilderrahmen einer Karte (mit 2 Punkten Rand)
+## Bildfeld einer Karte
 func _portrait(id: String) -> Rect2:
 	var c: Rect2 = _cards[id]
-	return Rect2(c.position + Vector2(4, 4), Vector2(c.size.x - 8.0, 88.0))
+	if _locked.has(id):
+		return Rect2(c.position + Vector2(6, 6), Vector2(c.size.x - 12.0, 100.0))
+	return Rect2(c.position, PORTRAIT)
 
 
-func _live_tex(id: String) -> Texture2D:
-	if not _tex.has(id):
-		var l: Dictionary = _live_info.get(id, {})
-		_tex[id] = load("res://ui_mock/helden/" + str(l.get("img", ""))) if str(l.get("img", "")) != "" else null
-	return _tex[id]
+## Bauteil aus dem Helden-Baukasten
+func part(id: String) -> Texture2D:
+	if not _parts.has(id):
+		_parts[id] = load(PART % id)
+	return _parts[id]
 
 
-## Bild eines Live-Elements an eine andere Stelle zeichnen: Versatz des Elements um d
-func _draw_live(ci: CanvasItem, id: String, d: Vector2, mod := Color.WHITE) -> void:
-	var tex := _live_tex(id)
-	var ir: Array = _live_info.get(id, {}).get("img_rect", [])
-	if tex == null or ir.is_empty():
-		return
-	ci.draw_texture_rect(tex, _px(Rect2(ir[0] + d.x, ir[1] + d.y, ir[2], ir[3])), false, mod)
+func _part(ci: CanvasItem, id: String, r: Rect2, mod := Color.WHITE) -> void:
+	var t := part(id)
+	if t:
+		ci.draw_texture_rect(t, _px(r), false, mod)
+
+
+func _text(ci: CanvasItem, txt: String, r: Rect2, family: String, weight: int, size: float, col: String, shadow := "") -> void:
+	MockPaint.text(self, ci, txt, r, family, weight, size, col, shadow)
 
 
 func _px(r: Rect2) -> Rect2:
@@ -196,7 +209,7 @@ func _px(r: Rect2) -> Rect2:
 
 func _short_name(id: String) -> String:
 	var n := String(GameData.HEROES[id]["name"]).to_upper()
-	if MockPaint.text_width(n, "Fredoka", 700, 13) > OPEN_COL - 8.0:
+	if MockPaint.text_width(n, "Fredoka", 700, 14) > OPEN_COL - 4.0:
 		n = n.get_slice(" ", n.get_slice_count(" ") - 1)
 	return n
 
@@ -205,117 +218,102 @@ func _short_name(id: String) -> String:
 
 func _draw_back(ci: CanvasItem) -> void:
 	for id in _cards.keys():
-		var c: Rect2 = _cards[id]
-		MockPaint.rrect(ci, _px(c), 10 * s, Color(30 / 255.0, 20 / 255.0, 80 / 255.0, 0.55))
-		var cols: Array = LOCK_FRAME if _locked.has(id) else FRAME.get(id, LOCK_FRAME)
-		MockPaint.rrect(ci, _px(_portrait(id)), 8 * s, Color(cols[0]), Color(cols[1]))
+		if _locked.has(id):
+			_part(ci, "kartenkoerper", _cards[id])
+		_part(ci, "portrait_hintergrund_" + str(BG.get(id, "violett")), _portrait(id))
 
 
 func _draw_front(ci: CanvasItem) -> void:
-	_draw_banner(ci, "banner", BANNER_Y, "FREIGESCHALTET", 181.3, 10.0, "%d/%d" % [_open.size(), GameData.HERO_IDS.size()],
-		Color(15 / 255.0, 61 / 255.0, 18 / 255.0, 0.6), 700, 20.0, 1.0, TITLE_SHADOW_OK)
+	_draw_banner(ci, "banner_gruen", Rect2(W * 0.5 - BANNER_OK.x * 0.5, BANNER_TOP, BANNER_OK.x, BANNER_OK.y), "FREIGESCHALTET", 21.0,
+		"%d/%d" % [_open.size(), GameData.HERO_IDS.size()], "rgb(29, 107, 42) 0px 2px 0px")
 	if not _locked.is_empty():
-		_draw_banner(ci, "banner_1", _lock_y, "NOCH NICHT FREIGESCHALTET", 239.9, 8.0, str(_locked.size()),
-			Color(90 / 255.0, 10 / 255.0, 40 / 255.0, 0.6), 600, 16.0, 0.32, TITLE_SHADOW_LOCK)
+		_draw_banner(ci, "banner_rot", Rect2(W * 0.5 - BANNER_LOCK.x * 0.5, _lock_y, BANNER_LOCK.x, BANNER_LOCK.y), "NOCH NICHT FREIGESCHALTET", 17.0,
+			str(_locked.size()), "rgb(122, 16, 32) 0px 2px 0px")
 	for id in _open:
 		_draw_open_card(ci, id)
 	for id in _locked:
 		_draw_locked_card(ci, id)
 
 
-## Band mit Titel und Zähler-Pille (Titelbreite aus dem Mockup)
-func _draw_banner(ci: CanvasItem, id: String, y: float, title: String, title_w: float, gap: float, count: String,
-		pill: Color, weight: int, size: float, ls: float, shadow: String) -> void:
-	var src := live_rect(id)
-	_draw_live(ci, id, Vector2(0, y - src.position.y))
-	var pw := MockPaint.text_width(count, "Nunito", 800, 11) + 16.0
-	var x0 := W * 0.5 - (title_w + gap + pw) * 0.5
-	MockPaint.text(self, ci, title, Rect2(x0, y + 9.0, title_w, 24), "Fredoka", weight, size, "rgb(255, 226, 122)", shadow, ls)
-	var pr := Rect2(x0 + title_w + gap, y + 11.5, pw, 19)
-	MockPaint.rrect(ci, _px(pr), 10 * s, pill)
-	MockPaint.text(self, ci, count, pr, "Nunito", 800, 11, "rgb(255, 255, 255)")
+## Band aus dem Baukasten mit Titel und Zähler rechts
+func _draw_banner(ci: CanvasItem, id: String, r: Rect2, title: String, size: float, count: String, shadow: String) -> void:
+	_part(ci, id, r)
+	var cw := 48.0 if count.length() > 1 else 40.0
+	_text(ci, title, Rect2(r.position.x, r.position.y, r.size.x - cw - 8.0, r.size.y), "Fredoka", 700, size, "rgb(255, 255, 255)", shadow)
+	var cr := Rect2(r.end.x - cw - 30.0, r.get_center().y - 12.0, cw, 24.0)
+	_part(ci, "zaehler_dunkel", cr)
+	_text(ci, count, cr, "Fredoka", 700, 15, "rgb(255, 255, 255)")
 
 
-func _bar(ci: CanvasItem, r: Rect2, ratio: float, a: Color, b: Color) -> void:
-	MockPaint.rrect(ci, _px(r), 4 * s, Color(0, 0, 0, 0.45))
-	var w := r.size.x * clampf(ratio, 0.0, 1.0)
-	if w > 0.5:
-		MockPaint.rrect_h(ci, _px(Rect2(r.position, Vector2(w, r.size.y))), 4 * s, a, b)
+## Fortschritt: Schiene, darüber die Füllung (abgeschnitten auf den Anteil)
+func _bar(ci: CanvasItem, r: Rect2, ratio: float, fill: String) -> void:
+	_part(ci, "fortschritt_schiene", r)
+	var f := clampf(ratio, 0.0, 1.0)
+	var t := part(fill)
+	if f > 0.01 and t:
+		var src := Rect2(Vector2.ZERO, Vector2(t.get_width() * f, t.get_height()))
+		ci.draw_texture_rect_region(t, _px(Rect2(r.position, Vector2(r.size.x * f, r.size.y))), src)
 
 
 func _draw_open_card(ci: CanvasItem, id: String) -> void:
 	var c: Rect2 = _cards[id]
 	var p := c.position
+	var pr := _portrait(id)
+	_part(ci, "portrait_rahmen_gold", pr.grow(1.0))
 	var lvl := Save.hero_level(id)
-	# Stufen-Band unten im Bild (unten rund wie der Rahmen)
-	var rib := Rect2(p + Vector2(6, 76), Vector2(c.size.x - 12.0, 14))
-	var top := Color("#ffe27a")
-	var bottom := Color("#ffb53d")
-	MockPaint.rrect(ci, _px(rib), 6 * s, top, bottom)
-	MockPaint.rrect(ci, _px(Rect2(rib.position, Vector2(rib.size.x, 8))), 0.0, top, top.lerp(bottom, 8.0 / 14.0))
-	MockPaint.text(self, ci, "Stufe %d" % lvl, rib, "Nunito", 800, 10, "rgb(90, 36, 0)")
-	MockPaint.border(ci, _px(_portrait(id)), 8 * s, Color("#ffd34d"), 2 * s)
+	var pl := Rect2(pr.get_center().x - 31.0, pr.end.y - 14.0, 62.0, 23.0)
+	_part(ci, "stufe_plakette", pl)
+	_text(ci, "Stufe %d" % lvl, pl, "Fredoka", 700, 11.5, "rgb(74, 32, 0)")
 	if Save.can_level_hero(id):
-		_draw_live(ci, "dot", p + Vector2(60, 9) - live_rect("dot").position)
-	MockPaint.text(self, ci, _short_name(id), Rect2(p + Vector2(4, 95), Vector2(c.size.x - 8, 16)), "Fredoka", 700, 13, "rgb(255, 247, 234)")
-	var bar := Rect2(p + Vector2(4, 114), Vector2(c.size.x - 8, 8))
-	var label_r := Rect2(p + Vector2(4, 125), Vector2(c.size.x - 8, 14))
+		_part(ci, "hinweispunkt", Rect2(pr.end.x - 13.0, pr.position.y - 5.0, 18, 18))
+	_text(ci, _short_name(id), Rect2(p.x - 6.0, pr.end.y + 12.0, c.size.x + 12.0, 18), "Fredoka", 700, 14, "rgb(255, 255, 255)", "rgb(26, 15, 58) 0px 2px 0px")
+	var bar := Rect2(p.x + 2.0, pr.end.y + 33.0, c.size.x - 4.0, 11.0)
+	var label_r := Rect2(p.x - 6.0, pr.end.y + 46.0, c.size.x + 12.0, 14)
 	if lvl >= MetaData.HERO_MAX_LEVEL:
-		_bar(ci, bar, 1.0, Color("#b6ff8a"), Color("#3fbf3a"))
-		MockPaint.text(self, ci, "Höchste Stufe", label_r, "Nunito", 800, 10, "rgb(182, 255, 138)")
+		_bar(ci, bar, 1.0, "fortschritt_gruen")
+		_text(ci, "Höchste Stufe", label_r, "Nunito", 800, 10.5, "rgb(125, 255, 138)")
 		return
 	var have := Save.hero_cards(id)
 	var need := MetaData.hero_cards_needed(lvl)
 	var ratio := float(have) / float(need)
 	if have >= need:
-		_bar(ci, bar, 1.0, Color("#b6ff8a"), Color("#3fbf3a"))
-		MockPaint.text(self, ci, "%d/%d · bereit" % [have, need], label_r, "Nunito", 800, 10, "rgb(182, 255, 138)")
-	elif ratio >= 0.5:
-		_bar(ci, bar, ratio, Color("#ffe27a"), Color("#ffb53d"))
-		MockPaint.text(self, ci, "%d/%d Karten" % [have, need], label_r, "Nunito", 800, 10, "rgb(255, 226, 122)")
+		_bar(ci, bar, 1.0, "fortschritt_gruen")
+		_text(ci, "%d/%d · bereit" % [have, need], label_r, "Nunito", 800, 10.5, "rgb(125, 255, 138)")
 	else:
-		_bar(ci, bar, ratio, Color("#6fd0ff"), Color("#3a7dff"))
-		MockPaint.text(self, ci, "%d/%d Karten" % [have, need], label_r, "Nunito", 800, 10, "rgb(207, 227, 255)")
+		_bar(ci, bar, ratio, "fortschritt_gold" if ratio >= 0.5 else "fortschritt_cyan")
+		_text(ci, "%d/%d Karten" % [have, need], label_r, "Nunito", 800, 10.5, "rgb(232, 226, 255)")
 
 
 func _draw_locked_card(ci: CanvasItem, id: String) -> void:
 	var c: Rect2 = _cards[id]
 	var p := c.position
-	var w := c.size.x - 8.0
-	_draw_live(ci, "shine", p + Vector2(6, 6) - live_rect("shine").position)
-	MockPaint.border(ci, _px(_portrait(id)), 8 * s, Color(160 / 255.0, 190 / 255.0, 1.0, 0.5), 2 * s)
-	MockPaint.text(self, ci, _short_name(id), Rect2(p + Vector2(4, 95), Vector2(w, 16)), "Fredoka", 700, 13, "rgb(255, 247, 234)")
-	MockPaint.text(self, ci, "Level %d gewinnen" % int(MetaData.HERO_UNLOCK[id]), Rect2(p + Vector2(4, 114), Vector2(w, 14)),
-		"Nunito", 800, 10, "rgb(255, 226, 122)")
+	var pr := _portrait(id)
+	_part(ci, "portrait_rahmen_gold", pr.grow(1.0))
+	_part(ci, "plus", Rect2(pr.end.x - 19.0, pr.position.y + 3.0, 16, 16))
+	var name := _short_name(id)
+	_text(ci, name, Rect2(p.x, p.y + 110.0, c.size.x, 20), "Fredoka", 700, 12.0 if name.length() > 10 else 15.0, "rgb(255, 226, 122)", "rgb(58, 26, 128) 0px 2px 0px")
+	_text(ci, "Level %d gewinnen" % int(MetaData.HERO_UNLOCK[id]), Rect2(p.x + 6.0, p.y + 132.0, c.size.x - 12.0, 14), "Nunito", 800, 10.5, "rgb(255, 211, 77)")
 	var have := Save.hero_cards(id)
 	var need := MetaData.hero_cards_needed(1)
-	_bar(ci, Rect2(p + Vector2(4, 131), Vector2(w, 8)), float(have) / float(need), Color("#6fd0ff"), Color("#3a7dff"))
-	MockPaint.text(self, ci, "%d/%d Karten" % [have, need], Rect2(p + Vector2(4, 142), Vector2(w, 14)), "Nunito", 800, 10, "rgb(207, 227, 255)")
-	# Freischalten mit Edelsteinen: grüner Knopf wie „Kaufen“ im Mockup, sonst dunkel wie „Gesperrt“
-	var br := _buy_rect(id)
-	var afford := Save.gems() >= MetaData.HERO_UNLOCK_GEMS
-	var col := "rgb(15, 61, 18)"
-	if afford:
-		var btn := button("Angebot-Volta.dc.html")
-		if btn and btn.texture:
-			var hit: Array = btn.info["rect"]
-			var ir: Array = btn.info["img_rect"]
-			var d := br.position - Vector2(hit[0], hit[1])
-			ci.draw_texture_rect(btn.texture, _px(Rect2(ir[0] + d.x, ir[1] + d.y, ir[2], ir[3])), false)
-		else:
-			MockPaint.rrect(ci, _px(br), 10 * s, Color("#b6ff8a"), Color("#3fbf3a"))
+	var br := Rect2(p.x + 10.0, p.y + 156.0, c.size.x - 20.0, 15.0)
+	if have > 0:
+		_bar(ci, br, float(have) / float(need), "fortschritt_cyan")
 	else:
-		MockPaint.rrect(ci, _px(br), 10 * s, Color(20 / 255.0, 12 / 255.0, 48 / 255.0, 0.7))
-		MockPaint.border(ci, _px(br), 10 * s, Color(1, 1, 1, 0.25), 2 * s)
-		col = "rgb(217, 208, 255)"
+		_part(ci, "zaehler_dunkel", br)
+	_text(ci, "%d/%d Karten" % [have, need], br, "Nunito", 800, 10, "rgb(255, 255, 255)")
+	# Freischalten mit Edelsteinen: grüner Knopf (genug Edelsteine) oder gesperrter Knopf
+	var kr := _buy_rect(id)
+	var afford := Save.gems() >= MetaData.HERO_UNLOCK_GEMS
+	_part(ci, "knopf_gruen_normal" if afford else "knopf_gesperrt", kr)
+	var col := "rgb(15, 61, 18)" if afford else "rgb(216, 212, 240)"
 	var label := "SICHER?" if _armed == id else str(MetaData.HERO_UNLOCK_GEMS)
-	var tw := MockPaint.text_width(label, "Fredoka", 700, 13)
-	var gem := 13.0 if _armed != id else 0.0
-	var x0 := br.get_center().x - (tw + gem + (4.0 if gem > 0.0 else 0.0)) * 0.5
+	var tw := MockPaint.text_width(label, "Fredoka", 700, 15)
+	var gem := 14.0 if _armed != id else 0.0
+	var x0 := kr.get_center().x - (tw + gem + (4.0 if gem > 0.0 else 0.0)) * 0.5
 	if gem > 0.0:
-		_gem(ci, Rect2(x0, br.get_center().y - 6.5, 13, 13))
+		_gem(ci, Rect2(x0, kr.get_center().y - 7.0, 14, 14))
 		x0 += gem + 4.0
-	MockPaint.text(self, ci, label, Rect2(x0, br.position.y, tw, br.size.y), "Fredoka", 700, 13, col)
+	_text(ci, label, Rect2(x0, kr.position.y, tw, kr.size.y), "Fredoka", 700, 15, col)
 
 
 ## Edelstein wie in der Kopfleiste der Mockups
@@ -332,7 +330,7 @@ func _gem(ci: CanvasItem, r: Rect2) -> void:
 
 func _buy_rect(id: String) -> Rect2:
 	var c: Rect2 = _cards[id]
-	return Rect2(c.position + Vector2(4, 159), Vector2(c.size.x - 8.0, 32))
+	return Rect2(c.position + Vector2(8, 182), Vector2(c.size.x - 16.0, 30))
 
 
 # --- Antippen ------------------------------------------------------------------------------

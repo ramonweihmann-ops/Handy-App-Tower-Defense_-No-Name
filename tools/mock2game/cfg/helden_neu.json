@@ -1,0 +1,3 @@
+{"board": "Helden-Neu.dc.html", "out": "out/helden_neu",
+ "states": [{"name": "main", "eval": "const root = document.querySelector('#dc-root > div'); [...root.children].forEach((e, i) => { const keep = i === 0 || e.getAttribute('data-up') === 'nav' || (e.tagName === 'A' && ['#shop', '#helden', '#kampf', '#upgrades', '#basis'].includes(e.getAttribute('href'))); if (!keep) e.remove(); });"}],
+ "live": []}
