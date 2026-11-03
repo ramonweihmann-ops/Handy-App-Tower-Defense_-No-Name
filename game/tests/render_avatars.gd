@@ -6,7 +6,8 @@ func _initialize() -> void:
 	var root_c := Control.new()
 	root.add_child(root_c)
 	var k := 0
-	for id in ["dusty", "iska", "brocken", "volta", "kalle", "margot", "lynx", "fritzi"]:
+	# Helden mit freigegebenem Entwurf (ui/heroes2d) haben ihr Rundbild schon daraus; nur die übrigen rendern
+	for id in GameData.HERO_IDS.filter(func(h: String) -> bool: return not ResourceLoader.exists("res://ui/heroes2d/%s.png" % h)):
 		var v = load("res://scripts/ui/hero_view_3d.gd").new()
 		v.hero_id = id
 		v.portrait = true

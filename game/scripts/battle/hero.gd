@@ -42,6 +42,10 @@ const ULTS := {
 	"shotgun": ["Breitseite", "Drei mächtige Schrotsalven, die alle Gegner vorne treffen.", 0.0],
 	"sniper": ["Kopfgeldjagd", "Durchschlagende Volltreffer auf die stärksten Gegner.", 0.0],
 	"flamer": ["Feuerwalze", "Flammen erfassen alle Gegner in Reichweite und setzen sie in Brand.", 6.0],
+	"beam": ["Sternenschweif", "Jeder Atemzug trifft drei Reihen auf einmal.", 6.0],
+	"drone": ["Geschützturm", "Repariert die Mauer und stellt einen Turm auf, der mitschießt.", 8.0],
+	"cannon": ["Dampfwalze", "Schleudert alle Gegner vor der Mauer weit zurück.", 0.0],
+	"gravity": ["Schwarzes Loch", "Zieht alle Gegner zu einem Punkt und bremst sie stark.", 0.0],
 }
 const ULT_CD := 30.0
 const ULT_MAX := 3
@@ -99,6 +103,19 @@ func activate_ult() -> bool:
 					for e in battle.enemies.duplicate():
 						if is_instance_valid(e) and e.alive and e.position.z > -12.0 * battle.z_scale:
 							battle.fire_bullet(_muzzle.global_position, e, dmg * 1.4, false, "normal", 0, 34.0, 0.8))
+		"drone":
+			battle.repair_fence(0.1 + 0.05 * (lvl - 1), 0.0)
+			_show_turret(true)
+		"cannon":
+			for e in battle.enemies.duplicate():
+				if is_instance_valid(e) and e.alive and e.position.z > -14.0 * battle.z_scale:
+					battle.apply_hit(e, dmg * 2.0, false, "normal")
+					e.knockback((4.0 + lvl) * battle.z_scale)
+			Fx.flash(battle, Vector3(0, 1, -4), Color(1.0, 0.7, 0.3), 8.0, 0.5)
+		"gravity":
+			var t := battle.pick_target()
+			var c := t.global_position if t else Vector3(0, 0, -8.0 * battle.z_scale)
+			battle.gravity_well(c, 5.0 + lvl, dmg * 2.0, true, "normal", 0.85, 0.7, 3.0 + lvl)
 		"sniper":
 			var strong: Array = battle.enemies.filter(func(e: Enemy) -> bool: return is_instance_valid(e) and e.alive)
 			strong.sort_custom(func(a: Enemy, b: Enemy) -> bool: return a.hp > b.hp)
@@ -117,9 +134,44 @@ func activate_ult() -> bool:
 	return true
 
 
+## Pips Geschützturm (Superfähigkeit): steht neben ihm, solange sie läuft
+var _turret: Node3D
+
+
+func _show_turret(on: bool) -> void:
+	if on and _turret == null:
+		_turret = Node3D.new()
+		var base := Fx.cylinder(0.3, 0.38, 0.35, Fx.mat(Color(0.85, 0.82, 0.75), 0.2, 0.5, 0.4), 10)
+		base.position.y = 0.18
+		_turret.add_child(base)
+		var head := Fx.box(Vector3(0.4, 0.3, 0.45), Fx.mat(Color(0.2, 0.7, 0.75), 0.2, 0.4, 0.4))
+		head.position.y = 0.5
+		_turret.add_child(head)
+		var gun := Fx.cylinder(0.06, 0.06, 0.5, Fx.mat(Color(0.3, 0.32, 0.36), 0.0, 0.8, 0.3), 8)
+		gun.rotation.x = PI * 0.5
+		gun.position = Vector3(0, 0.5, -0.4)
+		_turret.add_child(gun)
+		var eye := Fx.box(Vector3(0.24, 0.06, 0.02), Fx.mat(Color(0.3, 1.0, 1.0), 3.0))
+		eye.position = Vector3(0, 0.55, -0.23)
+		_turret.add_child(eye)
+		battle.add_child(_turret)
+		_turret.global_position = global_position + Vector3(1.4, 0, -0.6)
+		Fx.flash(battle, _turret.global_position + Vector3(0, 0.5, 0), Color(0.3, 1.0, 1.0), 1.5, 0.35)
+	elif not on and _turret:
+		_turret.queue_free()
+		_turret = null
+
+
+func _exit_tree() -> void:
+	if is_instance_valid(_turret):
+		_turret.queue_free()
+
+
 func _update_ult(delta: float) -> void:
 	_ult_cd = maxf(0.0, _ult_cd - delta)
 	_ult_t = maxf(0.0, _ult_t - delta)
+	if _turret and _ult_t <= 0.0:
+		_show_turret(false)
 	if _ult_ring == null:
 		return
 	var ready := ult_ready()
@@ -146,7 +198,8 @@ const FACE_CAMERA := false
 
 ## Ton beim Schuss je Waffenfamilie.
 const SHOT_SOUND := {"revolver": "shot", "mg": "shot_light", "rocket": "launch", "tesla": "zap",
-	"cryo": "frost", "shotgun": "shot_heavy", "sniper": "shot_heavy", "flamer": "flame"}
+	"cryo": "frost", "shotgun": "shot_heavy", "sniper": "shot_heavy", "flamer": "flame",
+	"beam": "zap", "drone": "shot_light", "cannon": "shot_heavy", "gravity": "whoosh"}
 
 
 func setup(id_: String, battle_: Battle) -> void:
@@ -309,6 +362,39 @@ func _fire(target: Enemy) -> void:
 		"flamer":
 			var cone: float = float(data["cone"]) * (1.0 + 0.2 * int(mods["special"])) * (2.2 if ult_active() else 1.0)
 			battle.flame(from, target, dmg, crit, ammo_type, cone)
+		"beam":
+			# Sternenatem: durchschlägt die ganze Reihe; mit der Superfähigkeit drei Reihen
+			var pierce := int(data["pierce"]) + int(mods["special"])
+			battle.fire_bullet(from, target, dmg, crit, ammo_type, pierce, 60.0, 1.3)
+			if ult_active():
+				for other in battle.spread_targets(2, target):
+					battle.fire_bullet(from, other, dmg, false, ammo_type, pierce, 60.0, 1.3)
+		"drone":
+			battle.fire_bullet(from, target, dmg, crit, ammo_type, 0, 34.0, 0.8)
+			battle.repair_fence(float(data["repair"]) * (1.0 + 0.5 * int(mods["special"])), 0.0)
+			if ult_active() and _turret:
+				for other in battle.spread_targets(2, target):
+					battle.fire_bullet(_turret.global_position + Vector3(0, 0.6, 0), other, dmg * 1.2, false, "normal", 0, 34.0, 0.8)
+		"cannon":
+			# Wuchtgeschoss: stößt den getroffenen Gegner zurück (beim Auftreffen)
+			battle.fire_bullet(from, target, dmg, crit, ammo_type, 0, 30.0, 1.4)
+			var push: float = float(data["push"]) * (1.0 + 0.25 * int(mods["special"])) * battle.z_scale
+			var eid := target.get_instance_id()
+			var travel := from.distance_to(target.aim_point()) / 30.0
+			get_tree().create_timer(travel, false).timeout.connect(func() -> void:
+				var e := instance_from_id(eid) as Enemy
+				if e and e.alive:
+					e.knockback(push))
+		"gravity":
+			# Schwerkraftfeld am Ziel: zieht die Gegner dort zusammen und bremst sie
+			var r: float = float(data["radius"]) * (1.0 + 0.2 * int(mods["special"]))
+			battle.fire_bullet(from, target, 0.0, false, ammo_type, 0, 32.0, 1.0)
+			var eid2 := target.get_instance_id()
+			var travel2 := from.distance_to(target.aim_point()) / 32.0
+			get_tree().create_timer(travel2, false).timeout.connect(func() -> void:
+				var e := instance_from_id(eid2) as Enemy
+				if battle and e and e.alive:
+					battle.gravity_well(e.global_position, r, dmg, crit, ammo_type, 0.5, 0.35, 1.2))
 	_recoil = 1.0
 	_flash_t = 0.06
 	_shot_anim()
@@ -482,6 +568,39 @@ func _build_visual() -> void:
 			pilot.position = Vector3(0, -0.06, -0.4)
 			_weapon.add_child(pilot)
 			_muzzle.position = Vector3(0, 0, -0.42)
+	match family():
+		"beam":
+			# Drache: kein Werkzeug, der Atem kommt aus dem Maul
+			_weapon_base = Vector3(0, 1.22, -0.3)
+			_muzzle.position = Vector3(0, 0, -0.12)
+		"drone":
+			_weapon_base = Vector3(0.2, 0.9, -0.38)
+			var wrench := Fx.box(Vector3(0.06, 0.06, 0.42), metal)
+			_weapon.add_child(wrench)
+			var jaw := Fx.torus(0.05, 0.1, metal)
+			jaw.rotation.x = PI * 0.5
+			jaw.position.z = -0.24
+			_weapon.add_child(jaw)
+			_muzzle.position = Vector3(0, 0, -0.32)
+		"cannon":
+			_weapon_base = Vector3(0, 1.0, -0.35)
+			var barrel := Fx.cylinder(0.1, 0.11, 0.7, metal, 12)
+			barrel.rotation.x = PI * 0.5
+			barrel.position.z = -0.2
+			_weapon.add_child(barrel)
+			var ring := Fx.torus(0.09, 0.14, Fx.mat(Color(0.95, 0.55, 0.15)))
+			ring.rotation.x = PI * 0.5
+			ring.position.z = -0.52
+			_weapon.add_child(ring)
+			_muzzle.position = Vector3(0, 0, -0.58)
+		"gravity":
+			_weapon_base = Vector3(0.22, 0.9, -0.36)
+			var fist := Fx.box(Vector3(0.2, 0.2, 0.24), Fx.mat(Color(0.5, 0.3, 0.85), 0.2, 0.4, 0.4))
+			_weapon.add_child(fist)
+			var core := Fx.sphere(0.07, Fx.mat(Color(0.3, 1.0, 1.0), 3.5), 8, 4)
+			core.position.z = -0.13
+			_weapon.add_child(core)
+			_muzzle.position = Vector3(0, 0, -0.18)
 	if _model:
 		_fit_weapon_to_model()
 	_weapon.position = _weapon_base
@@ -606,6 +725,67 @@ func _build_simple_body(col: Color, skin: Color, dark: Color) -> void:
 			scope_eye.rotation.x = PI * 0.5
 			scope_eye.position = Vector3(0.08, 1.27, -0.22)
 			_body.add_child(scope_eye)
+		"beam":
+			# Drache: Hörner, Flügel, Schwanz an der einfachen Figur
+			for sx in [-1.0, 1.0]:
+				var horn := Fx.cylinder(0.0, 0.05, 0.2, Fx.mat(Color(0.95, 0.88, 0.7)), 6)
+				horn.position = Vector3(0.12 * sx, 1.46, 0.02)
+				horn.rotation.z = -0.4 * sx
+				_body.add_child(horn)
+				var wing := Fx.box(Vector3(0.42, 0.03, 0.3), Fx.mat(Color(0.3, 0.85, 0.85), 0.0, 0.4, 0.4))
+				wing.position = Vector3(0.38 * sx, 1.0, 0.22)
+				wing.rotation.z = 0.5 * sx
+				_body.add_child(wing)
+			var tail := Fx.capsule(0.07, 0.55, Fx.mat(Color(0.55, 0.35, 0.85)))
+			tail.position = Vector3(0, 0.35, 0.38)
+			tail.rotation.x = 1.1
+			_body.add_child(tail)
+			var star := Fx.sphere(0.06, Fx.mat(Color(1.0, 0.85, 0.3), 2.5), 6, 3)
+			star.position = Vector3(0, 1.04, -0.24)
+			_body.add_child(star)
+		"drone":
+			var box_head := Fx.box(Vector3(0.44, 0.36, 0.4), Fx.mat(Color(0.95, 0.9, 0.8)))
+			box_head.position.y = 1.26
+			_body.add_child(box_head)
+			var visor := Fx.box(Vector3(0.36, 0.2, 0.05), Fx.mat(Color(0.08, 0.1, 0.15)))
+			visor.position = Vector3(0, 1.26, -0.2)
+			_body.add_child(visor)
+			for sx in [-0.08, 0.08]:
+				var eye := Fx.box(Vector3(0.05, 0.1, 0.02), Fx.mat(Color(0.3, 1.0, 1.0), 3.0))
+				eye.position = Vector3(sx, 1.26, -0.23)
+				_body.add_child(eye)
+			var antenna := Fx.cylinder(0.015, 0.015, 0.2, Fx.mat(Color(0.3, 0.32, 0.36)), 6)
+			antenna.position.y = 1.53
+			_body.add_child(antenna)
+			var tip := Fx.sphere(0.05, Fx.mat(Color(1.0, 0.6, 0.15), 2.0), 6, 3)
+			tip.position.y = 1.64
+			_body.add_child(tip)
+		"cannon":
+			# Mini-Panzer: Ketten statt Beine, runde Kuppel als Kopf
+			for sx in [-1.0, 1.0]:
+				var track := Fx.box(Vector3(0.2, 0.3, 0.8), Fx.mat(Color(0.95, 0.55, 0.15), 0.0, 0.6, 0.4))
+				track.position = Vector3(0.28 * sx, 0.15, 0)
+				_body.add_child(track)
+			var dome := Fx.sphere(0.26, Fx.mat(Color(0.25, 0.3, 0.55)), 14, 8)
+			dome.scale = Vector3(1.1, 0.8, 1.1)
+			dome.position.y = 1.18
+			_body.add_child(dome)
+			for sx in [-0.09, 0.09]:
+				var eye := Fx.box(Vector3(0.06, 0.1, 0.02), Fx.mat(Color(0.3, 1.0, 1.0), 3.0))
+				eye.position = Vector3(sx, 1.2, -0.25)
+				_body.add_child(eye)
+		"gravity":
+			var hair := Fx.sphere(0.28, Fx.mat(Color(0.3, 0.18, 0.12)), 12, 6)
+			hair.scale = Vector3(1.15, 0.95, 1.1)
+			hair.position = Vector3(0, 1.32, 0.05)
+			_body.add_child(hair)
+			var band := Fx.torus(0.2, 0.23, Fx.mat(Color(0.2, 0.75, 0.78)))
+			band.position.y = 1.4
+			_body.add_child(band)
+			for sx in [-1.0, 1.0]:
+				var pad := Fx.sphere(0.14, Fx.mat(Color(0.5, 0.3, 0.85)), 10, 5)
+				pad.position = Vector3(0.27 * sx, 1.05, 0)
+				_body.add_child(pad)
 		"flamer":
 			var helmet := Fx.sphere(0.25, Fx.mat(Color(0.9, 0.15, 0.1), 0.1, 0.3, 0.4), 14, 8)
 			helmet.scale = Vector3(1.05, 0.75, 1.15)

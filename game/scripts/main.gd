@@ -819,6 +819,10 @@ func _hero_cards(h: Hero) -> Array:
 		"shotgun": ["Mehr Schrot", "+1 Kugel pro Schuss", 3],
 		"sniper": ["Durchschlag", "Die Kugel durchschlägt 1 Gegner mehr", 3],
 		"flamer": ["Breitere Flamme", "Flammenbereich +20 %", 3],
+		"beam": ["Längerer Atem", "Der Atem durchschlägt 1 Gegner mehr", 3],
+		"drone": ["Feinmechanik", "Repariert 50 % mehr Mauer je Schuss", 3],
+		"cannon": ["Mehr Wucht", "Stößt 25 % weiter zurück", 3],
+		"gravity": ["Größeres Feld", "Schwerkraftfeld +20 %", 3],
 	}
 	var sp: Array = special[h.family()]
 	stats.append(["special", sp[0], sp[1], sp[2]])

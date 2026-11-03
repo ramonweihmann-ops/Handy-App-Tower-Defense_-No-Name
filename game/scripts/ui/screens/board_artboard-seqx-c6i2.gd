@@ -61,8 +61,8 @@ var _tex := {}
 
 func _init(m: MainMenu) -> void:
 	super("held", m, {"stars": "2", "gold": "4.974", "gems": "65"})
-	hero = start_hero if MockView.layout_of("held").get("states", {}).has(start_hero) else "dusty"
-	state = hero
+	hero = start_hero if GameData.HEROES.has(start_hero) else "dusty"
+	state = hero if MockView.layout_of("held").get("states", {}).has(hero) else "dusty"
 
 
 func _ready() -> void:
@@ -97,7 +97,8 @@ func _set_hero(id: String) -> void:
 	hero = id
 	_overrides.clear()
 	_hidden.clear()
-	show_state(id)
+	# Helden ohne eigenen Zustand im Mockup (neue Champions) zeigen die Vorlage von Dusty Jo
+	show_state(id if MockView.layout_of("held").get("states", {}).has(id) else "dusty")
 	if _view3d and _view3d.hero_id != id:
 		_view3d.set_hero(id)
 	_decorate()

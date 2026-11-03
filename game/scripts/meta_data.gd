@@ -10,7 +10,8 @@ const ENERGY_REGEN := 240
 const HERO_MAX_LEVEL := 30
 
 ## Welches Level gewonnen sein muss, damit ein Held freigeschaltet ist (0 = von Anfang an).
-const HERO_UNLOCK := {"dusty": 0, "iska": 0, "brocken": 1, "kalle": 2, "volta": 2, "margot": 3, "lynx": 4, "fritzi": 5}
+const HERO_UNLOCK := {"dusty": 0, "iska": 0, "brocken": 1, "kalle": 2, "volta": 2, "margot": 3, "lynx": 4, "fritzi": 5,
+	"fuenkchen": 7, "rollo": 10, "pip": 13, "nova": 16}
 ## Alternativ sofort freischalten mit Edelsteinen
 const HERO_UNLOCK_GEMS := 150
 ## Höchstzahl der Helden in der Aufstellung (aus ihnen werden die Karten im Kampf gezogen)
@@ -120,6 +121,10 @@ const BUILDINGS := {
 	"margot": "Margots Kapitänskajüte",
 	"lynx": "Lynx' Ausguck",
 	"fritzi": "Fritzis Feuerwache",
+	"fuenkchen": "Fünkchens Sternenhort",
+	"pip": "Pips Schraubwerkstatt",
+	"rollo": "Rollos Garage",
+	"nova": "Novas Exo-Hangar",
 }
 const BUILDING_MAX_LEVEL := 10
 

@@ -5,10 +5,11 @@ Vorschlag; vor dem Einbau rechne ich sie mit `scripts/economy-sim.py` und dem Ba
 
 ## Grundregeln
 
-- **Gebäude 01–08 gehören zu den Champions:** 01–05 hat jeder von Anfang an (fünf Starthelden),
-  06–08 kommen mit dem 6., 7. und 8. freigeschalteten Champion dazu (Reihenfolge der Freischaltung).
-- **Gebäude 09–30 baut man:** Jedes wird ab einem bestimmten Abenteuer-Level baubar und kostet
-  dann Gold. Etwa alle zwei Level ein neues, von Level 5 bis Level 47.
+- **Gebäude 01–12 gehören zu den Champions** (12 Champions, Stand 03.11.2026): 01–05 hat jeder von
+  Anfang an, 06–12 kommen mit dem 6. bis 12. freigeschalteten Champion dazu.
+- **Gebäude 13–30 baut man:** Jedes wird ab einem bestimmten Abenteuer-Level baubar und kostet
+  dann Gold, etwa alle zwei Level ein neues (Level 13 bis 47). Die Tabelle unten nennt für 09–12 noch
+  Level und Gold aus dem ersten Entwurf; die gelten jetzt nicht mehr, sie kommen mit dem 9.–12. Champion.
 - **Ausbau:** Jedes Gebäude hat Stufe 1–10. Ausbauen kostet Gold, ab Stufe 6 zusätzlich Sterne.
 - **Zwei Arten:** *Erzeuger* sammeln mit der Zeit etwas, das man abholt (Lager läuft voll und stoppt).
   *Verstärker* wirken dauerhaft im Kampf (kleine Prozentwerte, wachsen mit der Stufe).

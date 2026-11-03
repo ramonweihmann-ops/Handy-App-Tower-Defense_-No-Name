@@ -550,6 +550,19 @@ func flame(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type: Stri
 		Fx.flash(self, target.aim_point(), Color(1.0, 0.35, 0.1), radius * 0.8, 0.25)
 
 
+## Schwerkraftfeld (Nova): trifft alle im Umkreis, zieht sie zum Mittelpunkt und bremst sie
+func gravity_well(center: Vector3, radius: float, dmg: float, crit: bool, ammo_type: String, pull: float, slow: float, slow_t: float) -> void:
+	for e in enemies.duplicate():
+		if not is_instance_valid(e) or not e.alive:
+			continue
+		if Vector2(e.position.x - center.x, e.position.z - center.z).length() <= radius + e.radius():
+			if dmg > 0.0:
+				apply_hit(e, dmg, crit, ammo_type)
+			e.pull_to(center, pull)
+			e.apply_slow(slow, slow_t)
+	Fx.flash(self, center + Vector3(0, 0.6, 0), Color(0.6, 0.35, 1.0), radius * 0.9, 0.35)
+
+
 func _nearest_enemy(pos: Vector3, max_dist: float, exclude: Array[Enemy]) -> Enemy:
 	var best: Enemy = null
 	var best_d := max_dist

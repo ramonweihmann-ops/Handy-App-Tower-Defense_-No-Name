@@ -3,13 +3,15 @@ extends RefCounted
 ## Feste Spieldaten des Piloten: Helden, Gegner, Wellen.
 ## Namen und Werte sind Arbeitsstände und werden beim Balancing angepasst.
 
-const HERO_IDS := ["dusty", "iska", "brocken", "volta", "kalle", "margot", "lynx", "fritzi"]
+const HERO_IDS := ["dusty", "iska", "brocken", "volta", "kalle", "margot", "lynx", "fritzi",
+	"fuenkchen", "pip", "rollo", "nova"]
 
 ## Heldentyp: Start-Helden tragen den Anfang eines Kampfes. Verstärkungs-Helden sind als erster
 ## Held schwächer, werden aber stark, wenn sie im Kampf per Karte dazugerufen werden:
 ## eigener Schaden +30 %, das ganze Team +6 % (je Verstärkung).
 const HERO_TYPE := {"dusty": "start", "iska": "start", "brocken": "start", "kalle": "start", "fritzi": "start",
-	"volta": "verstaerkung", "margot": "verstaerkung", "lynx": "verstaerkung"}
+	"volta": "verstaerkung", "margot": "verstaerkung", "lynx": "verstaerkung",
+	"fuenkchen": "start", "rollo": "start", "pip": "verstaerkung", "nova": "verstaerkung"}
 const REINFORCE_DAMAGE := 0.3
 const TEAM_AURA := 0.06
 
@@ -99,6 +101,48 @@ const HEROES := {
 		"color": Color(0.95, 0.35, 0.15),
 		"skin": Color(0.95, 0.78, 0.64),
 		"damage": 8.0, "interval": 0.2, "mag": 20, "reload": 1.8, "cost": 5, "cone": 1.7,
+	},
+	# Ab hier die Champions aus dem zweiten Entwurf (03.11.2026); bis die GLB-Modelle da sind,
+	# zeigen die Menüs das Entwurfsbild (ui/heroes2d) und der Kampf eine einfache Figur.
+	"fuenkchen": {
+		"name": "Fünkchen",
+		"role": "Weltraumdrache",
+		"weapon": "Sternenatem",
+		"blurb": "Ein Atemzug, und die ganze Reihe glüht.",
+		"family": "beam",
+		"color": Color(0.6, 0.38, 0.92),
+		"skin": Color(0.62, 0.42, 0.9),
+		"damage": 30.0, "interval": 0.7, "mag": 5, "reload": 1.6, "cost": 4, "pierce": 4,
+	},
+	"pip": {
+		"name": "Pip",
+		"role": "Cyberbot",
+		"weapon": "Schraubenwerfer",
+		"blurb": "Repariert die Mauer, während er schraubt.",
+		"family": "drone",
+		"color": Color(0.2, 0.75, 0.78),
+		"skin": Color(0.95, 0.9, 0.8),
+		"damage": 12.0, "interval": 0.5, "mag": 8, "reload": 1.4, "cost": 3, "repair": 0.0015,
+	},
+	"rollo": {
+		"name": "Rollo",
+		"role": "Mini-Panzer",
+		"weapon": "Wuchtkanone",
+		"blurb": "Schiebt alles zurück, was zu nah kommt.",
+		"family": "cannon",
+		"color": Color(0.95, 0.55, 0.15),
+		"skin": Color(0.25, 0.3, 0.55),
+		"damage": 45.0, "interval": 0.8, "mag": 3, "reload": 1.8, "cost": 4, "push": 1.5,
+	},
+	"nova": {
+		"name": "Nova",
+		"role": "Exo-Pilotin",
+		"weapon": "Raketenfäuste",
+		"blurb": "Zieht die Gegner zusammen und bremst sie aus.",
+		"family": "gravity",
+		"color": Color(0.5, 0.3, 0.85),
+		"skin": Color(0.66, 0.45, 0.32),
+		"damage": 20.0, "interval": 0.6, "mag": 6, "reload": 1.6, "cost": 3, "radius": 1.6,
 	},
 }
 

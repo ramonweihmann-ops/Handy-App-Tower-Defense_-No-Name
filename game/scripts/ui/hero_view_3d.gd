@@ -122,6 +122,11 @@ func set_hero(id: String) -> void:
 	_model = null
 	_ap = null
 	_skel = null
+	# Freigegebener Entwurf (ui/heroes2d) hat Vorrang vor den alten 3D-Figuren, bis die neuen
+	# GLB-Modelle da sind
+	if ResourceLoader.exists("res://ui/heroes2d/%s.png" % id):
+		_show_design(id)
+		return
 	var info: Dictionary = Models.HEROES.get(id, {})
 	var scene := Models._scene(str(info.get("file", "")))
 	if scene == null:
@@ -165,6 +170,30 @@ func set_hero(id: String) -> void:
 		_attach_gun(id)
 	_vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	# Standbild: ein paar Bilder zeichnen (Knochen und Waffe sind dann gesetzt), danach ruhen
+	_frames_left = 4 if portrait else -1
+
+
+## Bis die neuen GLB-Modelle da sind: das freigegebene Entwurfsbild (ui/heroes2d) als flaches Bild an
+## der Stelle der Figur, Füße auf dem Boden.
+const DESIGN_HEIGHT := {"fuenkchen": 1.75, "rollo": 1.45}
+
+
+func _show_design(id: String) -> void:
+	var path := "res://ui/heroes2d/%s.png" % id
+	if not ResourceLoader.exists(path):
+		return
+	var tex: Texture2D = load(path)
+	_holder = Node3D.new()
+	_vp.add_child(_holder)
+	var sp := Sprite3D.new()
+	sp.texture = tex
+	sp.shaded = false
+	sp.alpha_cut = SpriteBase3D.ALPHA_CUT_DISABLED
+	var h := float(DESIGN_HEIGHT.get(id, 2.0))
+	sp.pixel_size = h / float(tex.get_height())
+	sp.position.y = h * 0.5
+	_holder.add_child(sp)
+	_vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	_frames_left = 4 if portrait else -1
 
 

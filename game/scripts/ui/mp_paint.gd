@@ -8,6 +8,8 @@ const HERO_BG := {
 	"margot": [Color("#ff9fc3"), Color("#c2508f")], "lynx": [Color("#7a4bff"), Color("#3a1f9a")],
 	"volta": [Color("#6fe8d0"), Color("#1f8f9a")], "brocken": [Color("#ff8a7a"), Color("#c0303a")],
 	"kalle": [Color("#ffb070"), Color("#c8661a")], "fritzi": [Color("#9dff7a"), Color("#3f9f3a")],
+	"fuenkchen": [Color("#c8a0ff"), Color("#6a3fd8")], "pip": [Color("#8fe8e8"), Color("#1f8f9a")],
+	"rollo": [Color("#ffc070"), Color("#d8661a")], "nova": [Color("#d0a8ff"), Color("#5a2a9a")],
 }
 
 static var _tex := {}

@@ -102,6 +102,27 @@ func apply_burn(burn_dps: float, duration: float) -> void:
 	_burn_t = maxf(_burn_t, duration)
 
 
+## Zurückstoßen (Rollos Wuchtkanone): starke Gegner weniger, Bosse kaum
+func knockback(dist: float) -> void:
+	if not alive:
+		return
+	var k := 0.3 if is_boss() else (0.6 if data["tier"] == "stark" else 1.0)
+	position.z = maxf(battle.spawn_z(), position.z - dist * k)
+	attacking = false
+
+
+## Zur Mitte ziehen (Novas Schwerkraftfeld): Anteil f der Strecke zum Punkt c
+func pull_to(c: Vector3, f: float) -> void:
+	if not alive or is_boss():
+		return
+	_base_x = lerpf(_base_x, c.x, f)
+	position.x = lerpf(position.x, c.x, f)
+	var nz := lerpf(position.z, c.z, f * 0.5)
+	if nz < position.z:
+		attacking = false
+	position.z = nz
+
+
 func apply_slow(amount: float, duration: float) -> void:
 	_slow = maxf(_slow, amount)
 	_slow_t = maxf(_slow_t, duration)
