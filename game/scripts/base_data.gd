@@ -21,7 +21,7 @@ const BUILDINGS := [
 		"text": "Schild heilt nach jeder Welle"},
 	{"id": "03", "name": "Werkstatt", "kind": "prod", "item": "cards", "v1": 0.5, "v10": 5.0,
 		"text": "Heldenkarten pro Stunde für deine Helden"},
-	{"id": "04", "name": "Hologrammakademie", "kind": "boost", "bonus": "xp", "v1": 0.03, "v10": 0.15,
+	{"id": "04", "name": "Hologrammakademie", "kind": "boost", "bonus": "xp", "v1": 0.015, "v10": 0.075,
 		"text": "Mehr Erfahrung im Kampf"},
 	{"id": "05", "name": "Reaktorturm", "kind": "prod", "item": "energy", "v1": 1.0 / 3.0, "v10": 1.0,
 		"text": "Energie pro Stunde"},

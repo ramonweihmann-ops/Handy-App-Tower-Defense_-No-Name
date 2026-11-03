@@ -23,7 +23,7 @@ geprüft (Abschnitt „Wirtschafts-Simulation“); die Kampf-Boni prüft noch da
 | 01 | Kommandozentrale | Start | Erzeuger | Gold 40 → 400 pro Stunde; Stufe der Zentrale begrenzt alle anderen Stufen |
 | 02 | Sanitätsstation | Start | Verstärker | Schild heilt nach jeder Welle 1 % → 3 % |
 | 03 | Werkstatt | Start | Erzeuger | Heldenkarten 0,5 → 5 pro Stunde (wie die heutigen Quartiere) |
-| 04 | Hologrammakademie | Start | Verstärker | Erfahrung im Kampf +3 % → +15 % |
+| 04 | Hologrammakademie | Start | Verstärker | Erfahrung im Kampf +1,5 % → +7,5 % (mehr Kartenwahlen im Kampf) |
 | 05 | Reaktorturm | Start | Erzeuger | Energie: 1 Punkt alle 3 Std. → alle 1 Std. |
 | 06 | Kommunikationsstation | 6. Champion | Verstärker | Pass-Punkte je Sieg +2 → +10 |
 | 07 | Gewächshaus | 7. Champion | Erzeuger | Gold 60 → 600 pro Stunde |
@@ -103,7 +103,8 @@ Boss-Level 25–50, 6 Läufe je Level und Profil, Ø Siegquote:
 
 Die Basis ersetzte das Leveln nicht (Anfänger mit Basis gewinnt trotzdem nicht), hob aber den
 Durchschnittsspieler um gut 20 Punkte über das Ziel, fast auf Höhe der Zahlenden ohne Basis. Darum
-sind alle Kampfwerte halbiert (Komfort-Boni wie Erfahrung, Gold, Karten, Pass, Energie, Lager nicht).
+sind alle Kampfwerte halbiert, auch die Erfahrung im Kampf (sie bringt mehr Kartenwahlen); Komfort-Boni
+wie Gold, Karten, Pass, Energie und Lager nicht.
 
 ## Grafik
 
