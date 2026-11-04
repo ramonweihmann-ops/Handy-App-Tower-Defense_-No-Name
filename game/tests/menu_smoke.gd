@@ -165,6 +165,18 @@ func _run() -> bool:
 						m._mock.select(str(t["id"]))
 				m._mock.set_area("schutz")
 				m._mock.buy_selected()
+				# Munition nach dem Mockup: Fenster offen, Antippen eines Kaufknopfs kauft genau eine Stufe
+				var ap = m._mock._ammo
+				var before := save.ammo_level("cap")
+				if ap is UpgradesTab.AmmoPanel:
+					var ev := InputEventMouseButton.new()
+					ev.button_index = MOUSE_BUTTON_LEFT
+					ev.pressed = true
+					ev.position = ap.off + UpgradesTab.AmmoPanel.button_rect(1).get_center() * ap.s
+					ap._gui_input(ev)
+				print("SMOKE munition-fenster: ", ap is UpgradesTab.AmmoPanel, " tank ", before, " -> ", save.ammo_level("cap"))
+				if not (ap is UpgradesTab.AmmoPanel) or save.ammo_level("cap") != before + 1:
+					print("SMOKE FEHLER: Munition-Fenster kauft nicht")
 				m._mock.close_ammo()
 				print("SMOKE tech-baum: gebaut ", save.tech_count())
 		8:

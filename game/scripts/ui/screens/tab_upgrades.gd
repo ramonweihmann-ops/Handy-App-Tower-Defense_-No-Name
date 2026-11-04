@@ -111,7 +111,7 @@ func bind() -> void:
 	if _ammo_btn:
 		_ammo_btn.queue_redraw()
 	if is_instance_valid(_ammo):
-		_ammo.queue_redraw()
+		_ammo.redraw()
 
 
 func handle(b: Dictionary) -> bool:
@@ -323,7 +323,7 @@ func open_ammo() -> void:
 		return
 	_ammo = AmmoPanel.new()
 	_ammo.tab = self
-	place_at(_ammo, Rect2(0, 0, W, H), true)
+	add_child(_ammo)
 
 
 func close_ammo() -> void:
@@ -625,121 +625,125 @@ class AmmoButton:
 			accept_event()
 
 
-## Fenster „Munition“: dauerhafte Stufen für Plasma und Energiekern (Logik wie im alten Upgrade-Reiter)
+## Fenster „Munition“ nach dem freigegebenen Mockup „Upgrades · Munition“ (Entwurf Vorlage_Raw/Munition_Fenster_v1):
+## sechs unabhängige Module im 2×3-Raster. Rahmen, Symbole, Titel und Beschreibungen kommen aus dem Export
+## ui_mock/munition (mit der weich auslaufenden Abdunklung dahinter); Stufe, Segmente und der Knopf je nach
+## Spielstand zeichnet das Spiel: kaufbar (grün, Preis), zu teuer (grau, Preis rot), voll ausgebaut (MAX, gold).
 class AmmoPanel:
-	extends Control
-	const PANEL := Rect2(16, 112, 358, 574)
-	const ROW_Y := 162.0
-	const ROW_H := 84.0
+	extends MockView
+	const DIALOG := Rect2(13, 80, 364, 655)
+	const CELL := Vector2(168, 185)
 	var tab: UpgradesTab
+	var _layer: Control
+	var _coin: Texture2D
+
+	func _init() -> void:
+		super("munition")
 
 	func _ready() -> void:
-		mouse_filter = Control.MOUSE_FILTER_STOP
+		super()
+		_fill.visible = false
+		_coin = load("res://ui/icons/gold.webp")
+		_layer = Control.new()
+		_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_layer.draw.connect(_draw_layer)
+		place_at(_layer, Rect2(0, 0, W, H), true)
+		button_pressed.connect(func(b: Dictionary) -> void:
+			if str(b.get("label", "")) == "Schließen":
+				Sfx.play("click")
+				tab.close_ammo())
 		modulate.a = 0.0
 		create_tween().tween_property(self, "modulate:a", 1.0, 0.15)
-		await get_tree().process_frame
-		queue_redraw()
 
-	func _row_button(k: int) -> Rect2:
-		return Rect2(262, ROW_Y + ROW_H * k + 16.0, 98, 44)
+	func redraw() -> void:
+		if is_instance_valid(_layer):
+			_layer.queue_redraw()
 
-	func _draw() -> void:
-		var s := tab.s
-		var o := Vector2.ZERO   # Ursprung = Mockup-Punkt (0,0)
-		draw_rect(Rect2(-tab.off, tab.size), Color(0.04, 0.02, 0.12, 0.55))
+	static func cell(k: int) -> Rect2:
+		return Rect2(Vector2(23 + (k % 2) * 176, 151 + (k / 2) * 191), CELL)
+
+	static func button_rect(k: int) -> Rect2:
+		var c := cell(k)
+		return Rect2(c.position + Vector2(26, 149), Vector2(CELL.x - 52, 28))
+
+	func _box(r: Rect2, fill: Color, radius: float, shadow := Color(0, 0, 0, 0), sh_y := 0.0) -> void:
 		var sb := StyleBoxFlat.new()
-		sb.bg_color = Color(20 / 255.0, 12 / 255.0, 48 / 255.0, 0.96)
-		sb.border_color = Color(1, 1, 1, 0.15)
-		sb.set_border_width_all(maxi(1, roundi(2 * s)))
-		sb.set_corner_radius_all(roundi(16 * s))
-		sb.shadow_color = Color(0, 0, 0, 0.35)
-		sb.shadow_size = roundi(20 * s)
-		draw_style_box(sb, Rect2(o + PANEL.position * s, PANEL.size * s))
-		# Reiter-Kopf wie „Neues Talent erhalten“
-		var hb := StyleBoxFlat.new()
-		hb.bg_color = Color("#24203a")
-		hb.corner_radius_top_left = roundi(8 * s)
-		hb.corner_radius_top_right = roundi(8 * s)
-		var head := Rect2(100, PANEL.position.y - 14.0, 190, 31)
-		draw_style_box(hb, Rect2(o + head.position * s, head.size * s))
-		tab.label_at(self, "Munition", o + head.get_center() * s, "Fredoka", 700, 15.0, Color("#fff7ea"))
-		# Schließen-Kreuz
-		var cr := Rect2(326, PANEL.position.y + 12.0, 34, 34)
-		var cb := StyleBoxFlat.new()
-		cb.bg_color = Color(1, 1, 1, 0.12)
-		cb.set_corner_radius_all(roundi(10 * s))
-		draw_style_box(cb, Rect2(o + cr.position * s, cr.size * s))
-		var cc := o + cr.get_center() * s
-		var d := 5.0 * s
-		draw_line(cc + Vector2(-d, -d), cc + Vector2(d, d), Color.WHITE, 2.3 * s, true)
-		draw_line(cc + Vector2(d, -d), cc + Vector2(-d, d), Color.WHITE, 2.3 * s, true)
-		tab.label_at(self, "Gilt in jedem Kampf.", o + Vector2(32, PANEL.position.y + 29.0) * s, "Nunito", 700, 13.0, Color("#d6d0f5"), -1)
-		for k in MetaData.AMMO_UPGRADES.size():
-			_row(k)
+		sb.bg_color = fill
+		sb.set_corner_radius_all(roundi(radius * s))
+		if shadow.a > 0.0:
+			sb.shadow_color = shadow
+			sb.shadow_offset = Vector2(0, sh_y * s)
+			sb.shadow_size = 0
+		sb.anti_aliasing = true
+		_layer.draw_style_box(sb, Rect2(r.position * s, r.size * s))
 
-	func _row(k: int) -> void:
-		var s := tab.s
-		var o := Vector2.ZERO
+	func _text(t: String, cx: float, mid_y: float, fam: String, weight: int, px: float, col: Color, align := 0.5) -> float:
+		var f := MockFonts.font(fam, weight)
+		var fs := maxi(1, roundi(px * s))
+		var w := f.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		var base := mid_y * s + (f.get_ascent(fs) - f.get_descent(fs)) * 0.5
+		_layer.draw_string(f, Vector2(cx * s - w * align, base), t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, col)
+		return w / s
+
+	func _draw_layer() -> void:
+		for k in MetaData.AMMO_UPGRADES.size():
+			_module(k)
+
+	func _module(k: int) -> void:
 		var u: Dictionary = MetaData.AMMO_UPGRADES[k]
 		var id := str(u["id"])
 		var lvl := Save.ammo_level(id)
 		var mx := int(u["max"])
-		var y := ROW_Y + ROW_H * k
-		var rb := StyleBoxFlat.new()
-		rb.bg_color = Color(0, 0, 0, 0.25)
-		rb.set_corner_radius_all(roundi(10 * s))
-		draw_style_box(rb, Rect2(o + Vector2(28, y) * s, Vector2(334, 76) * s))
-		var tw := tab.label_at(self, str(u["title"]), o + Vector2(40, y + 15.0) * s, "Fredoka", 700, 16.0, Color("#fff7ea"), -1)
-		tab.label_at(self, "Stufe %d/%d" % [lvl, mx], o + Vector2(40, y + 15.0) * s + Vector2(tw + 8.0 * s, 1.0 * s), "Nunito", 800, 12.0, Color("#ffe27a"), -1)
-		var lines := tab.wrap(String(u["desc"]).replace("%%", "%"), "Nunito", 700, 12.0, 212.0)
-		for j in mini(lines.size(), 2):
-			tab.label_at(self, lines[j], o + Vector2(40, y + 35.0 + 15.0 * j) * s, "Nunito", 700, 12.0, Color("#d6d0f5"), -1)
-		# Fortschritt
-		var bar := Rect2(40, y + 64.0, 212, 5)
-		var bb := StyleBoxFlat.new()
-		bb.bg_color = Color(1, 1, 1, 0.15)
-		bb.set_corner_radius_all(maxi(1, roundi(2.5 * s)))
-		draw_style_box(bb, Rect2(o + bar.position * s, bar.size * s))
-		if lvl > 0:
-			bb.bg_color = Color("#ffd34d")
-			draw_style_box(bb, Rect2(o + bar.position * s, Vector2(bar.size.x * lvl / float(mx), bar.size.y) * s))
-		var br := _row_button(k)
-		if lvl >= mx:
-			var mb := StyleBoxFlat.new()
-			mb.bg_color = Color(63 / 255.0, 208 / 255.0, 90 / 255.0, 0.18)
-			mb.border_color = Color("#3fd05a")
-			mb.set_border_width_all(maxi(1, roundi(2 * s)))
-			mb.set_corner_radius_all(roundi(14 * s))
-			draw_style_box(mb, Rect2(o + br.position * s, br.size * s))
-			tab.label_at(self, "MAX", o + br.get_center() * s, "Fredoka", 700, 17.0, Color("#9dff7a"))
+		var c := cell(k)
+		var cx := c.get_center().x
+		var full := lvl >= mx
+		_text("Stufe %d/%d" % [lvl, mx], cx, c.position.y + 124.0, "Fredoka", 700, 13.0, Color("#ffd56a"))
+		# Segmente: so viele wie Stufen, gefüllt bis zur erreichten Stufe (gold, wenn voll)
+		var seg := Vector2(11, 10)
+		var gap := 3.0
+		var x0 := cx - (mx * seg.x + (mx - 1) * gap) * 0.5
+		for i in mx:
+			var r := Rect2(Vector2(x0 + i * (seg.x + gap), c.position.y + 134.0), seg)
+			if i < lvl:
+				var col := Color("#f0b53a") if full else Color("#52e7ff")
+				var hi := Color("#ffe58a") if full else Color("#9ef4ff")
+				_box(r.grow(1.5), Color(col.r, col.g, col.b, 0.25), 4.5)
+				_box(r, col, 3)
+				_box(Rect2(r.position, Vector2(r.size.x, r.size.y * 0.5)), hi, 3)
+			else:
+				_box(r, Color("#514266"), 3)
+		var b := button_rect(k)
+		if full:
+			_box(b, Color("#d99b31"), 14, Color("#8a5a10"), 3)
+			_box(Rect2(b.position, Vector2(b.size.x, b.size.y * 0.55)), Color("#ffe58a"), 14)
+			_text("MAX", cx, b.get_center().y + 0.5, "Fredoka", 700, 16.0, Color("#613a0a"))
 			return
 		var cost := MetaData.ammo_cost(u, lvl)
 		var can := Save.gold() >= cost
-		tab.pill(self, "knopf_gruen_normal", br, Vector2.ZERO, Color(1, 1, 1, 1.0 if can else 0.55))
+		if can:
+			_box(b, Color("#4bc62d"), 14, Color("#23802a"), 3)
+			_box(Rect2(b.position, Vector2(b.size.x, b.size.y * 0.55)), Color("#8fe85c"), 14)
+		else:
+			_box(b, Color("#514d68"), 14, Color("#2e2b40"), 3)
+			_box(Rect2(b.position, Vector2(b.size.x, b.size.y * 0.55)), Color("#6a6684"), 14)
 		var price := MockScreen.num(cost)
-		var pw := tab.text_width(price, "Fredoka", 700, 16.0)
-		var x0 := br.get_center().x - (18.0 + 5.0 + pw) * 0.5
-		_coin(o + Vector2(x0 + 9.0, br.get_center().y) * s, 9.0 * s, can)
-		tab.label_at(self, price, o + Vector2(x0 + 23.0, br.get_center().y) * s, "Fredoka", 700, 16.0, Color(15 / 255.0, 61 / 255.0, 18 / 255.0, 1.0 if can else 0.6), -1)
-
-	## Goldmünze wie im Mockup (Kreis mit Rand und hellem Innenring)
-	func _coin(c: Vector2, r: float, bright: bool) -> void:
-		var a := 1.0 if bright else 0.6
-		draw_circle(c, r * 0.75 + r * 0.0625, Color(168 / 255.0, 106 / 255.0, 0, a))
-		draw_circle(c, r * 0.75 - r * 0.0625, Color(1.0, 210 / 255.0, 58 / 255.0, a))
-		draw_arc(c, r * 0.458, 0, TAU, 24, Color(1.0, 243 / 255.0, 176 / 255.0, a), r * 0.125, true)
+		var pw := MockFonts.font("Fredoka", 700).get_string_size(price, HORIZONTAL_ALIGNMENT_LEFT, -1, maxi(1, roundi(16.0 * s))).x / s
+		var left := cx - (18.0 + 6.0 + pw) * 0.5
+		if _coin:
+			_layer.draw_texture_rect(_coin, Rect2(Vector2(left, b.get_center().y - 9.0) * s, Vector2(18, 18) * s), false, Color(1, 1, 1, 1.0 if can else 0.8))
+		_text(price, left + 24.0, b.get_center().y + 0.5, "Fredoka", 700, 16.0, Color("#14320e") if can else Color("#ff8a8a"), 0.0)
 
 	func _gui_input(e: InputEvent) -> void:
 		if not (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT):
 			return
 		accept_event()
-		var p: Vector2 = e.position / tab.s
-		if Rect2(326, PANEL.position.y + 12.0, 34, 34).grow(6.0).has_point(p) or not PANEL.has_point(p):
+		var p: Vector2 = (e.position - off) / s
+		if not DIALOG.has_point(p):
 			Sfx.play("click")
 			tab.close_ammo()
 			return
 		for k in MetaData.AMMO_UPGRADES.size():
-			if _row_button(k).grow(4.0).has_point(p):
+			if button_rect(k).grow(6.0).has_point(p):
 				var u: Dictionary = MetaData.AMMO_UPGRADES[k]
 				var id := str(u["id"])
 				if Save.ammo_level(id) >= int(u["max"]):

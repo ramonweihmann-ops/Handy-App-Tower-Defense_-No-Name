@@ -1,0 +1,5 @@
+{"board": "Upgrades-Munition-Neu.dc.html", "out": "out/munition",
+ "states": [{"name": "main", "eval": "document.querySelectorAll('#dc-root div[role=\"group\"]').forEach(g => { [...g.children].forEach(c => { const t = c.textContent.trim(); if (t.startsWith('Stufe ') && !t.includes(':')) c.remove(); else if (c.getAttribute('aria-hidden') === 'true') c.remove(); else if (c.tagName === 'A' || (c.getAttribute('aria-label') || '').length > 0) c.remove(); }); });"}],
+ "only": ["#dc-root > div > div[style*=\"top: 66px\"]", "#dc-root > div > div[role=\"dialog\"]", "#dc-root > div > div[style*=\"top: 88px\"]",
+   "#dc-root > div > div[style*=\"top: 124px\"]", "#dc-root > div > a[aria-label=\"Schließen\"]", "#dc-root > div > div[role=\"group\"]"],
+ "live": []}

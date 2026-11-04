@@ -537,6 +537,12 @@ func _process(delta: float) -> void:
 						if not BaseData.by_champion(bid):
 							Save.base()[bid] = {"level": 2, "stock": 999.0, "time": Time.get_unix_time_from_system()}
 					menu.show_tab(parts[1])
+				elif parts.size() > 2 and parts[2] == "munition-beispiel":
+					# Beispielstand wie im Mockup: drei Zustände (kaufbar, zu teuer, MAX), 662 Gold
+					Save.data["ammo_up"] = {"rate": 6, "cap": 4, "start": 10, "lever": 3, "count": 0, "gate": 0}
+					Save.data["gold"] = 662
+					menu.sub_tab[parts[1]] = "munition"
+					menu.show_tab(parts[1])
 				elif parts.size() > 2 and parts[2].begins_with("bau:"):
 					# Gebäudefenster fürs Bild: bau:<id>, gebaut mit halbvollem Lager (bau:<id>:leer = noch nicht gebaut)
 					Save.data["max_level"] = 20
