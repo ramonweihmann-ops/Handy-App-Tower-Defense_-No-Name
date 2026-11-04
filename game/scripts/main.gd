@@ -189,6 +189,15 @@ func _parse_args() -> void:
 			ms.set("kinds", spec.get_slice(":", 0).split(","))
 			ms.set("out_dir", spec.get_slice(":", 1))
 			add_child.call_deferred(ms)
+		elif arg.begins_with("--fx-show="):
+			var fs: Node = load("res://tests/fx_show.gd").new()
+			var spec := arg.get_slice("=", 1)
+			fs.set("main", self)
+			fs.set("mode", spec.get_slice(":", 0))
+			fs.set("out_dir", spec.get_slice(":", 1))
+			add_child.call_deferred(fs)
+		elif arg == "--fx-neu":
+			Battle.fx_test = true
 		elif arg == "--neue-monster":
 			Models.test_new = true   # noch nicht freigegebene Gegnermodelle zeigen (Prüfbilder)
 		elif arg == "--mp":
@@ -409,6 +418,7 @@ func _use_booster(i: int) -> void:
 			battle.booster_air_strike(power * (1.0 + float(bonus.get("airstrike", 0.0))))
 		"medipack":
 			battle.repair_fence(0.25 * power * (1.0 + float(bonus.get("medipack", 0.0))), 0.0)
+			battle.fence_heal_fx("medipack_heilung", [-2.8, 0.0, 2.8])
 		"zeitlupe":
 			battle.booster_slow(power)
 		"kuppel":

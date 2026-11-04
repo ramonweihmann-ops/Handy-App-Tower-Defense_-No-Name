@@ -332,6 +332,9 @@ func _fire(target: Enemy) -> void:
 	var dmg := damage() * (2.0 if crit else 1.0)
 	var from := _muzzle.global_position
 	Sfx.play(SHOT_SOUND.get(family(), "shot"))
+	var style := str(FX_STYLE.get(family(), ""))
+	battle.shot_style = style
+	_muzzle_fx(style, from, target)
 	match family():
 		"revolver":
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, 0, 30.0, 1.0)
@@ -365,6 +368,9 @@ func _fire(target: Enemy) -> void:
 		"beam":
 			# Sternenatem: durchschlägt die ganze Reihe; mit der Superfähigkeit drei Reihen
 			var pierce := int(data["pierce"]) + int(mods["special"])
+			if FxSprite.has("fuenkchen_geschoss"):
+				var far := from + (target.aim_point() - from).normalized() * maxf(8.0, from.distance_to(target.aim_point()) + 4.0)
+				FxSprite.beam(battle, "fuenkchen_geschoss", from, far, 0.25, 0.6, 0.7)
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, pierce, 60.0, 1.3)
 			if ult_active():
 				for other in battle.spread_targets(2, target):
@@ -372,6 +378,9 @@ func _fire(target: Enemy) -> void:
 		"drone":
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, 0, 34.0, 0.8)
 			battle.repair_fence(float(data["repair"]) * (1.0 + 0.5 * int(mods["special"])), 0.0)
+			_repair_n += 1
+			if _repair_n % 4 == 0:
+				battle.fence_heal_fx("pip_reparatur", [global_position.x])
 			if ult_active() and _turret:
 				for other in battle.spread_targets(2, target):
 					battle.fire_bullet(_turret.global_position + Vector3(0, 0.6, 0), other, dmg * 1.2, false, "normal", 0, 34.0, 0.8)
@@ -395,9 +404,36 @@ func _fire(target: Enemy) -> void:
 				var e := instance_from_id(eid2) as Enemy
 				if battle and e and e.alive:
 					battle.gravity_well(e.global_position, r, dmg, crit, ammo_type, 0.5, 0.35, 1.2))
+	battle.shot_style = ""
 	_recoil = 1.0
-	_flash_t = 0.06
+	_flash_t = 0.0 if FxSprite.has(style + "_muendung") else 0.06
 	_shot_anim()
+
+
+## Bildfolgen je Held (Präfix in game/fx): Mündung, Geschoss, Einschlag
+const FX_STYLE := {"revolver": "dusty_jo", "mg": "iska", "rocket": "brocken", "tesla": "volta", "cryo": "kalle",
+	"shotgun": "margot", "sniper": "lynx", "flamer": "fritzi", "beam": "fuenkchen", "drone": "pip", "cannon": "rollo",
+	"gravity": "nova"}
+var _repair_n := 0
+var _muzzle_n := 0
+
+
+## Mündungsfeuer als Bildfolge in Schussrichtung (Brocken: Rauchstoß nach hinten); Iska wechselt drei Varianten
+func _muzzle_fx(style: String, from: Vector3, target: Enemy) -> void:
+	if style == "":
+		return
+	var name := style + "_muendung"
+	if style == "iska":
+		_muzzle_n += 1
+		var v := _muzzle_n % 3
+		if v > 0 and FxSprite.has("iska_muendung_variante_%d" % (v + 1)):
+			name = "iska_muendung_variante_%d" % (v + 1)
+	if not FxSprite.has(name):
+		return
+	var d := target.aim_point() - from
+	if style == "brocken":
+		d = -d
+	FxSprite.play(battle, name, from, {"dir": d, "speed": 2.4, "scale": 0.8})
 
 
 func _aim_at(target_pos: Vector3, delta: float) -> void:

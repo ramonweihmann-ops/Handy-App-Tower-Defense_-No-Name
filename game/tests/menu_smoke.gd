@@ -47,6 +47,7 @@ func _run() -> bool:
 			m.sub_tab["upgrades"] = "talente"
 			m.show_tab("upgrades")
 			print("SMOKE alle Reiter gebaut")
+			_check_close_buttons(m)
 			# Basislager: Lager-Blase einsammeln und „Alle Lager einsammeln“
 			m.show_tab("basis")
 			var bt: BaseTab = m._mock
@@ -268,3 +269,56 @@ func _sizes(n: Node, depth: int) -> void:
 		print("SMOKE größe: ", "  ".repeat(depth), c.get_class(), " pos=", c.position, " size=", c.size, " min=", c.get_combined_minimum_size())
 	for ch in n.get_children():
 		_sizes(ch, depth + 1)
+
+
+## Jedes Fenster öffnen, seinen Schließen-/Zurück-Knopf drücken und prüfen, dass es wirklich zu ist
+const CLOSE_LABELS := ["Schließen", "Zurück"]
+const BOARDS := ["Angebot-Lynx.dc.html", "Angebot-Volta.dc.html", "Kartenpaket.dc.html", "Starterpaket.dc.html",
+	"Missionen.dc.html", "Rangliste.dc.html", "Spielmodi.dc.html", "Taegliche-Belohnung.dc.html", "Artboard-zqpq.dc.html",
+	"Artboard-seqx-c6i2.dc.html", "Helden-Meldung.dc.html", "Battle-Pass-Comic.dc.html"]
+
+
+func _check_close_buttons(m: MainMenu) -> void:
+	var bad: Array[String] = []
+	var n := 0
+	for href in BOARDS:
+		m.show_tab("kampf")
+		var before := m._boards.size()
+		m.open_board(href)
+		if m._boards.size() <= before:
+			bad.append(href + " (öffnet nicht)")
+			continue
+		var board: Control = m._boards[-1]
+		var close: Dictionary = {}
+		if board is MockView:
+			for b in (board as MockView).buttons():
+				var lab := str(b.info.get("label", ""))
+				var h := str(b.info.get("href", ""))
+				if lab in CLOSE_LABELS or (h == "Main-v4.dc.html" and href == "Battle-Pass-Comic.dc.html"):
+					close = b.info
+					break
+		if close.is_empty():
+			bad.append(href + " (kein Schließen-Knopf)")
+			m.close_board(board)
+			continue
+		(board as MockView)._on_pressed(close)
+		n += 1
+		if m._boards.has(board) or m._boards.size() != before:
+			bad.append(href)
+			while m._boards.size() > before:
+				m.close_board(m._boards[-1])
+	# Gebäudefenster
+	m.show_tab("basis")
+	var nb := m._boards.size()
+	m.open_building("01")
+	var w: Control = m._boards[-1]
+	for b in (w as MockView).buttons():
+		if str(b.info.get("label", "")) == "Schließen":
+			(w as MockView)._on_pressed(b.info)
+			n += 1
+			break
+	if m._boards.size() != nb:
+		bad.append("Gebäudefenster")
+		while m._boards.size() > nb:
+			m.close_board(m._boards[-1])
+	print("SMOKE schließen geprüft: ", n, " fenster, fehler ", bad)

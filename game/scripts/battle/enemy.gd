@@ -66,6 +66,7 @@ func setup(kind_: String, battle_: Battle, hp_mult: float) -> void:
 
 ## Innerer Rand der Brücke (Mitte bis Geländer); Gegner bleiben mit ihrer ganzen Breite davor
 const LANE_HALF := 4.2
+var _fence_fx := 0.0
 var _half_w := 0.0
 
 
@@ -165,6 +166,11 @@ func _process(delta: float) -> void:
 			attacking = true
 	else:
 		battle.damage_fence(dps * delta)
+		_fence_fx -= delta
+		if _fence_fx <= 0.0:
+			# fester Takt (kein Würfeln: der Zufall des Kampfes bleibt unberührt)
+			_fence_fx = 0.8 + 0.3 * fmod(_phase, 1.0)
+			FxSprite.play(battle, "energiezaun_treffer", Vector3(position.x, 0.7, Battle.FENCE_Z), {"width": maxf(1.15, radius() * 2.0)})
 	if is_boss():
 		_spawn_cd -= delta
 		if _spawn_cd <= 0.0:

@@ -135,6 +135,7 @@ class PathLayer:
 		var first := w * GameData.LEVELS_PER_WORLD + 1
 		var sel := home.menu.selected_level
 		var slots := _slot_rects()
+		_road(slots)
 		var cur_src := home.live_rect("node_cur")
 		for k in 4:
 			var lvl := first + k
@@ -177,6 +178,52 @@ class PathLayer:
 			sb.set_corner_radius_all(roundi(10 * home.s))
 			draw_style_box(sb, r)
 		draw_string(font, Vector2(tc.x - tw * 0.5, tc.y + (font.get_ascent(fs) - font.get_descent(fs)) * 0.5), name, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(1.0, 0.97, 0.92))
+
+	## Straße von Level 1 bis zum Boss, durchgehend unter den Knoten und dem Helden. Im Hintergrundbild ist sie dort
+	## lückenhaft, wo im Entwurf Knoten, Held und Namensschild standen (beim Freistellen mit weggefallen).
+	## Wie im Bild: dunkelviolettes Band mit hellem Rand und hellblauen Mittelstrichen.
+	func _road(slots: Array[Rect2]) -> void:
+		var s := home.s
+		var pts: Array[Vector2] = []
+		for r in slots:
+			pts.append(r.get_center())
+		var line := PackedVector2Array()
+		for i in pts.size() - 1:
+			var p0: Vector2 = pts[maxi(0, i - 1)]
+			var p1: Vector2 = pts[i]
+			var p2: Vector2 = pts[i + 1]
+			var p3: Vector2 = pts[mini(pts.size() - 1, i + 2)]
+			for k in 16:
+				var t := k / 16.0
+				var t2 := t * t
+				var t3 := t2 * t
+				var q := 0.5 * ((2.0 * p1) + (-p0 + p2) * t + (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * t2 + (-p0 + 3.0 * p1 - 3.0 * p2 + p3) * t3)
+				# endet am Rand des Boss-Portals (das Portal ist Teil des Hintergrunds)
+				if q.distance_to(pts[-1]) < BOSS_RECT.size.x * 0.5 + 4.0:
+					break
+				line.append(q * s)
+		draw_polyline(line, Color(0.08, 0.05, 0.22, 0.55), 17.0 * s, true)
+		draw_polyline(line, Color(0.62, 0.56, 1.0, 0.85), 14.0 * s, true)
+		draw_polyline(line, Color(0.25, 0.2, 0.52), 11.0 * s, true)
+		# Mittelstriche: 4 Punkte lang, 5 Punkte Abstand
+		var dash := PackedVector2Array()
+		var acc := 0.0
+		for i in line.size() - 1:
+			var a0 := line[i]
+			var a1 := line[i + 1]
+			var seg := a0.distance_to(a1)
+			var pos := 0.0
+			while pos < seg:
+				var phase := fmod(acc + pos, 9.0 * s)
+				var on := phase < 4.0 * s
+				var step := minf(seg - pos, (4.0 * s - phase) if on else (9.0 * s - phase))
+				if on:
+					dash.append(a0.lerp(a1, pos / seg))
+					dash.append(a0.lerp(a1, (pos + step) / seg))
+				pos += maxf(step, 0.01)
+			acc += seg
+		if dash.size() >= 2:
+			draw_multiline(dash, Color(0.45, 0.88, 1.0, 0.95), 2.2 * s, true)
 
 	func _num(c: Vector2, n: int, size: int, col: Color) -> void:
 		var font := MockFonts.font("Fredoka", 700)

@@ -18,6 +18,11 @@ var kind := "bullet"
 var pierce := 0
 var splash := 0.0
 var speed := 45.0
+## Effekt-Stil des Helden (Bildfolgen <style>_geschoss / _einschlag); leer = einfache Kugel
+var style := ""
+## Diese Helden zeigen ihr Geschoss als Strahl (hero.gd/battle.gd), das Projektil selbst bleibt unsichtbar
+const BEAM_STYLES := ["fuenkchen"]
+var _sprite: FxSprite
 
 var _start := Vector3.ZERO
 var _last_target := Vector3.ZERO
@@ -40,6 +45,10 @@ func launch(battle_: Battle, kind_: String, from: Vector3, target_: Enemy, dmg_:
 	_length = maxf(0.5, from.distance_to(_last_target))
 	global_position = from
 	var col: Color = AMMO_COLORS.get(ammo_type, AMMO_COLORS["normal"])
+	if style != "" and FxSprite.has(style + "_geschoss"):
+		if not style in BEAM_STYLES:
+			_sprite = FxSprite.attach(self, style + "_geschoss", {"dir": _last_target - from, "scale": 0.6 * size if kind != "rocket" else 0.8, "alpha": 0.9})
+		return
 	if kind == "rocket":
 		_arc = clampf(_length * 0.12, 0.6, 2.5)
 		var body := Fx.inst(Fx.shared_mesh("rocket_body", func() -> Mesh:
@@ -88,12 +97,16 @@ func _process(delta: float) -> void:
 	var dir := pos - global_position
 	if dir.length() > 0.001:
 		look_at(global_position + dir, Vector3.UP)
+		if _sprite:
+			_sprite.set_dir(dir)
 	global_position = pos
 	if _s >= 1.0:
 		_impact()
 
 
 func _impact() -> void:
+	if kind != "rocket" and style != "" and style != "nova":
+		FxSprite.play(battle, style + "_einschlag", _last_target, {"speed": 1.5})
 	if kind == "rocket":
 		battle.explode(_last_target, splash, dmg, crit, ammo_type)
 	elif is_instance_valid(target) and target.alive:

@@ -75,11 +75,15 @@ func _ready() -> void:
 	_frame.add_child(_build_nav())
 
 	_toast = UiKit.label("", 24, UiKit.C_TEXT)
-	_toast.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
-	_toast.offset_top = -230
+	# volle Breite mit Rand, lange Hinweise brechen um (sonst ragen sie auf schmalen Handys über den Rand)
+	_toast.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	_toast.offset_top = -290
 	_toast.offset_bottom = -190
-	_toast.offset_left = -330
-	_toast.offset_right = 330
+	_toast.offset_left = 28
+	_toast.offset_right = -28
+	_toast.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_toast.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	_toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_toast.add_theme_constant_override("outline_size", 10)
 	_toast.modulate.a = 0.0
 	add_child(_toast)
@@ -1510,6 +1514,13 @@ func _open_settings() -> void:
 		Save.data["perf_level"] = 0
 		Save.save_game()
 		quality_changed.emit()
+		_open_settings()
+	, 420)))
+	# Neue Kampfeffekte (Bildfolgen von ChatGPT) zum Vergleich mit den bisherigen
+	var fx_on := bool(Save.data.get("fx_bilder", false))
+	v.add_child(UiKit.secondary(UiKit.button("Kampfeffekte: %s" % ("Neu (Test)" if fx_on else "Bisher"), func() -> void:
+		Save.data["fx_bilder"] = not fx_on
+		Save.save_game()
 		_open_settings()
 	, 420)))
 	# Testphase: zwischen zwei Spielständen wechseln

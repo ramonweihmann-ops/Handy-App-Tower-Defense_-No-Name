@@ -2,7 +2,8 @@
 """Effektpakete von ChatGPT (Vorlage_Raw/Effekte_ChatGPT_v1/<name>/) ins Spiel übernehmen: game/fx/<name>.webp + .json.
 Die Einzelbilder werden auf die Größe gebracht, in der der Effekt auf dem Handy erscheint (etwa 110 Bildpunkte je
 Meter, auf 64/128/256 gerundet), damit der Grafikspeicher im Kampf klein bleibt. Raster, Reihenfolge, Anker,
-Bildrate und Schleife bleiben wie geliefert. Aufruf: import_chatgpt.py <quelle> <ziel>"""
+Bildrate und Schleife bleiben wie geliefert. Aufruf: import_chatgpt.py <ziel> <quelle> [<quelle> …] – spätere Quellen
+ersetzen gleichnamige Effekte früherer (z. B. v1, dann die drei Explosionen aus v2)."""
 import json, os, sys
 from PIL import Image
 
@@ -44,4 +45,5 @@ def main(src, dst):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1], sys.argv[2])
+    for src in sys.argv[2:]:
+        main(src, sys.argv[1])

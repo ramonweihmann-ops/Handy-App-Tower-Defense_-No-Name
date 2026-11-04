@@ -13,6 +13,9 @@ func bind() -> void:
 
 func handle(b: Dictionary) -> bool:
 	var href := str(b.get("href", ""))
+	if str(b.get("label", "")) == "Schließen":
+		menu.close_board(self)
+		return true
 	if href == "MP-Gegnersuche.dc.html":
 		if Save.energy() < MetaData.ENERGY_COST:
 			menu.open_energy()
