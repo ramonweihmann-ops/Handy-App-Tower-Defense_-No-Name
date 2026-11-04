@@ -1,0 +1,380 @@
+{
+  "effekte": [
+    {
+      "name": "brocken_explosion",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.7524014336917563,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          112,
+          116,
+          144,
+          141
+        ],
+        [
+          86,
+          78,
+          170,
+          177
+        ],
+        [
+          54,
+          70,
+          201,
+          187
+        ],
+        [
+          38,
+          58,
+          218,
+          199
+        ],
+        [
+          31,
+          46,
+          225,
+          211
+        ],
+        [
+          24,
+          36,
+          232,
+          221
+        ],
+        [
+          23,
+          36,
+          233,
+          220
+        ],
+        [
+          30,
+          32,
+          226,
+          224
+        ],
+        [
+          36,
+          30,
+          221,
+          226
+        ],
+        [
+          33,
+          38,
+          223,
+          219
+        ],
+        [
+          36,
+          40,
+          220,
+          217
+        ],
+        [
+          40,
+          46,
+          217,
+          209
+        ],
+        [
+          54,
+          56,
+          203,
+          200
+        ],
+        [
+          58,
+          74,
+          197,
+          182
+        ],
+        [
+          66,
+          82,
+          189,
+          174
+        ],
+        [
+          78,
+          102,
+          178,
+          154
+        ]
+      ],
+      "quell_sha256": "727ebee8fb54199df128f26f832bebd760b2248ee79919ad53fcabb9aa80985a"
+    },
+    {
+      "name": "luftangriff_explosionsreihe",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.6685350318471337,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          23,
+          23,
+          233,
+          233
+        ],
+        [
+          24,
+          23,
+          233,
+          233
+        ],
+        [
+          24,
+          23,
+          233,
+          233
+        ],
+        [
+          23,
+          23,
+          233,
+          233
+        ],
+        [
+          23,
+          24,
+          233,
+          233
+        ],
+        [
+          24,
+          24,
+          233,
+          233
+        ],
+        [
+          24,
+          24,
+          233,
+          233
+        ],
+        [
+          23,
+          24,
+          233,
+          233
+        ],
+        [
+          23,
+          24,
+          233,
+          233
+        ],
+        [
+          24,
+          24,
+          233,
+          233
+        ],
+        [
+          24,
+          24,
+          233,
+          233
+        ],
+        [
+          23,
+          24,
+          233,
+          233
+        ],
+        [
+          23,
+          23,
+          233,
+          233
+        ],
+        [
+          24,
+          23,
+          233,
+          233
+        ],
+        [
+          24,
+          23,
+          233,
+          233
+        ],
+        [
+          23,
+          23,
+          233,
+          233
+        ]
+      ],
+      "quell_sha256": "e59794e4ba63b08b9a735f346665ac4a844d8d39ec307c0f741a6502aaa6efbb"
+    },
+    {
+      "name": "rollo_einschlag",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.6685350318471337,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          23,
+          23,
+          233,
+          233
+        ],
+        [
+          24,
+          29,
+          233,
+          233
+        ],
+        [
+          24,
+          34,
+          233,
+          233
+        ],
+        [
+          23,
+          23,
+          233,
+          233
+        ],
+        [
+          23,
+          24,
+          233,
+          233
+        ],
+        [
+          24,
+          24,
+          233,
+          233
+        ],
+        [
+          24,
+          24,
+          233,
+          233
+        ],
+        [
+          23,
+          24,
+          233,
+          233
+        ],
+        [
+          23,
+          24,
+          233,
+          233
+        ],
+        [
+          24,
+          24,
+          233,
+          233
+        ],
+        [
+          24,
+          24,
+          233,
+          233
+        ],
+        [
+          23,
+          24,
+          233,
+          233
+        ],
+        [
+          23,
+          23,
+          233,
+          233
+        ],
+        [
+          24,
+          23,
+          233,
+          233
+        ],
+        [
+          24,
+          23,
+          233,
+          233
+        ],
+        [
+          23,
+          23,
+          225,
+          233
+        ]
+      ],
+      "quell_sha256": "96c4c6b4e037173b9ca85de122898de52cbc28779aeb4bea45b228a2d273a72e"
+    }
+  ],
+  "anzahl": 3,
+  "soll": 3,
+  "technische_pruefung": "RGBA, Transparenz, Raster, feste Zellen, freie Außenränder, Größenlimit; Sichtprüfung separat",
+  "godot_geprueft": false
+}

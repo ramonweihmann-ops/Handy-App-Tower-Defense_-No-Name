@@ -1,0 +1,69 @@
+{
+  "pakete": 3,
+  "godot_geprueft": false,
+  "effekte": [
+    {
+      "name": "brocken_explosion",
+      "png_rgba": true,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "gif_frames": 16,
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "groesse_m": 2.5,
+      "transparenz": true,
+      "godot_geprueft": false
+    },
+    {
+      "name": "luftangriff_explosionsreihe",
+      "png_rgba": true,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "gif_frames": 16,
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "groesse_m": 8,
+      "transparenz": true,
+      "godot_geprueft": false
+    },
+    {
+      "name": "rollo_einschlag",
+      "png_rgba": true,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "gif_frames": 16,
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "groesse_m": 1.7,
+      "transparenz": true,
+      "godot_geprueft": false
+    }
+  ]
+}
