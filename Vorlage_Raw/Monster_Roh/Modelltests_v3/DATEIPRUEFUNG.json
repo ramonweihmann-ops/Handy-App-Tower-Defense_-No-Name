@@ -1,0 +1,317 @@
+{
+  "dateien": [
+    {
+      "datei": "BILDANWEISUNG_SCHLEIMLING.txt",
+      "bytes": 1154,
+      "sha256": "8eecf9ad3a32aae03318955a4104c6687ee5200f10e104293dd1aae18cd408b4"
+    },
+    {
+      "datei": "brecher_IMPORTPRUEFUNG.json",
+      "bytes": 439,
+      "sha256": "804e4eeef9d79faaf378001638351b850e7089ba042aa86812ba060bb3365b1e"
+    },
+    {
+      "datei": "brecher_rig_roh.glb",
+      "bytes": 3676352,
+      "sha256": "0309132b09b33dd303f7514b7bbafd59433dae84295cd8d4bcf70b24de147584"
+    },
+    {
+      "datei": "brecher_statisch_roh.glb",
+      "bytes": 3083616,
+      "sha256": "33df3ea5035131cc3150f65846e09ed1b6c8bbe2325d865ef7e1ef51d43c477e"
+    },
+    {
+      "datei": "brecher_vorlage.png",
+      "bytes": 473863,
+      "sha256": "bdc1267e14be4723e9b83ecbaff033f7fb1a70d38a6bd73b035de568840668a5",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "brecher_vorschau_oben.png",
+      "bytes": 416809,
+      "sha256": "0a3a7010b7fbef6829057316117ac79bc5451cbf6deb7ca64314f5693c5f1f3c",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "brecher_vorschau_seite.png",
+      "bytes": 501061,
+      "sha256": "6175d7b05a17c3d3b1580d504842aed5bf70c67ba87660e130b584659d0f1550",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "brecher_vorschau_vorn.png",
+      "bytes": 670756,
+      "sha256": "8c37400f69574b008efc65a67c9cdadaf7e8d32f060c8ade6095c1917af4fd20",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "GLB_PRUEFUNG.json",
+      "bytes": 17036,
+      "sha256": "ad5582c89f574e7b08fb34bfab16e310423dd4f0827572948a3d687e09f1d8f3"
+    },
+    {
+      "datei": "koloss_IMPORTPRUEFUNG.json",
+      "bytes": 438,
+      "sha256": "bdbd166dc599926bb8391b7b3001c5c26c95fb3b8e8fdc57adead13cb2935f65"
+    },
+    {
+      "datei": "koloss_rig_roh.glb",
+      "bytes": 3811400,
+      "sha256": "4df1cfaf32ab13fc7f2f3daca90eab835f5a90b49c3d9bc9ff8152d788d78b79"
+    },
+    {
+      "datei": "koloss_statisch_roh.glb",
+      "bytes": 3213384,
+      "sha256": "be5c8fd9d1246b2eb44950e00bca5aaabfbc10ae5178effa341f2f7f438c6f68"
+    },
+    {
+      "datei": "koloss_vorlage.png",
+      "bytes": 392664,
+      "sha256": "0203c7c0506240ec3b1ebf41c2b2b584ae570ecc49c835b31f2c0436e4850066",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "koloss_vorschau_oben.png",
+      "bytes": 483853,
+      "sha256": "45a248e4a74ba50c1be4bce7fa07a4d0998907b304fae6c99decde4da52eb89a",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "koloss_vorschau_seite.png",
+      "bytes": 498833,
+      "sha256": "c4182335868e6c52156320e802968fa3267d27987aa5c69c8863249e20a8045f",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "koloss_vorschau_vorn.png",
+      "bytes": 614549,
+      "sha256": "50bf6c8466985df6bab3e2b69ccfda9998c129d03d9e9151f24f79d203007034",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "krabbler_IMPORTPRUEFUNG.json",
+      "bytes": 439,
+      "sha256": "74f89dcdef3ff8b5883d9a6799a457d8256ae9dc0e33d3c24b52d3a0ad00e968"
+    },
+    {
+      "datei": "krabbler_rig_roh.glb",
+      "bytes": 3668752,
+      "sha256": "bc58230804da60486d2f049d2f07d772206bfda91930d891bddb18ee0a80172a"
+    },
+    {
+      "datei": "krabbler_statisch_roh.glb",
+      "bytes": 3072444,
+      "sha256": "a6a88f95ebeacddbd534445e17cff9826a5953a9976e27f6675c89528c7a1e6f"
+    },
+    {
+      "datei": "krabbler_vorlage.png",
+      "bytes": 407413,
+      "sha256": "1928585b3313f410a173374db5793637a76f10956cc96ad2dd5b5e5b6a005152",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "krabbler_vorschau_oben.png",
+      "bytes": 389285,
+      "sha256": "0937fe685eb6a193fc9ece2b42fa8271757eb9e2fc085ce3afc99a050682f594",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "krabbler_vorschau_seite.png",
+      "bytes": 517090,
+      "sha256": "214dbe812bbfbfb260e077cf24acb6e5fb862a1dc6c515ad5acf32837ad5ea65",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "krabbler_vorschau_vorn.png",
+      "bytes": 608743,
+      "sha256": "2b454d99b463c914a6f73bbee68851b052f38b4a2f5bfc798d8bf22a7f9e6f8e",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "LIESMICH_CLAUDE.md",
+      "bytes": 6729,
+      "sha256": "a7f544fb0baaf94f68b0cd19881cd9c20d95e0bfd73d7f7891fd996afbafd72e"
+    },
+    {
+      "datei": "MODELLUEBERSICHT.jpg",
+      "bytes": 111449,
+      "sha256": "dbb22ce27ca41895d3f674c18f2b52c4cda4c98cbdb865937de3b16f4b13ca48"
+    },
+    {
+      "datei": "pruefe_glb.py",
+      "bytes": 2628,
+      "sha256": "689ff3e790377054c5739c667ad767cf817c5dc7ae001fce4438f5281e4a4731"
+    },
+    {
+      "datei": "pruefe_rigs.py",
+      "bytes": 1985,
+      "sha256": "b9fc6e88a4085e075a1d2bc1ffbffb2ae6da6a2108d1bee76b5f4ae19bbd133e"
+    },
+    {
+      "datei": "rendere_rohmodelle.py",
+      "bytes": 2454,
+      "sha256": "6e158929aa1d5903bfeb5d9988f77a49e39fc68594374b98564c0879d3a829e6"
+    },
+    {
+      "datei": "RIG_IMPORT_UND_BEWEGUNGSPRUEFUNG.json",
+      "bytes": 18894,
+      "sha256": "63d2ef36ad4cd5d8f1f34055d35d9d72c7649d251c567a9a101dcd3494d61f84"
+    },
+    {
+      "datei": "schleimling_IMPORTPRUEFUNG.json",
+      "bytes": 442,
+      "sha256": "759d6f46031a51e498e73df60cbce921eb9d24f3d84ed058b4628c0695905c2f"
+    },
+    {
+      "datei": "schleimling_statisch_roh.glb",
+      "bytes": 3505360,
+      "sha256": "841011b5b7b9312b274ade7e475a22ad0b47a983131d9af449a1454c584043d6"
+    },
+    {
+      "datei": "schleimling_vorlage.png",
+      "bytes": 579018,
+      "sha256": "dfa92ccb5c13dedf04477f3081bef1f999e464d56170a8f8b407cfc7931b9270",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "schleimling_vorschau_oben.png",
+      "bytes": 710086,
+      "sha256": "1fcf70486f8820336f83b32999bc8a60604f1c3ec413dc113701d5b0d2f58646",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "schleimling_vorschau_seite.png",
+      "bytes": 524652,
+      "sha256": "d304a083fb8cd89089f517c11437aeab739f02f40484290818876314425e4878",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "schleimling_vorschau_vorn.png",
+      "bytes": 592341,
+      "sha256": "f9cbc936d2d05ad4ea9092c8c72eceb24a9e87655a1d0549e3a0c7873de0be49",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "schleimmutter_IMPORTPRUEFUNG.json",
+      "bytes": 443,
+      "sha256": "ea77a4d7224b64d8a2691f553fcc6773cf4bd64ffddffbc1473c086ef3ac5eff"
+    },
+    {
+      "datei": "schleimmutter_statisch_roh.glb",
+      "bytes": 2960024,
+      "sha256": "2fba880be4cf349b64f038360675b75058f600ccb63d2daa236e19876961473e"
+    },
+    {
+      "datei": "schleimmutter_vorlage.png",
+      "bytes": 451749,
+      "sha256": "4efc0ed15b84af25eeaef2d45a4d79f0770c153a4ecf087c49d0472aff4c7013",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "schleimmutter_vorschau_oben.png",
+      "bytes": 578243,
+      "sha256": "4a9b1667495a19f2d35de32178e1eeb1f8d7e4ebd7e0e40c03a4618f440b3449",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "schleimmutter_vorschau_seite.png",
+      "bytes": 473627,
+      "sha256": "c6777ba10a6e97c4e4b4aef50704f730cf9634594b9757d8e41d56eb99b8d5f0",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "schleimmutter_vorschau_vorn.png",
+      "bytes": 548640,
+      "sha256": "67e6b3a2d9d8e3fefc9fe82b01a42369f990e1e63feb0cca621da592ce5e6942",
+      "masse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    }
+  ],
+  "statische_modelle": 5,
+  "rigs": 3,
+  "vorschaubilder": 15,
+  "bildvorlagen": 5,
+  "anatomie_visuell_bestanden": true,
+  "godot_getestet": false,
+  "credits": 75,
+  "rigging_zusatzcredits": 0
+}

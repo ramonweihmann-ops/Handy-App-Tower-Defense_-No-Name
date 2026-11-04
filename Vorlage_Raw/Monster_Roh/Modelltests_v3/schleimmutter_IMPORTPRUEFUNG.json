@@ -1,0 +1,21 @@
+{
+  "id": "schleimmutter",
+  "import_erfolgreich": true,
+  "netze": 1,
+  "dreiecke": 10215,
+  "grenzen_blender_xyz": [
+    [
+      -0.4787600040435791,
+      0.4748539924621582
+    ],
+    [
+      -0.3718259930610657,
+      0.3732909858226776
+    ],
+    [
+      -0.2629390060901642,
+      0.2639159858226776
+    ]
+  ],
+  "hinweis": "Ansichten aus unverändertem Rohmodell; Anatomie wird visuell geprüft. Kein Godot-Test."
+}

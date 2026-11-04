@@ -1,0 +1,21 @@
+{
+  "id": "brecher",
+  "import_erfolgreich": true,
+  "netze": 1,
+  "dreiecke": 10274,
+  "grenzen_blender_xyz": [
+    [
+      -0.4753420054912567,
+      0.4753420054912567
+    ],
+    [
+      -0.16040000319480896,
+      0.16333000361919403
+    ],
+    [
+      -0.4309079945087433,
+      0.4309079945087433
+    ]
+  ],
+  "hinweis": "Ansichten aus unverändertem Rohmodell; Anatomie wird visuell geprüft. Kein Godot-Test."
+}

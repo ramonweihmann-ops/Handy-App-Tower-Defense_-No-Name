@@ -1,0 +1,21 @@
+{
+  "id": "koloss",
+  "import_erfolgreich": true,
+  "netze": 1,
+  "dreiecke": 10501,
+  "grenzen_blender_xyz": [
+    [
+      -0.4782710075378418,
+      0.4787600040435791
+    ],
+    [
+      -0.2438959926366806,
+      0.24291999638080597
+    ],
+    [
+      -0.35082998871803284,
+      0.3493649959564209
+    ]
+  ],
+  "hinweis": "Ansichten aus unverändertem Rohmodell; Anatomie wird visuell geprüft. Kein Godot-Test."
+}

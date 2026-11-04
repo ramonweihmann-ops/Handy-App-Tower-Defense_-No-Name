@@ -1,0 +1,21 @@
+{
+  "id": "schleimling",
+  "import_erfolgreich": true,
+  "netze": 1,
+  "dreiecke": 10447,
+  "grenzen_blender_xyz": [
+    [
+      -0.4782710075378418,
+      0.4777829945087433
+    ],
+    [
+      -0.4787600040435791,
+      0.4748539924621582
+    ],
+    [
+      -0.35082998871803284,
+      0.3532710075378418
+    ]
+  ],
+  "hinweis": "Ansichten aus unverändertem Rohmodell; Anatomie wird visuell geprüft. Kein Godot-Test."
+}

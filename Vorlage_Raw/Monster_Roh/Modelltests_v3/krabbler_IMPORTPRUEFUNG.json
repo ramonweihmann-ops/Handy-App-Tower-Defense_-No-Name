@@ -1,0 +1,21 @@
+{
+  "id": "krabbler",
+  "import_erfolgreich": true,
+  "netze": 1,
+  "dreiecke": 10116,
+  "grenzen_blender_xyz": [
+    [
+      -0.3259280025959015,
+      0.3259280025959015
+    ],
+    [
+      -0.2014160007238388,
+      0.20727500319480896
+    ],
+    [
+      -0.4753420054912567,
+      0.4753420054912567
+    ]
+  ],
+  "hinweis": "Ansichten aus unverändertem Rohmodell; Anatomie wird visuell geprüft. Kein Godot-Test."
+}
