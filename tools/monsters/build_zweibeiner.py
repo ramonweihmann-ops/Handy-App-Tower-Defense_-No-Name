@@ -4,6 +4,10 @@ Aufruf: python3 build_zweibeiner.py <id>_rig_roh.glb <ausgabe.glb> [dreiecke] [a
 (benötigt: pip install bpy). arm-abstand-grad: wie weit die Arme beim Laufen vom Körper abstehen (Hände
 sollen frei an den Beinen vorbeischwingen), Standard 18. --klaue: Angriff mit offenen Klauen statt Fäusten.
 --offene-haende: echte Fingerknochen behalten (keine Faust), wie beim Brecher.
+--beine-wie-ruhe: Meshys Gang ohne das Nach-innen-Drehen der Oberschenkel (Koloss: dadurch X-Beine); Ober- und
+Unterschenkel stehen seitlich wie in der Grundhaltung und schwingen nur vor und zurück, Knie und Füße wie bei Meshy.
+--beine-versatz=m: beide Beine als Ganzes um m nach außen schieben, ohne sie zu drehen (Koloss: dicke
+Oberschenkel liefen ineinander); Füße und Knie bleiben wie bei Meshy.
 --beine-gerade: Beine beim Laufen gerade nebeneinander nach vorn (Koloss: Meshys Gang ließ die dicken
 Oberschenkel ineinanderlaufen); jeder Fuß auf fester Spur, Knie und Fußspitzen nach vorn.
 --meshy-angriff=f: den mitgelieferten Angriff von Meshy nehmen (Brecher, Krabbler; vom Nutzer so gewählt),
@@ -36,6 +40,11 @@ claw = '--klaue' in sys.argv
 # --beine-gerade: Beine beim Laufen selbst führen (Koloss): jeder Fuß auf fester Spur nach vorn im Abstand
 # der Grundhaltung, Knie nach vorn, Füße gerade; von Meshy nur Takt, Schrittlänge und Fußheben
 straight_legs = '--beine-gerade' in sys.argv
+leg_shift = 0.0     # --beine-versatz=m: beide Beine als Ganzes nach außen schieben (ohne Drehung; Füße bleiben gerade)
+legs_rest_side = '--beine-wie-ruhe' in sys.argv   # Ober-/Unterschenkel seitlich wie in der Grundhaltung, nur vor/zurück
+for a in sys.argv:
+    if a.startswith('--beine-versatz='):
+        leg_shift = float(a.split('=', 1)[1])
 open_hands = '--offene-haende' in sys.argv   # echte Fingerknochen behalten, keine Faust (Koloss wie Brecher)
 hand_twist = 0.0   # --hand-dreh=grad: Hände um die Unterarmachse zum Körper drehen (Handfläche nach innen)
 finger_relax = 0.0  # --finger=grad: echte Finger beim Laufen locker krümmen
@@ -382,6 +391,12 @@ for walk_name in ("Walk", "Run"):
     peak = max(max(abs(v) for v in d.values()) for d in swing.values()) or 1.0
     amp = 24.0 if walk_name == "Walk" else 34.0
     LEGB = ["mixamorig:%s%s" % (sd, b) for sd, _ in SIDES for b in ("UpLeg", "Leg", "Foot")] if straight_legs else []
+    SHIFT = ["mixamorig:%s%s" % (sd, b) for sd, _ in SIDES for b in (("UpLeg", "Leg", "Foot") if legs_rest_side else ("UpLeg",))] if (leg_shift or legs_rest_side) else []
+    shift_basis = {}
+    for f in range(f0, f1 + 1):
+        scene.frame_set(f)
+        shift_basis[f] = {n: pose.bones[n].matrix_basis.copy() for n in SHIFT}
+    LEGB = LEGB + SHIFT
     legs = {}
     track = {}
     if straight_legs:
@@ -407,6 +422,37 @@ for walk_name in ("Walk", "Run"):
     for f in range(f0, f1 + 1):
         scene.frame_set(f)
         reset(ARMS + RIGID + FINGER_BONES + EXTRA)
+        if legs_rest_side:
+            for sd, sx in SIDES:
+                for part in ("UpLeg", "Leg", "Foot"):
+                    n = "mixamorig:%s%s" % (sd, part)
+                    pose.bones[n].matrix_basis = shift_basis[f][n]
+                    bpy.context.view_layer.update()
+                for part in ("UpLeg", "Leg"):
+                    n = "mixamorig:%s%s" % (sd, part)
+                    b = arm.data.bones[n]
+                    r = ((aw @ b.tail_local) - (aw @ b.head_local)).normalized()
+                    d = bone_dir(n)
+                    yz = math.hypot(d.y, d.z)
+                    k = math.sqrt(max(0.0, 1.0 - r.x * r.x)) / max(1e-4, yz)
+                    point(n, Vector((r.x, d.y * k, d.z * k)))
+                # Fuß nur um die Hochachse gerade nach vorn drehen (Neigung und Abrollen bleiben)
+                # gemessen an der Querachse des Fußes: die bleibt beim Abrollen waagerecht
+                fn = "mixamorig:%sFoot" % sd
+                ax = (aw @ pose.bones[fn].matrix).to_3x3().col[0]
+                if math.hypot(ax.x, ax.y) > 0.2:
+                    tx = 1.0 if ax.x >= 0 else -1.0
+                    yaw = math.degrees(math.atan2(ax.y, ax.x)) if tx > 0 else math.degrees(math.atan2(-ax.y, -ax.x))
+                    rot_world(fn, (0, 0, 1), -max(-35.0, min(35.0, yaw)))
+        elif leg_shift:
+            sgn = 1.0 if (aw @ arm.data.bones["mixamorig:LeftUpLeg"].head_local).x > (aw @ arm.data.bones["mixamorig:RightUpLeg"].head_local).x else -1.0
+            for sd, sx in SIDES:
+                n = "mixamorig:%sUpLeg" % sd
+                pose.bones[n].matrix_basis = shift_basis[f][n]
+                bpy.context.view_layer.update()
+                cur = aw @ pose.bones[n].matrix
+                pose.bones[n].matrix = aw.inverted() @ (Matrix.Translation(Vector((sx * sgn * leg_shift, 0, 0))) @ cur)
+                bpy.context.view_layer.update()
         if straight_legs:
             reset(LEGB)
             for sd, _ in SIDES:
@@ -485,7 +531,8 @@ for f in range(wf0, wf1 + 1):
     if d < best_d:
         best, best_d = f, d
 scene.frame_set(best)
-STANCE = {n: (pose.bones[n].rotation_quaternion.copy(), pose.bones[n].location.copy()) for n in LEGS}
+HAND_KEEP = (REAL_FINGERS + THUMBS) if not FINGERS else []   # echte Finger: Haltung aus dem Laufen
+STANCE = {n: (pose.bones[n].rotation_quaternion.copy(), pose.bones[n].location.copy()) for n in LEGS + HAND_KEEP}
 arm.animation_data.action = None
 print("STAND aus Laufbild", best)
 
