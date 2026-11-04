@@ -211,9 +211,15 @@ func _run() -> bool:
 				main._show_result(true, {"gold": 1200, "stars": 3, "pass": 20, "cards": [{"hero": "dusty", "amount": 7}, {"hero": "iska", "amount": 7}]})
 			elif step == 630:
 				print("SMOKE sieg-fenster: ", (main._screen as ResultScreen) != null)
+				# Mehrere Level geschafft, gestartet bei Level 1: zurück im Menü muss das aktuelle Level gewählt sein
+				save.data["max_level"] = maxi(save.max_level(), 4)
+				m.selected_level = 1
 				main.show_menu()
 			elif step == 640:
 				print("SMOKE zurück im menü: ", main.menu.visible, " ", main.state)
+				print("SMOKE pfad zeigt aktuelles level: ", m.selected_level == save.max_level(), " (", m.selected_level, ")")
+				if m.selected_level != save.max_level():
+					print("SMOKE FEHLER: Pfad zeigt nicht das aktuelle Level")
 				# Multiplayer: Spielmodi, Rangliste, Gegnersuche, Kampf, Ergebnis
 				m.open_board("Spielmodi.dc.html")
 			elif step == 645:

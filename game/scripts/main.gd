@@ -605,6 +605,8 @@ func show_menu() -> void:
 	_set_screen(null)
 	_column.visible = false
 	menu.visible = true
+	# Zurück im Menü: der Abenteuer-Pfad zeigt immer das aktuelle (höchste freie) Level, nicht das zuletzt gewählte
+	menu.selected_level = Save.max_level()
 	menu.refresh()
 
 
