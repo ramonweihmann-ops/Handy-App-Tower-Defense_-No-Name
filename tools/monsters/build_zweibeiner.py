@@ -3,6 +3,7 @@ Krabbler, Brecher und Zombie-Koloss (Modelltests_v3). Gleiches Vorgehen für all
 Aufruf: python3 build_zweibeiner.py <id>_rig_roh.glb <ausgabe.glb> [dreiecke] [arm-abstand-grad] [--klaue] [--meshy-angriff=0.5]
 (benötigt: pip install bpy). arm-abstand-grad: wie weit die Arme beim Laufen vom Körper abstehen (Hände
 sollen frei an den Beinen vorbeischwingen), Standard 18. --klaue: Angriff mit offenen Klauen statt Fäusten.
+--offene-haende: echte Fingerknochen behalten (keine Faust), wie beim Brecher.
 --beine-gerade: Beine beim Laufen gerade nebeneinander nach vorn (Koloss: Meshys Gang ließ die dicken
 Oberschenkel ineinanderlaufen); jeder Fuß auf fester Spur, Knie und Fußspitzen nach vorn.
 --meshy-angriff=f: den mitgelieferten Angriff von Meshy nehmen (Brecher, Krabbler; vom Nutzer so gewählt),
@@ -35,6 +36,14 @@ claw = '--klaue' in sys.argv
 # --beine-gerade: Beine beim Laufen selbst führen (Koloss): jeder Fuß auf fester Spur nach vorn im Abstand
 # der Grundhaltung, Knie nach vorn, Füße gerade; von Meshy nur Takt, Schrittlänge und Fußheben
 straight_legs = '--beine-gerade' in sys.argv
+open_hands = '--offene-haende' in sys.argv   # echte Fingerknochen behalten, keine Faust (Koloss wie Brecher)
+hand_twist = 0.0   # --hand-dreh=grad: Hände um die Unterarmachse zum Körper drehen (Handfläche nach innen)
+finger_relax = 0.0  # --finger=grad: echte Finger beim Laufen locker krümmen
+for a in sys.argv:
+    if a.startswith('--hand-dreh='):
+        hand_twist = float(a.split('=', 1)[1])
+    if a.startswith('--finger='):
+        finger_relax = float(a.split('=', 1)[1])
 leg_spread = 0.0
 meshy_attack = 0.0
 for a in sys.argv:
@@ -107,7 +116,7 @@ def finger_bone(side, palm):
     return "%sFingers" % side, bend
 
 # Faust-Knochen nur für den eigenen Angriff; mit Meshys Angriff bleiben die echten Fingerknochen
-FINGERS = [] if meshy_attack > 0 else [finger_bone("Left", (-1, 0, 0)), finger_bone("Right", (1, 0, 0))]
+FINGERS = [] if meshy_attack > 0 or open_hands else [finger_bone("Left", (-1, 0, 0)), finger_bone("Right", (1, 0, 0))]
 
 # --- Beingewichte nach Seite --------------------------------------------------------------------
 # Meshys Auto-Rig hängt bei kurzen, dicht stehenden Beinen Teile eines Oberschenkels an die Knochen des
@@ -249,6 +258,21 @@ def keep_legs_apart(factor):
                 rot_world("mixamorig:%s%s" % (s, part), (0, 1, 0), -sx * sign * ang)
 
 
+def knee_dirs():
+    out = {}
+    for sd, _ in SIDES:
+        bh = aw @ arm.data.bones["mixamorig:%sUpLeg" % sd].head_local
+        bk = aw @ arm.data.bones["mixamorig:%sLeg" % sd].head_local
+        ba = aw @ arm.data.bones["mixamorig:%sFoot" % sd].head_local
+        u = (ba - bh).normalized()
+        o = (bk - bh) - u * (bk - bh).dot(u)
+        out[sd] = o.normalized() if o.length > 1e-4 else Vector((0, -1, 0))
+    return out
+
+
+KNEE_DIR = knee_dirs()
+
+
 def leg_ik(side, ankle, foot_world):
     """Zwei-Knochen-Bein: Oberschenkel und Schienbein so drehen, dass das Fußgelenk bei ankle liegt und das
     Knie nach vorn (−Y) zeigt; danach den Fuß auf seine Weltlage foot_world (gerade nach vorn) setzen."""
@@ -261,7 +285,9 @@ def leg_ik(side, ankle, foot_world):
     u = d_vec.normalized()
     a = (l1 * l1 - l2 * l2 + d * d) / (2 * d)
     h = math.sqrt(max(0.0, l1 * l1 - a * a))
-    p = Vector((0, -1, 0))
+    # Knie zeigt in die Richtung, in die es in der Grundhaltung gebeugt ist (bei kurzen, breiten Beinen etwas
+    # nach außen; sonst sähen die Beine x-beinig aus), dazu nach vorn
+    p = KNEE_DIR[side] + Vector((0, -0.6, 0))
     p = (p - u * p.dot(u)).normalized()
     K = H + u * a + p * h
     A = H + u * d
@@ -300,6 +326,18 @@ def arm_dirs(sx, out_deg, swing_deg, bend_deg):
 
 
 FINGER_BONES = [n for n, _ in FINGERS]
+REAL_FINGERS = [pb.name for pb in pose.bones if any(k in pb.name for k in ("HandIndex", "HandMiddle", "HandRing", "HandPinky"))
+                and pb.name[-1] in "123"]
+
+
+def relax_fingers(side, deg):
+    """Echte Finger locker krümmen: jedes Glied um seine eigene Querachse (lokal X)"""
+    for n in REAL_FINGERS:
+        if n.startswith("mixamorig:%sHand" % side):
+            pb = pose.bones[n]
+            pb.rotation_mode = 'QUATERNION'
+            pb.rotation_quaternion = Quaternion((1, 0, 0), math.radians(deg))
+    bpy.context.view_layer.update()
 
 
 def curl(deg):
@@ -346,10 +384,11 @@ for walk_name in ("Walk", "Run"):
                 q = flat.rotation_difference(yaw) if flat.length > 1e-4 else Quaternion()
                 rot = (q.to_matrix().to_4x4() @ Matrix(w.to_3x3()).to_4x4())
                 track[f][sd] = (a_pos, rot)
-    drop_channels(act, ARMS + RIGID + FINGER_BONES + LEGB)
+    EXTRA = REAL_FINGERS if finger_relax else []
+    drop_channels(act, ARMS + RIGID + FINGER_BONES + LEGB + EXTRA)
     for f in range(f0, f1 + 1):
         scene.frame_set(f)
-        reset(ARMS + RIGID + FINGER_BONES)
+        reset(ARMS + RIGID + FINGER_BONES + EXTRA)
         if straight_legs:
             reset(LEGB)
             for sd, _ in SIDES:
@@ -360,9 +399,13 @@ for walk_name in ("Walk", "Run"):
             point("mixamorig:%sArm" % s, up)
             point("mixamorig:%sForeArm" % s, fore)
             point("mixamorig:%sHand" % s, fore)
+            if hand_twist:
+                rot_world("mixamorig:%sForeArm" % s, fore, sx * hand_twist)
+            if finger_relax:
+                relax_fingers(s, finger_relax)
         if FINGERS:
             curl(18)
-        key(ARMS + RIGID + FINGER_BONES + LEGB, f)
+        key(ARMS + RIGID + FINGER_BONES + LEGB + EXTRA, f)
     arm.animation_data.action = None
     print("LAUFEN neu", walk_name, f0, f1)
 
@@ -460,6 +503,11 @@ def attack_pose(phase):
         point("mixamorig:%sHand" % s, fore)
     curl({"lauern": 20, "vorn": 35, "ausholen": 45 if not claw else 15, "obenvorn": 70 if not claw else 25,
           "schlag": 100 if not claw else 35, "zurueck": 60}[phase])
+    if not FINGERS and finger_relax:
+        # echte Finger: beim Schlag fester gekrümmt
+        for s, _ in SIDES:
+            relax_fingers(s, finger_relax * {"lauern": 1.0, "vorn": 1.2, "ausholen": 1.0, "obenvorn": 1.6,
+                                             "schlag": 2.4, "zurueck": 1.6}[phase])
 
 
 act = bpy.data.actions.new("Attack")
