@@ -180,6 +180,11 @@ func focus(id: String) -> void:
 	queue_redraw()
 
 
+## Lage des ganzen Basisbilds auf dem Bildschirm (für den unscharfen Hintergrund der Gebäudefenster)
+func image_rect_global() -> Rect2:
+	return Rect2(get_global_rect().position + _to_screen(Vector2.ZERO), Vector2(IMG_W, IMG_H) * _zoom)
+
+
 func overview() -> void:
 	_fit()
 

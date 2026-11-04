@@ -39,6 +39,8 @@ var _toast: Label
 var _toast_t := 0.0
 var _tick := 0.0
 var _bg_mat: ShaderMaterial
+var _bg_rect: ColorRect        # Sternenhimmel hinter dem alten Menü (aufwendiger Shader)
+var _shade: ColorRect
 var _mock: MockScreen          # Bildschirm aus den Mockups für den aktuellen Reiter (oder null)
 var _boards: Array[Control] = []   # darüber geöffnete Mockup-Fenster (Angebote, Missionen …)
 
@@ -54,7 +56,9 @@ func _ready() -> void:
 	_bg_mat = mat
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
+	_bg_rect = bg
 	var shade := ColorRect.new()
+	_shade = shade
 	shade.color = Color(0.03, 0.02, 0.09, 0.15)
 	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -137,7 +141,18 @@ func _process(delta: float) -> void:
 	if _tick >= 1.0:
 		_tick = 0.0
 		_refresh_top()
-	if _bg_mat and size.y > 0.0:
+	# Liegt ein bildschirmfüllendes Fenster darüber, den Reiter darunter nicht mitzeichnen
+	if is_instance_valid(_mock):
+		var covered := false
+		for b in _boards:
+			if is_instance_valid(b) and _covers(b):
+				covered = true
+		_mock.visible = not covered
+	# Bilder der Hauptreiter im Hintergrund vorladen, sobald das Menü steht
+	if visible:
+		TexCache.prefetch_main()
+	TexCache.poll()
+	if _bg_mat and _bg_rect.visible and size.y > 0.0:
 		_bg_mat.set_shader_parameter("aspect", Vector2(size.x / size.y, 1.0))
 	if _toast_t > 0.0:
 		_toast_t -= delta
@@ -398,6 +413,9 @@ func show_tab(id: String) -> void:
 		_mock.queue_free()
 	_mock = _mock_for(id)
 	_frame.visible = _mock == null
+	# Die Mockup-Bildschirme verdecken den Sternenhimmel ganz: dann nicht mehr berechnen
+	_bg_rect.visible = _mock == null
+	_shade.visible = _mock == null
 	if _mock:
 		add_child(_mock)
 		move_child(_mock, _frame.get_index() + 1)
@@ -461,6 +479,16 @@ func open_board(href: String) -> void:
 
 func info(title: String, text: String) -> void:
 	_info(title, text)
+
+
+## Verdeckt dieses Fenster den ganzen Bildschirm (undurchsichtiger Hintergrund)?
+func _covers(b: Control) -> bool:
+	if b is BuildingWindow:
+		return (b as BuildingWindow)._backdrop != null
+	if b is MockView:
+		var v := b as MockView
+		return v.overlay == "" and v._bg.texture != null and not bool(MockView.layout_of(v.screen).get("transparent", false))
+	return false
 
 
 func close_board(screen: Control) -> void:
@@ -1478,6 +1506,8 @@ func _open_settings() -> void:
 	var high: bool = Save.data.get("quality", "hoch") == "hoch"
 	v.add_child(UiKit.secondary(UiKit.button("Grafik: %s" % ("Hoch (Leuchten, Schatten)" if high else "Sparsam"), func() -> void:
 		Save.data["quality"] = "sparsam" if high else "hoch"
+		# Wer wieder „Hoch“ wählt, bekommt auch die volle Stufe zurück (die Automatik senkt sie bei Bedarf neu)
+		Save.data["perf_level"] = 0
 		Save.save_game()
 		quality_changed.emit()
 		_open_settings()

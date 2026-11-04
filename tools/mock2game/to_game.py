@@ -2,6 +2,7 @@
 """Export (PNG + layout.json) in den Spielordner übernehmen: WebP, Import-Einstellungen (verlustbehaftet,
 spart Platz), Bildpfade in der layout.json.  Aufruf: to_game.py <export-ordner> <bildschirm-name>"""
 import hashlib, json, os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from PIL import Image, ImageChops
 
 GAME = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'game')
@@ -100,6 +101,9 @@ def convert(src, name):
         if base.endswith('.webp') and base not in keep:
             os.remove(os.path.join(dst, f))
     json.dump(lay, open(os.path.join(dst, 'layout.json'), 'w'), ensure_ascii=False, separators=(',', ':'))
+    if lay.get('transparent'):
+        import bg_rows
+        bg_rows.apply(name)
     total = sum(os.path.getsize(os.path.join(dst, f)) for f in os.listdir(dst))
     print(name, len(keep), 'Bilder', total // 1024, 'KB')
 

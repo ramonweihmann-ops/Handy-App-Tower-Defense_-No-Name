@@ -73,6 +73,7 @@ var _world_container: SubViewportContainer
 var _field_bg: TextureRect
 var _field_fill: TextureRect
 var _menu_shot_t := 0
+var _side_bg: ColorRect   # Rand neben dem Spielfeld; im Menü verdeckt
 
 
 func _ready() -> void:
@@ -173,6 +174,10 @@ func _parse_args() -> void:
 			var smoke: Node = load("res://tests/menu_smoke.gd").new()
 			smoke.set("main", self)
 			add_child.call_deferred(smoke)
+		elif arg == "--perf":
+			var pp: Node = load("res://tests/perf_probe.gd").new()
+			pp.set("main", self)
+			add_child.call_deferred(pp)
 		elif arg == "--ultcheck":
 			var uc: Node = load("res://tests/ult_check.gd").new()
 			uc.set("main", self)
@@ -223,6 +228,7 @@ func _build_layout() -> void:
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
 	var side_bg := ColorRect.new()
+	_side_bg = side_bg
 	side_bg.color = Color(0.02, 0.02, 0.05)
 	side_bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	side_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -430,7 +436,46 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
+## Automatische Grafikstufe: Kommt das Gerät im Kampf nicht mit (Median der Bildzeit über 2 s
+## über 22 ms, also unter etwa 45 Bildern pro Sekunde), eine Stufe herunter (battle.apply_quality).
+## Die ersten Sekunden nach dem Start zählen nicht (Laden, erste Effekte).
+const PERF_LIMIT_MS := 22.0
+const PERF_MAX_LEVEL := 3
+var _perf_frames: PackedFloat32Array = []
+var _perf_last := 0
+var _perf_skip := 0.0
+
+
+func _watch_performance(delta: float) -> void:
+	var now := Time.get_ticks_usec()
+	var ms := (now - _perf_last) / 1000.0
+	_perf_last = now
+	if state != "battle" or _autotest or get_tree().paused:
+		_perf_frames.clear()
+		_perf_skip = 3.0
+		return
+	if _perf_skip > 0.0:
+		_perf_skip -= delta / maxf(0.01, Engine.time_scale)
+		return
+	_perf_frames.append(ms)
+	if _perf_frames.size() < 120:
+		return
+	var sorted := _perf_frames.duplicate()
+	sorted.sort()
+	var median: float = sorted[sorted.size() / 2]
+	_perf_frames.clear()
+	var lvl := int(Save.data.get("perf_level", 0))
+	if median > PERF_LIMIT_MS and lvl < PERF_MAX_LEVEL and Save.data.get("quality", "hoch") == "hoch":
+		Save.data["perf_level"] = lvl + 1
+		Save.save_game()
+		battle.apply_quality()
+		_perf_skip = 1.0   # Umstellen selbst kostet kurz
+
+
 func _process(delta: float) -> void:
+	# Das Menü liegt bildschirmfüllend darüber: den Rand darunter nicht zeichnen
+	_side_bg.visible = not menu.visible
+	_watch_performance(delta)
 	if state == "battle":
 		_update_boosters(delta)
 		if mp and mp_match:

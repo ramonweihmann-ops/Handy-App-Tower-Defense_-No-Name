@@ -88,24 +88,25 @@ func _ready() -> void:
 		_content.queue_redraw()
 
 
-## Verschwommenes, abgedunkeltes Bild der Basis hinter dem Fenster (wie im Mockup: blur 4px, 70 % dunkel)
+## Verschwommenes, abgedunkeltes Bild der Basis hinter dem Fenster (wie im Mockup: blur 4px, 70 % dunkel).
+## Kein Bildschirmfoto (das Zurücklesen von der Grafikkarte hält das Handy kurz an): eine fertig
+## weichgezeichnete kleine Fassung des Basisbilds, genau dort, wo die Karte gerade steht.
 func _add_backdrop() -> void:
-	if _backdrop == null and DisplayServer.get_name() != "headless":
-		var vt := get_viewport().get_texture()
-		var img := vt.get_image() if vt else null
-		if img and img.get_width() > 16:
-			img.resize(maxi(8, img.get_width() / 12), maxi(8, img.get_height() / 12), Image.INTERPOLATE_BILINEAR)
-			_backdrop = ImageTexture.create_from_image(img)
-	if _backdrop:
+	var rect := Rect2()
+	if menu._mock is BaseTab and (menu._mock as BaseTab).map:
+		rect = (menu._mock as BaseTab).map.image_rect_global()
+	if rect.size.x > 0.0:
 		var tr := TextureRect.new()
-		tr.texture = _backdrop
+		tr.texture = load("res://ui/base/basis_voll_unscharf.webp")
 		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		tr.stretch_mode = TextureRect.STRETCH_SCALE
 		tr.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 		tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		tr.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		add_child(tr)
 		move_child(tr, 0)
+		tr.position = rect.position - menu.get_global_rect().position
+		tr.size = rect.size
+		_backdrop = tr.texture
 	var dim := ColorRect.new()
 	dim.color = Color(10.0 / 255.0, 6.0 / 255.0, 30.0 / 255.0, 0.7 if _backdrop else 0.85)
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE

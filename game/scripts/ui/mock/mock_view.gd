@@ -18,8 +18,9 @@ var data: Dictionary = {}
 var s := 1.0
 var off := Vector2.ZERO
 
-var _fill: TextureRect
+var _fill: FillBands   # Ränder außerhalb des Mockups (anderes Seitenverhältnis), nur die Streifen
 var _bg: TextureRect
+var _bg_rows: RowBands   # durchsichtige Hintergründe: nur die Streifen mit Inhalt zeichnen
 var _live_layer: Control
 var _text_layer: Control
 var _btn_layer: Control
@@ -50,10 +51,8 @@ func _init(screen_name := "", state_name := "main", overlay_name := "") -> void:
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	_fill = TextureRect.new()
+	_fill = FillBands.new()
 	_fill.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_fill.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_fill.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	_fill.modulate = Color(0.55, 0.55, 0.6)
 	_fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_fill.visible = overlay == ""
@@ -63,6 +62,9 @@ func _ready() -> void:
 	_bg.stretch_mode = TextureRect.STRETCH_SCALE
 	_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_bg)
+	_bg_rows = RowBands.new()
+	_bg_rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_bg_rows)
 	_live_layer = _plain()
 	_text_layer = _plain()
 	_text_layer.draw.connect(_draw_free_texts)
@@ -90,7 +92,13 @@ func show_state(state_name: String) -> void:
 		data = lay.get("states", {}).get(state_name, {})
 	var dir := "res://ui_mock/%s/" % screen
 	var tex: Texture2D = load(dir + str(data.get("bg", ""))) if str(data.get("bg", "")) != "" else null
+	if tex:
+		TexCache.hold(dir + str(data["bg"]), tex)
 	_bg.texture = tex
+	_bg_rows.texture = tex
+	_bg_rows.rows = data.get("bg_rows", [])
+	_bg_rows.visible = not _bg_rows.rows.is_empty()
+	_bg.visible = not _bg_rows.visible
 	if overlay == "":
 		_fill.texture = tex
 	for b in _buttons:
@@ -102,6 +110,7 @@ func show_state(state_name: String) -> void:
 		mb.info = b
 		if str(b.get("img", "")) != "":
 			mb.texture = load(dir + str(b["img"]))
+			TexCache.hold(dir + str(b["img"]), mb.texture)
 		_btn_layer.add_child(mb)
 		_buttons.append(mb)
 	# frei gesetzte Elemente (place_at) behalten ihre Lage, nur die des Mockups wechseln
@@ -132,6 +141,11 @@ func _layout() -> void:
 	else:
 		_bg.position = off
 		_bg.size = Vector2(W, H) * s
+	_fill.inner = Rect2(_bg.position, _bg.size)
+	_fill.queue_redraw()
+	_bg_rows.position = _bg.position
+	_bg_rows.size = _bg.size
+	_bg_rows.queue_redraw()
 	for b in _buttons:
 		b.fit()
 	for id in _placed.keys():
@@ -376,6 +390,63 @@ func place_at(c: Control, r: Rect2, front := false) -> void:
 	(_btn_layer if front else _live_layer).add_child(c)
 	c.position = to_screen(r.position)
 	c.size = r.size * s
+
+
+## Hintergrund für die Ränder, die das Mockup bei anderem Seitenverhältnis frei lässt: dasselbe Bild
+## bildschirmfüllend, aber nur in den Streifen außerhalb des Mockups gezeichnet (nicht noch einmal unter
+## dem ganzen Bild – das kostet auf dem Handy eine volle Bildschirmfläche pro Bild).
+class FillBands:
+	extends Control
+	var texture: Texture2D:
+		set(v):
+			texture = v
+			queue_redraw()
+	var inner := Rect2()
+
+	func _ready() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _draw() -> void:
+		if texture == null or size.x <= 0.0 or size.y <= 0.0:
+			return
+		var ts := texture.get_size()
+		var k := maxf(size.x / ts.x, size.y / ts.y)
+		var cover := Rect2((size - ts * k) * 0.5, ts * k)
+		var bands: Array[Rect2] = []
+		if inner.size == Vector2.ZERO:
+			bands.append(Rect2(Vector2.ZERO, size))
+		else:
+			if inner.position.y > 0.5:
+				bands.append(Rect2(0, 0, size.x, inner.position.y + 1.0))
+			if inner.end.y < size.y - 0.5:
+				bands.append(Rect2(0, inner.end.y - 1.0, size.x, size.y - inner.end.y + 1.0))
+			if inner.position.x > 0.5:
+				bands.append(Rect2(0, inner.position.y, inner.position.x + 1.0, inner.size.y))
+			if inner.end.x < size.x - 0.5:
+				bands.append(Rect2(inner.end.x - 1.0, inner.position.y, size.x - inner.end.x + 1.0, inner.size.y))
+		for b in bands:
+			draw_texture_rect_region(texture, b, Rect2((b.position - cover.position) / k, b.size / k))
+
+
+## Durchsichtiger Hintergrund, der nur in einigen Streifen Inhalt hat (Kopf- und Reiterleiste):
+## nur diese Streifen zeichnen. rows = [[oben, unten, Lage im Bild], …] in Mockup-Punkten; das Bild
+## enthält die Streifen untereinander (tools/mock2game/bg_rows.py).
+class RowBands:
+	extends Control
+	var texture: Texture2D
+	var rows: Array = []
+
+	func _draw() -> void:
+		if texture == null or size.x <= 0.0:
+			return
+		var ts := texture.get_size()
+		var k := ts.x / W   # Bildpunkte je Mockup-Punkt (die Breite bleibt beim Verkleinern gleich)
+		var sc := size.y / H
+		for r in rows:
+			var y0 := float(r[0])
+			var y1 := float(r[1])
+			var src_y := float(r[2]) if r.size() > 2 else y0
+			draw_texture_rect_region(texture, Rect2(0, y0 * sc, size.x, (y1 - y0) * sc), Rect2(0, src_y * k, ts.x, (y1 - y0) * k))
 
 
 class MockButton:
