@@ -20,7 +20,7 @@ const DESC_BOX_Y := 502.5
 const DESC_PLAIN_Y := 446.5
 const DESC_X := 42.5
 const DESC_W := 305.0
-const HINT_Y := 632.0
+const HINT_Y := 606.0
 
 const C_CHIP := "#cfc8f0"
 const C_ROW := "#e8e2ff"
@@ -372,34 +372,34 @@ class Layer:
 		var sw := w.text_w(sub, "Nunito", 800, 12)
 		w.rounded(self, Rect2(195.0 - sw * 0.5 - 10.0, CHIP_Y, sw + 20.0, 20.4), Color(10 / 255.0, 6 / 255.0, 30 / 255.0, 0.55), 9)
 		w.text_at(self, sub, 195.0, CHIP_Y + 10.2, "Nunito", 800, 12, Color(C_CHIP), 0.5)
-		# Wertezeile: Symbol, Name, jetzt → nächste Stufe
+		# Wertezeile (zweizeilig wie im Mockup): oben Symbol und Name mittig, darunter jetzt → nächste Stufe
 		var row := w.live_rect("row")
-		var mid := row.position.y + row.size.y * 0.5
-		var x := row.position.x + 12.0
+		var mid1 := row.position.y + 11.0
+		var mid2 := row.position.y + 30.5
 		var tex: Texture2D = w.icon_tex(str(d["item"])) if d["kind"] == "prod" else null
-		if tex:
-			draw_texture_rect(tex, Rect2(Vector2(x, mid - 9.0) * w.s, Vector2(18, 18) * w.s), false)
-			x += 22.0
-		else:
-			w.draw_sparkle(self, Vector2(x + 6.0, mid), 6.0, Color(C_ROW))
-			x += 16.0
-		var lvl := Save.base_level(id)
-		var right := row.end.x - 12.0
-		var left_end := right
-		if st == "built" and lvl >= BaseData.MAX_LEVEL:
-			left_end -= w.text_at(self, BaseData.row_value(id, lvl), right, mid, "Fredoka", 700, 16, Color(C_NEXT), 1.0)
-		else:
-			var nxt := BaseData.row_value(id, lvl + 1)
-			var nw := w.text_at(self, nxt, right, mid, "Fredoka", 700, 16, Color(C_NEXT), 1.0)
-			var ax := right - nw - 8.0 - 12.0
-			w.draw_arrow(self, ax, mid + 0.5, 11.0, Color(C_CHIP))
-			left_end = ax - 8.0 - w.text_at(self, BaseData.row_value(id, lvl), ax - 8.0, mid, "Fredoka", 700, 16, Color(1, 0.97, 0.92), 1.0)
-		# Name der Wirkung; zu lang für den Platz: etwas kleiner
+		var icon_w := 22.0 if tex else 16.0
 		var label := BaseData.row_label(id)
 		var px := 13.0
-		while px > 10.0 and w.text_w(label, "Nunito", 800, px) > left_end - 10.0 - x:
+		while px > 10.0 and w.text_w(label, "Nunito", 800, px) + icon_w > row.size.x - 24.0:
 			px -= 0.5
-		w.text_at(self, label, x, mid, "Nunito", 800, px, Color(C_ROW))
+		var x := 195.0 - (w.text_w(label, "Nunito", 800, px) + icon_w) * 0.5
+		if tex:
+			draw_texture_rect(tex, Rect2(Vector2(x, mid1 - 9.0) * w.s, Vector2(18, 18) * w.s), false)
+		else:
+			w.draw_sparkle(self, Vector2(x + 6.0, mid1), 6.0, Color(C_ROW))
+		w.text_at(self, label, x + icon_w, mid1, "Nunito", 800, px, Color(C_ROW))
+		var lvl := Save.base_level(id)
+		if st == "built" and lvl >= BaseData.MAX_LEVEL:
+			w.text_at(self, BaseData.row_value(id, lvl), 195.0, mid2, "Fredoka", 700, 16, Color(C_NEXT), 0.5)
+		else:
+			var cur := BaseData.row_value(id, lvl)
+			var nxt := BaseData.row_value(id, lvl + 1)
+			var cw := w.text_w(cur, "Fredoka", 700, 16)
+			var total := cw + 8.0 + 13.0 + 8.0 + w.text_w(nxt, "Fredoka", 700, 16)
+			var left := 195.0 - total * 0.5
+			w.text_at(self, cur, left, mid2, "Fredoka", 700, 16, Color(1, 0.97, 0.92))
+			w.draw_arrow(self, left + cw + 9.0, mid2 + 0.5, 11.0, Color(C_CHIP))
+			w.text_at(self, nxt, left + cw + 29.0, mid2, "Fredoka", 700, 16, Color(C_NEXT))
 		var desc_y := DESC_PLAIN_Y
 		# Lager der Erzeuger
 		if w.state == "lager":

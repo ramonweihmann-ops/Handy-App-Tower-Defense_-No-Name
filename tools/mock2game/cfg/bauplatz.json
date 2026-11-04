@@ -1,7 +1,7 @@
 {"board": "Basislager-Bauplatz.dc.html", "out": "out/bauplatz",
- "states": [{"name": "main", "eval": "const big=document.querySelector('#dc-root a[style*=\"top: 662px\"]'); [...big.childNodes].forEach(n=>{ if(n.nodeName!='svg') n.remove(); }); document.querySelector('#dc-root img[alt=\"Sternwarte\"]').remove();"}],
- "only": ["#dc-root > div > div[style*=\"top: 120px; bottom: 120px\"] svg[width=\"54\"]", "#dc-root > div > a[style*=\"top: 662px\"] svg"],
+ "states": [{"name": "main", "eval": "const big=document.querySelector('#dc-root a[style*=\"top: 636px\"]'); [...big.childNodes].forEach(n=>{ if(n.nodeName!='svg') n.remove(); }); document.querySelector('#dc-root img[alt=\"Sternwarte\"]').remove();"}],
+ "only": ["#dc-root > div > div[style*=\"top: 120px; bottom: 120px\"] svg[width=\"54\"]", "#dc-root > div > a[style*=\"top: 636px\"] svg"],
  "live": [
   {"sel": "svg[width=\"54\"]", "id": "lock", "img": true, "pad": 4},
-  {"sel": "a[style*=\"top: 662px\"] svg", "id": "hammer", "img": true, "pad": 3}
+  {"sel": "a[style*=\"top: 636px\"] svg", "id": "hammer", "img": true, "pad": 3}
  ]}

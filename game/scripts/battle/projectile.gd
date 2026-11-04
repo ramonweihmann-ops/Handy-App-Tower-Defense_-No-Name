@@ -45,10 +45,6 @@ func launch(battle_: Battle, kind_: String, from: Vector3, target_: Enemy, dmg_:
 	_length = maxf(0.5, from.distance_to(_last_target))
 	global_position = from
 	var col: Color = AMMO_COLORS.get(ammo_type, AMMO_COLORS["normal"])
-	if style != "" and FxP.enabled:
-		if not style in BEAM_STYLES:
-			FxP.trail(self, style, kind == "rocket")
-		return
 	if style != "" and FxSprite.has(style + "_geschoss"):
 		if not style in BEAM_STYLES:
 			_sprite = FxSprite.attach(self, style + "_geschoss", {"dir": _last_target - from, "scale": 0.6 * size if kind != "rocket" else 0.8, "alpha": 0.9})
@@ -110,10 +106,7 @@ func _process(delta: float) -> void:
 
 func _impact() -> void:
 	if kind != "rocket" and style != "" and style != "nova":
-		if FxP.enabled:
-			FxP.impact(battle, style, _last_target)
-		else:
-			FxSprite.play(battle, style + "_einschlag", _last_target, {"speed": 1.5})
+		FxSprite.play(battle, style + "_einschlag", _last_target, {"speed": 1.5})
 	if kind == "rocket":
 		battle.explode(_last_target, splash, dmg, crit, ammo_type)
 	elif is_instance_valid(target) and target.alive:

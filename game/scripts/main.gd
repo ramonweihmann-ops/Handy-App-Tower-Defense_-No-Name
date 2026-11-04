@@ -65,7 +65,7 @@ var _auto_pull_t := 0.0
 var _profile := ""
 ## Nur für Tests mit Fenster: nach 8 Sekunden Kampf ein Bild speichern und beenden (--shot=pfad.png).
 var _shot_path := ""
-## Nur für Tests mit Fenster: Menübild speichern (--menushot=pfad.png[,reiter]) und beenden.
+## Nur für Tests mit Fenster: Menübild speichern (--menushot=pfad.png[,reiter[,lager-voll|held:<id>|bau:<id>[:leer]|unterreiter]]) und beenden.
 var _menu_shot := ""
 var _world_holder: Control
 var _world_container: SubViewportContainer
@@ -200,8 +200,6 @@ func _parse_args() -> void:
 			add_child.call_deferred(fs)
 		elif arg == "--fx-neu":
 			Battle.fx_test = "bilder"
-		elif arg == "--fx-partikel":
-			Battle.fx_test = "partikel"
 		elif arg == "--fx-bisher":
 			Battle.fx_test = "bisher"
 		elif arg == "--neue-monster":
@@ -530,6 +528,14 @@ func _process(delta: float) -> void:
 						if not BaseData.by_champion(bid):
 							Save.base()[bid] = {"level": 2, "stock": 999.0, "time": Time.get_unix_time_from_system()}
 					menu.show_tab(parts[1])
+				elif parts.size() > 2 and parts[2].begins_with("bau:"):
+					# Gebäudefenster fürs Bild: bau:<id>, gebaut mit halbvollem Lager (bau:<id>:leer = noch nicht gebaut)
+					Save.data["max_level"] = 20
+					var bid2 := parts[2].get_slice(":", 1)
+					if parts[2].get_slice_count(":") < 3:
+						Save.base()[bid2] = {"level": 2, "stock": 3.0, "time": Time.get_unix_time_from_system()}
+					menu.show_tab(parts[1])
+					menu.open_building(bid2)
 				elif parts.size() > 2 and parts[2].begins_with("held:"):
 					menu.show_tab(parts[1])
 					HeroLockBoard.hero = parts[2].get_slice(":", 1)

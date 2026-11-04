@@ -368,11 +368,9 @@ func _fire(target: Enemy) -> void:
 		"beam":
 			# Sternenatem: durchschlägt die ganze Reihe; mit der Superfähigkeit drei Reihen
 			var pierce := int(data["pierce"]) + int(mods["special"])
-			var far := from + (target.aim_point() - from).normalized() * maxf(8.0, from.distance_to(target.aim_point()) + 4.0)
 			if FxSprite.has("fuenkchen_geschoss"):
+				var far := from + (target.aim_point() - from).normalized() * maxf(8.0, from.distance_to(target.aim_point()) + 4.0)
 				FxSprite.beam(battle, "fuenkchen_geschoss", from, far, 0.25, 0.6, 0.7)
-			elif FxP.enabled:
-				FxP.beam(battle, "fuenkchen", from, far)
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, pierce, 60.0, 1.3)
 			if ult_active():
 				for other in battle.spread_targets(2, target):
@@ -408,7 +406,7 @@ func _fire(target: Enemy) -> void:
 					battle.gravity_well(e.global_position, r, dmg, crit, ammo_type, 0.5, 0.35, 1.2))
 	battle.shot_style = ""
 	_recoil = 1.0
-	_flash_t = 0.0 if FxSprite.has(style + "_muendung") or (FxP.enabled and style != "") else 0.06
+	_flash_t = 0.0 if FxSprite.has(style + "_muendung") else 0.06
 	_shot_anim()
 
 
@@ -423,9 +421,6 @@ var _muzzle_n := 0
 ## Mündungsfeuer als Bildfolge in Schussrichtung (Brocken: Rauchstoß nach hinten); Iska wechselt drei Varianten
 func _muzzle_fx(style: String, from: Vector3, target: Enemy) -> void:
 	if style == "":
-		return
-	if FxP.enabled:
-		FxP.muzzle(battle, style, from, target.aim_point() - from)
 		return
 	var name := style + "_muendung"
 	if style == "iska":

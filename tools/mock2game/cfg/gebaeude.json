@@ -1,7 +1,7 @@
 {"board": "Basislager-Gebaeude.dc.html", "out": "out/gebaeude", "script": "gebaeude.js",
  "states": [{"name": "lager", "eval": "m2gStrip(true)"}, {"name": "plain", "eval": "m2gStrip(false)"}],
  "only": ["#dc-root > div > div[style*=\"top: 12px; height: 38px\"]", "#dc-root > div > div[style*=\"top: 120px; bottom: 120px\"]",
-   "#dc-root > div > a[aria-label=\"Schließen\"]", "#dc-root > div > a[style*=\"top: 662px\"]", "#dc-root > div > nav"],
+   "#dc-root > div > a[aria-label=\"Schließen\"]", "#dc-root > div > a[style*=\"top: 636px\"]", "#dc-root > div > nav"],
  "live": [
   {"sel": "div[style*=\"width: 210px; height: 170px\"]", "id": "pic", "img": true, "pad": 2},
   {"sel": "div[style*=\"top: 266px; height: 40px\"]", "id": "row", "img": true, "pad": 2},
