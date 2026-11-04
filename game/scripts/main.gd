@@ -182,6 +182,15 @@ func _parse_args() -> void:
 			var uc: Node = load("res://tests/ult_check.gd").new()
 			uc.set("main", self)
 			add_child.call_deferred(uc)
+		elif arg.begins_with("--monster-show="):
+			var ms: Node = load("res://tests/monster_show.gd").new()
+			var spec := arg.get_slice("=", 1)
+			ms.set("main", self)
+			ms.set("kinds", spec.get_slice(":", 0).split(","))
+			ms.set("out_dir", spec.get_slice(":", 1))
+			add_child.call_deferred(ms)
+		elif arg == "--neue-monster":
+			Models.test_new = true   # noch nicht freigegebene Gegnermodelle zeigen (Prüfbilder)
 		elif arg == "--mp":
 			mp = true
 		elif arg == "--pull":

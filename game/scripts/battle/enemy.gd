@@ -201,7 +201,7 @@ func _update_effects(delta: float) -> void:
 
 func _animate(_delta: float, moving: bool) -> void:
 	if _model:
-		var d: Dictionary = Models.ENEMIES[kind]
+		var d: Dictionary = Models.enemy(kind)
 		_play(String(d["attack"]) if attacking else String(d["walk"]))
 		if _anim:
 			if d.has("stride") and moving and not attacking:
@@ -418,7 +418,7 @@ func _build_visual() -> void:
 
 ## Fertiges Modell statt einfacher Formen. Zombies bekommen grünliche Haut.
 func _build_model() -> void:
-	var d: Dictionary = Models.ENEMIES[kind]
+	var d: Dictionary = Models.enemy(kind)
 	_model = Models.make(String(d["file"]), float(d["height"]), false)
 	_model.position.y = float(d.get("lift", 0.0))
 	_visual.add_child(_model)

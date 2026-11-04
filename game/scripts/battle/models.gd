@@ -37,6 +37,26 @@ const ENEMIES := {
 	"koloss": {"file": "enemies/Yeti", "height": 3.0, "walk": "Walk", "attack": "Punch"},
 }
 
+## Neue Comic-Gegner, gebaut, aber noch nicht freigegeben (Prüfbild steht aus). Aktiv nur mit dem
+## Test-Schalter --neue-monster; nach der Freigabe wandern die Einträge nach ENEMIES.
+## stride gemessen in Blender (Fußweg der Meshy-Laufbewegung), wie beim Zombie leicht angehoben.
+const ENEMIES_NEU := {
+	"schleimling": {"file": "enemies_v2/schleimling", "height": 0.95, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.56},
+	"schleimmutter": {"file": "enemies_v2/schleimmutter", "height": 2.6, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.35},
+	"krabbler": {"file": "enemies_v2/krabbler", "height": 1.45, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.39},
+	"brecher": {"file": "enemies_v2/brecher", "height": 2.0, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.59},
+	"koloss": {"file": "enemies_v2/koloss", "height": 3.0, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.58},
+}
+static var test_new := false
+
+
+## Daten eines Gegnermodells (mit dem Test-Schalter die neuen, noch nicht freigegebenen)
+static func enemy(kind: String) -> Dictionary:
+	if test_new and ENEMIES_NEU.has(kind):
+		return ENEMIES_NEU[kind]
+	return ENEMIES.get(kind, {})
+
+
 static var _scenes := {}
 static var _heights := {}
 
@@ -60,7 +80,7 @@ static func has_hero(id: String) -> bool:
 
 
 static func has_enemy(kind: String) -> bool:
-	return ENEMIES.has(kind) and _scene(ENEMIES[kind]["file"]) != null
+	return not enemy(kind).is_empty() and _scene(enemy(kind)["file"]) != null
 
 
 ## Modell anlegen und auf die gewünschte Höhe bringen. Blickrichtung: -Z (wie das Spiel).
