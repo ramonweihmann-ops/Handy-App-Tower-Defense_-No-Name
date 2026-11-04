@@ -1,0 +1,407 @@
+{
+  "anzahl": 50,
+  "dateiformate_geprueft": true,
+  "godot_spieltest": false,
+  "effekte": [
+    {
+      "name": "brocken_explosion",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "luftangriff_raumjaeger",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 1,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "luftangriff_triebwerk",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "luftangriff_bombe",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "luftangriff_explosionsreihe",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "gegner_besiegt_gruen",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "gegner_besiegt_lila",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "gegner_besiegt_rosa",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "boss_besiegt",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "energiezaun_treffer",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "kritischer_treffer",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "medipack_heilung",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "dusty_jo_muendung",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "dusty_jo_geschoss",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "dusty_jo_einschlag",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "iska_muendung",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "iska_geschoss",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "iska_einschlag",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "brocken_muendung",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "brocken_geschoss",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "volta_muendung",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "volta_geschoss",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "volta_einschlag",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "kalle_muendung",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "kalle_geschoss",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "kalle_einschlag",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "margot_muendung",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "margot_geschoss",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "margot_einschlag",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "lynx_muendung",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "lynx_geschoss",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "lynx_einschlag",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "fritzi_muendung",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "fritzi_geschoss",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "fritzi_einschlag",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "fuenkchen_muendung",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "fuenkchen_geschoss",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "fuenkchen_einschlag",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "pip_muendung",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "pip_geschoss",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "pip_einschlag",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "rollo_muendung",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "rollo_geschoss",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "rollo_einschlag",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "nova_muendung",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "nova_geschoss",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "nova_einschlag",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "iska_muendung_variante_2",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "iska_muendung_variante_3",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    },
+    {
+      "name": "pip_reparatur",
+      "png_rgba": true,
+      "raster_stimmt": true,
+      "echte_transparenz": true,
+      "gif_frames": 16,
+      "quelle_aktuell": true
+    }
+  ]
+}

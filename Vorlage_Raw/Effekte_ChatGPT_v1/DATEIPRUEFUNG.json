@@ -1,0 +1,6103 @@
+{
+  "effekte": [
+    {
+      "name": "brocken_explosion",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.9413452914798206,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          82,
+          88,
+          174,
+          168
+        ],
+        [
+          58,
+          67,
+          198,
+          189
+        ],
+        [
+          41,
+          54,
+          215,
+          201
+        ],
+        [
+          29,
+          36,
+          227,
+          220
+        ],
+        [
+          30,
+          41,
+          225,
+          215
+        ],
+        [
+          23,
+          34,
+          233,
+          223
+        ],
+        [
+          23,
+          28,
+          233,
+          229
+        ],
+        [
+          24,
+          28,
+          231,
+          228
+        ],
+        [
+          24,
+          28,
+          233,
+          229
+        ],
+        [
+          26,
+          31,
+          230,
+          225
+        ],
+        [
+          24,
+          32,
+          232,
+          225
+        ],
+        [
+          28,
+          37,
+          228,
+          219
+        ],
+        [
+          32,
+          50,
+          224,
+          205
+        ],
+        [
+          46,
+          53,
+          209,
+          203
+        ],
+        [
+          48,
+          64,
+          207,
+          192
+        ],
+        [
+          70,
+          70,
+          187,
+          185
+        ]
+      ],
+      "quell_sha256": "ebf9fec98c52f978e6695cfed4adc07c1704dc9dcf93b21170a84f6baedfed63"
+    },
+    {
+      "name": "luftangriff_raumjaeger",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        512,
+        512
+      ],
+      "frames": 1,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.4314902363823227,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          46,
+          62,
+          466,
+          449
+        ]
+      ],
+      "quell_sha256": "0921c76082a4abc320be8a022fe0de387c8cc7c1d6c01fd114b4ab040c5e2c98"
+    },
+    {
+      "name": "luftangriff_triebwerk",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.5767032967032967,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          14,
+          20,
+          113,
+          109
+        ],
+        [
+          14,
+          18,
+          114,
+          110
+        ],
+        [
+          13,
+          16,
+          115,
+          112
+        ],
+        [
+          12,
+          14,
+          116,
+          114
+        ],
+        [
+          12,
+          14,
+          117,
+          115
+        ],
+        [
+          12,
+          16,
+          115,
+          112
+        ],
+        [
+          14,
+          18,
+          115,
+          109
+        ],
+        [
+          14,
+          20,
+          113,
+          109
+        ],
+        [
+          16,
+          21,
+          113,
+          107
+        ],
+        [
+          14,
+          20,
+          113,
+          109
+        ],
+        [
+          14,
+          18,
+          115,
+          111
+        ],
+        [
+          12,
+          16,
+          115,
+          111
+        ],
+        [
+          12,
+          14,
+          117,
+          113
+        ],
+        [
+          12,
+          16,
+          115,
+          111
+        ],
+        [
+          14,
+          18,
+          115,
+          109
+        ],
+        [
+          14,
+          20,
+          113,
+          109
+        ]
+      ],
+      "quell_sha256": "8403ff7fc789a19b6cb6f5dad1d3ce6c38b44fdc608ed01122d6aecd16315cf6"
+    },
+    {
+      "name": "luftangriff_explosionsreihe",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.7832835820895522,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          38,
+          92,
+          217,
+          163
+        ],
+        [
+          38,
+          82,
+          217,
+          174
+        ],
+        [
+          35,
+          74,
+          221,
+          182
+        ],
+        [
+          31,
+          70,
+          225,
+          187
+        ],
+        [
+          30,
+          62,
+          227,
+          193
+        ],
+        [
+          26,
+          58,
+          231,
+          199
+        ],
+        [
+          26,
+          59,
+          230,
+          197
+        ],
+        [
+          23,
+          63,
+          233,
+          193
+        ],
+        [
+          24,
+          62,
+          233,
+          194
+        ],
+        [
+          24,
+          62,
+          231,
+          195
+        ],
+        [
+          28,
+          61,
+          227,
+          195
+        ],
+        [
+          28,
+          62,
+          227,
+          194
+        ],
+        [
+          30,
+          62,
+          225,
+          194
+        ],
+        [
+          33,
+          64,
+          223,
+          191
+        ],
+        [
+          35,
+          68,
+          221,
+          187
+        ],
+        [
+          35,
+          71,
+          221,
+          185
+        ]
+      ],
+      "quell_sha256": "d9dd72e0fa7a01f709bc630f5254428112636bfd9f85ef6e9c0a18eefafe106f"
+    },
+    {
+      "name": "luftangriff_bombe",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.5466666666666666,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          20,
+          12,
+          107,
+          115
+        ],
+        [
+          20,
+          12,
+          107,
+          116
+        ],
+        [
+          21,
+          12,
+          107,
+          115
+        ],
+        [
+          22,
+          12,
+          107,
+          115
+        ],
+        [
+          22,
+          12,
+          106,
+          116
+        ],
+        [
+          21,
+          12,
+          107,
+          115
+        ],
+        [
+          20,
+          12,
+          108,
+          116
+        ],
+        [
+          20,
+          12,
+          107,
+          117
+        ],
+        [
+          20,
+          12,
+          107,
+          116
+        ],
+        [
+          20,
+          12,
+          107,
+          116
+        ],
+        [
+          21,
+          12,
+          107,
+          116
+        ],
+        [
+          22,
+          12,
+          107,
+          116
+        ],
+        [
+          22,
+          12,
+          107,
+          116
+        ],
+        [
+          20,
+          12,
+          108,
+          116
+        ],
+        [
+          20,
+          12,
+          107,
+          116
+        ],
+        [
+          20,
+          12,
+          107,
+          116
+        ]
+      ],
+      "quell_sha256": "3324f492be11351980dd34060d96e7538ccdb0c4e3ff35273733add83b504506"
+    },
+    {
+      "name": "gegner_besiegt_gruen",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.7497142857142857,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          88,
+          94,
+          167,
+          162
+        ],
+        [
+          74,
+          84,
+          181,
+          171
+        ],
+        [
+          61,
+          66,
+          195,
+          191
+        ],
+        [
+          44,
+          52,
+          211,
+          203
+        ],
+        [
+          32,
+          42,
+          225,
+          215
+        ],
+        [
+          23,
+          30,
+          233,
+          226
+        ],
+        [
+          24,
+          30,
+          232,
+          226
+        ],
+        [
+          32,
+          36,
+          225,
+          221
+        ],
+        [
+          36,
+          38,
+          221,
+          219
+        ],
+        [
+          39,
+          43,
+          217,
+          213
+        ],
+        [
+          44,
+          50,
+          213,
+          207
+        ],
+        [
+          52,
+          58,
+          205,
+          198
+        ],
+        [
+          59,
+          63,
+          197,
+          193
+        ],
+        [
+          68,
+          71,
+          187,
+          185
+        ],
+        [
+          76,
+          76,
+          179,
+          180
+        ],
+        [
+          78,
+          78,
+          178,
+          177
+        ]
+      ],
+      "quell_sha256": "d36bc14c61aede88b05c816722df65ffa3f3bcd3dbab22d49835e05dcd196395"
+    },
+    {
+      "name": "gegner_besiegt_lila",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.8674380165289256,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          86,
+          79,
+          169,
+          177
+        ],
+        [
+          76,
+          69,
+          181,
+          187
+        ],
+        [
+          60,
+          59,
+          197,
+          197
+        ],
+        [
+          44,
+          44,
+          211,
+          212
+        ],
+        [
+          34,
+          34,
+          223,
+          222
+        ],
+        [
+          25,
+          23,
+          231,
+          233
+        ],
+        [
+          28,
+          29,
+          229,
+          227
+        ],
+        [
+          36,
+          35,
+          220,
+          221
+        ],
+        [
+          36,
+          38,
+          220,
+          218
+        ],
+        [
+          43,
+          44,
+          213,
+          211
+        ],
+        [
+          48,
+          52,
+          208,
+          203
+        ],
+        [
+          54,
+          59,
+          201,
+          197
+        ],
+        [
+          58,
+          64,
+          198,
+          192
+        ],
+        [
+          66,
+          70,
+          191,
+          187
+        ],
+        [
+          68,
+          77,
+          187,
+          179
+        ],
+        [
+          73,
+          84,
+          183,
+          172
+        ]
+      ],
+      "quell_sha256": "3d85bdd745fd5d4d6b7044daa853964ba9e0d6ec91b3dd59027a84cdbab11859"
+    },
+    {
+      "name": "gegner_besiegt_rosa",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.7862172284644194,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          77,
+          84,
+          179,
+          173
+        ],
+        [
+          60,
+          68,
+          197,
+          188
+        ],
+        [
+          50,
+          56,
+          206,
+          201
+        ],
+        [
+          43,
+          44,
+          213,
+          211
+        ],
+        [
+          32,
+          30,
+          225,
+          227
+        ],
+        [
+          23,
+          24,
+          233,
+          233
+        ],
+        [
+          28,
+          26,
+          228,
+          230
+        ],
+        [
+          34,
+          33,
+          221,
+          223
+        ],
+        [
+          39,
+          38,
+          217,
+          217
+        ],
+        [
+          44,
+          44,
+          213,
+          213
+        ],
+        [
+          48,
+          48,
+          207,
+          208
+        ],
+        [
+          54,
+          57,
+          203,
+          199
+        ],
+        [
+          58,
+          64,
+          197,
+          191
+        ],
+        [
+          64,
+          72,
+          191,
+          185
+        ],
+        [
+          68,
+          78,
+          188,
+          179
+        ],
+        [
+          72,
+          92,
+          183,
+          165
+        ]
+      ],
+      "quell_sha256": "ac6dbd634e8485937fca1568a35c2c68ecead907f831c87e58e1ae0626e271e4"
+    },
+    {
+      "name": "boss_besiegt",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.7746125461254612,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          82,
+          88,
+          173,
+          167
+        ],
+        [
+          74,
+          79,
+          181,
+          177
+        ],
+        [
+          63,
+          70,
+          193,
+          185
+        ],
+        [
+          48,
+          54,
+          208,
+          201
+        ],
+        [
+          34,
+          46,
+          223,
+          209
+        ],
+        [
+          23,
+          43,
+          233,
+          213
+        ],
+        [
+          31,
+          46,
+          225,
+          209
+        ],
+        [
+          38,
+          54,
+          218,
+          202
+        ],
+        [
+          40,
+          60,
+          216,
+          196
+        ],
+        [
+          50,
+          66,
+          207,
+          189
+        ],
+        [
+          55,
+          70,
+          201,
+          185
+        ],
+        [
+          60,
+          76,
+          196,
+          181
+        ],
+        [
+          67,
+          80,
+          189,
+          175
+        ],
+        [
+          78,
+          84,
+          179,
+          173
+        ],
+        [
+          83,
+          88,
+          173,
+          168
+        ],
+        [
+          92,
+          94,
+          165,
+          161
+        ]
+      ],
+      "quell_sha256": "98d9559f874b25fb260971b55f02f03a2503904cfd6ed9cdd93a66293a6a8f1d"
+    },
+    {
+      "name": "medipack_heilung",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.9673732718894008,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          30,
+          84,
+          225,
+          172
+        ],
+        [
+          31,
+          77,
+          225,
+          179
+        ],
+        [
+          31,
+          52,
+          225,
+          203
+        ],
+        [
+          31,
+          40,
+          225,
+          217
+        ],
+        [
+          31,
+          28,
+          225,
+          227
+        ],
+        [
+          31,
+          23,
+          225,
+          233
+        ],
+        [
+          31,
+          23,
+          225,
+          233
+        ],
+        [
+          31,
+          27,
+          225,
+          229
+        ],
+        [
+          31,
+          31,
+          225,
+          225
+        ],
+        [
+          31,
+          38,
+          225,
+          218
+        ],
+        [
+          31,
+          44,
+          225,
+          212
+        ],
+        [
+          31,
+          55,
+          225,
+          201
+        ],
+        [
+          31,
+          60,
+          225,
+          195
+        ],
+        [
+          31,
+          72,
+          225,
+          183
+        ],
+        [
+          31,
+          80,
+          225,
+          175
+        ],
+        [
+          31,
+          89,
+          225,
+          167
+        ]
+      ],
+      "quell_sha256": "18416965bb5910667493a62da1e8181c5680a2c27308ec45bf3db7954569630d"
+    },
+    {
+      "name": "energiezaun_treffer",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.8012213740458015,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          68,
+          77,
+          187,
+          179
+        ],
+        [
+          55,
+          66,
+          201,
+          189
+        ],
+        [
+          44,
+          54,
+          211,
+          201
+        ],
+        [
+          32,
+          38,
+          225,
+          218
+        ],
+        [
+          23,
+          32,
+          233,
+          225
+        ],
+        [
+          24,
+          34,
+          233,
+          223
+        ],
+        [
+          26,
+          36,
+          231,
+          219
+        ],
+        [
+          32,
+          46,
+          225,
+          211
+        ],
+        [
+          36,
+          51,
+          219,
+          205
+        ],
+        [
+          44,
+          60,
+          213,
+          196
+        ],
+        [
+          50,
+          66,
+          205,
+          190
+        ],
+        [
+          60,
+          74,
+          197,
+          183
+        ],
+        [
+          64,
+          78,
+          191,
+          177
+        ],
+        [
+          68,
+          85,
+          187,
+          171
+        ],
+        [
+          74,
+          94,
+          181,
+          162
+        ],
+        [
+          79,
+          96,
+          177,
+          159
+        ]
+      ],
+      "quell_sha256": "60b4ed40fff4aefb034ea23bb8a6ba0f3743e4144b81739c400b108a3d7b6b2d"
+    },
+    {
+      "name": "kritischer_treffer",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.4132283464566929,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          45,
+          40,
+          83,
+          87
+        ],
+        [
+          38,
+          34,
+          90,
+          93
+        ],
+        [
+          30,
+          28,
+          98,
+          99
+        ],
+        [
+          22,
+          22,
+          105,
+          107
+        ],
+        [
+          14,
+          13,
+          115,
+          115
+        ],
+        [
+          12,
+          12,
+          116,
+          117
+        ],
+        [
+          17,
+          16,
+          111,
+          112
+        ],
+        [
+          22,
+          21,
+          107,
+          107
+        ],
+        [
+          28,
+          26,
+          101,
+          102
+        ],
+        [
+          33,
+          30,
+          95,
+          97
+        ],
+        [
+          37,
+          35,
+          91,
+          93
+        ],
+        [
+          42,
+          38,
+          86,
+          89
+        ],
+        [
+          44,
+          40,
+          84,
+          87
+        ],
+        [
+          45,
+          46,
+          83,
+          83
+        ],
+        [
+          45,
+          46,
+          83,
+          82
+        ],
+        [
+          44,
+          48,
+          83,
+          80
+        ]
+      ],
+      "quell_sha256": "dfc9cb2c20868fa78dc02cd5d97f94f04d1515497033fae592bc2749a061700b"
+    },
+    {
+      "name": "dusty_jo_muendung",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.75
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.3382113821138211,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          52,
+          67,
+          77,
+          96
+        ],
+        [
+          45,
+          57,
+          83,
+          96
+        ],
+        [
+          40,
+          45,
+          88,
+          96
+        ],
+        [
+          32,
+          29,
+          96,
+          96
+        ],
+        [
+          26,
+          13,
+          103,
+          96
+        ],
+        [
+          27,
+          18,
+          101,
+          96
+        ],
+        [
+          30,
+          24,
+          99,
+          96
+        ],
+        [
+          35,
+          33,
+          93,
+          96
+        ],
+        [
+          38,
+          42,
+          89,
+          96
+        ],
+        [
+          43,
+          49,
+          85,
+          96
+        ],
+        [
+          46,
+          54,
+          83,
+          96
+        ],
+        [
+          49,
+          67,
+          79,
+          96
+        ],
+        [
+          50,
+          77,
+          78,
+          96
+        ],
+        [
+          51,
+          81,
+          77,
+          96
+        ],
+        [
+          53,
+          82,
+          75,
+          96
+        ],
+        [
+          54,
+          85,
+          74,
+          96
+        ]
+      ],
+      "quell_sha256": "dc9aecf022ab2838b5d9c6a0e72eca5e79b16eca1b44657a3eaff18cd603f601"
+    },
+    {
+      "name": "dusty_jo_geschoss",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.9048275862068965,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          100,
+          28,
+          157,
+          228
+        ],
+        [
+          98,
+          27,
+          157,
+          229
+        ],
+        [
+          97,
+          26,
+          159,
+          230
+        ],
+        [
+          96,
+          25,
+          161,
+          231
+        ],
+        [
+          92,
+          24,
+          165,
+          232
+        ],
+        [
+          89,
+          23,
+          167,
+          233
+        ],
+        [
+          87,
+          23,
+          169,
+          233
+        ],
+        [
+          87,
+          24,
+          169,
+          233
+        ],
+        [
+          87,
+          24,
+          169,
+          233
+        ],
+        [
+          90,
+          24,
+          166,
+          232
+        ],
+        [
+          92,
+          24,
+          163,
+          232
+        ],
+        [
+          94,
+          24,
+          161,
+          232
+        ],
+        [
+          97,
+          24,
+          159,
+          232
+        ],
+        [
+          98,
+          24,
+          157,
+          231
+        ],
+        [
+          99,
+          26,
+          157,
+          230
+        ],
+        [
+          99,
+          26,
+          157,
+          230
+        ]
+      ],
+      "quell_sha256": "7a0f202d1d5a0812e298baf63daff4426555b9cab0771af908e2ae027ba4539d"
+    },
+    {
+      "name": "dusty_jo_einschlag",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.5095145631067961,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          58,
+          58,
+          70,
+          69
+        ],
+        [
+          52,
+          54,
+          75,
+          75
+        ],
+        [
+          44,
+          47,
+          85,
+          81
+        ],
+        [
+          34,
+          39,
+          94,
+          89
+        ],
+        [
+          26,
+          33,
+          101,
+          95
+        ],
+        [
+          22,
+          24,
+          106,
+          105
+        ],
+        [
+          14,
+          18,
+          115,
+          111
+        ],
+        [
+          12,
+          14,
+          115,
+          115
+        ],
+        [
+          12,
+          12,
+          115,
+          117
+        ],
+        [
+          12,
+          12,
+          116,
+          115
+        ],
+        [
+          13,
+          15,
+          115,
+          113
+        ],
+        [
+          14,
+          16,
+          115,
+          111
+        ],
+        [
+          18,
+          22,
+          110,
+          107
+        ],
+        [
+          31,
+          23,
+          97,
+          105
+        ],
+        [
+          62,
+          62,
+          67,
+          67
+        ],
+        [
+          62,
+          62,
+          67,
+          66
+        ]
+      ],
+      "quell_sha256": "e1c5520bef4a303ec74a4ea41530ee1fb47c9c73c753711afa14842a9f4e1e22"
+    },
+    {
+      "name": "iska_muendung",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.75
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.35708154506437767,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          52,
+          72,
+          75,
+          96
+        ],
+        [
+          48,
+          59,
+          80,
+          96
+        ],
+        [
+          43,
+          49,
+          85,
+          96
+        ],
+        [
+          34,
+          26,
+          94,
+          96
+        ],
+        [
+          26,
+          13,
+          101,
+          96
+        ],
+        [
+          28,
+          16,
+          100,
+          96
+        ],
+        [
+          34,
+          25,
+          95,
+          96
+        ],
+        [
+          39,
+          35,
+          89,
+          96
+        ],
+        [
+          44,
+          48,
+          83,
+          96
+        ],
+        [
+          48,
+          56,
+          79,
+          96
+        ],
+        [
+          50,
+          66,
+          77,
+          96
+        ],
+        [
+          52,
+          73,
+          77,
+          96
+        ],
+        [
+          54,
+          75,
+          73,
+          96
+        ],
+        [
+          54,
+          75,
+          74,
+          96
+        ],
+        [
+          55,
+          77,
+          73,
+          96
+        ],
+        [
+          55,
+          79,
+          73,
+          96
+        ]
+      ],
+      "quell_sha256": "2273525d20a960bc975d0efe94b4c0f54238dfd784a38aa388d664def46276d2"
+    },
+    {
+      "name": "iska_geschoss",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        249
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 1.2421301775147928,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          120,
+          43,
+          137,
+          213
+        ],
+        [
+          118,
+          36,
+          139,
+          219
+        ],
+        [
+          114,
+          36,
+          143,
+          219
+        ],
+        [
+          112,
+          32,
+          144,
+          225
+        ],
+        [
+          110,
+          30,
+          146,
+          227
+        ],
+        [
+          107,
+          28,
+          149,
+          227
+        ],
+        [
+          107,
+          28,
+          149,
+          228
+        ],
+        [
+          105,
+          23,
+          151,
+          233
+        ],
+        [
+          106,
+          28,
+          149,
+          228
+        ],
+        [
+          108,
+          30,
+          147,
+          227
+        ],
+        [
+          110,
+          32,
+          145,
+          225
+        ],
+        [
+          113,
+          34,
+          143,
+          222
+        ],
+        [
+          115,
+          39,
+          141,
+          217
+        ],
+        [
+          118,
+          40,
+          139,
+          215
+        ],
+        [
+          120,
+          46,
+          135,
+          211
+        ],
+        [
+          121,
+          42,
+          135,
+          213
+        ]
+      ],
+      "quell_sha256": "c027e9078007e57f765808384112da2e1ae37d3daa2832b8db41a07e310071b9"
+    },
+    {
+      "name": "iska_einschlag",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        248
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.4974407582938388,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          54,
+          56,
+          73,
+          73
+        ],
+        [
+          50,
+          50,
+          77,
+          79
+        ],
+        [
+          42,
+          42,
+          86,
+          86
+        ],
+        [
+          34,
+          38,
+          95,
+          91
+        ],
+        [
+          22,
+          31,
+          106,
+          97
+        ],
+        [
+          12,
+          22,
+          117,
+          106
+        ],
+        [
+          14,
+          23,
+          113,
+          105
+        ],
+        [
+          19,
+          26,
+          109,
+          101
+        ],
+        [
+          23,
+          29,
+          105,
+          99
+        ],
+        [
+          30,
+          32,
+          99,
+          95
+        ],
+        [
+          37,
+          41,
+          91,
+          87
+        ],
+        [
+          51,
+          44,
+          77,
+          85
+        ],
+        [
+          54,
+          48,
+          75,
+          79
+        ],
+        [
+          55,
+          52,
+          73,
+          77
+        ],
+        [
+          62,
+          63,
+          65,
+          65
+        ],
+        null
+      ],
+      "quell_sha256": "f75447557b88d135b3b9f457c1c4f4ab2c7cc6ba106db93331f4ef71c052218a"
+    },
+    {
+      "name": "brocken_muendung",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.75
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.3617391304347826,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          52,
+          71,
+          75,
+          96
+        ],
+        [
+          48,
+          62,
+          81,
+          96
+        ],
+        [
+          42,
+          50,
+          86,
+          96
+        ],
+        [
+          35,
+          37,
+          93,
+          96
+        ],
+        [
+          29,
+          25,
+          99,
+          96
+        ],
+        [
+          24,
+          15,
+          105,
+          96
+        ],
+        [
+          22,
+          13,
+          106,
+          96
+        ],
+        [
+          27,
+          15,
+          101,
+          96
+        ],
+        [
+          30,
+          16,
+          99,
+          96
+        ],
+        [
+          33,
+          23,
+          95,
+          96
+        ],
+        [
+          36,
+          29,
+          91,
+          96
+        ],
+        [
+          42,
+          41,
+          86,
+          96
+        ],
+        [
+          46,
+          50,
+          83,
+          96
+        ],
+        [
+          49,
+          58,
+          79,
+          96
+        ],
+        [
+          52,
+          67,
+          77,
+          96
+        ],
+        [
+          55,
+          72,
+          73,
+          96
+        ]
+      ],
+      "quell_sha256": "9c5934fb2596b5bc9e980029b1a5f43f5e6256b36716a3a08fa5396bd07b0120"
+    },
+    {
+      "name": "brocken_geschoss",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.8603278688524589,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          65,
+          34,
+          191,
+          222
+        ],
+        [
+          66,
+          31,
+          191,
+          225
+        ],
+        [
+          65,
+          29,
+          191,
+          227
+        ],
+        [
+          65,
+          28,
+          191,
+          228
+        ],
+        [
+          65,
+          26,
+          191,
+          230
+        ],
+        [
+          66,
+          25,
+          191,
+          231
+        ],
+        [
+          65,
+          24,
+          191,
+          231
+        ],
+        [
+          66,
+          23,
+          191,
+          233
+        ],
+        [
+          65,
+          23,
+          191,
+          233
+        ],
+        [
+          66,
+          25,
+          191,
+          231
+        ],
+        [
+          65,
+          27,
+          191,
+          229
+        ],
+        [
+          65,
+          27,
+          191,
+          229
+        ],
+        [
+          65,
+          31,
+          191,
+          225
+        ],
+        [
+          66,
+          32,
+          191,
+          224
+        ],
+        [
+          65,
+          35,
+          191,
+          221
+        ],
+        [
+          65,
+          36,
+          191,
+          219
+        ]
+      ],
+      "quell_sha256": "035b377367500066bdb09e5ff6837a3dff868d716d974abbaa9e84736d67e993"
+    },
+    {
+      "name": "volta_muendung",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.75
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.3466666666666667,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          38,
+          71,
+          89,
+          96
+        ],
+        [
+          36,
+          58,
+          92,
+          96
+        ],
+        [
+          32,
+          44,
+          96,
+          96
+        ],
+        [
+          27,
+          23,
+          101,
+          96
+        ],
+        [
+          24,
+          13,
+          105,
+          96
+        ],
+        [
+          24,
+          16,
+          104,
+          96
+        ],
+        [
+          25,
+          22,
+          103,
+          96
+        ],
+        [
+          26,
+          29,
+          101,
+          96
+        ],
+        [
+          28,
+          37,
+          99,
+          96
+        ],
+        [
+          31,
+          46,
+          97,
+          96
+        ],
+        [
+          32,
+          54,
+          95,
+          96
+        ],
+        [
+          37,
+          62,
+          91,
+          96
+        ],
+        [
+          38,
+          68,
+          91,
+          96
+        ],
+        [
+          40,
+          74,
+          88,
+          96
+        ],
+        [
+          42,
+          77,
+          87,
+          96
+        ],
+        [
+          42,
+          79,
+          85,
+          96
+        ]
+      ],
+      "quell_sha256": "68e0d7f902aa564089eaa025486dfac1f1dcc1b359dd8225ce9a74447e88c12f"
+    },
+    {
+      "name": "volta_geschoss",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.8894915254237288,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          26,
+          44,
+          231,
+          212
+        ],
+        [
+          26,
+          42,
+          230,
+          214
+        ],
+        [
+          26,
+          40,
+          231,
+          216
+        ],
+        [
+          25,
+          37,
+          231,
+          219
+        ],
+        [
+          26,
+          38,
+          231,
+          218
+        ],
+        [
+          23,
+          38,
+          233,
+          219
+        ],
+        [
+          24,
+          40,
+          233,
+          216
+        ],
+        [
+          24,
+          41,
+          232,
+          215
+        ],
+        [
+          24,
+          42,
+          232,
+          215
+        ],
+        [
+          24,
+          42,
+          233,
+          214
+        ],
+        [
+          24,
+          44,
+          233,
+          213
+        ],
+        [
+          24,
+          42,
+          233,
+          213
+        ],
+        [
+          24,
+          42,
+          232,
+          213
+        ],
+        [
+          24,
+          42,
+          232,
+          215
+        ],
+        [
+          24,
+          42,
+          232,
+          214
+        ],
+        [
+          24,
+          42,
+          233,
+          215
+        ]
+      ],
+      "quell_sha256": "af3547147859c51d2f722e5c1897757963a1f8f59d9adb81208dbd54bd93cc03"
+    },
+    {
+      "name": "volta_einschlag",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.912695652173913,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          87,
+          102,
+          169,
+          155
+        ],
+        [
+          90,
+          97,
+          165,
+          159
+        ],
+        [
+          78,
+          78,
+          178,
+          177
+        ],
+        [
+          47,
+          60,
+          209,
+          197
+        ],
+        [
+          36,
+          46,
+          221,
+          211
+        ],
+        [
+          23,
+          36,
+          233,
+          219
+        ],
+        [
+          34,
+          42,
+          222,
+          214
+        ],
+        [
+          47,
+          62,
+          209,
+          193
+        ],
+        [
+          58,
+          65,
+          199,
+          191
+        ],
+        [
+          63,
+          80,
+          193,
+          176
+        ],
+        [
+          74,
+          96,
+          183,
+          160
+        ],
+        [
+          70,
+          96,
+          187,
+          161
+        ],
+        [
+          78,
+          112,
+          177,
+          143
+        ],
+        [
+          106,
+          110,
+          150,
+          147
+        ],
+        [
+          120,
+          114,
+          135,
+          143
+        ],
+        [
+          122,
+          118,
+          133,
+          137
+        ]
+      ],
+      "quell_sha256": "bd242a4b7576955c3ce52a4c01e07b0dccb9cf76d431058b508e0b1a3d8c9732"
+    },
+    {
+      "name": "kalle_muendung",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.75
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.34238683127572017,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          48,
+          56,
+          79,
+          96
+        ],
+        [
+          46,
+          46,
+          81,
+          96
+        ],
+        [
+          42,
+          34,
+          85,
+          96
+        ],
+        [
+          34,
+          23,
+          93,
+          96
+        ],
+        [
+          28,
+          13,
+          101,
+          96
+        ],
+        [
+          28,
+          14,
+          101,
+          96
+        ],
+        [
+          30,
+          17,
+          98,
+          96
+        ],
+        [
+          34,
+          21,
+          94,
+          96
+        ],
+        [
+          37,
+          26,
+          91,
+          96
+        ],
+        [
+          38,
+          31,
+          90,
+          96
+        ],
+        [
+          40,
+          36,
+          88,
+          96
+        ],
+        [
+          42,
+          43,
+          85,
+          96
+        ],
+        [
+          44,
+          47,
+          84,
+          96
+        ],
+        [
+          47,
+          51,
+          81,
+          96
+        ],
+        [
+          48,
+          56,
+          79,
+          96
+        ],
+        [
+          52,
+          62,
+          77,
+          96
+        ]
+      ],
+      "quell_sha256": "25abe25ef207192da4b0e5e549da7f117b28877a01863f94ef0bf13b8669ebc7"
+    },
+    {
+      "name": "kalle_geschoss",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.878326359832636,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          106,
+          26,
+          150,
+          230
+        ],
+        [
+          106,
+          24,
+          151,
+          231
+        ],
+        [
+          106,
+          24,
+          151,
+          232
+        ],
+        [
+          105,
+          24,
+          151,
+          233
+        ],
+        [
+          104,
+          23,
+          151,
+          233
+        ],
+        [
+          105,
+          25,
+          151,
+          231
+        ],
+        [
+          106,
+          25,
+          151,
+          231
+        ],
+        [
+          106,
+          25,
+          151,
+          231
+        ],
+        [
+          106,
+          25,
+          150,
+          231
+        ],
+        [
+          106,
+          26,
+          150,
+          231
+        ],
+        [
+          106,
+          25,
+          151,
+          231
+        ],
+        [
+          105,
+          25,
+          151,
+          231
+        ],
+        [
+          106,
+          24,
+          151,
+          231
+        ],
+        [
+          106,
+          25,
+          151,
+          231
+        ],
+        [
+          106,
+          25,
+          150,
+          231
+        ],
+        [
+          106,
+          26,
+          150,
+          231
+        ]
+      ],
+      "quell_sha256": "b277b67293af76ffb5c99d384318b21098a06f570ce26984c7454b1f37ec4489"
+    },
+    {
+      "name": "kalle_einschlag",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.7689377289377289,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          82,
+          94,
+          173,
+          163
+        ],
+        [
+          69,
+          81,
+          187,
+          175
+        ],
+        [
+          48,
+          68,
+          208,
+          187
+        ],
+        [
+          36,
+          54,
+          219,
+          202
+        ],
+        [
+          26,
+          40,
+          229,
+          216
+        ],
+        [
+          23,
+          36,
+          233,
+          221
+        ],
+        [
+          28,
+          40,
+          229,
+          215
+        ],
+        [
+          32,
+          47,
+          223,
+          209
+        ],
+        [
+          40,
+          54,
+          217,
+          201
+        ],
+        [
+          50,
+          66,
+          205,
+          190
+        ],
+        [
+          52,
+          79,
+          205,
+          177
+        ],
+        [
+          66,
+          88,
+          189,
+          169
+        ],
+        [
+          74,
+          96,
+          182,
+          161
+        ],
+        [
+          80,
+          100,
+          176,
+          157
+        ],
+        [
+          86,
+          104,
+          171,
+          153
+        ],
+        [
+          90,
+          106,
+          167,
+          151
+        ]
+      ],
+      "quell_sha256": "b1b9dfe94a2d702ba255c0117d451e85321b14ff99eb975ad51fb4589763927f"
+    },
+    {
+      "name": "margot_muendung",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.75
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.36331877729257644,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          46,
+          66,
+          83,
+          96
+        ],
+        [
+          36,
+          53,
+          92,
+          96
+        ],
+        [
+          30,
+          39,
+          99,
+          96
+        ],
+        [
+          18,
+          21,
+          110,
+          96
+        ],
+        [
+          15,
+          14,
+          113,
+          96
+        ],
+        [
+          14,
+          13,
+          113,
+          96
+        ],
+        [
+          18,
+          18,
+          111,
+          96
+        ],
+        [
+          19,
+          23,
+          109,
+          96
+        ],
+        [
+          22,
+          33,
+          105,
+          96
+        ],
+        [
+          27,
+          36,
+          101,
+          96
+        ],
+        [
+          32,
+          45,
+          95,
+          96
+        ],
+        [
+          36,
+          51,
+          91,
+          96
+        ],
+        [
+          41,
+          56,
+          87,
+          96
+        ],
+        [
+          44,
+          60,
+          83,
+          96
+        ],
+        [
+          48,
+          63,
+          79,
+          96
+        ],
+        [
+          52,
+          65,
+          76,
+          96
+        ]
+      ],
+      "quell_sha256": "c476c11ae95801549fda4e77622f533380d9e2ca5b12478c6ca2e21c786060a9"
+    },
+    {
+      "name": "margot_geschoss",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.9498642533936651,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          32,
+          38,
+          224,
+          219
+        ],
+        [
+          32,
+          36,
+          225,
+          219
+        ],
+        [
+          28,
+          35,
+          227,
+          221
+        ],
+        [
+          26,
+          35,
+          229,
+          221
+        ],
+        [
+          24,
+          34,
+          232,
+          222
+        ],
+        [
+          24,
+          34,
+          231,
+          223
+        ],
+        [
+          24,
+          34,
+          233,
+          223
+        ],
+        [
+          24,
+          34,
+          231,
+          223
+        ],
+        [
+          26,
+          34,
+          229,
+          221
+        ],
+        [
+          28,
+          34,
+          227,
+          221
+        ],
+        [
+          26,
+          34,
+          229,
+          222
+        ],
+        [
+          24,
+          34,
+          231,
+          222
+        ],
+        [
+          24,
+          34,
+          231,
+          222
+        ],
+        [
+          25,
+          34,
+          231,
+          222
+        ],
+        [
+          23,
+          34,
+          233,
+          222
+        ],
+        [
+          24,
+          34,
+          231,
+          221
+        ]
+      ],
+      "quell_sha256": "5b70030cc9e6c32ac178878b8e3e8ca11facb9762ce37df079d19fe097a42ad3"
+    },
+    {
+      "name": "margot_einschlag",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.42666666666666664,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          39,
+          39,
+          89,
+          89
+        ],
+        [
+          36,
+          33,
+          92,
+          95
+        ],
+        [
+          32,
+          28,
+          95,
+          100
+        ],
+        [
+          28,
+          22,
+          100,
+          107
+        ],
+        [
+          24,
+          14,
+          103,
+          113
+        ],
+        [
+          22,
+          12,
+          105,
+          117
+        ],
+        [
+          24,
+          14,
+          104,
+          113
+        ],
+        [
+          26,
+          16,
+          103,
+          111
+        ],
+        [
+          28,
+          20,
+          100,
+          107
+        ],
+        [
+          30,
+          25,
+          97,
+          103
+        ],
+        [
+          32,
+          29,
+          96,
+          99
+        ],
+        [
+          34,
+          31,
+          95,
+          97
+        ],
+        [
+          34,
+          34,
+          95,
+          95
+        ],
+        [
+          35,
+          36,
+          93,
+          91
+        ],
+        [
+          36,
+          39,
+          92,
+          89
+        ],
+        [
+          36,
+          40,
+          91,
+          87
+        ]
+      ],
+      "quell_sha256": "c6369598322e92645a2d967edaf17accedd3a48b630e432bdbf9004b1da88593"
+    },
+    {
+      "name": "lynx_muendung",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.75
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.36331877729257644,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          50,
+          75,
+          77,
+          96
+        ],
+        [
+          46,
+          60,
+          81,
+          96
+        ],
+        [
+          42,
+          42,
+          85,
+          96
+        ],
+        [
+          37,
+          30,
+          91,
+          96
+        ],
+        [
+          32,
+          14,
+          97,
+          96
+        ],
+        [
+          28,
+          13,
+          100,
+          96
+        ],
+        [
+          31,
+          16,
+          97,
+          96
+        ],
+        [
+          36,
+          24,
+          92,
+          96
+        ],
+        [
+          38,
+          34,
+          89,
+          96
+        ],
+        [
+          41,
+          41,
+          87,
+          96
+        ],
+        [
+          44,
+          45,
+          83,
+          96
+        ],
+        [
+          46,
+          57,
+          81,
+          96
+        ],
+        [
+          50,
+          68,
+          79,
+          96
+        ],
+        [
+          52,
+          75,
+          76,
+          96
+        ],
+        [
+          52,
+          82,
+          75,
+          96
+        ],
+        [
+          54,
+          84,
+          75,
+          96
+        ]
+      ],
+      "quell_sha256": "950a4850994e53829fef45db207e9eef0f3aed022ea4ef9694f83bb1a9950437"
+    },
+    {
+      "name": "lynx_einschlag",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.4036923076923077,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          56,
+          37,
+          72,
+          91
+        ],
+        [
+          52,
+          32,
+          77,
+          96
+        ],
+        [
+          43,
+          24,
+          85,
+          104
+        ],
+        [
+          34,
+          17,
+          93,
+          111
+        ],
+        [
+          29,
+          12,
+          99,
+          117
+        ],
+        [
+          33,
+          16,
+          95,
+          113
+        ],
+        [
+          38,
+          20,
+          90,
+          109
+        ],
+        [
+          44,
+          24,
+          85,
+          104
+        ],
+        [
+          50,
+          28,
+          79,
+          101
+        ],
+        [
+          52,
+          33,
+          77,
+          95
+        ],
+        [
+          53,
+          39,
+          75,
+          89
+        ],
+        [
+          54,
+          42,
+          75,
+          85
+        ],
+        [
+          58,
+          46,
+          71,
+          82
+        ],
+        [
+          59,
+          47,
+          69,
+          81
+        ],
+        [
+          61,
+          61,
+          67,
+          67
+        ],
+        null
+      ],
+      "quell_sha256": "4958eb69d62c000b4eea80cc91f8e4f1624953c55ebb0aa9b8950d27b53e7736"
+    },
+    {
+      "name": "fritzi_muendung",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.75
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.35555555555555557,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          52,
+          78,
+          76,
+          96
+        ],
+        [
+          46,
+          62,
+          81,
+          96
+        ],
+        [
+          40,
+          48,
+          87,
+          96
+        ],
+        [
+          38,
+          28,
+          91,
+          96
+        ],
+        [
+          32,
+          13,
+          95,
+          96
+        ],
+        [
+          32,
+          13,
+          95,
+          96
+        ],
+        [
+          34,
+          19,
+          94,
+          96
+        ],
+        [
+          38,
+          27,
+          91,
+          96
+        ],
+        [
+          40,
+          41,
+          89,
+          96
+        ],
+        [
+          44,
+          50,
+          83,
+          96
+        ],
+        [
+          44,
+          57,
+          83,
+          96
+        ],
+        [
+          46,
+          68,
+          83,
+          96
+        ],
+        [
+          48,
+          73,
+          79,
+          96
+        ],
+        [
+          52,
+          75,
+          75,
+          96
+        ],
+        [
+          52,
+          78,
+          76,
+          96
+        ],
+        [
+          52,
+          79,
+          75,
+          96
+        ]
+      ],
+      "quell_sha256": "c42585cfe6a3a9405de66d08d893b2944a039c874b9f7dc28230ff742a8f9f95"
+    },
+    {
+      "name": "fritzi_geschoss",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.75
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.6326996197718632,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          45,
+          48,
+          211,
+          192
+        ],
+        [
+          44,
+          44,
+          212,
+          192
+        ],
+        [
+          44,
+          35,
+          212,
+          192
+        ],
+        [
+          44,
+          28,
+          212,
+          192
+        ],
+        [
+          42,
+          27,
+          213,
+          192
+        ],
+        [
+          43,
+          26,
+          213,
+          192
+        ],
+        [
+          44,
+          34,
+          212,
+          192
+        ],
+        [
+          42,
+          33,
+          213,
+          192
+        ],
+        [
+          42,
+          31,
+          213,
+          192
+        ],
+        [
+          43,
+          36,
+          213,
+          192
+        ],
+        [
+          43,
+          34,
+          213,
+          192
+        ],
+        [
+          42,
+          34,
+          213,
+          192
+        ],
+        [
+          43,
+          36,
+          213,
+          192
+        ],
+        [
+          42,
+          34,
+          213,
+          192
+        ],
+        [
+          43,
+          33,
+          213,
+          192
+        ],
+        [
+          44,
+          33,
+          212,
+          192
+        ]
+      ],
+      "quell_sha256": "3d6a7c44d7c588cfaaa37c1242509df10774d6c404990825ccba2aa77e7dc352"
+    },
+    {
+      "name": "fritzi_einschlag",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.912695652173913,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          41,
+          40,
+          215,
+          215
+        ],
+        [
+          42,
+          37,
+          214,
+          219
+        ],
+        [
+          42,
+          32,
+          215,
+          224
+        ],
+        [
+          42,
+          26,
+          215,
+          229
+        ],
+        [
+          41,
+          23,
+          215,
+          233
+        ],
+        [
+          42,
+          26,
+          215,
+          230
+        ],
+        [
+          42,
+          32,
+          215,
+          223
+        ],
+        [
+          42,
+          39,
+          215,
+          217
+        ],
+        [
+          42,
+          42,
+          215,
+          214
+        ],
+        [
+          42,
+          42,
+          215,
+          214
+        ],
+        [
+          41,
+          36,
+          215,
+          219
+        ],
+        [
+          41,
+          31,
+          215,
+          225
+        ],
+        [
+          40,
+          28,
+          215,
+          227
+        ],
+        [
+          41,
+          33,
+          215,
+          223
+        ],
+        [
+          41,
+          40,
+          215,
+          215
+        ],
+        [
+          41,
+          42,
+          215,
+          215
+        ]
+      ],
+      "quell_sha256": "9dcaa1b6a194e98c66f09f588450a71cd831ef3a0924b47ca149ebd2155e0388"
+    },
+    {
+      "name": "fuenkchen_muendung",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.75
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.3395918367346939,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          54,
+          59,
+          75,
+          96
+        ],
+        [
+          48,
+          53,
+          79,
+          96
+        ],
+        [
+          38,
+          41,
+          90,
+          96
+        ],
+        [
+          32,
+          28,
+          96,
+          96
+        ],
+        [
+          22,
+          13,
+          107,
+          96
+        ],
+        [
+          22,
+          13,
+          107,
+          96
+        ],
+        [
+          24,
+          17,
+          103,
+          96
+        ],
+        [
+          29,
+          24,
+          99,
+          96
+        ],
+        [
+          33,
+          27,
+          95,
+          96
+        ],
+        [
+          40,
+          33,
+          89,
+          96
+        ],
+        [
+          44,
+          37,
+          85,
+          96
+        ],
+        [
+          48,
+          48,
+          80,
+          96
+        ],
+        [
+          48,
+          51,
+          80,
+          96
+        ],
+        [
+          52,
+          57,
+          77,
+          96
+        ],
+        [
+          55,
+          61,
+          73,
+          96
+        ],
+        [
+          56,
+          65,
+          72,
+          96
+        ]
+      ],
+      "quell_sha256": "30f01e5aacee2e0c42f439de18f755063d4c6a7ef3deb69fec27626b75a4e819"
+    },
+    {
+      "name": "fuenkchen_geschoss",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.8136434108527131,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          78,
+          24,
+          179,
+          233
+        ],
+        [
+          78,
+          23,
+          179,
+          233
+        ],
+        [
+          76,
+          24,
+          179,
+          232
+        ],
+        [
+          76,
+          24,
+          180,
+          232
+        ],
+        [
+          74,
+          24,
+          183,
+          231
+        ],
+        [
+          74,
+          24,
+          183,
+          231
+        ],
+        [
+          74,
+          24,
+          182,
+          231
+        ],
+        [
+          76,
+          24,
+          179,
+          232
+        ],
+        [
+          78,
+          24,
+          177,
+          231
+        ],
+        [
+          76,
+          24,
+          179,
+          232
+        ],
+        [
+          74,
+          24,
+          182,
+          232
+        ],
+        [
+          74,
+          24,
+          182,
+          232
+        ],
+        [
+          75,
+          24,
+          181,
+          232
+        ],
+        [
+          76,
+          24,
+          180,
+          232
+        ],
+        [
+          76,
+          24,
+          179,
+          232
+        ],
+        [
+          77,
+          24,
+          179,
+          232
+        ]
+      ],
+      "quell_sha256": "91104aa549f96a79eec30e7311b31ae31d777f4669da56f5196170a90626f048"
+    },
+    {
+      "name": "lynx_geschoss",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.882016806722689,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          118,
+          28,
+          137,
+          229
+        ],
+        [
+          118,
+          27,
+          138,
+          229
+        ],
+        [
+          118,
+          27,
+          138,
+          229
+        ],
+        [
+          118,
+          26,
+          139,
+          229
+        ],
+        [
+          114,
+          25,
+          141,
+          231
+        ],
+        [
+          114,
+          24,
+          142,
+          232
+        ],
+        [
+          114,
+          24,
+          142,
+          233
+        ],
+        [
+          114,
+          23,
+          143,
+          233
+        ],
+        [
+          111,
+          24,
+          145,
+          232
+        ],
+        [
+          112,
+          24,
+          145,
+          233
+        ],
+        [
+          111,
+          24,
+          145,
+          232
+        ],
+        [
+          111,
+          24,
+          145,
+          233
+        ],
+        [
+          115,
+          25,
+          141,
+          231
+        ],
+        [
+          116,
+          25,
+          140,
+          231
+        ],
+        [
+          118,
+          25,
+          139,
+          231
+        ],
+        [
+          118,
+          25,
+          137,
+          231
+        ]
+      ],
+      "quell_sha256": "04b94dd81920dac285a78b42d0a03359a55ca4cfed71d9cebb4ad390838cffb9"
+    },
+    {
+      "name": "fuenkchen_einschlag",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.45241379310344826,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          42,
+          42,
+          85,
+          87
+        ],
+        [
+          36,
+          34,
+          93,
+          95
+        ],
+        [
+          24,
+          26,
+          103,
+          102
+        ],
+        [
+          18,
+          17,
+          109,
+          111
+        ],
+        [
+          13,
+          13,
+          115,
+          115
+        ],
+        [
+          12,
+          12,
+          117,
+          115
+        ],
+        [
+          16,
+          16,
+          112,
+          112
+        ],
+        [
+          21,
+          22,
+          107,
+          106
+        ],
+        [
+          25,
+          28,
+          103,
+          101
+        ],
+        [
+          31,
+          32,
+          97,
+          95
+        ],
+        [
+          34,
+          36,
+          94,
+          93
+        ],
+        [
+          38,
+          44,
+          90,
+          85
+        ],
+        [
+          39,
+          48,
+          89,
+          81
+        ],
+        [
+          45,
+          51,
+          83,
+          77
+        ],
+        [
+          50,
+          53,
+          77,
+          75
+        ],
+        [
+          52,
+          54,
+          77,
+          74
+        ]
+      ],
+      "quell_sha256": "fa441124ffa522ae3c6eb14556edc78d01b342a203b1f764bdb2f13a76d5d7ac"
+    },
+    {
+      "name": "pip_muendung",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.75
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.34522821576763485,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          58,
+          82,
+          70,
+          96
+        ],
+        [
+          47,
+          69,
+          81,
+          96
+        ],
+        [
+          41,
+          52,
+          87,
+          96
+        ],
+        [
+          36,
+          38,
+          91,
+          96
+        ],
+        [
+          32,
+          21,
+          95,
+          96
+        ],
+        [
+          27,
+          13,
+          101,
+          96
+        ],
+        [
+          34,
+          25,
+          94,
+          96
+        ],
+        [
+          40,
+          35,
+          88,
+          96
+        ],
+        [
+          40,
+          38,
+          89,
+          96
+        ],
+        [
+          43,
+          49,
+          85,
+          96
+        ],
+        [
+          46,
+          56,
+          82,
+          96
+        ],
+        [
+          51,
+          70,
+          77,
+          96
+        ],
+        [
+          52,
+          72,
+          76,
+          96
+        ],
+        [
+          56,
+          77,
+          71,
+          96
+        ],
+        [
+          59,
+          81,
+          69,
+          96
+        ],
+        [
+          61,
+          90,
+          67,
+          96
+        ]
+      ],
+      "quell_sha256": "5f255684f92bd46dee3cb9223bcb4e8fc4785ff0ad114816249ec86c82030e44"
+    },
+    {
+      "name": "pip_geschoss",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.9166812227074235,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          65,
+          25,
+          191,
+          231
+        ],
+        [
+          66,
+          26,
+          190,
+          231
+        ],
+        [
+          66,
+          24,
+          189,
+          231
+        ],
+        [
+          68,
+          25,
+          187,
+          231
+        ],
+        [
+          66,
+          24,
+          189,
+          232
+        ],
+        [
+          64,
+          24,
+          191,
+          231
+        ],
+        [
+          65,
+          23,
+          191,
+          233
+        ],
+        [
+          64,
+          23,
+          191,
+          233
+        ],
+        [
+          64,
+          24,
+          191,
+          233
+        ],
+        [
+          65,
+          24,
+          191,
+          233
+        ],
+        [
+          64,
+          24,
+          191,
+          232
+        ],
+        [
+          64,
+          26,
+          191,
+          231
+        ],
+        [
+          64,
+          24,
+          191,
+          231
+        ],
+        [
+          64,
+          24,
+          191,
+          233
+        ],
+        [
+          64,
+          24,
+          191,
+          231
+        ],
+        [
+          64,
+          24,
+          191,
+          231
+        ]
+      ],
+      "quell_sha256": "b1e6e995955d8ad94de95ce59da94dda2d0567766859a62ee562725cec6e55a7"
+    },
+    {
+      "name": "pip_einschlag",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.4881860465116279,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          48,
+          54,
+          80,
+          73
+        ],
+        [
+          41,
+          50,
+          87,
+          77
+        ],
+        [
+          33,
+          46,
+          95,
+          83
+        ],
+        [
+          29,
+          37,
+          99,
+          91
+        ],
+        [
+          23,
+          28,
+          105,
+          99
+        ],
+        [
+          12,
+          20,
+          117,
+          109
+        ],
+        [
+          16,
+          26,
+          112,
+          103
+        ],
+        [
+          22,
+          28,
+          107,
+          101
+        ],
+        [
+          23,
+          38,
+          105,
+          90
+        ],
+        [
+          32,
+          40,
+          96,
+          88
+        ],
+        [
+          36,
+          44,
+          93,
+          83
+        ],
+        [
+          42,
+          47,
+          86,
+          81
+        ],
+        [
+          48,
+          50,
+          81,
+          77
+        ],
+        [
+          53,
+          56,
+          75,
+          72
+        ],
+        [
+          62,
+          62,
+          66,
+          67
+        ],
+        null
+      ],
+      "quell_sha256": "50f08253211941073e80bf1be8dc14c66ea70629386beb88028188868235dc4e"
+    },
+    {
+      "name": "rollo_muendung",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.75
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.35708154506437767,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          44,
+          76,
+          83,
+          96
+        ],
+        [
+          39,
+          61,
+          89,
+          96
+        ],
+        [
+          32,
+          45,
+          95,
+          96
+        ],
+        [
+          26,
+          31,
+          103,
+          96
+        ],
+        [
+          21,
+          13,
+          107,
+          96
+        ],
+        [
+          22,
+          17,
+          107,
+          96
+        ],
+        [
+          24,
+          24,
+          105,
+          96
+        ],
+        [
+          27,
+          31,
+          101,
+          96
+        ],
+        [
+          29,
+          37,
+          99,
+          96
+        ],
+        [
+          34,
+          41,
+          94,
+          96
+        ],
+        [
+          37,
+          43,
+          91,
+          96
+        ],
+        [
+          44,
+          47,
+          84,
+          96
+        ],
+        [
+          45,
+          52,
+          83,
+          96
+        ],
+        [
+          48,
+          57,
+          81,
+          96
+        ],
+        [
+          52,
+          61,
+          77,
+          96
+        ],
+        [
+          53,
+          69,
+          75,
+          96
+        ]
+      ],
+      "quell_sha256": "90c518775eb94185f7e551c3f959622f3a26a354cdca6b2f12ceaf852315aa29"
+    },
+    {
+      "name": "rollo_geschoss",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.9629357798165137,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          31,
+          28,
+          225,
+          227
+        ],
+        [
+          31,
+          28,
+          225,
+          227
+        ],
+        [
+          30,
+          28,
+          225,
+          228
+        ],
+        [
+          30,
+          28,
+          225,
+          229
+        ],
+        [
+          28,
+          26,
+          227,
+          231
+        ],
+        [
+          28,
+          26,
+          227,
+          231
+        ],
+        [
+          27,
+          26,
+          229,
+          231
+        ],
+        [
+          27,
+          25,
+          229,
+          231
+        ],
+        [
+          25,
+          23,
+          231,
+          233
+        ],
+        [
+          25,
+          24,
+          231,
+          233
+        ],
+        [
+          25,
+          24,
+          231,
+          233
+        ],
+        [
+          25,
+          24,
+          231,
+          233
+        ],
+        [
+          26,
+          24,
+          230,
+          231
+        ],
+        [
+          27,
+          24,
+          229,
+          231
+        ],
+        [
+          26,
+          24,
+          229,
+          231
+        ],
+        [
+          27,
+          24,
+          229,
+          231
+        ]
+      ],
+      "quell_sha256": "d0c90107689b126b827e2c81708a6b6def2186d7cce63d40805e024427cf198a"
+    },
+    {
+      "name": "rollo_einschlag",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 1.0765128205128205,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          87,
+          100,
+          169,
+          155
+        ],
+        [
+          74,
+          91,
+          182,
+          165
+        ],
+        [
+          62,
+          86,
+          195,
+          171
+        ],
+        [
+          49,
+          78,
+          207,
+          178
+        ],
+        [
+          53,
+          82,
+          203,
+          174
+        ],
+        [
+          40,
+          80,
+          215,
+          175
+        ],
+        [
+          34,
+          78,
+          222,
+          177
+        ],
+        [
+          23,
+          72,
+          233,
+          185
+        ],
+        [
+          24,
+          71,
+          232,
+          185
+        ],
+        [
+          27,
+          70,
+          229,
+          187
+        ],
+        [
+          34,
+          70,
+          221,
+          187
+        ],
+        [
+          36,
+          74,
+          221,
+          181
+        ],
+        [
+          51,
+          76,
+          205,
+          181
+        ],
+        [
+          58,
+          79,
+          199,
+          177
+        ],
+        [
+          66,
+          98,
+          189,
+          157
+        ],
+        [
+          84,
+          106,
+          173,
+          150
+        ]
+      ],
+      "quell_sha256": "2b094eeca4e4aad1485fb52873ddf9edd0a87b2aa904c5a5416ba75d7be52959"
+    },
+    {
+      "name": "nova_muendung",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.75
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.3510548523206751,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          56,
+          72,
+          72,
+          96
+        ],
+        [
+          51,
+          62,
+          77,
+          96
+        ],
+        [
+          47,
+          47,
+          81,
+          96
+        ],
+        [
+          41,
+          30,
+          87,
+          96
+        ],
+        [
+          36,
+          19,
+          91,
+          96
+        ],
+        [
+          34,
+          13,
+          93,
+          96
+        ],
+        [
+          36,
+          19,
+          91,
+          96
+        ],
+        [
+          38,
+          26,
+          89,
+          96
+        ],
+        [
+          42,
+          37,
+          86,
+          96
+        ],
+        [
+          46,
+          45,
+          81,
+          96
+        ],
+        [
+          49,
+          46,
+          79,
+          96
+        ],
+        [
+          51,
+          50,
+          77,
+          96
+        ],
+        [
+          54,
+          52,
+          75,
+          96
+        ],
+        [
+          56,
+          57,
+          72,
+          96
+        ],
+        [
+          58,
+          65,
+          70,
+          96
+        ],
+        [
+          60,
+          71,
+          69,
+          96
+        ]
+      ],
+      "quell_sha256": "c61c71e00a299cfaaa435b865fbca2866b52704aeb064765e1719c824d39cc13"
+    },
+    {
+      "name": "nova_geschoss",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.8894915254237288,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          54,
+          36,
+          202,
+          221
+        ],
+        [
+          54,
+          32,
+          202,
+          223
+        ],
+        [
+          54,
+          29,
+          202,
+          227
+        ],
+        [
+          54,
+          26,
+          202,
+          229
+        ],
+        [
+          54,
+          23,
+          202,
+          233
+        ],
+        [
+          54,
+          26,
+          201,
+          231
+        ],
+        [
+          54,
+          28,
+          202,
+          227
+        ],
+        [
+          54,
+          30,
+          202,
+          226
+        ],
+        [
+          54,
+          33,
+          203,
+          223
+        ],
+        [
+          54,
+          37,
+          202,
+          219
+        ],
+        [
+          54,
+          40,
+          202,
+          216
+        ],
+        [
+          54,
+          38,
+          203,
+          219
+        ],
+        [
+          54,
+          35,
+          203,
+          221
+        ],
+        [
+          54,
+          32,
+          202,
+          223
+        ],
+        [
+          54,
+          32,
+          202,
+          224
+        ],
+        [
+          54,
+          34,
+          202,
+          223
+        ]
+      ],
+      "quell_sha256": "1e655fd7f6672de3ed3f530d5a882056b8e14a3ca6f430337167e3446c7540c6"
+    },
+    {
+      "name": "nova_einschlag",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.8012213740458015,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          58,
+          76,
+          197,
+          181
+        ],
+        [
+          52,
+          67,
+          203,
+          189
+        ],
+        [
+          44,
+          60,
+          212,
+          195
+        ],
+        [
+          32,
+          52,
+          223,
+          203
+        ],
+        [
+          26,
+          41,
+          230,
+          215
+        ],
+        [
+          24,
+          38,
+          232,
+          217
+        ],
+        [
+          23,
+          38,
+          233,
+          217
+        ],
+        [
+          28,
+          45,
+          228,
+          211
+        ],
+        [
+          34,
+          46,
+          223,
+          209
+        ],
+        [
+          43,
+          53,
+          213,
+          203
+        ],
+        [
+          48,
+          60,
+          208,
+          196
+        ],
+        [
+          54,
+          67,
+          201,
+          189
+        ],
+        [
+          60,
+          72,
+          196,
+          184
+        ],
+        [
+          66,
+          77,
+          189,
+          179
+        ],
+        [
+          72,
+          86,
+          183,
+          171
+        ],
+        [
+          79,
+          90,
+          177,
+          166
+        ]
+      ],
+      "quell_sha256": "5c17eb32fcce3648eb6a640ebb2103b981953d60076e9c1a21067c19759c3b52"
+    },
+    {
+      "name": "iska_muendung_variante_3",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.75
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.37990867579908677,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          52,
+          70,
+          76,
+          96
+        ],
+        [
+          48,
+          58,
+          81,
+          96
+        ],
+        [
+          40,
+          46,
+          89,
+          96
+        ],
+        [
+          32,
+          31,
+          96,
+          96
+        ],
+        [
+          24,
+          15,
+          105,
+          96
+        ],
+        [
+          22,
+          13,
+          106,
+          96
+        ],
+        [
+          26,
+          20,
+          101,
+          96
+        ],
+        [
+          32,
+          28,
+          95,
+          96
+        ],
+        [
+          38,
+          39,
+          91,
+          96
+        ],
+        [
+          42,
+          51,
+          86,
+          96
+        ],
+        [
+          46,
+          58,
+          82,
+          96
+        ],
+        [
+          48,
+          59,
+          81,
+          96
+        ],
+        [
+          49,
+          63,
+          79,
+          96
+        ],
+        [
+          50,
+          69,
+          79,
+          96
+        ],
+        [
+          50,
+          73,
+          77,
+          96
+        ],
+        [
+          52,
+          77,
+          76,
+          96
+        ]
+      ],
+      "quell_sha256": "b81e99679657a518cf3ca6bfa142b73b638021b4c830bce0fb33f5366a6ab970"
+    },
+    {
+      "name": "pip_reparatur",
+      "pack_version": 2,
+      "sheet_px": [
+        1024,
+        1024
+      ],
+      "einzelbild_px": [
+        256,
+        256
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.5
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.882016806722689,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          80,
+          98,
+          176,
+          159
+        ],
+        [
+          74,
+          75,
+          181,
+          181
+        ],
+        [
+          60,
+          62,
+          195,
+          195
+        ],
+        [
+          50,
+          48,
+          205,
+          207
+        ],
+        [
+          40,
+          32,
+          216,
+          225
+        ],
+        [
+          30,
+          23,
+          226,
+          233
+        ],
+        [
+          31,
+          28,
+          225,
+          227
+        ],
+        [
+          34,
+          34,
+          221,
+          223
+        ],
+        [
+          44,
+          46,
+          211,
+          211
+        ],
+        [
+          54,
+          55,
+          201,
+          201
+        ],
+        [
+          58,
+          62,
+          197,
+          194
+        ],
+        [
+          63,
+          70,
+          193,
+          187
+        ],
+        [
+          76,
+          78,
+          179,
+          177
+        ],
+        [
+          79,
+          98,
+          177,
+          159
+        ],
+        [
+          82,
+          103,
+          175,
+          153
+        ],
+        [
+          92,
+          110,
+          164,
+          145
+        ]
+      ],
+      "quell_sha256": "fbb8500c3904bf6cd7a9a19f7da279ce82816339a863f9acce8d9d3a0d31dfed"
+    },
+    {
+      "name": "iska_muendung_variante_2",
+      "pack_version": 2,
+      "sheet_px": [
+        512,
+        512
+      ],
+      "einzelbild_px": [
+        128,
+        128
+      ],
+      "frames": 16,
+      "alpha": [
+        0,
+        255
+      ],
+      "anker": [
+        0.5,
+        0.75
+      ],
+      "rahmen_frei": true,
+      "einheitlicher_skalenfaktor": 0.3781818181818182,
+      "registrierung": "Mündung: untere Motivmitte am Anker; andere Effekte: Motivmitte am Anker. Gemeinsamer Maßstab pro Folge.",
+      "sichtpruefung_noetig": true,
+      "frame_bbox": [
+        [
+          54,
+          74,
+          74,
+          96
+        ],
+        [
+          52,
+          64,
+          77,
+          96
+        ],
+        [
+          47,
+          53,
+          81,
+          96
+        ],
+        [
+          44,
+          40,
+          84,
+          96
+        ],
+        [
+          37,
+          22,
+          91,
+          96
+        ],
+        [
+          34,
+          13,
+          93,
+          96
+        ],
+        [
+          36,
+          20,
+          91,
+          96
+        ],
+        [
+          40,
+          31,
+          87,
+          96
+        ],
+        [
+          44,
+          43,
+          83,
+          96
+        ],
+        [
+          48,
+          55,
+          81,
+          96
+        ],
+        [
+          50,
+          63,
+          77,
+          96
+        ],
+        [
+          54,
+          70,
+          75,
+          96
+        ],
+        [
+          54,
+          80,
+          73,
+          96
+        ],
+        [
+          54,
+          82,
+          73,
+          96
+        ],
+        [
+          54,
+          88,
+          73,
+          96
+        ],
+        [
+          54,
+          91,
+          73,
+          96
+        ]
+      ],
+      "quell_sha256": "803202d91fec19afbf7724d7ae238c97655cf01ac55fc3118a5eb9d9fcdf5ae0"
+    }
+  ],
+  "anzahl": 50,
+  "soll": 50,
+  "technische_pruefung": "RGBA, Transparenz, Raster, feste Zellen, freie Außenränder, Größenlimit; Sichtprüfung separat",
+  "godot_geprueft": false
+}

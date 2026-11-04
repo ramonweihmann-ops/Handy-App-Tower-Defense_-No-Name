@@ -1,0 +1,19 @@
+{
+  "name": "boss_besiegt",
+  "frames": 16,
+  "cols": 4,
+  "rows": 4,
+  "fps": 24,
+  "loop": false,
+  "groesse_m": 3.3,
+  "mischung": "alpha",
+  "anker": [
+    0.5,
+    0.5
+  ],
+  "einzelbild_px": [
+    256,
+    256
+  ],
+  "notiz": "Vorschlag zur Sichtprüfung. Originalrichtung nach oben; im Spiel ausrichten. Anker normiert, X nach rechts/Y nach unten. Gerade Alpha-Daten. Einmal abspielen und danach ausblenden; die GIF-Vorschau wiederholt nur zur Prüfung."
+}

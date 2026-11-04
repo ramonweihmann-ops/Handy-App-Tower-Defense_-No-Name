@@ -1,0 +1,19 @@
+{
+  "name": "luftangriff_raumjaeger",
+  "frames": 1,
+  "cols": 1,
+  "rows": 1,
+  "fps": 24,
+  "loop": false,
+  "groesse_m": 1.8,
+  "mischung": "alpha",
+  "anker": [
+    0.5,
+    0.5
+  ],
+  "einzelbild_px": [
+    512,
+    512
+  ],
+  "notiz": "Vorschlag zur Sichtprüfung. Originalrichtung nach oben; im Spiel ausrichten. Anker normiert, X nach rechts/Y nach unten. Gerade Alpha-Daten. Statisches 512er-Sprite als ausdrücklich gewünschte Ausnahme; Bewegung übernimmt das Spiel. Kein 3D-Modell."
+}

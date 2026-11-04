@@ -1,0 +1,902 @@
+[
+  {
+    "name": "brocken_explosion",
+    "label": "Brocken · Raketenexplosion",
+    "art": "Orangegelbe runde Comic-Feuerwolke, deutlich erkennbare flache elliptische Druckwelle, danach violettgraue geschlossene Rauchkringel, wenige Funken.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 2.5,
+    "mischung": "alpha",
+    "priority": 0
+  },
+  {
+    "name": "luftangriff_raumjaeger",
+    "label": "Luftangriff · Raumjäger",
+    "art": "GENAU EIN kompakter kleiner lila-weiß-goldgelber Raumjäger, runde freundliche Space-Comic-Formen und türkisfarbenes Cockpit. Schräg von oben gesehen, Nase zur oberen Bildkante, beide Flügel symmetrisch, zwei Triebwerksdüsen hinten. OHNE Flamme, ohne Schatten, keine Bodenplatte.",
+    "cell": 512,
+    "frames": 1,
+    "cols": 1,
+    "rows": 1,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 1.8,
+    "mischung": "alpha",
+    "priority": 0
+  },
+  {
+    "name": "luftangriff_triebwerk",
+    "label": "Luftangriff · Triebwerk",
+    "art": "Zwei kleine blauviolette Triebwerksflammen nebeneinander. Düsenansätze feste Position, kurze Flammen zeigen nach UNTEN. Keine Düsenkörper oder Raumjäger zeichnen.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": true,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 0.8,
+    "mischung": "alpha",
+    "priority": 0
+  },
+  {
+    "name": "luftangriff_bombe",
+    "label": "Luftangriff · Bombe",
+    "art": "Eine einzelne kleine rundliche violettgraue Bombe mit goldgelber Spitze und kleinen starren Flossen; fällt von schräg oben gesehen mit Spitze zur oberen Bildkante. Subtiles Rotieren um die eigene Längsachse, kein Schwanz, kein Feuerball.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": true,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 0.35,
+    "mischung": "alpha",
+    "priority": 0
+  },
+  {
+    "name": "luftangriff_explosionsreihe",
+    "label": "Luftangriff · Explosionsreihe",
+    "art": "Drei kleine orangegelbe Comic-Explosionen NEBENEINANDER, zeitlich leicht nacheinander von links nach rechts gezündet, unten flache elliptische Druckringe, anschließend geringe violette Rauchkringel. Die GRUPPE bleibt in jeder Zelle im selben Platz.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 8,
+    "mischung": "alpha",
+    "priority": 0
+  },
+  {
+    "name": "gegner_besiegt_gruen",
+    "label": "Besiegt · gruen",
+    "art": "Comic-Zerplatzen aus limettengrünem Glibber als wenige dicke runde Tropfen mit goldgelben Sternchen. Kein Körper und keine Augen. Kleine Wolke wird zu größerem Ring aus Tropfen und löst sich auf. KEIN Blut.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 1.15,
+    "mischung": "alpha",
+    "priority": 0
+  },
+  {
+    "name": "gegner_besiegt_lila",
+    "label": "Besiegt · lila",
+    "art": "Comic-Zerplatzen aus violettem Glibber als wenige dicke runde Tropfen mit goldgelben Sternchen. Kein Körper und keine Augen. Kleine Wolke wird zu größerem Ring aus Tropfen und löst sich auf. KEIN Blut.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 1.15,
+    "mischung": "alpha",
+    "priority": 0
+  },
+  {
+    "name": "gegner_besiegt_rosa",
+    "label": "Besiegt · rosa",
+    "art": "Comic-Zerplatzen aus rosaem Glibber als wenige dicke runde Tropfen mit goldgelben Sternchen. Kein Körper und keine Augen. Kleine Wolke wird zu größerem Ring aus Tropfen und löst sich auf. KEIN Blut.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 1.15,
+    "mischung": "alpha",
+    "priority": 0
+  },
+  {
+    "name": "boss_besiegt",
+    "label": "Boss besiegt",
+    "art": "Großes violett-türkises Comic-Zerplatzen mit goldenen Sternchen und wenigen breiten cremegelben Lichtstrahlen, elliptischer Bodenring. Kein Monster, kein Text.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 3.3,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "energiezaun_treffer",
+    "label": "Energiezaun · Treffer",
+    "art": "Türkisblaue Funken mit kurzem kompaktem Aufleuchten einer kleinen gebogenen Schildfläche und zwei hexagonalen Lichtflecken. Kein ganzer Zaun.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 1.15,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "kritischer_treffer",
+    "label": "Kritischer Treffer",
+    "art": "Ein kleiner kräftiger goldgelb-oranger gezackter Comic-Blitzstern, deutliche leere Mitte für spätere Spielschrift. Kein Text und keine Buchstaben.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 0.65,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "medipack_heilung",
+    "label": "Medipack · Heilung",
+    "art": "Grüne leuchtend gemalte Kreuze steigen über zwei flachen mintgrünen elliptischen Heilringen auf. Freundliche klare Symbole, keine Verpackung, keine Schrift.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 2,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "dusty_jo_muendung",
+    "label": "Dusty Jo · Mündung",
+    "art": "kurzer gelber Revolverblitz. Ursprung unten mittig und Ausrichtung nach oben, KEINE Waffe und keine Hand zeichnen.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.8
+    ],
+    "groesse_m": 0.55,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "dusty_jo_geschoss",
+    "label": "Dusty Jo · Geschoss",
+    "art": "schmale goldgelbe Leuchtspur mit weißer Spitze. Ausrichtung nach oben, feste Position in der Zelle. Keine Waffe.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": true,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 0.8,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "dusty_jo_einschlag",
+    "label": "Dusty Jo · Einschlag",
+    "art": "kleine goldene Funkenspritzer. Fester Mittelpunkt, Blick schräg von oben.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 0.65,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "iska_muendung",
+    "label": "Iska · Mündung",
+    "art": "sehr kurzer schnell flackernder gelber Maschinengewehrblitz. Ursprung unten mittig und Ausrichtung nach oben, KEINE Waffe und keine Hand zeichnen.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.8
+    ],
+    "groesse_m": 0.5,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "iska_geschoss",
+    "label": "Iska · Geschoss",
+    "art": "sehr dünne gelbe Leuchtspur. Ausrichtung nach oben, feste Position in der Zelle. Keine Waffe.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": true,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 0.8,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "iska_einschlag",
+    "label": "Iska · Einschlag",
+    "art": "kleiner goldgelber Funkenregen. Fester Mittelpunkt, Blick schräg von oben.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 0.65,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "brocken_muendung",
+    "label": "Brocken · Mündung",
+    "art": "kurzer violettgrauer Comic-Rauchstoß vom Raketenheck, ohne Waffe. Ursprung unten mittig und Ausrichtung nach oben, KEINE Waffe und keine Hand zeichnen.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.8
+    ],
+    "groesse_m": 0.8,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "brocken_geschoss",
+    "label": "Brocken · Geschoss",
+    "art": "eine kurze orangeweiße Rakete mit violetten Flossen und kurzem klar begrenztem grauvioletten Rauchschweif. Ausrichtung nach oben, feste Position in der Zelle. Keine Waffe.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": true,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 1.1,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "volta_muendung",
+    "label": "Volta · Mündung",
+    "art": "kompakter leuchtend blauer elektrischer Funkenstern. Ursprung unten mittig und Ausrichtung nach oben, KEINE Waffe und keine Hand zeichnen.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.8
+    ],
+    "groesse_m": 0.55,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "volta_geschoss",
+    "label": "Volta · Geschoss",
+    "art": "ein dehnbarer gewinkelter blauweißer Blitzbogen mit türkisem Rand. Ausrichtung nach oben, feste Position in der Zelle. Keine Waffe.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": true,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 2,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "volta_einschlag",
+    "label": "Volta · Einschlag",
+    "art": "blaues elektrisches Zucken mit kurzen verzweigten Entladungen ohne Körper. Fester Mittelpunkt, Blick schräg von oben.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 1.2,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "kalle_muendung",
+    "label": "Kalle · Mündung",
+    "art": "kleine geschlossene eisblaue Frostwolke und zwei Schneefunken. Ursprung unten mittig und Ausrichtung nach oben, KEINE Waffe und keine Hand zeichnen.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.8
+    ],
+    "groesse_m": 0.6,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "kalle_geschoss",
+    "label": "Kalle · Geschoss",
+    "art": "ein dünner Eisstrahl mit drei klaren cyanfarbenen Eiskristallen. Ausrichtung nach oben, feste Position in der Zelle. Keine Waffe.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": true,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 1.8,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "kalle_einschlag",
+    "label": "Kalle · Einschlag",
+    "art": "cyanfarbene Eissplitter mit einer kurz verbleibenden flachen elliptischen Frostfläche. Fester Mittelpunkt, Blick schräg von oben.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 1.4,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "margot_muendung",
+    "label": "Käpt'n Margot · Mündung",
+    "art": "breiter gelber Schrotflintenblitz mit wenig geschlossenem grauviolettem Rauch. Ursprung unten mittig und Ausrichtung nach oben, KEINE Waffe und keine Hand zeichnen.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.8
+    ],
+    "groesse_m": 0.75,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "margot_geschoss",
+    "label": "Käpt'n Margot · Geschoss",
+    "art": "ein kurzer Fächer aus fünf goldgelben Schrotleuchtspuren. Ausrichtung nach oben, feste Position in der Zelle. Keine Waffe.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": true,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 1.6,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "margot_einschlag",
+    "label": "Käpt'n Margot · Einschlag",
+    "art": "fünf kleine goldene Trefffunken in einer lockeren Gruppe. Fester Mittelpunkt, Blick schräg von oben.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 1.1,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "lynx_muendung",
+    "label": "Lynx · Mündung",
+    "art": "sehr heller kleiner cremeweißer Präzisionsgewehrblitz mit goldgelbem Rand. Ursprung unten mittig und Ausrichtung nach oben, KEINE Waffe und keine Hand zeichnen.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.8
+    ],
+    "groesse_m": 0.55,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "lynx_geschoss",
+    "label": "Lynx · Geschoss",
+    "art": "eine lange gerade sehr dünne weiße Spur mit gelbem Rand. Ausrichtung nach oben, feste Position in der Zelle. Keine Waffe.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": true,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 2.5,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "lynx_einschlag",
+    "label": "Lynx · Einschlag",
+    "art": "gerichtete cremegelbe Durchschussfunken mit kleiner Fortsetzung hinter der Treffermitte. Fester Mittelpunkt, Blick schräg von oben.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 0.9,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "fritzi_muendung",
+    "label": "Fritzi · Mündung",
+    "art": "kurzer orangegelber Feuerstoß. Ursprung unten mittig und Ausrichtung nach oben, KEINE Waffe und keine Hand zeichnen.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.8
+    ],
+    "groesse_m": 0.75,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "fritzi_geschoss",
+    "label": "Fritzi · Geschoss",
+    "art": "ein kurzer breiter orangegoldener Flammenkegel, Ursprung fest unten und Spitze nach oben. Ausrichtung nach oben, feste Position in der Zelle. Keine Waffe.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": true,
+    "anker": [
+      0.5,
+      0.8
+    ],
+    "groesse_m": 2.2,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "fritzi_einschlag",
+    "label": "Fritzi · Einschlag",
+    "art": "orangegelbe Comic-Flammen für Brennen am Gegner, ohne Gegnerkörper. Fester Mittelpunkt, Blick schräg von oben.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": true,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 1.1,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "fuenkchen_muendung",
+    "label": "Fünkchen · Mündung",
+    "art": "weiches türkis-violettes Glühen mit einem kleinen goldenen Stern am Maulansatz, KEIN Maul zeichnen. Ursprung unten mittig und Ausrichtung nach oben, KEINE Waffe und keine Hand zeichnen.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.8
+    ],
+    "groesse_m": 0.55,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "fuenkchen_geschoss",
+    "label": "Fünkchen · Geschoss",
+    "art": "ein dehnbarer violett-türkiser Sternenstrahl mit kleinen goldgelben Sternen entlang seiner Länge. Ausrichtung nach oben, feste Position in der Zelle. Keine Waffe.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": true,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 2.8,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "fuenkchen_einschlag",
+    "label": "Fünkchen · Einschlag",
+    "art": "goldene und türkisfarbene Sternenfunken. Fester Mittelpunkt, Blick schräg von oben.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 1,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "pip_muendung",
+    "label": "Pip · Mündung",
+    "art": "kleiner graugelber mechanischer Klack-Funken, kein Text. Ursprung unten mittig und Ausrichtung nach oben, KEINE Waffe und keine Hand zeichnen.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.8
+    ],
+    "groesse_m": 0.35,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "pip_geschoss",
+    "label": "Pip · Geschoss",
+    "art": "eine einzelne dicke silberne Schraube mit goldener Spitze, dreht um Längsachse. Ausrichtung nach oben, feste Position in der Zelle. Keine Waffe.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": true,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 0.45,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "pip_einschlag",
+    "label": "Pip · Einschlag",
+    "art": "kleine silbergelbe Metallfunken. Fester Mittelpunkt, Blick schräg von oben.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 0.65,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "rollo_muendung",
+    "label": "Rollo · Mündung",
+    "art": "kräftiger runder orangegelber Kanonenblitz mit wenig violettgrauem Rauch. Ursprung unten mittig und Ausrichtung nach oben, KEINE Waffe und keine Hand zeichnen.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.8
+    ],
+    "groesse_m": 0.9,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "rollo_geschoss",
+    "label": "Rollo · Geschoss",
+    "art": "eine einzelne runde dunkelgraue Kanonenkugel mit sanfter heller Glanzkante. Ausrichtung nach oben, feste Position in der Zelle. Keine Waffe.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": true,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 0.65,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "rollo_einschlag",
+    "label": "Rollo · Einschlag",
+    "art": "deutlicher elliptischer Aufprallring und wenige kleine beigeviolette Comic-Staubwölkchen. Fester Mittelpunkt, Blick schräg von oben.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 1.7,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "nova_muendung",
+    "label": "Nova · Mündung",
+    "art": "kleine blauviolette Antriebsflamme. Ursprung unten mittig und Ausrichtung nach oben, KEINE Waffe und keine Hand zeichnen.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.8
+    ],
+    "groesse_m": 0.65,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "nova_geschoss",
+    "label": "Nova · Geschoss",
+    "art": "eine einzelne fliegende violettweiße Roboterfaust, Finger geschlossen, goldene Panzerkante und kleiner blauer Antriebsschweif. Ausrichtung nach oben, feste Position in der Zelle. Keine Waffe.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": true,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 0.9,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "nova_einschlag",
+    "label": "Nova · Einschlag",
+    "art": "ein lila Sogwirbel aus zwei elliptisch spiraligen Bändern, kleine Partikel werden zur Mitte gezogen. Fester Mittelpunkt, Blick schräg von oben.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 2,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "iska_muendung_variante_2",
+    "label": "Iska · Mündungsvariante 2",
+    "art": "Sehr kurzer gelber Maschinengewehrblitz, Variante2: dreizackiger schlanker cremeweißer Kern mit goldenem Rand. Ursprung unten mittig, Ausrichtung nach oben. KEINE Waffe.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.8
+    ],
+    "groesse_m": 0.5,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "iska_muendung_variante_3",
+    "label": "Iska · Mündungsvariante 3",
+    "art": "Sehr kurzer gelber Maschinengewehrblitz, Variante3: breiter vierzackiger cremeweißer Kern mit goldenem Rand. Ursprung unten mittig, Ausrichtung nach oben. KEINE Waffe.",
+    "cell": 128,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.8
+    ],
+    "groesse_m": 0.5,
+    "mischung": "alpha",
+    "priority": 2
+  },
+  {
+    "name": "pip_reparatur",
+    "label": "Pip · Reparatur",
+    "art": "Mintgrüne kleine Reparatur-Sternfunken mit drei kleinen goldenen Schraubenköpfen und einem flachen türkisen Schildring, kein Zaun und keine Schrift.",
+    "cell": 256,
+    "frames": 16,
+    "cols": 4,
+    "rows": 4,
+    "fps": 24,
+    "loop": false,
+    "anker": [
+      0.5,
+      0.5
+    ],
+    "groesse_m": 1.3,
+    "mischung": "alpha",
+    "priority": 2
+  }
+]
