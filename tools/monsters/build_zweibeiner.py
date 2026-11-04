@@ -286,6 +286,21 @@ def knee_dirs():
 KNEE_DIR = knee_dirs()
 
 
+def rest_foot_yaw():
+    out = {}
+    for sd, _ in SIDES:
+        f = aw @ arm.data.bones["mixamorig:%sFoot" % sd].head_local
+        t = aw @ arm.data.bones["mixamorig:%sToeBase" % sd].head_local
+        # fast gerade nach vorn, nur 5° nach außen (die Grundhaltung steht 13–18° nach außen)
+        out[sd] = math.copysign(math.radians(5.0), math.atan2(t.x - f.x, -(t.y - f.y)))
+    return out
+
+
+REST_FOOT_YAW = rest_foot_yaw()
+FOOT_INWARD = 10.0
+print("FUSS Grundhaltung", {k: round(math.degrees(v), 1) for k, v in REST_FOOT_YAW.items()})
+
+
 def leg_ik(side, ankle, foot_world):
     """Zwei-Knochen-Bein: Oberschenkel und Schienbein so drehen, dass das Fußgelenk bei ankle liegt und das
     Knie nach vorn (−Y) zeigt; danach den Fuß auf seine Weltlage foot_world (gerade nach vorn) setzen."""
@@ -393,9 +408,11 @@ for walk_name in ("Walk", "Run"):
     LEGB = ["mixamorig:%s%s" % (sd, b) for sd, _ in SIDES for b in ("UpLeg", "Leg", "Foot")] if straight_legs else []
     SHIFT = ["mixamorig:%s%s" % (sd, b) for sd, _ in SIDES for b in (("UpLeg", "Leg", "Foot") if legs_rest_side else ("UpLeg",))] if (leg_shift or legs_rest_side) else []
     shift_basis = {}
+    foot_world = {}
     for f in range(f0, f1 + 1):
         scene.frame_set(f)
         shift_basis[f] = {n: pose.bones[n].matrix_basis.copy() for n in SHIFT}
+        foot_world[f] = {sd: (aw @ pose.bones["mixamorig:%sFoot" % sd].matrix).copy() for sd, _ in SIDES}
     LEGB = LEGB + SHIFT
     legs = {}
     track = {}
@@ -428,22 +445,25 @@ for walk_name in ("Walk", "Run"):
                     n = "mixamorig:%s%s" % (sd, part)
                     pose.bones[n].matrix_basis = shift_basis[f][n]
                     bpy.context.view_layer.update()
+                # Ober- und Unterschenkel nur um die Blickachse (Welt-Y) auf ihre seitliche Neigung aus der
+                # Grundhaltung drehen: kein Verdrehen um die Beinachse, das Knie bleibt vorn
                 for part in ("UpLeg", "Leg"):
                     n = "mixamorig:%s%s" % (sd, part)
                     b = arm.data.bones[n]
                     r = ((aw @ b.tail_local) - (aw @ b.head_local)).normalized()
                     d = bone_dir(n)
-                    yz = math.hypot(d.y, d.z)
-                    k = math.sqrt(max(0.0, 1.0 - r.x * r.x)) / max(1e-4, yz)
-                    point(n, Vector((r.x, d.y * k, d.z * k)))
-                # Fuß nur um die Hochachse gerade nach vorn drehen (Neigung und Abrollen bleiben)
-                # gemessen an der Querachse des Fußes: die bleibt beim Abrollen waagerecht
+                    want = math.atan2(r.x, -r.z)
+                    have = math.atan2(d.x, -d.z)
+                    rot_world(n, (0, 1, 0), -math.degrees(want - have))
+                # Fuß: genau so im Raum wie bei Meshy (Abrollen, Aufsetzen), nur am neuen Fußgelenk
+                # … und um einen festen Winkel weniger nach außen gedreht (Meshy setzt sie gut 15° nach außen)
                 fn = "mixamorig:%sFoot" % sd
-                ax = (aw @ pose.bones[fn].matrix).to_3x3().col[0]
-                if math.hypot(ax.x, ax.y) > 0.2:
-                    tx = 1.0 if ax.x >= 0 else -1.0
-                    yaw = math.degrees(math.atan2(ax.y, ax.x)) if tx > 0 else math.degrees(math.atan2(-ax.y, -ax.x))
-                    rot_world(fn, (0, 0, 1), -max(-35.0, min(35.0, yaw)))
+                side_sign = 1.0 if REST_FOOT_YAW[sd] > 0 else -1.0
+                q = Quaternion(Vector((0, 0, 1)), math.radians(-side_sign * FOOT_INWARD))
+                m = q.to_matrix().to_4x4() @ foot_world[f][sd]
+                m.translation = aw @ pose.bones[fn].head
+                pose.bones[fn].matrix = aw.inverted() @ m
+                bpy.context.view_layer.update()
         elif leg_shift:
             sgn = 1.0 if (aw @ arm.data.bones["mixamorig:LeftUpLeg"].head_local).x > (aw @ arm.data.bones["mixamorig:RightUpLeg"].head_local).x else -1.0
             for sd, sx in SIDES:
