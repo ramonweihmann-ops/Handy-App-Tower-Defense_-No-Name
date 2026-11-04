@@ -23,31 +23,29 @@ const GUN_LENGTH := {"guns/Revolver": 0.42, "guns/AK": 0.78, "guns/RocketLaunche
 ## stride: Tempo, bei dem die Laufbewegung ohne Rutschen passt, in Körperhöhen pro Sekunde (nur neue
 ## Modelle, gemessen in Blender). Dann läuft die Bewegung so schnell wie der Gegner wirklich ist.
 const ENEMIES := {
-	"schleimling": {"file": "enemies/GreenBlob", "height": 0.95, "walk": "Walk", "attack": "Bite_Front"},
+	# Comic-Schleimling (tools/monsters/build_schleim.py), freigegeben 04.11.2026; breiter als hoch,
+	# daher Höhe so, dass er so breit ist wie die bisherige Figur
+	"schleimling": {"file": "enemies_v2/schleimling", "height": 0.85, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.62},
 	# Comic-Tentakler (tools/monsters/build_tentakler.py), freigegeben 03.11.2026
 	"tentakler": {"file": "enemies_v2/tentakler", "height": 1.2, "walk": "Fly", "attack": "Attack", "lift": 0.45, "v2": true},
 	# Comic-Panzerkäfer (tools/monsters/build_panzerkaefer.py), freigegeben 03.11.2026; flach und breit,
 	# daher geringere Höhe; Schrittlänge 0,075 je 0,8 s bei 0,416 hohem Rohmodell
 	"panzerkaefer": {"file": "enemies_v2/panzerkaefer", "height": 0.85, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.23},
-	"schleimmutter": {"file": "enemies/PinkBlob", "height": 2.6, "walk": "Walk", "attack": "Bite_Front"},
-	"krabbler": {"file": "enemies/Zombie_Female", "height": 1.45, "walk": "Run", "attack": "Punch"},
+	# Comic-Schleimmutter (Boss, tools/monsters/build_schleim.py), freigegeben 04.11.2026; Höhe nach Breite wie oben
+	"schleimmutter": {"file": "enemies_v2/schleimmutter", "height": 1.45, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.6},
+	# Comic-Krabbler (tools/monsters/build_zweibeiner.py), freigegeben 04.11.2026
+	"krabbler": {"file": "enemies_v2/krabbler", "height": 1.45, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.39},
 	# Comic-Zombie (tools/monsters/build_zombie.py), freigegeben 03.11.2026
 	"zombie": {"file": "enemies_v2/zombie", "height": 1.6, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.68},
-	"brecher": {"file": "enemies/Orc", "height": 2.0, "walk": "Walk", "attack": "Punch"},
-	"koloss": {"file": "enemies/Yeti", "height": 3.0, "walk": "Walk", "attack": "Punch"},
-}
-
-## Neue Comic-Gegner, gebaut, aber noch nicht freigegeben (Prüfbild steht aus). Aktiv nur mit dem
-## Test-Schalter --neue-monster; nach der Freigabe wandern die Einträge nach ENEMIES.
-## stride gemessen in Blender (Fußweg der Meshy-Laufbewegung), wie beim Zombie leicht angehoben.
-const ENEMIES_NEU := {
-	# Schleime sind breiter als hoch: Höhe so, dass sie so breit sind wie die bisherigen Figuren
-	"schleimling": {"file": "enemies_v2/schleimling", "height": 0.85, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.62},
-	"schleimmutter": {"file": "enemies_v2/schleimmutter", "height": 1.45, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.6},
-	"krabbler": {"file": "enemies_v2/krabbler", "height": 1.45, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.39},
+	# Comic-Brecher (tools/monsters/build_zweibeiner.py), freigegeben 04.11.2026
 	"brecher": {"file": "enemies_v2/brecher", "height": 2.0, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.59},
+	# Comic-Zombie-Koloss (Boss, tools/monsters/build_zweibeiner.py), freigegeben 04.11.2026
 	"koloss": {"file": "enemies_v2/koloss", "height": 3.0, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.58},
 }
+
+## Neue Comic-Gegner zur Prüfung, gebaut, aber noch nicht freigegeben. Aktiv nur mit dem Test-Schalter
+## --neue-monster (Prüfbilder: tests/monster_show.gd); nach der Freigabe wandern die Einträge nach ENEMIES.
+const ENEMIES_NEU := {}
 static var test_new := false
 
 

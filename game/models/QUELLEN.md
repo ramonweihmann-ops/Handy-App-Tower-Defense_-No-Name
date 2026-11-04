@@ -6,11 +6,17 @@ Alle Modelle sind von **Quaternius** (https://quaternius.com) und stehen unter *
 | Ordner | Paket | Dateien |
 |---|---|---|
 | `heroes/` | Ultimate Animated Character Pack | Cowboy_Male, BlueSoldier_Female, Worker_Male, Doctor_Female_Young, Casual3_Male, Pirate_Female, Soldier_Female, Worker_Female |
-| `enemies/` | Ultimate Animated Character Pack | Zombie_Male, Zombie_Female |
-| `enemies/` | Ultimate Monsters (Blob, Flying, Big) | GreenBlob, GreenSpikyBlob, PinkBlob, Squidle, Orc, Yeti, Dragon_Evolved (Drache im Ladebildschirm) |
 | `station/` | Ultimate Space Kit (Environment) | Rock_Large_1, Base_Large, GeodesicDome, SolarPanel_Structure, SolarPanel_Ground, Roof_Radar, Roof_Antenna, Building_L, House_Cylinder, Rock_1–4 (Stations-Inseln und Felsbrocken neben der Brücke) |
 | `guns/` | Toon Shooter Game Kit (Guns) | Revolver, AK, RocketLauncher, Shotgun, Sniper, GrenadeLauncher, ShortCannon |
 
 Geladen am 31.10.2026 (Station am 02.11.2026) aus den öffentlichen Google-Drive-Ordnern, die auf quaternius.com verlinkt
 sind. Zuordnung zu Helden und Gegnern: `scripts/battle/models.gd`. Die Hautfarbe der Figuren
 (Material „Skin“) wird im Spiel je Held bzw. für Zombies umgefärbt.
+
+## Gegner (`enemies_v2/`)
+
+Die acht Comic-Gegner (Schleimling, Tentakler, Panzerkäfer, Schleimmutter, Krabbler, Zombie, Brecher,
+Zombie-Koloss) sind eigene Modelle: Bildvorlagen aus der freigegebenen Monsterübersicht, als Rohmodell mit
+Meshy erzeugt (bezahltes Konto, privat, Bedingungen: https://www.meshy.ai/terms-of-use), Skelett, Gewichte
+und Bewegungen nachgearbeitet mit `tools/monsters/`. Rohdaten und Prüfberichte: `Vorlage_Raw/Monster_Roh/`.
+Die früheren Quaternius-Gegner (`enemies/`) sind seit dem 04.11.2026 nicht mehr im Spiel.

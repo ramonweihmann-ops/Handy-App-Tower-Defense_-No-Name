@@ -37,7 +37,7 @@ Godot-Test → **Prüfbild für die Freigabe** → erst dann im Spiel aktiv.
   Freigabe). Ein Beinpaar in Blender zu entfernen geht, hinterlässt aber leicht Löcher und schiefe Gewichte.
 - Danach rigge ich die sechs Beine selbst und erzeuge einen Dreifuß-Gang (`Walk`) und einen Biss (`Attack`).
 
-**Stand:** Zombie, Tentakler und Panzerkäfer sind freigegeben und aktiv (Version 0.7.4). Auftrag für die
+**Stand 04.11.2026:** Alle acht Gegner der Welten 1 und 2 sind Comic-Modelle und aktiv (Version 0.7.7): Zombie, Tentakler, Panzerkäfer (0.7.4), dazu Schleimling, Schleimmutter, Krabbler, Brecher und Zombie-Koloss (Rohmodelle Modelltests_v3, gebaut mit `tools/monsters/build_schleim.py` und `build_zweibeiner.py`). Die alten Quaternius-Gegner sind entfernt. Ab Welt 3 färbt das Spiel dieselben Modelle je Welt ein. Auftrag für die
 übrigen fünf: `Vorlage_Raw/Monster_Roh/NAECHSTE_MONSTER_FUER_CHATGPT.md` (etwa 75 Meshy-Credits, freigegeben am 03.11.2026).
 
 **Schritt 4 – restliche Gegner**, wenn die drei laufen: Schleimling, Schleimmutter (Boss), Krabbler, Brecher,
