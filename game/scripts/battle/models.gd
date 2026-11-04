@@ -41,8 +41,9 @@ const ENEMIES := {
 ## Test-Schalter --neue-monster; nach der Freigabe wandern die Einträge nach ENEMIES.
 ## stride gemessen in Blender (Fußweg der Meshy-Laufbewegung), wie beim Zombie leicht angehoben.
 const ENEMIES_NEU := {
-	"schleimling": {"file": "enemies_v2/schleimling", "height": 0.95, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.56},
-	"schleimmutter": {"file": "enemies_v2/schleimmutter", "height": 2.6, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.35},
+	# Schleime sind breiter als hoch: Höhe so, dass sie so breit sind wie die bisherigen Figuren
+	"schleimling": {"file": "enemies_v2/schleimling", "height": 0.85, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.62},
+	"schleimmutter": {"file": "enemies_v2/schleimmutter", "height": 1.45, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.6},
 	"krabbler": {"file": "enemies_v2/krabbler", "height": 1.45, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.39},
 	"brecher": {"file": "enemies_v2/brecher", "height": 2.0, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.59},
 	"koloss": {"file": "enemies_v2/koloss", "height": 3.0, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.58},
@@ -59,6 +60,7 @@ static func enemy(kind: String) -> Dictionary:
 
 static var _scenes := {}
 static var _heights := {}
+static var _widths := {}   # Breite (größere von x/z) je Höhe 1, gemessen wie die Höhe
 
 
 static func _scene(file: String) -> PackedScene:
@@ -93,6 +95,8 @@ static func make(file: String, height: float, face_minus_z := true) -> Node3D:
 		var acc := [null]
 		_measure(n, Transform3D.IDENTITY, acc)
 		_heights[file] = (acc[0] as AABB).size.y if acc[0] != null else 1.0
+		var box: AABB = acc[0] if acc[0] != null else AABB(Vector3.ZERO, Vector3.ONE)
+		_widths[file] = maxf(box.size.x, box.size.z) / maxf(0.01, box.size.y)
 	var holder := Node3D.new()
 	holder.add_child(n)
 	n.scale = Vector3.ONE * (height / maxf(0.01, float(_heights[file])))
@@ -101,6 +105,11 @@ static func make(file: String, height: float, face_minus_z := true) -> Node3D:
 	holder.set_meta("model_scale", n.scale.x)
 	_loop_all(n)
 	return holder
+
+
+## Halbe Breite eines Gegnermodells in Gegner-Einheiten (vor VIS_SCALE), nach make() bekannt
+static func half_width(file: String, height: float) -> float:
+	return 0.5 * height * float(_widths.get(file, 1.0))
 
 
 ## Länge der Waffe entlang X messen und Waffe so drehen, dass der Lauf nach -Z zeigt.

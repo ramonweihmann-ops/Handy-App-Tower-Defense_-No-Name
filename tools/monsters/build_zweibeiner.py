@@ -39,7 +39,11 @@ straight_legs = '--beine-gerade' in sys.argv
 open_hands = '--offene-haende' in sys.argv   # echte Fingerknochen behalten, keine Faust (Koloss wie Brecher)
 hand_twist = 0.0   # --hand-dreh=grad: Hände um die Unterarmachse zum Körper drehen (Handfläche nach innen)
 finger_relax = 0.0  # --finger=grad: echte Finger beim Laufen locker krümmen
+thumb = None        # --daumen=achse:grad (z. B. z:40): Daumen an die Hand legen
 for a in sys.argv:
+    if a.startswith('--daumen='):
+        ax, dg = a.split('=', 1)[1].split(':')
+        thumb = ({"x": (1, 0, 0), "y": (0, 1, 0), "z": (0, 0, 1)}[ax.lower()], float(dg))
     if a.startswith('--hand-dreh='):
         hand_twist = float(a.split('=', 1)[1])
     if a.startswith('--finger='):
@@ -330,13 +334,27 @@ REAL_FINGERS = [pb.name for pb in pose.bones if any(k in pb.name for k in ("Hand
                 and pb.name[-1] in "123"]
 
 
+THUMBS = [pb.name for pb in pose.bones if "HandThumb" in pb.name and pb.name[-1] in "123"]
+
+
 def relax_fingers(side, deg):
-    """Echte Finger locker krümmen: jedes Glied um seine eigene Querachse (lokal X)"""
+    """Echte Finger locker krümmen: jedes Glied um seine eigene Querachse (lokal X); Daumen an die Hand"""
     for n in REAL_FINGERS:
         if n.startswith("mixamorig:%sHand" % side):
             pb = pose.bones[n]
             pb.rotation_mode = 'QUATERNION'
             pb.rotation_quaternion = Quaternion((1, 0, 0), math.radians(deg))
+    if thumb:
+        sgn = 1.0 if side == "Left" else -1.0
+        for n in THUMBS:
+            if n.startswith("mixamorig:%sHand" % side):
+                pb = pose.bones[n]
+                pb.rotation_mode = 'QUATERNION'
+                k = 1.0 if n.endswith("1") else 0.5
+                ax = Vector(thumb[0])
+                if ax.x == 0:      # Achsen außer X spiegeln
+                    ax = ax * sgn
+                pb.rotation_quaternion = Quaternion(ax, math.radians(thumb[1] * k))
     bpy.context.view_layer.update()
 
 
@@ -384,7 +402,7 @@ for walk_name in ("Walk", "Run"):
                 q = flat.rotation_difference(yaw) if flat.length > 1e-4 else Quaternion()
                 rot = (q.to_matrix().to_4x4() @ Matrix(w.to_3x3()).to_4x4())
                 track[f][sd] = (a_pos, rot)
-    EXTRA = REAL_FINGERS if finger_relax else []
+    EXTRA = (REAL_FINGERS + THUMBS) if finger_relax else []
     drop_channels(act, ARMS + RIGID + FINGER_BONES + LEGB + EXTRA)
     for f in range(f0, f1 + 1):
         scene.frame_set(f)

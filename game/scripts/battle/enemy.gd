@@ -64,6 +64,21 @@ func setup(kind_: String, battle_: Battle, hp_mult: float) -> void:
 	_visual.scale = Vector3.ONE * 0.01
 
 
+## Innerer Rand der Brücke (Mitte bis Geländer); Gegner bleiben mit ihrer ganzen Breite davor
+const LANE_HALF := 4.2
+var _half_w := 0.0
+
+
+func lane_limit() -> float:
+	return maxf(0.0, LANE_HALF - maxf(_half_w, radius()))
+
+
+func keep_on_bridge() -> void:
+	var lim := lane_limit()
+	position.x = clampf(position.x, -lim, lim)
+	_base_x = clampf(_base_x, -lim, lim)
+
+
 func is_boss() -> bool:
 	return data["tier"] == "boss"
 
@@ -145,7 +160,7 @@ func _process(delta: float) -> void:
 	if not attacking:
 		position.z += spd * delta
 		if data["tier"] == "leicht" or data["tier"] == "mittel":
-			position.x = clampf(_base_x + sin(_t * 1.4 + _phase) * 0.25, -3.9, 3.9)
+			position.x = clampf(_base_x + sin(_t * 1.4 + _phase) * 0.25, -lane_limit(), lane_limit())
 		if position.z >= Battle.FENCE_Z - (0.3 + radius()):
 			attacking = true
 	else:
@@ -420,6 +435,8 @@ func _build_visual() -> void:
 func _build_model() -> void:
 	var d: Dictionary = Models.enemy(kind)
 	_model = Models.make(String(d["file"]), float(d["height"]), false)
+	_half_w = Models.half_width(String(d["file"]), float(d["height"])) * VIS_SCALE
+	keep_on_bridge()
 	_model.position.y = float(d.get("lift", 0.0))
 	_visual.add_child(_model)
 	if (kind == "krabbler" or kind == "zombie") and not bool(d.get("v2", false)):

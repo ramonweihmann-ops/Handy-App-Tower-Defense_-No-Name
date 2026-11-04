@@ -20,7 +20,7 @@ func _initialize() -> void:
 	var head := args.size() > 4 and args[4] == "kopf"
 	var count := int(args[5]) if args.size() > 5 else 6
 	vp = SubViewport.new()
-	vp.size = Vector2i(360, 400)
+	vp.size = Vector2i(360, 400) if args.size() <= 6 else Vector2i(int(args[6]), int(args[6]) * 10 / 9)
 	vp.transparent_bg = false
 	vp.own_world_3d = true
 	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
