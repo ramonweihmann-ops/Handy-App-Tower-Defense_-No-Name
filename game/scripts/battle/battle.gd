@@ -652,10 +652,18 @@ func _fire_pellet(a: Vector3, b: Vector3, burn: bool) -> void:
 	var p := Node3D.new()
 	add_child(p)
 	p.global_position = a
+	# Kugel und Schweif als eine Form: heller Kern mit orangem Schein, der Flammenansatz liegt darauf
+	# (der Anker der Bildfolge sitzt unter dem Flammenansatz, darum die Flamme ein Stück nach vorn)
+	var fwd := (b - a).normalized()
+	var halo := Fx.inst(Fx.unit_sphere(), Fx.shared_glow(Color(1.0, 0.55, 0.12), 0.55))
+	halo.scale = Vector3.ONE * 0.2
+	p.add_child(halo)
 	var core := Fx.inst(Fx.unit_sphere(), Fx.shared_glow(Color(1.0, 0.92, 0.55)))
-	core.scale = Vector3.ONE * 0.15
+	core.scale = Vector3.ONE * 0.11
 	p.add_child(core)
-	FxSprite.attach(p, "fritzi_geschoss", {"dir": a - b, "scale": 0.45, "alpha": 0.95, "speed": 1.6})
+	var tail := FxSprite.attach(p, "fritzi_geschoss", {"dir": a - b, "scale": 0.45, "alpha": 0.95, "speed": 1.6, "sort": -0.1})
+	if tail:
+		tail.position = fwd * 0.3
 	var t := clampf(a.distance_to(b) / 22.0, 0.15, 0.55)
 	var tw := p.create_tween()
 	tw.tween_property(p, "global_position", b, t)

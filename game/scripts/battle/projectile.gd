@@ -119,23 +119,23 @@ func _process(delta: float) -> void:
 ## Leuchtspur: heller Kern und farbiger Schein, beide als lange flache Stäbe hinter der Kugel.
 ## Länge nach Tempo, damit sie auch bei hohem Spieltempo noch zu sehen ist.
 func _make_tracer(col: Color) -> void:
-	_tracer_len = clampf(speed * 0.04 * maxf(1.0, Engine.time_scale), 1.1, 2.8)
+	_tracer_len = clampf(speed * 0.03 * maxf(1.0, Engine.time_scale), 0.9, 2.2)
 	_tracer = Node3D.new()
 	add_child(_tracer)
 	# flach liegend (von oben gesehen), außen weicher Schein in zwei Stufen, innen ein schmaler heller Kern
 	# Schein kräftiger als die Kugelfarbe, damit er auch auf hellen Brücken (Eis, Wüste) absticht
-	var glow := col.lerp(Color(1.0, 0.45, 0.05), 0.4) if ammo_type == "normal" else col
-	var halo := Fx.inst(Fx.unit_box(), Fx.shared_glow(glow, 0.3))
-	halo.scale = Vector3(0.34, 0.02, 1.08)
+	var glow := col.lerp(Color(1.0, 0.45, 0.05), 0.25) if ammo_type == "normal" else col
+	var halo := Fx.inst(Fx.unit_box(), Fx.shared_glow(glow, 0.18))
+	halo.scale = Vector3(0.26, 0.02, 1.06)
 	_tracer.add_child(halo)
-	var mid := Fx.inst(Fx.unit_box(), Fx.shared_glow(glow, 0.6))
-	mid.scale = Vector3(0.17, 0.03, 1.0)
+	var mid := Fx.inst(Fx.unit_box(), Fx.shared_glow(glow, 0.4))
+	mid.scale = Vector3(0.13, 0.03, 1.0)
 	_tracer.add_child(mid)
 	var core := Fx.inst(Fx.unit_box(), Fx.shared_glow(col.lerp(Color(1, 1, 0.95), 0.75)))
-	core.scale = Vector3(0.06, 0.04, 0.95)
+	core.scale = Vector3(0.05, 0.04, 0.95)
 	_tracer.add_child(core)
 	var head := Fx.inst(Fx.unit_sphere(), Fx.shared_glow(Color(1, 1, 0.92)))
-	head.scale = Vector3(0.09, 0.05, 0.12)
+	head.scale = Vector3(0.07, 0.04, 0.1)
 	add_child(head)
 
 
