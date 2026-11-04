@@ -6,9 +6,11 @@ extends Control
 ## oder, wenn baubar, den goldenen Knopf „BAUEN“. Gebaute Gebäude bekommen das Stufen-Schild („St. 2“) und,
 ## wenn ihr Lager etwas bereit hat, eine Blase mit dem Symbol. Lage und Größen wie im Mockup (Mockup-Punkte
 ## bei voller Breite = 390 Punkte für 724 Bildpunkte). Ziehen verschiebt, zwei Finger oder Mausrad zoomen,
-## Antippen öffnet das Gebäudefenster (BuildingWindow).
+## Antippen öffnet das Gebäudefenster (BuildingWindow). Antippen der Lager-Blase über einem Gebäude sammelt
+## sofort ein (collect_pressed), ohne das Fenster zu öffnen; ein kurzes „+120“ steigt dort auf.
 
 signal building_pressed(id: String)
+signal collect_pressed(id: String)
 
 const IMG_W := 724.0
 const IMG_H := 2172.0
@@ -31,6 +33,7 @@ var _cache := {}        # Platz -> zwischengespeicherter Zustand (siehe _refresh
 var _cache_t := 0.0
 var _animated := false
 var _vig: Texture2D
+var _popups: Array = []   # aufsteigende „+120“ nach dem Einsammeln: {pos (Bildpunkte), text, item, t}
 ## Mockup-Punkte je Bildpunkt (Mockup zeigt das 724 Punkte breite Bild auf 390 Punkten)
 const K := 390.0 / 724.0
 ## Bildschirmpunkte oben/unten, die Kopfleiste und Reiterleiste verdecken (Karte lässt sich darunter hervorziehen)
@@ -160,6 +163,18 @@ func _gui_input(e: InputEvent) -> void:
 
 
 func _tap(p: Vector2) -> void:
+	# zuerst die Lager-Blasen: sammeln direkt ein
+	var m := _zoom / K
+	for d in BaseData.BUILDINGS:
+		var bid: String = d["id"]
+		var e: Dictionary = _cache.get(bid, {})
+		if not bool(e.get("ready", false)):
+			continue
+		var c := _bubble_center(bid, m)
+		if p.distance_to(c) <= 22.0 * m:
+			Sfx.play("ding")
+			collect_pressed.emit(bid)
+			return
 	var ip := _to_img(p)
 	for d in BaseData.BUILDINGS:
 		var id: String = d["id"]
@@ -168,6 +183,19 @@ func _tap(p: Vector2) -> void:
 			Sfx.play("click")
 			building_pressed.emit(id)
 			return
+
+
+## Mitte der Lager-Blase eines Gebäudes auf dem Bildschirm (wie in _bubble gezeichnet, ohne Wippen)
+func _bubble_center(id: String, m: float) -> Vector2:
+	var foot: Array = _layout[id]["foot"]
+	return _to_screen(Vector2(foot[0], foot[1])) + Vector2(26, -207) * _zoom + Vector2(15, 15) * m
+
+
+## Nach dem Einsammeln: „+120“ mit Symbol über der Blase aufsteigen lassen
+func popup(id: String, text: String, item: String) -> void:
+	var foot: Array = _layout[id]["foot"]
+	_popups.append({"pos": Vector2(foot[0], foot[1]) + Vector2(41, -192), "text": text, "item": item, "t": 0.0})
+	_refresh_cache()
 
 
 ## Auf ein Gebäude zoomen (Gebäude-Fokus)
@@ -194,8 +222,11 @@ func _process(delta: float) -> void:
 	_cache_t -= delta
 	if _cache_t <= 0.0:
 		_refresh_cache()
-	# Nur neu zeichnen, wenn sich etwas bewegt (Bauen-Knöpfe und Blasen wippen) oder die Karte bewegt wurde
-	if _animated:
+	for pp in _popups:
+		pp["t"] = float(pp["t"]) + delta
+	_popups = _popups.filter(func(pp: Dictionary) -> bool: return float(pp["t"]) < 1.1)
+	# Nur neu zeichnen, wenn sich etwas bewegt (Bauen-Knöpfe, Blasen, „+120“) oder die Karte bewegt wurde
+	if _animated or not _popups.is_empty():
 		queue_redraw()
 
 
@@ -265,6 +296,29 @@ func _draw() -> void:
 			_build_button(vc + Vector2(0, 7.5 + sin(_t * TAU / 1.4) * 1.5) * m, m)
 		else:
 			_lock(vc + Vector2(0, 11.5) * m, str(e["lock"]), m)
+	if not _popups.is_empty():
+		_draw_popups(m)
+
+
+## „+120“ mit Symbol: steigt auf und verblasst (1,1 s)
+func _draw_popups(m: float) -> void:
+	for pp in _popups:
+		var t := float(pp["t"])
+		var a := clampf(1.0 - maxf(0.0, t - 0.6) / 0.5, 0.0, 1.0)
+		var c := _to_screen(pp["pos"]) + Vector2(0, -34.0 * m * ease(minf(1.0, t / 0.9), 0.4))
+		var fs := maxi(8, roundi(18 * m))
+		var txt := str(pp["text"])
+		var tw := _font.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		var icon := _icon(str(pp["item"]))
+		var iw := 20.0 * m if icon else 0.0
+		var x := c.x - (tw + iw + 3.0 * m) * 0.5
+		var base := c.y + (_font.get_ascent(fs) - _font.get_descent(fs)) * 0.5
+		if icon:
+			draw_texture_rect(icon, Rect2(Vector2(x, c.y - iw * 0.5), Vector2(iw, iw)), false, Color(1, 1, 1, a))
+		var tx := x + iw + 3.0 * m
+		for d in [Vector2(-1, 0), Vector2(1, 0), Vector2(0, -1), Vector2(0, 2)]:
+			draw_string(_font, Vector2(tx, base) + d * 1.6 * m, txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.16, 0.06, 0.32, a))
+		draw_string(_font, Vector2(tx, base), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(1.0, 0.89, 0.48, a))
 
 
 ## Bedingung wie im Mockup: „ab Level 19“, „mit 7. Champion“, „erst Nr. 13 bauen“

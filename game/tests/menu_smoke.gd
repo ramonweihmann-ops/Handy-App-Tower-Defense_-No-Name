@@ -47,6 +47,15 @@ func _run() -> bool:
 			m.sub_tab["upgrades"] = "talente"
 			m.show_tab("upgrades")
 			print("SMOKE alle Reiter gebaut")
+			# Basislager: Lager-Blase einsammeln und „Alle Lager einsammeln“
+			m.show_tab("basis")
+			var bt: BaseTab = m._mock
+			save.base()["01"] = {"level": 1, "stock": 50.0, "time": Time.get_unix_time_from_system()}
+			var g0: int = save.gold()
+			bt._collect("01")
+			save.base()["01"]["stock"] = 30.0
+			bt.collect_all()
+			print("SMOKE lager eingesammelt: ", save.gold() - g0, " noch bereit ", bt.ready_buildings().size())
 		2:
 			# Handybreite nachstellen (720 Pixel), damit nichts über den Rand ragt
 			m._frame.offset_left = -360.0

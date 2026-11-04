@@ -505,7 +505,16 @@ func _process(delta: float) -> void:
 			if parts[1] == "feier":
 				menu.celebrate("gold", "+150 Gold")
 			else:
-				if parts.size() > 2 and parts[2].begins_with("held:"):
+				if parts.size() > 2 and parts[2] == "lager-voll":
+					# Testzustand fürs Bild: alle Champions, Gebäude 1–15 gebaut, Lager voll
+					Save.data["unlocked"] = GameData.HERO_IDS.duplicate()
+					Save.data["max_level"] = 20
+					for i in range(1, 16):
+						var bid := "%02d" % i
+						if not BaseData.by_champion(bid):
+							Save.base()[bid] = {"level": 2, "stock": 999.0, "time": Time.get_unix_time_from_system()}
+					menu.show_tab(parts[1])
+				elif parts.size() > 2 and parts[2].begins_with("held:"):
 					menu.show_tab(parts[1])
 					HeroLockBoard.hero = parts[2].get_slice(":", 1)
 					menu.open_board("Helden-Meldung.dc.html")
