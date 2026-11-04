@@ -22,7 +22,11 @@ var speed := 45.0
 var style := ""
 ## Diese Helden zeigen ihr Geschoss als Strahl (hero.gd/battle.gd), das Projektil selbst bleibt unsichtbar
 const BEAM_STYLES := ["fuenkchen"]
+## Diese Helden bekommen statt der (zu feinen) Bildfolge eine kräftige Leuchtspur, die mit dem Tempo länger wird
+const TRACER_STYLES := ["iska"]
 var _sprite: FxSprite
+var _tracer: Node3D
+var _tracer_len := 1.0
 
 var _start := Vector3.ZERO
 var _last_target := Vector3.ZERO
@@ -45,6 +49,9 @@ func launch(battle_: Battle, kind_: String, from: Vector3, target_: Enemy, dmg_:
 	_length = maxf(0.5, from.distance_to(_last_target))
 	global_position = from
 	var col: Color = AMMO_COLORS.get(ammo_type, AMMO_COLORS["normal"])
+	if style in TRACER_STYLES and FxSprite.enabled:
+		_make_tracer(col)
+		return
 	if style != "" and FxSprite.has(style + "_geschoss"):
 		if not style in BEAM_STYLES:
 			_sprite = FxSprite.attach(self, style + "_geschoss", {"dir": _last_target - from, "scale": 0.6 * size if kind != "rocket" else 0.8, "alpha": 0.9})
@@ -100,8 +107,36 @@ func _process(delta: float) -> void:
 		if _sprite:
 			_sprite.set_dir(dir)
 	global_position = pos
+	if _tracer:
+		# Spur wächst aus der Mündung heraus und bleibt dann gleich lang
+		var l := minf(_tracer_len, _s * _length)
+		_tracer.scale.z = maxf(0.05, l)
+		_tracer.position.z = l * 0.5
 	if _s >= 1.0:
 		_impact()
+
+
+## Leuchtspur: heller Kern und farbiger Schein, beide als lange flache Stäbe hinter der Kugel.
+## Länge nach Tempo, damit sie auch bei hohem Spieltempo noch zu sehen ist.
+func _make_tracer(col: Color) -> void:
+	_tracer_len = clampf(speed * 0.04 * maxf(1.0, Engine.time_scale), 1.1, 2.8)
+	_tracer = Node3D.new()
+	add_child(_tracer)
+	# flach liegend (von oben gesehen), außen weicher Schein in zwei Stufen, innen ein schmaler heller Kern
+	# Schein kräftiger als die Kugelfarbe, damit er auch auf hellen Brücken (Eis, Wüste) absticht
+	var glow := col.lerp(Color(1.0, 0.45, 0.05), 0.4) if ammo_type == "normal" else col
+	var halo := Fx.inst(Fx.unit_box(), Fx.shared_glow(glow, 0.3))
+	halo.scale = Vector3(0.34, 0.02, 1.08)
+	_tracer.add_child(halo)
+	var mid := Fx.inst(Fx.unit_box(), Fx.shared_glow(glow, 0.6))
+	mid.scale = Vector3(0.17, 0.03, 1.0)
+	_tracer.add_child(mid)
+	var core := Fx.inst(Fx.unit_box(), Fx.shared_glow(col.lerp(Color(1, 1, 0.95), 0.75)))
+	core.scale = Vector3(0.06, 0.04, 0.95)
+	_tracer.add_child(core)
+	var head := Fx.inst(Fx.unit_sphere(), Fx.shared_glow(Color(1, 1, 0.92)))
+	head.scale = Vector3(0.09, 0.05, 0.12)
+	add_child(head)
 
 
 func _impact() -> void:

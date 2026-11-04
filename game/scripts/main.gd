@@ -67,6 +67,7 @@ var _profile := ""
 var _shot_path := ""
 ## Nur für Tests mit Fenster: Menübild speichern (--menushot=pfad.png[,reiter[,lager-voll|held:<id>|bau:<id>[:leer]|unterreiter]]) und beenden.
 var _menu_shot := ""
+var _squad := ""
 var _world_holder: Control
 var _world_container: SubViewportContainer
 ## Gemaltes Schlachtfeld hinter dem Kampf; _field_fill füllt Ränder bei anderem Seitenverhältnis
@@ -87,6 +88,8 @@ func _ready() -> void:
 		if _profile != "":
 			Save.sim = true
 			load("res://tests/balance_profiles.gd").apply(Save, _profile, level)
+			if _squad != "":
+				Save.data["squad"] = Array(_squad.split(","))
 	_build_layout()
 	if _autotest and mp:
 		start_mp(level)
@@ -236,6 +239,9 @@ func _parse_args() -> void:
 			MpData.BOSS_TUNE_FIXED = float(arg.get_slice("=", 1))
 		elif arg.begins_with("--profile="):
 			_profile = arg.get_slice("=", 1)
+		elif arg.begins_with("--squad="):
+			# nur mit --profile: feste Heldenauswahl für Prüfbilder, z. B. --squad=iska,fritzi
+			_squad = arg.get_slice("=", 1)
 		elif arg.begins_with("--menushot="):
 			_menu_shot = arg.get_slice("=", 1)
 		elif arg.begins_with("--shot="):

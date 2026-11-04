@@ -36,11 +36,11 @@ static func shared_mesh(key: String, make: Callable) -> Mesh:
 	return c[key]
 
 
-static func shared_glow(color: Color) -> StandardMaterial3D:
+static func shared_glow(color: Color, alpha := 1.0) -> StandardMaterial3D:
 	var c := _cache()
-	var key := "glow:" + color.to_html()
+	var key := "glow:%s:%.2f" % [color.to_html(), alpha]
 	if not c.has(key):
-		c[key] = glow_mat(color)
+		c[key] = glow_mat(color, alpha)
 	return c[key]
 
 

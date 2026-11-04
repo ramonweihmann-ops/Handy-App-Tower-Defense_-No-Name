@@ -628,14 +628,41 @@ func flame(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type: Stri
 			apply_hit(e, dmg, crit, ammo_type)
 			e.apply_burn(dmg * 0.6 * (1.0 + burn_bonus), 2.5)
 	_flame_tick += 1
-	if _flame_tick % 3 == 0 and FxSprite.has("fritzi_geschoss"):
-		# dezent: schmaler, halb durchsichtiger Feuerstrahl, kleines Brennen am Ziel
-		FxSprite.beam(self, "fritzi_geschoss", from, target.aim_point(), 0.22, 0.55, 0.6)
-		FxSprite.play(self, "fritzi_einschlag", target.global_position + Vector3(0, 0.3, 0), {"life": 0.45, "width": 0.8, "alpha": 0.85})
+	if FxSprite.has("fritzi_geschoss"):
+		# Brandflinte: je Schuss zwei Feuerkugeln mit Flammenschweif, gestreut über den Kegel; jede zweite
+		# setzt beim Aufschlag ein kleines Feuer (reine Optik, der Schaden ist schon verrechnet)
+		var to := target.aim_point()
+		var side := (to - from).cross(Vector3.UP).normalized()
+		for k in 2:
+			var off := side * Fx.vis_rng.randf_range(-radius, radius) * 0.7 + Vector3(0, Fx.vis_rng.randf_range(-0.15, 0.25), 0)
+			var burn := k == 0 and _flame_tick % 2 == 0
+			if k == 0:
+				_fire_pellet(from, to + off, burn)
+			else:
+				# zweite Kugel kurz danach, damit es ein Feuerstoß ist und keine Zwillingsflamme
+				get_tree().create_timer(0.09, false).timeout.connect(func() -> void: _fire_pellet(from, to + off, burn))
 	elif _flame_tick % 3 == 0:
 		var mid := from.lerp(target.aim_point(), 0.7)
 		Fx.flash(self, mid, Color(1.0, 0.55, 0.15), 0.9, 0.2)
 		Fx.flash(self, target.aim_point(), Color(1.0, 0.35, 0.1), radius * 0.8, 0.25)
+
+
+## Eine Feuerkugel der Brandflinte: heller Kern, Flammen als Schweif nach hinten, fliegt von a nach b
+func _fire_pellet(a: Vector3, b: Vector3, burn: bool) -> void:
+	var p := Node3D.new()
+	add_child(p)
+	p.global_position = a
+	var core := Fx.inst(Fx.unit_sphere(), Fx.shared_glow(Color(1.0, 0.92, 0.55)))
+	core.scale = Vector3.ONE * 0.15
+	p.add_child(core)
+	FxSprite.attach(p, "fritzi_geschoss", {"dir": a - b, "scale": 0.45, "alpha": 0.95, "speed": 1.6})
+	var t := clampf(a.distance_to(b) / 22.0, 0.15, 0.55)
+	var tw := p.create_tween()
+	tw.tween_property(p, "global_position", b, t)
+	tw.tween_callback(func() -> void:
+		if burn:
+			FxSprite.play(self, "fritzi_einschlag", b + Vector3(0, -0.1, 0), {"life": 0.4, "width": 0.75, "alpha": 0.85})
+		p.queue_free())
 
 
 ## Schwerkraftfeld (Nova): trifft alle im Umkreis, zieht sie zum Mittelpunkt und bremst sie
