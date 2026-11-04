@@ -1516,10 +1516,11 @@ func _open_settings() -> void:
 		quality_changed.emit()
 		_open_settings()
 	, 420)))
-	# Neue Kampfeffekte (Bildfolgen von ChatGPT) zum Vergleich mit den bisherigen
-	var fx_on := bool(Save.data.get("fx_bilder", false))
-	v.add_child(UiKit.secondary(UiKit.button("Kampfeffekte: %s" % ("Neu (Test)" if fx_on else "Bisher"), func() -> void:
-		Save.data["fx_bilder"] = not fx_on
+	# Kampfeffekte: Bildfolgen (Standard) oder die bisherigen einfachen Effekte
+	var stil := Battle.fx_style()
+	v.add_child(UiKit.secondary(UiKit.button("Kampfeffekte: %s" % ("Bisher" if stil == "bisher" else "Neu"), func() -> void:
+		Save.data["fx_stil"] = "bilder" if stil == "bisher" else "bisher"
+		Save.data.erase("fx_bilder")
 		Save.save_game()
 		_open_settings()
 	, 420)))

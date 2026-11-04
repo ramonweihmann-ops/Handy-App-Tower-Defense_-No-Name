@@ -195,9 +195,15 @@ func _parse_args() -> void:
 			fs.set("main", self)
 			fs.set("mode", spec.get_slice(":", 0))
 			fs.set("out_dir", spec.get_slice(":", 1))
+			if spec.get_slice_count(":") > 2:
+				fs.set("start", float(spec.get_slice(":", 2)))
 			add_child.call_deferred(fs)
 		elif arg == "--fx-neu":
-			Battle.fx_test = true
+			Battle.fx_test = "bilder"
+		elif arg == "--fx-partikel":
+			Battle.fx_test = "partikel"
+		elif arg == "--fx-bisher":
+			Battle.fx_test = "bisher"
 		elif arg == "--neue-monster":
 			Models.test_new = true   # noch nicht freigegebene Gegnermodelle zeigen (Prüfbilder)
 		elif arg == "--mp":

@@ -4,6 +4,12 @@ extends RefCounted
 ## Der Pilot baut alle Figuren aus einfachen Formen; echte Modelle folgen später.
 
 
+## Eigener Zufall für Optik (Blitz-Zacken, Funken, Blitzgröße): der Zufall des Kampfes bleibt unberührt,
+## damit alle Effekt-Stile denselben Spielverlauf haben
+static var vis_rng := RandomNumberGenerator.new()
+static var _seed := 7
+
+
 static func mat(color: Color, emission := 0.0, metallic := 0.0, roughness := 0.6) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
 	m.albedo_color = color
@@ -114,6 +120,9 @@ static func torus(inner: float, outer: float, material: Material) -> MeshInstanc
 ## Funken- oder Splitterwolke, die sich selbst aufräumt.
 static func burst(parent: Node, pos: Vector3, color: Color, amount := 12, speed := 4.0, size := 0.1, life := 0.5) -> void:
 	var p := CPUParticles3D.new()
+	p.use_fixed_seed = true
+	_seed += 1
+	p.seed = _seed
 	p.one_shot = true
 	p.explosiveness = 0.95
 	p.amount = amount
@@ -177,7 +186,7 @@ static func lightning(parent: Node, points: Array[Vector3], color: Color) -> voi
 			var t := float(s + 1) / steps
 			var nxt := a.lerp(b, t)
 			if s < steps - 1:
-				nxt += Vector3(randf_range(-0.25, 0.25), randf_range(-0.2, 0.2), randf_range(-0.25, 0.25))
+				nxt += Vector3(vis_rng.randf_range(-0.25, 0.25), vis_rng.randf_range(-0.2, 0.2), vis_rng.randf_range(-0.25, 0.25))
 			_segment(root, prev, nxt, 0.07, m)
 			_segment(root, prev, nxt, 0.025, core)
 			prev = nxt

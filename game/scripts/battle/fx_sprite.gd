@@ -13,8 +13,11 @@ extends MeshInstance3D
 const DIR := "res://fx/"
 ## Höchstzahl gleichzeitiger Effekte: was darüber hinausgeht, wird nicht mehr gezeigt (Dauerfeuer)
 const MAX_LIVE := 90
-## Alle Effekte so viel größer als „groesse_m“ (Figuren stehen im Kampf vergrößert: Helden ×2, Gegner ×1,45)
-const SCALE := 1.5
+## Alle Effekte so viel größer als „groesse_m“ (Figuren stehen im Kampf vergrößert: Helden ×2, Gegner ×1,45);
+## bewusst etwas kleiner als die Figuren es verlangen würden, damit die Gegner sichtbar bleiben
+const SCALE := 1.2
+## Effekte abgeschwächt: leicht durchsichtig (außer festen Dingen wie den Raumjägern, Option „solid“)
+const ALPHA := 0.8
 
 static var enabled := true
 static var _info := {}
@@ -94,7 +97,7 @@ static func _make(name: String, opts: Dictionary) -> FxSprite:
 	s.set_instance_shader_parameter("size", Vector2(w, l))
 	s.set_instance_shader_parameter("dir", opts.get("dir", Vector3.ZERO))
 	s.set_instance_shader_parameter("frame", 0.0)
-	s.base_alpha = float(opts.get("alpha", 1.0))
+	s.base_alpha = float(opts.get("alpha", 1.0)) * (1.0 if opts.get("solid", false) else ALPHA)
 	s.set_instance_shader_parameter("alpha", s.base_alpha)
 	s.set_instance_shader_parameter("stretch", 1.0 if opts.has("length") else 0.0)
 	s.sorting_offset = float(opts.get("sort", 0.0))

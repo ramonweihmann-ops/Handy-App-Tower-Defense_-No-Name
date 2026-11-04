@@ -170,7 +170,11 @@ func _process(delta: float) -> void:
 		if _fence_fx <= 0.0:
 			# fester Takt (kein Würfeln: der Zufall des Kampfes bleibt unberührt)
 			_fence_fx = 0.8 + 0.3 * fmod(_phase, 1.0)
-			FxSprite.play(battle, "energiezaun_treffer", Vector3(position.x, 0.7, Battle.FENCE_Z), {"width": maxf(1.15, radius() * 2.0)})
+			var at := Vector3(position.x, 0.7, Battle.FENCE_Z)
+			if FxP.enabled:
+				FxP.fence_hit(battle, at)
+			else:
+				FxSprite.play(battle, "energiezaun_treffer", at, {"width": maxf(1.15, radius() * 2.0)})
 	if is_boss():
 		_spawn_cd -= delta
 		if _spawn_cd <= 0.0:

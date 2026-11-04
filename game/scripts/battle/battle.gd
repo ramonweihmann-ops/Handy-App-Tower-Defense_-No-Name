@@ -94,8 +94,17 @@ var _sun: DirectionalLight3D
 var _target_frame := -1
 ## Effekt-Stil des gerade feuernden Helden (Präfix der Bildfolgen, z. B. „lynx“); setzt hero.gd vor jedem Schuss
 var shot_style := ""
-## Test-Schalter --fx-neu: neue Effekte unabhängig vom Spielstand
-static var fx_test := false
+## Test-Schalter --fx-neu / --fx-partikel: Effekt-Stil unabhängig vom Spielstand
+static var fx_test := ""
+
+
+## Effekt-Stil im Kampf: „bisher“, „bilder“ (Bildfolgen von ChatGPT) oder „partikel“ (Einstellungen)
+static func fx_style() -> String:
+	if fx_test != "":
+		return fx_test
+	# Standard sind die Bildfolgen von ChatGPT (abgeschwächt, entschieden 04.11.2026); „bisher“ bleibt wählbar,
+	# die Partikel-Fassung nur noch als Testschalter --fx-partikel
+	return "bisher" if str(Save.data.get("fx_stil", "")) == "bisher" else "bilder"
 
 
 func _ready() -> void:
@@ -174,8 +183,10 @@ func apply_quality() -> void:
 
 func setup(level_: int, ammo_: AmmoStore) -> void:
 	clear()
-	# Neue Kampfeffekte (Bildfolgen) noch zur Prüfung: in den Einstellungen einschaltbar
-	FxSprite.enabled = bool(Save.data.get("fx_bilder", false)) or fx_test
+	# Kampfeffekte: Bildfolgen (Standard), bisherige einfache Effekte oder Partikel (nur Testschalter)
+	var stil := fx_style()
+	FxSprite.enabled = stil == "bilder"
+	FxP.enabled = stil == "partikel"
 	FxSprite.preload_all()
 	level = level_
 	ammo = ammo_
@@ -410,10 +421,12 @@ func on_enemy_died(e: Enemy) -> void:
 	if FxSprite.has(splat):
 		var w := maxf(float(FxSprite.info(splat).get("groesse_m", 1.0)), e.radius() * (2.2 if e.is_boss() else 2.6))
 		FxSprite.play(self, splat, e.aim_point(), {"width": w})
+	elif FxP.enabled:
+		FxP.death(self, e.aim_point(), col, e.radius() * 1.6, e.is_boss())
 	else:
 		Fx.burst(self, e.aim_point(), col, 10 + int(e.size * 10), 4.0 + e.size * 2.0, 0.08 + e.size * 0.05)
 	if e.is_boss():
-		if not FxSprite.has(splat):
+		if not FxSprite.has(splat) and not FxP.enabled:
 			Fx.flash(self, e.aim_point(), col, 6.0, 0.5)
 		add_shake(0.8)
 	enemy_killed.emit(e, e.xp)
@@ -450,33 +463,41 @@ func booster_air_strike(power: float) -> void:
 	while spots.size() < 5:
 		spots.append(Vector3(randf_range(-3.5, 3.5), 0, randf_range(-20.0, -4.0) * z_scale))
 	var dmg := 140.0 * power * GameData.hp_mult(level, maxi(wave, 1))
-	if not FxSprite.has("luftangriff_raumjaeger"):
-		for i in spots.size():
-			var p := spots[i]
-			get_tree().create_timer(0.15 * i).timeout.connect(func() -> void:
-				explode(p, 2.3, dmg, false, "fire"))
-		return
+	# Abwurfzeitpunkte sind in allen Effekt-Stilen gleich (der Stil ist reine Optik)
+	var sprites := FxSprite.has("luftangriff_raumjaeger")
+	var jets := sprites or FxP.enabled
 	var end_z := spawn_z() - 4.0
-	for x in [-2.6, 0.0, 2.6]:
-		var jet := Node3D.new()
-		add_child(jet)
+	for x in ([-2.6, 0.0, 2.6] if jets else []):
+		var jet: Node3D
+		if sprites:
+			jet = Node3D.new()
+			add_child(jet)
+			FxSprite.attach(jet, "luftangriff_raumjaeger", {"dir": Vector3(0, 0, -1), "width": 2.75, "solid": true})
+			var trail := Node3D.new()
+			trail.position = Vector3(0, -0.15, 1.0)
+			jet.add_child(trail)
+			FxSprite.attach(trail, "luftangriff_triebwerk", {"width": 1.0})
+		else:
+			jet = FxP.jet(self)
 		jet.position = Vector3(x, 3.6, JET_START_Z + absf(x) * 0.4)
-		FxSprite.attach(jet, "luftangriff_raumjaeger", {"dir": Vector3(0, 0, -1), "width": 2.2})
-		var trail := Node3D.new()
-		trail.position = Vector3(0, -0.15, 1.0)
-		jet.add_child(trail)
-		FxSprite.attach(trail, "luftangriff_triebwerk", {"width": 1.0})
 		var tw := jet.create_tween()
 		tw.tween_property(jet, "position:z", end_z, JET_TIME).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 		tw.tween_callback(jet.queue_free)
-	Sfx.play("whoosh", 0.05)
+	if jets:
+		Sfx.play("whoosh", 0.05)
 	for p in spots:
 		# Abwurf, wenn der Jäger über der Stelle ist
 		var u := clampf((JET_START_Z - p.z) / (JET_START_Z - end_z), 0.0, 1.0)
 		var t := JET_TIME * sqrt(u)
 		var pos := p
 		get_tree().create_timer(t).timeout.connect(func() -> void:
-			var bomb := FxSprite.play(self, "luftangriff_bombe", pos + Vector3(0, 3.4, 0), {"loop": true, "life": 0.3})
+			var bomb: Node3D = FxSprite.play(self, "luftangriff_bombe", pos + Vector3(0, 3.4, 0), {"loop": true, "life": 0.3}) if sprites else null
+			if bomb == null and FxP.enabled:
+				bomb = Fx.inst(Fx.unit_sphere(), Fx.shared_glow(Color(1.0, 0.75, 0.3)))
+				bomb.scale = Vector3.ONE * 0.14
+				add_child(bomb)
+				bomb.global_position = pos + Vector3(0, 3.4, 0)
+				get_tree().create_timer(0.3, false).timeout.connect(bomb.queue_free)
 			if bomb:
 				var bt := bomb.create_tween()
 				bt.tween_property(bomb, "position:y", pos.y + 0.3, 0.28).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
@@ -503,7 +524,11 @@ func booster_dome(power: float) -> void:
 ## Heilung am Zaun sichtbar machen: name = medipack_heilung (Booster) oder pip_reparatur (Pip), xs = Lagen
 func fence_heal_fx(name: String, xs: Array) -> void:
 	for x in xs:
-		FxSprite.play(self, name, Vector3(float(x), 0.6, FENCE_Z + 0.4))
+		var at := Vector3(float(x), 0.6, FENCE_Z + 0.4)
+		if FxP.enabled:
+			FxP.heal(self, at, name == "medipack_heilung")
+		else:
+			FxSprite.play(self, name, at)
 
 
 func repair_fence(fraction: float, raise_max: float) -> void:
@@ -608,6 +633,10 @@ func fire_chain(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type:
 		for i in points.size() - 1:
 			FxSprite.beam(self, beam, points[i], points[i + 1], 0.2)
 			FxSprite.play(self, shot_style + "_einschlag", points[i + 1], {"speed": 1.6})
+	elif FxP.enabled and shot_style != "":
+		for i in points.size() - 1:
+			FxP.beam(self, shot_style, points[i], points[i + 1])
+			FxP.impact(self, shot_style, points[i + 1])
 	else:
 		Fx.lightning(self, points, col)
 
@@ -626,6 +655,8 @@ func flame(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type: Stri
 		# dezent: schmaler, halb durchsichtiger Feuerstrahl, kleines Brennen am Ziel
 		FxSprite.beam(self, "fritzi_geschoss", from, target.aim_point(), 0.22, 0.55, 0.6)
 		FxSprite.play(self, "fritzi_einschlag", target.global_position + Vector3(0, 0.3, 0), {"life": 0.45, "width": 0.8, "alpha": 0.85})
+	elif _flame_tick % 3 == 0 and FxP.enabled:
+		FxP.flame(self, from, target.aim_point())
 	elif _flame_tick % 3 == 0:
 		var mid := from.lerp(target.aim_point(), 0.7)
 		Fx.flash(self, mid, Color(1.0, 0.55, 0.15), 0.9, 0.2)
@@ -644,6 +675,8 @@ func gravity_well(center: Vector3, radius: float, dmg: float, crit: bool, ammo_t
 			e.apply_slow(slow, slow_t)
 	if FxSprite.has("nova_einschlag"):
 		FxSprite.play(self, "nova_einschlag", center + Vector3(0, 0.3, 0), {"width": maxf(1.6, radius * 2.0)})
+	elif FxP.enabled:
+		FxP.vortex(self, center, maxf(0.8, radius))
 	else:
 		Fx.flash(self, center + Vector3(0, 0.6, 0), Color(0.6, 0.35, 1.0), radius * 0.9, 0.35)
 
@@ -676,6 +709,8 @@ func apply_hit(e: Enemy, dmg: float, crit: bool, ammo_type: String) -> void:
 	if crit:
 		if FxSprite.has("kritischer_treffer"):
 			FxSprite.play(self, "kritischer_treffer", at + Vector3(0, 0.4, 0), {"speed": 1.4})
+		elif FxP.enabled:
+			FxP.crit(self, at + Vector3(0, 0.3, 0))
 		else:
 			Fx.burst(self, at, Projectile.AMMO_COLORS.get(ammo_type, Color.WHITE), 5, 2.5, 0.06, 0.3)
 
@@ -704,6 +739,8 @@ func explode(pos: Vector3, radius: float, dmg: float, crit: bool, ammo_type: Str
 	Sfx.play("boom", 0.12, -3.0)
 	if FxSprite.has("brocken_explosion"):
 		FxSprite.play(self, "brocken_explosion", pos + Vector3(0, 0.5, 0), {"width": maxf(2.5, radius * 1.45), "speed": 1.15})
+	elif FxP.enabled:
+		FxP.explosion(self, pos, radius * 0.75)
 	else:
 		Fx.flash(self, pos, col, radius, 0.28)
 		Fx.burst(self, pos, col, 14, 6.0, 0.12, 0.5)
@@ -716,7 +753,8 @@ func _animate_world(delta: float) -> void:
 	if camera:
 		_shake = maxf(0.0, _shake - delta * 2.5)
 		var s := _shake * _shake * 0.35
-		var offset := Vector3(randf_range(-s, s), randf_range(-s, s), 0)
+		# Optik-Zufall: läuft je gezeichnetem Bild, darf den Spielverlauf nicht verändern
+		var offset := Vector3(Fx.vis_rng.randf_range(-s, s), Fx.vis_rng.randf_range(-s, s), 0)
 		camera.transform = _cam_base.translated_local(offset)
 	_fence_flash = maxf(0.0, _fence_flash - delta * 3.0)
 	if shield_guard > 0.0:

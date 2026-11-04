@@ -91,7 +91,7 @@ func play(name: String, pitch_var: float = 0.08, volume: float = 0.0) -> void:
 	_next = (_next + 1) % POOL
 	p.stream = _streams[name]
 	p.volume_db = float(VOLUME.get(name, -10.0)) + volume
-	p.pitch_scale = 1.0 + randf_range(-pitch_var, pitch_var)
+	p.pitch_scale = 1.0 + Fx.vis_rng.randf_range(-pitch_var, pitch_var)
 	p.play()
 
 
