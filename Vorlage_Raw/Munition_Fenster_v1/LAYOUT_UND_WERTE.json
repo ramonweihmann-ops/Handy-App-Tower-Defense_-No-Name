@@ -1,0 +1,173 @@
+{
+  "titel": "Munition",
+  "untertitel": "Gilt in jedem Kampf.",
+  "gold": 662,
+  "entwurf_pixel": [
+    852,
+    1846
+  ],
+  "bildschirm_punkte": [
+    390,
+    844
+  ],
+  "modal_rechteck_punkte": [
+    10,
+    76,
+    370,
+    684
+  ],
+  "kopfzeile_rechteck_punkte": [
+    0,
+    0,
+    390,
+    66
+  ],
+  "navigation_rechteck_punkte": [
+    0,
+    774,
+    390,
+    70
+  ],
+  "abhaengigkeiten_zwischen_upgrades": false,
+  "demoabweichung": "Nur Startvorrat wird für die gewünschte MAX-Darstellung mit 10/10 statt 4/10 gezeigt. Reine Darstellung, keine Änderung der Spielstände.",
+  "module": [
+    {
+      "id": "plasma_takt",
+      "name": "Plasma-Takt",
+      "beschreibung": "Plasma kommt 6 % schneller nach (je Stufe)",
+      "symbol": "icon_plasma_takt.png",
+      "max_stufe": 10,
+      "preis_basis_gold": 80,
+      "preisformel": "preis_basis_gold * (aktuelle_stufe + 1)",
+      "urspruenglicher_beispielstand": 6,
+      "dargestellte_stufe": 6,
+      "dargestellter_preis_gold": 560,
+      "zustand": "kaufbar",
+      "unabhaengig_ausbaubar": true,
+      "voraussetzungen": [],
+      "raster_spalte": 0,
+      "raster_zeile": 0,
+      "zielrechteck_punkte": [
+        22,
+        145,
+        169,
+        192
+      ]
+    },
+    {
+      "id": "plasma_tank",
+      "name": "Plasma-Tank",
+      "beschreibung": "+8 Plasma Platz (je Stufe)",
+      "symbol": "icon_plasma_tank.png",
+      "max_stufe": 10,
+      "preis_basis_gold": 60,
+      "preisformel": "preis_basis_gold * (aktuelle_stufe + 1)",
+      "urspruenglicher_beispielstand": 4,
+      "dargestellte_stufe": 4,
+      "dargestellter_preis_gold": 300,
+      "zustand": "kaufbar",
+      "unabhaengig_ausbaubar": true,
+      "voraussetzungen": [],
+      "raster_spalte": 1,
+      "raster_zeile": 0,
+      "zielrechteck_punkte": [
+        199,
+        145,
+        169,
+        192
+      ]
+    },
+    {
+      "id": "startvorrat",
+      "name": "Startvorrat",
+      "beschreibung": "+5 Plasma zu Beginn (je Stufe)",
+      "symbol": "icon_startvorrat.png",
+      "max_stufe": 10,
+      "preis_basis_gold": 50,
+      "preisformel": "preis_basis_gold * (aktuelle_stufe + 1)",
+      "urspruenglicher_beispielstand": 4,
+      "dargestellte_stufe": 10,
+      "dargestellter_preis_gold": null,
+      "zustand": "max",
+      "unabhaengig_ausbaubar": true,
+      "voraussetzungen": [],
+      "raster_spalte": 0,
+      "raster_zeile": 1,
+      "zielrechteck_punkte": [
+        22,
+        345,
+        169,
+        192
+      ]
+    },
+    {
+      "id": "energiekern",
+      "name": "Energiekern",
+      "beschreibung": "Energiekern 1,5 s schneller bereit und +2 Plasma (je Stufe)",
+      "symbol": "icon_energiekern.png",
+      "max_stufe": 5,
+      "preis_basis_gold": 150,
+      "preisformel": "preis_basis_gold * (aktuelle_stufe + 1)",
+      "urspruenglicher_beispielstand": 3,
+      "dargestellte_stufe": 3,
+      "dargestellter_preis_gold": 600,
+      "zustand": "kaufbar",
+      "unabhaengig_ausbaubar": true,
+      "voraussetzungen": [],
+      "raster_spalte": 1,
+      "raster_zeile": 1,
+      "zielrechteck_punkte": [
+        199,
+        345,
+        169,
+        192
+      ]
+    },
+    {
+      "id": "zweiter_erzeuger",
+      "name": "Zweiter Erzeuger",
+      "beschreibung": "+1 Plasma pro Ladung (je Stufe)",
+      "symbol": "icon_zweiter_erzeuger.png",
+      "max_stufe": 3,
+      "preis_basis_gold": 500,
+      "preisformel": "preis_basis_gold * (aktuelle_stufe + 1)",
+      "urspruenglicher_beispielstand": 0,
+      "dargestellte_stufe": 0,
+      "dargestellter_preis_gold": 500,
+      "zustand": "kaufbar",
+      "unabhaengig_ausbaubar": true,
+      "voraussetzungen": [],
+      "raster_spalte": 0,
+      "raster_zeile": 2,
+      "zielrechteck_punkte": [
+        22,
+        545,
+        169,
+        192
+      ]
+    },
+    {
+      "id": "start_tore",
+      "name": "Start-Tore",
+      "beschreibung": "Stufe 1: +3-Tor, Stufe 2: zweites ×2-Tor von Anfang an",
+      "symbol": "icon_start_tore.png",
+      "max_stufe": 2,
+      "preis_basis_gold": 1200,
+      "preisformel": "preis_basis_gold * (aktuelle_stufe + 1)",
+      "urspruenglicher_beispielstand": 0,
+      "dargestellte_stufe": 0,
+      "dargestellter_preis_gold": 1200,
+      "zustand": "zu_teuer",
+      "unabhaengig_ausbaubar": true,
+      "voraussetzungen": [],
+      "raster_spalte": 1,
+      "raster_zeile": 2,
+      "zielrechteck_punkte": [
+        199,
+        545,
+        169,
+        192
+      ]
+    }
+  ]
+}

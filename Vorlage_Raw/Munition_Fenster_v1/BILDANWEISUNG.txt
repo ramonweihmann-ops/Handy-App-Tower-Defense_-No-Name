@@ -1,0 +1,9 @@
+Kurzfassung der verwendeten Bildanweisungen
+
+Mit der eingebauten Bildgenerierung im bestehenden Konto das alte Fenster Munition im freigegebenen Space-Comic-Boxenstil überarbeiten: dunkelviolett, feiner Goldrand, runde Fredoka-Überschrift, Nunito-Beschreibungen, roter X-Knopf. Oben Währungsleiste mit 662 Gold, unten Navigation mit aktivem Upgrades-Reiter. Die Upgrade-Seite dahinter abdunkeln.
+
+Sechs gleichwertige, unabhängig ausbaubare Module in zwei Spalten und drei Reihen; keine Verbindungslinien, Reihenfolge oder Freischaltbedingungen. Jedem Modul das passende cyanfarbene Plasmasymbol, die wortgetreue Beschreibung und die vorgegebene Stufenanzeige geben. Segmentzahlen 10/10/10/5/3/2. Kaufbare Knöpfe grün; Start-Tore mit rotem Preis 1.200 auf grauem Knopf; Startvorrat als MAX-Beispiel mit 10/10 und goldenem Abzeichen. Alle übrigen Beispielwerte unverändert. Bildschirm hochkant 852 × 1846, bei 390 × 844 ohne Scrollen lesbar. Dezimalkomma in 1,5 s, keine erfundenen Werte.
+
+Die Symbole je einzeln generieren: Uhr/Pfeile mit Plasmatropfen, Plasma-Tank, Kiste mit drei Plasmakapseln, leuchtende Energiekugel, zwei Generatorrohre, zwei Torbögen mit +3 und ×2. Weiche Comic-Schattierung, violettgoldene Gehäuse, cyanfarbenes Plasma, Licht oben links, klare Silhouette. Echter transparenter Hintergrund, keine Kachel, kein äußerer Schatten. Technischer Export auf 256 × 256 mit freiem Rand.
+
+Die vollständigen tatsächlich verwendeten Anweisungen einschließlich der Korrektur stehen in BILDANWEISUNGEN_VOLLSTAENDIG.json. Die exakten Texte und Werte stehen in LAYOUT_UND_WERTE.json und LIESMICH_CLAUDE.md.

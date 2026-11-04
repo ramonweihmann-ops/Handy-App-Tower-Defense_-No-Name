@@ -1,0 +1,120 @@
+{
+  "bildschirm": {
+    "datei": "munition_entwurf_v1.png",
+    "pixel": [
+      852,
+      1846
+    ],
+    "quellpixel": [
+      934,
+      1684
+    ],
+    "format": "PNG",
+    "farbraum": "sRGB",
+    "groessenexport": "Technische Anpassung an die angeforderte Pixelgröße"
+  },
+  "symbole": [
+    {
+      "datei": "icon_energiekern.png",
+      "pixel": [
+        256,
+        256
+      ],
+      "modus": "RGBA",
+      "echte_transparenz": true,
+      "mindestens_16_px_aussenrand": true,
+      "motivgrenzen": [
+        33,
+        32,
+        216,
+        226
+      ]
+    },
+    {
+      "datei": "icon_plasma_takt.png",
+      "pixel": [
+        256,
+        256
+      ],
+      "modus": "RGBA",
+      "echte_transparenz": true,
+      "mindestens_16_px_aussenrand": true,
+      "motivgrenzen": [
+        20,
+        26,
+        213,
+        232
+      ]
+    },
+    {
+      "datei": "icon_plasma_tank.png",
+      "pixel": [
+        256,
+        256
+      ],
+      "modus": "RGBA",
+      "echte_transparenz": true,
+      "mindestens_16_px_aussenrand": true,
+      "motivgrenzen": [
+        16,
+        34,
+        240,
+        226
+      ]
+    },
+    {
+      "datei": "icon_start_tore.png",
+      "pixel": [
+        256,
+        256
+      ],
+      "modus": "RGBA",
+      "echte_transparenz": true,
+      "mindestens_16_px_aussenrand": true,
+      "motivgrenzen": [
+        29,
+        66,
+        227,
+        219
+      ]
+    },
+    {
+      "datei": "icon_startvorrat.png",
+      "pixel": [
+        256,
+        256
+      ],
+      "modus": "RGBA",
+      "echte_transparenz": true,
+      "mindestens_16_px_aussenrand": true,
+      "motivgrenzen": [
+        39,
+        33,
+        224,
+        236
+      ]
+    },
+    {
+      "datei": "icon_zweiter_erzeuger.png",
+      "pixel": [
+        256,
+        256
+      ],
+      "modus": "RGBA",
+      "echte_transparenz": true,
+      "mindestens_16_px_aussenrand": true,
+      "motivgrenzen": [
+        36,
+        22,
+        235,
+        237
+      ]
+    }
+  ],
+  "preisformeln_geprueft": true,
+  "alle_drei_zustaende": true,
+  "sechs_unabhaengige_module": true,
+  "max_demoabweichung": "Nur Startvorrat 10/10 statt ursprünglich 4/10",
+  "godot_geprueft": false,
+  "schriften": "Die Bildvorlage ersetzt keine Fontdateien. In Godot Fredoka und Nunito nach LIESMICH einsetzen."
+}
