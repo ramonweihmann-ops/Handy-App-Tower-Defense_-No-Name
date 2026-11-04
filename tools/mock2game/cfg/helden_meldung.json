@@ -1,0 +1,7 @@
+{"board": "Helden-Meldung.dc.html", "out": "out/helden_meldung",
+ "only": ["div[role=\"dialog\"]", "#dc-root > div > a", "nav", "#dc-root > div > div[style*=\"justify-content: center\"]"],
+ "states": [{"name": "main"}],
+ "live": [
+  {"sel": "div[role=\"dialog\"] > div:nth-child(3)", "id": "bild"},
+  {"sel": "div[role=\"dialog\"] > div:nth-child(3) > span", "id": "schloss", "img": true, "pad": 4}
+ ]}

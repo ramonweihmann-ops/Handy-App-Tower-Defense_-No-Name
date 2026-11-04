@@ -134,6 +134,12 @@ func _run() -> bool:
 			hb._level_up()
 			print("SMOKE heldenfenster: ", hb.hero, " stufe ", save.hero_level("dusty"))
 			m.close_board(hb)
+			# Fenster „Champion noch gesperrt“ (gesperrter Held)
+			HeroLockBoard.hero = "nova"
+			m.open_board("Helden-Meldung.dc.html")
+			var lb: Control = m._boards[-1]
+			print("SMOKE helden-meldung: ", lb is HeroLockBoard, " ", lb.hero)
+			m.close_board(lb)
 			m.sub_tab["upgrades"] = "munition"
 			m.show_tab("upgrades")
 			# Tech-Werft: jeden Bereich zeigen, jedes Modul wählen, das gewählte ausbauen, Munition

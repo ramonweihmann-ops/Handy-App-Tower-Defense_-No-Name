@@ -348,9 +348,9 @@ func _tap(p: Vector2) -> bool:
 		elif _buy_rect(id).grow(4.0).has_point(p):
 			_buy(id)
 		else:
-			var d: Dictionary = GameData.HEROES[id]
-			menu.info(String(d["name"]), "%s · %s\n\n%s\n\nGewinne Level %d, dann ist %s dabei – oder schalte %s sofort für %d Edelsteine frei." % [
-				d["role"], d["weapon"], d["blurb"], int(MetaData.HERO_UNLOCK[id]), d["name"], d["name"], MetaData.HERO_UNLOCK_GEMS])
+			# Fenster „Champion noch gesperrt“ (freigegebenes Mockup)
+			HeroLockBoard.hero = id
+			menu.open_board("Helden-Meldung.dc.html")
 		return true
 	return false
 
