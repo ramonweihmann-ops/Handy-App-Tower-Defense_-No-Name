@@ -11,7 +11,9 @@
     ],
     "format": "PNG",
     "farbraum": "sRGB",
-    "groessenexport": "Technische Anpassung an die angeforderte Pixelgröße"
+    "groessenexport": "Technische Anpassung an die angeforderte Pixelgröße",
+    "auswahl": "Vom Nutzer angehängte kompakte Fassung",
+    "quell_sha256": "733d978454f91367e8f0481bf6c8f5833bde0926ef3373cb4d992013f17cd874"
   },
   "symbole": [
     {
@@ -116,5 +118,6 @@
   "sechs_unabhaengige_module": true,
   "max_demoabweichung": "Nur Startvorrat 10/10 statt ursprünglich 4/10",
   "godot_geprueft": false,
-  "schriften": "Die Bildvorlage ersetzt keine Fontdateien. In Godot Fredoka und Nunito nach LIESMICH einsetzen."
+  "schriften": "Die Bildvorlage ersetzt keine Fontdateien. In Godot Fredoka und Nunito nach LIESMICH einsetzen.",
+  "hinweis_text": "Im Bild Dezimalpunkt bei 1.5; im Spiel entsprechend Textvorgabe 1,5 s einsetzen."
 }

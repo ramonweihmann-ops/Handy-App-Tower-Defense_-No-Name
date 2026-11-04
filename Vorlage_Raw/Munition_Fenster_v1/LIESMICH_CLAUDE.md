@@ -4,6 +4,12 @@ Die Munition gehört zum Reiter **Upgrades**. Das Fenster öffnet sich über die
 
 Alle sechs Verbesserungen können **parallel und unabhängig** gekauft werden. Die Anordnung ist nur eine Sortierung. Keine Verbindungslinien, Pfeilketten, vorherigen Stufen anderer Module oder neuen Freischaltbedingungen. Pro Kauf steigt ausschließlich das gewählte Modul um eine Stufe. Die Verbesserungen gelten dauerhaft in jedem Kampf.
 
+## Maßgebliche Fassung
+
+Der Nutzer hat am 04.11.2026 ausdrücklich die kompaktere Fassung mit kürzeren Textblöcken bevorzugt. `munition_entwurf_v1.png` entspricht jetzt dieser ausgewählten Bildschirmvorlage. Ihre Textdichte und Umbrüche beibehalten; nicht wieder auf die spätere Fassung mit größeren, dreizeiligen Beschreibungen wechseln. Alle sechs Module bleiben unabhängig ausbaubar.
+
+Die ausgewählte Bildvorlage zeigt bei der Zeitangabe einen Dezimalpunkt. In der tatsächlichen Oberfläche weiterhin den vorgegebenen deutschen Text mit **1,5 s** aus diesem Dokument beziehungsweise der JSON-Datei verwenden. Die Auswahl betrifft die Gestaltung, keine Änderung von Werten oder Formeln.
+
 ## Dateien
 
 - `munition_entwurf_v1.png`: vollständige Bildschirmvorlage, 852 × 1846 Pixel.
@@ -63,7 +69,7 @@ Alle folgenden Maße sind **logische Punkte auf 390 × 844**, keine Pixel des ho
 - Module als Raster **2 Spalten × 3 Reihen**. Linke Spalte x = 22, rechte x = 199; Breite jeweils 169. Zeilen beginnen bei y = 145, 345, 545; Höhe jeweils 192. 8 Punkte horizontaler und vertikaler Zwischenraum. Außenabstand mindestens 12.
 - Reihenfolge zeilenweise: Plasma-Takt / Plasma-Tank; Startvorrat / Energiekern; Zweiter Erzeuger / Start-Tore. Diese Reihenfolge begründet **keine** Kaufabhängigkeit.
 - Innenabstand je Modul etwa 8. Titel 16 Punkte Fredoka fett, für lange Namen nötigenfalls zweizeilig; Stufen 11–12 Punkte Nunito fett.
-- Symbole etwa 42–48 Punkte groß, nicht über Namen oder Text legen. Beschreibungen 12 Punkte Nunito mit ca. 14 Punkten Zeilenhöhe. Im schmalen Modul sind bei Energiekern und Start-Tore bis zu drei Zeilen zulässig, damit keine Wörter fehlen und die Schrift lesbar bleibt.
+- Symbole etwa 42–48 Punkte groß, nicht über Namen oder Text legen. Beschreibungen kompakt in Nunito mit 11–12 Punkten und ca. 13 Punkten Zeilenhöhe. Die zweizeiligen Textblöcke der ausgewählten Vorlage beibehalten; vollständige Texte erhalten und bei der Umsetzung passende Umbrüche prüfen. Keine zusätzlichen erklärenden Sätze auf den Modulen.
 - Segmentleiste ca. 6–7 Punkte hoch, Abstände 2–3. Die Breite pro Segment passt sich der jeweiligen Segmentzahl an.
 - Preisknöpfe ca. 120–145 × 32 sichtbar, Trefferfläche mindestens 44 Punkte hoch. Roter Preis nur im Zustand zu teuer. Münze ohne zusätzliche Preiswährung.
 - Kein Scrollen. Auf 390 × 844 prüfen, ob alle sechs Module zwischen den bestehenden Leisten vollständig sichtbar sind. Das rasterartige Layout soll sich klar von einem linearen Tech-Baum unterscheiden.

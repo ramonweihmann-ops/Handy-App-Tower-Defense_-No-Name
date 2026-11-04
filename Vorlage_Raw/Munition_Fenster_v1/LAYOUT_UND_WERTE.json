@@ -169,5 +169,13 @@
         192
       ]
     }
-  ]
+  ],
+  "gestaltungsfreigabe": "Kompakte Fassung laut Nutzerauswahl vom 04.11.2026",
+  "beschreibungen": {
+    "schrift": "Nunito",
+    "groesse_punkte": "11–12",
+    "zeilenhoehe_punkte": 13,
+    "ziel": "Kompakte zweizeilige Textblöcke wie ausgewählte Vorlage; keine Zusatztexte",
+    "dezimalzeichen": "1,5 s mit Komma; der Dezimalpunkt im Bild ist keine Wertänderung"
+  }
 }

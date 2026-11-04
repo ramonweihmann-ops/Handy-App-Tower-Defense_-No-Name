@@ -7,3 +7,5 @@ Sechs gleichwertige, unabhängig ausbaubare Module in zwei Spalten und drei Reih
 Die Symbole je einzeln generieren: Uhr/Pfeile mit Plasmatropfen, Plasma-Tank, Kiste mit drei Plasmakapseln, leuchtende Energiekugel, zwei Generatorrohre, zwei Torbögen mit +3 und ×2. Weiche Comic-Schattierung, violettgoldene Gehäuse, cyanfarbenes Plasma, Licht oben links, klare Silhouette. Echter transparenter Hintergrund, keine Kachel, kein äußerer Schatten. Technischer Export auf 256 × 256 mit freiem Rand.
 
 Die vollständigen tatsächlich verwendeten Anweisungen einschließlich der Korrektur stehen in BILDANWEISUNGEN_VOLLSTAENDIG.json. Die exakten Texte und Werte stehen in LAYOUT_UND_WERTE.json und LIESMICH_CLAUDE.md.
+
+Finale Auswahl am 04.11.2026: Der Nutzer bevorzugt die kompaktere erste Bildschirmfassung. Diese wird geliefert, mit kurzen Textblöcken und weniger Umbrüchen. Die spätere Korrekturfassung bleibt nur in der Entstehungshistorie. Den deutschen Dezimaltext 1,5 s in Godot aus der JSON-Datei übernehmen. Keine neue Bildgenerierung für diese Auswahl.
