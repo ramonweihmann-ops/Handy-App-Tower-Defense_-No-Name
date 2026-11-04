@@ -1,0 +1,4 @@
+{"board": "Kampf-Heldenwahl.dc.html", "out": "out/heldenwahl",
+ "states": [{"name": "main", "eval": "document.querySelectorAll('#dc-root div[role=\"dialog\"] > button').forEach(b => b.remove());"}],
+ "only": ["#dc-root > div > div[role=\"dialog\"]"],
+ "live": []}

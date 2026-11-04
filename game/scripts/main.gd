@@ -68,6 +68,7 @@ var _shot_path := ""
 ## Nur für Tests mit Fenster: Menübild speichern (--menushot=pfad.png[,reiter[,lager-voll|held:<id>|bau:<id>[:leer]|unterreiter]]) und beenden.
 var _menu_shot := ""
 var _squad := ""
+var _pick_shot := ""
 var _world_holder: Control
 var _world_container: SubViewportContainer
 ## Gemaltes Schlachtfeld hinter dem Kampf; _field_fill füllt Ränder bei anderem Seitenverhältnis
@@ -239,6 +240,8 @@ func _parse_args() -> void:
 			MpData.BOSS_TUNE_FIXED = float(arg.get_slice("=", 1))
 		elif arg.begins_with("--profile="):
 			_profile = arg.get_slice("=", 1)
+		elif arg.begins_with("--pickshot="):
+			_pick_shot = arg.get_slice("=", 1)
 		elif arg.begins_with("--squad="):
 			# nur mit --profile: feste Heldenauswahl für Prüfbilder, z. B. --squad=iska,fritzi
 			_squad = arg.get_slice("=", 1)
@@ -733,6 +736,17 @@ func _start(n: int, hard_mode: bool, multi: bool, found: MpMatch = null) -> void
 	options.shuffle()
 	if options.size() > 3:
 		options.resize(3)
+	if _pick_shot != "":
+		# Prüfbild der Heldenauswahl: --pickshot=pfad.png[,held1,held2,held3]
+		var parts := _pick_shot.split(",")
+		if parts.size() > 1:
+			options = Array(parts.slice(1))
+		_show_hero_picker(options)
+		get_tree().create_timer(1.5).timeout.connect(func() -> void:
+			get_viewport().get_texture().get_image().save_png(parts[0])
+			print("BILD gespeichert: ", parts[0])
+			get_tree().quit())
+		return
 	if _autotest:
 		_set_screen(null)
 		_on_hero_picked(options[0])
@@ -741,24 +755,12 @@ func _start(n: int, hard_mode: bool, multi: bool, found: MpMatch = null) -> void
 
 
 func _show_hero_picker(options: Array) -> void:
+	# Heldenauswahl nach dem freigegebenen Mockup (screens/hero_pick.gd); der Kampf bleibt dahinter sichtbar
 	var s := _full_screen()
-	s.add_child(UiKit.dim(0.6))
-	var v := _centered(s, 22)
-	v.add_child(UiKit.label("Wer verteidigt die Station?", 40, UiKit.C_GOLD))
-	v.add_child(UiKit.label("Wähle deinen ersten Helden", 24, UiKit.C_MUTED))
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 12)
-	v.add_child(row)
-	for id in options:
-		var d: Dictionary = GameData.HEROES[id]
-		var card := {
-			"kind": "hero_pick", "target": d["weapon"], "color": d["color"], "title": d["name"],
-			"role": d["role"], "desc": d["blurb"], "note": GameData.hero_type_text(id),
-			"stars": 0, "max": 0, "emblem": String(d["name"]).left(1),
-			"hero_id": id,
-		}
-		var hero_id: String = id
-		row.add_child(_card_button(card, func(_c: Dictionary) -> void: _on_hero_picked(hero_id)))
+	s.add_child(UiKit.dim(0.2))
+	var board := HeroPickBoard.new(options)
+	board.picked.connect(_on_hero_picked)
+	s.add_child(board)
 	_set_screen(s)
 
 

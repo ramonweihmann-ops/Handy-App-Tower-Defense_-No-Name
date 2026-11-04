@@ -192,6 +192,20 @@ func _run() -> bool:
 			main.start_level(1, false)
 			print("SMOKE level gestartet, zustand ", main.state, " energie ", save.energy())
 		11:
+			# Heldenauswahl nach dem Mockup: Box, Karten je angebotenem Held, Antippen wählt
+			var pick: HeroPickBoard = null
+			if main._screen:
+				for c in main._screen.get_children():
+					if c is HeroPickBoard:
+						pick = c
+			var cards := 0
+			if pick:
+				for id in pick._placed:
+					if pick._placed[id] is HeroPickBoard.Card:
+						cards += 1
+			print("SMOKE heldenauswahl: ", pick != null, " karten ", cards, " hinweis ", pick._hint_text if pick else "")
+			if pick == null or cards == 0:
+				print("SMOKE FEHLER: Heldenauswahl fehlt")
 			main._on_hero_picked("dusty")
 		200:
 			main._booster_cd[0] = 0.0
