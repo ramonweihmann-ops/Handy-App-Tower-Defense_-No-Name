@@ -5,4 +5,5 @@
  {"sel": "div[aria-label$=\"Sterne\"]", "id": "stars"},
  {"sel": "[data-live=\"map_hero\"]", "id": "map_hero", "img": true},
  {"sel": "[data-live=\"lvl_tag\"]", "id": "lvl_tag", "img": true},
- {"sel": "[aria-label=\"gesperrt\"]", "id": "boss_lock", "img": true}]}
+ {"sel": "[aria-label=\"gesperrt\"]", "id": "boss_lock", "img": true},
+ {"sel": "[data-live=\"energie\"]", "id": "energie", "img": true, "pad": 1}]}
