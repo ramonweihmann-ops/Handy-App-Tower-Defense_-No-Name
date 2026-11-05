@@ -1345,6 +1345,22 @@ func _grant_mp_rewards(place: int) -> Dictionary:
 	return out
 
 
+## „Belohnung verdoppeln“ nach einem Sieg (Werbevideo, 5× am Tag; mit Prime ohne Video):
+## Gold und Heldenkarten des Kampfes gibt es noch einmal. Gibt die neuen Werte zurück oder {}.
+func double_rewards(rewards: Dictionary) -> Dictionary:
+	if rewards.get("doubled", false) or not Save.use_video():
+		return {}
+	var out := rewards.duplicate(true)
+	Save.data["gold"] = Save.gold() + int(rewards["gold"])
+	out["gold"] = int(rewards["gold"]) * 2
+	for c in out["cards"]:
+		Save.add_hero_cards(c["hero"], int(c["amount"]))
+		c["amount"] = int(c["amount"]) * 2
+	out["doubled"] = true
+	Save.save_game()
+	return out
+
+
 func _finish_autotest(result: String) -> void:
 	var names: Array[String] = []
 	for h in battle.heroes:
