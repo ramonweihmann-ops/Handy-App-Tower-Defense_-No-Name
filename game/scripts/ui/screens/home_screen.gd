@@ -9,8 +9,8 @@ extends MockScreen
 const BOSS_RECT := Rect2(168, 224, 64, 64)
 
 var _path: PathLayer
-## Energie-Symbol hinter „Level X · 5“ auf dem Spielen-Knopf: rückt mit der Textbreite mit
-var _energy_key := ""
+## Zeile „Level X · 5 ⚡“ unter SPIELEN (Mockup: Energiekosten mit Energielogo direkt an der Zahl)
+var _play_line: PlayLine
 
 
 func _init(m: MainMenu) -> void:
@@ -23,11 +23,9 @@ func _ready() -> void:
 	_path.home = self
 	place_at(_path, Rect2(0, 0, W, H))
 	_path.mouse_filter = Control.MOUSE_FILTER_PASS
-	var en := live_image("energie", true)
-	if en:
-		for k in _placed.keys():
-			if _placed[k] == en:
-				_energy_key = k
+	_play_line = PlayLine.new()
+	_play_line.icon = load("res://ui/icons/energy.webp")
+	place_at(_play_line, Rect2(68.7, 686.5, 251.8, 14), true)
 	bind()
 
 
@@ -43,8 +41,10 @@ func bind() -> void:
 	var name: String = GameData.WORLDS[w]["name"]
 	var dash := name.find("-")
 	set_text("Schleim-Welt", name.substr(0, dash + 1) + "\n" + name.substr(dash + 1) if dash > 0 else name)
-	set_text("Level 4 · 5", "Level %d · %d" % [menu.selected_level, MetaData.ENERGY_COST])
-	_place_energy("Level %d · %d" % [menu.selected_level, MetaData.ENERGY_COST])
+	if _play_line:
+		_play_line.level = menu.selected_level
+		_play_line.cost = MetaData.ENERGY_COST
+		_play_line.queue_redraw()
 	var badges := {"Tägliche Belohnung": Save.daily_ready("daily_date"), "Glücksrad": Save.daily_ready("wheel_date"),
 		"Missionen": menu.mission_ready(), "Spielmodi": int(Save.mp()["games"]) == 0}
 	for b in buttons():
@@ -59,26 +59,6 @@ func bind() -> void:
 		next.modulate.a = 1.0 if (w + 1) * GameData.LEVELS_PER_WORLD < Save.max_level() else 0.35
 	if _path:
 		_path.queue_redraw()
-
-
-## Das Energie-Symbol direkt hinter den Text setzen (der Text steht mittig wie im Mockup)
-func _place_energy(txt: String) -> void:
-	if _energy_key == "" or not _live.has(_energy_key):
-		return
-	var t := -1
-	var lay: Array = data.get("texts", [])
-	for i in lay.size():
-		if str(lay[i]["text"]) == "Level 4 · 5":
-			t = i
-	if t < 0:
-		return
-	var r: Array = lay[t]["lines"][0]["rect"]
-	var fs := maxi(1, roundi(10.0 * maxf(s, 0.01)))
-	var w := MockFonts.font("Nunito", 800).get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x / maxf(s, 0.01)
-	var cx := float(r[0]) + float(r[2]) * 0.5
-	var old: Rect2 = _live[_energy_key]
-	_live[_energy_key] = Rect2(Vector2(cx + w * 0.5 + 2.0, old.position.y), old.size)
-	_layout()
 
 
 func handle(b: Dictionary) -> bool:
@@ -285,3 +265,39 @@ class PathLayer:
 						home.menu.toast("Erst das Level davor schaffen")
 					accept_event()
 					return
+
+
+## „Level 4“, Abstand, dezenter Punkt, Abstand, „5“ mit dem Energielogo direkt daran – mittig auf dem Knopf
+class PlayLine:
+	extends Control
+	var level := 1
+	var cost := 5
+	var icon: Texture2D
+
+	func _ready() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _draw() -> void:
+		var k := size.y / 14.0
+		var f := MockFonts.font("Nunito", 800)
+		var fs := maxi(1, roundi(10.0 * k))
+		var col := Color("#3d1d00")
+		col.a = 0.85
+		var a := "Level %d" % level
+		var b := str(cost)
+		var wa := f.get_string_size(a, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		var wd := f.get_string_size("·", HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		var wb := f.get_string_size(b, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		var gap := 7.0 * k
+		var iw := 12.0 * k
+		var total := wa + gap + wd + gap + wb - 0.5 * k + iw
+		var x := (size.x - total) * 0.5
+		var base := size.y * 0.5 + (f.get_ascent(fs) - f.get_descent(fs)) * 0.5
+		draw_string(f, Vector2(x, base), a, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, col)
+		x += wa + gap
+		draw_string(f, Vector2(x, base), "·", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(col.r, col.g, col.b, col.a * 0.7))
+		x += wd + gap
+		draw_string(f, Vector2(x, base), b, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, col)
+		x += wb - 0.5 * k
+		if icon:
+			draw_texture_rect(icon, Rect2(Vector2(x, base + 2.5 * k - iw), Vector2(iw, iw)), false)

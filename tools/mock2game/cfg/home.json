@@ -1,9 +1,8 @@
-{"board": "Main-v4.dc.html", "out": "out/home", "states": [{"name": "main"}], "live": [
+{"board": "Main-v4.dc.html", "out": "out/home", "states": [{"name": "main", "eval": "document.querySelector('#dc-root [data-play-line]').remove();"}], "live": [
  {"sel": "[data-live=\"node_done\"]", "id": "node_done", "img": true, "pad": 16},
  {"sel": "[data-live=\"node_cur\"]", "id": "node_cur", "img": true, "pad": 30},
  {"sel": "[data-live=\"cur_glow\"]", "id": "cur_glow", "img": true},
  {"sel": "div[aria-label$=\"Sterne\"]", "id": "stars"},
  {"sel": "[data-live=\"map_hero\"]", "id": "map_hero", "img": true},
  {"sel": "[data-live=\"lvl_tag\"]", "id": "lvl_tag", "img": true},
- {"sel": "[aria-label=\"gesperrt\"]", "id": "boss_lock", "img": true},
- {"sel": "[data-live=\"energie\"]", "id": "energie", "img": true, "pad": 1}]}
+ {"sel": "[aria-label=\"gesperrt\"]", "id": "boss_lock", "img": true}]}
