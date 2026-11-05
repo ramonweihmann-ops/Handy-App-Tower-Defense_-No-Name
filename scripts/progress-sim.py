@@ -82,7 +82,7 @@ PROFILES = {
     # Kämpfe/Tag, Startkauf (Edelsteine bei Level 21), Edelsteine/Monat, Prime, Pass-Premium
     "ohne Käufe": dict(battles=10, gems_at21=0, gems_month=0, prime=False, premium=False),
     "einmal 5 €": dict(battles=10, gems_at21=1100, gems_month=0, prime=False, premium=False),
-    "monatlich": dict(battles=10, gems_at21=0, gems_month=2400, prime=True, premium=True, noads=True),
+    "monatlich": dict(battles=10, gems_at21=0, gems_month=2400, prime=True, premium=True),
 }
 
 
@@ -164,8 +164,8 @@ def simulate(V, prof, seed, levels=50, days_max=400):
         pl = PASS_PER_DAY * (2 if prof["premium"] else 1)
         lvlf = 1 + L // 10
         s["gold"] += pl / 3 * 150 * lvlf; s["gems"] += pl / 3 * 10 * lvlf; s["cards"] += to_team(pl / 6 * 4 * lvlf); s["stars"] += pl / 6 * lvlf
-        if prof["gems_month"] and day % 30 == 1:
-            s["gems"] += prof["gems_month"]
+        if prof["gems_month"] and L >= 21:
+            s["gems"] += prof["gems_month"] / 30      # Monatspaket, über den Monat verteilt ausgegeben
         if prof["gems_at21"] and L >= 21 and not bought21:
             s["gems"] += prof["gems_at21"]; bought21 = True
         for b, lvl in blv.items():
@@ -179,7 +179,7 @@ def simulate(V, prof, seed, levels=50, days_max=400):
         # Kämpfe: das nächste offene Level; ist es gerade aussichtslos, ein geschafftes
         # Level noch einmal fahren (Karten und Gold sammeln)
         won_today = False
-        videos = 0 if prof.get("noads") else V["videos"]
+        videos = V["videos"]   # mit Werbefrei/Prime ohne Video, sonst per Video
         for _ in range(prof["battles"]):
             if s["L"] > levels:
                 break
