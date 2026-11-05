@@ -318,7 +318,8 @@ Balance-Labor. Abschnitt 9.1 und 9.2 gelten weiter, soweit hier nichts anderes s
   Käufe knapp 5 Monate. Dafür kommen 10 neue Planeten, Heldenstufe bis 60 und mehr Basis-Stufen.
 - **Kämpfe:** Die gemalten Schlachtfelder (2. November) haben die Bahn verdoppelt; Flächenwaffen
   treffen seitdem weniger Gegner. Ausgleich: Lebens-Sprung bei Level 21 ×6 statt ×10, eigene
-  Korrektur für Level 24 und 44 (`GameData.HP_STEP`, `BOSS_TUNE`).
+  Korrektur für Level 24, 35, 44, 45 und 48 (`GameData.HP_STEP`, `BOSS_TUNE`). Labor (6 Durchläufe):
+  Durchschnitt im Mittel etwa 75 % Siege beim ersten Versuch, Zahlend 83–100 %.
 - **Heldenstufen kosten mehr:** Stufe 1–8 wie bisher, ab Stufe 9 steigend bis ×2,5 (ab Stufe 10),
   ab Stufe 21 je Stufe +0,15 dazu, also gleichmäßig, kein Zinseszins (`MetaData.hero_cost_mult`).
 - **Kommandozentrale begrenzt die Heldenstufe:** höchstens 2 × Stufe der Kommandozentrale + 10.

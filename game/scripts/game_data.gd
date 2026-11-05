@@ -258,7 +258,7 @@ static var HARD_BOSS_HP := 0.8
 ## Feinabstimmung der Boss-Level (Level -> Faktor auf das Leben aller Gegner dieses Levels).
 ## Boss-Level haben mehr und gemischtere Wellen; verloren wird meist mitten im Level, nicht am
 ## Boss. Die Welten sind unterschiedlich, ein gemeinsamer Wert trifft die Zielkurve nicht.
-static var BOSS_TUNE := {24: 0.7, 25: 0.7, 30: 0.85, 40: 1.05, 44: 0.85, 45: 0.95, 50: 0.6}
+static var BOSS_TUNE := {24: 0.7, 25: 0.7, 30: 0.85, 35: 0.92, 40: 1.05, 44: 0.85, 45: 0.92, 48: 0.85, 50: 0.6}
 
 
 static func world_of(level: int) -> int:
