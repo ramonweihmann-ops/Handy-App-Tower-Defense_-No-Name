@@ -114,7 +114,7 @@ func _ready() -> void:
 func _tut_stage() -> void:
 	var stage := Tutorial.shot_stage
 	Tutorial.setup_stage(stage)
-	if stage in ["wahl", "plasma", "kern", "karte", "sieg"]:
+	if stage in ["wahl", "plasma", "kern", "karte", "sieg", "tipp-luftangriff", "tipp-medipack"]:
 		start_level(1)
 		return
 	show_menu()
@@ -133,8 +133,10 @@ func _tut_stage() -> void:
 		"bau":
 			menu.show_tab("basis")
 			menu.open_building("01")
-		"fertig":
+		"fertig", "tipp-lager":
 			menu.show_tab("basis")
+		"tipp-munition", "tipp-talente":
+			menu.show_tab("upgrades")
 
 
 ## Setzt das Spieltempo (x1 oder x2). Die Physik bleibt bei 60 Schritten pro Spielsekunde,

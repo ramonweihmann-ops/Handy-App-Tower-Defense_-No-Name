@@ -12,6 +12,12 @@ extends CanvasLayer
 ## Fehlt für einen Schritt Material (Energie, Karten, Gold, Sterne), schenkt das Spiel genau den
 ## Fehlbetrag, damit der Knopf sicher klappt (freigegeben am 05.11.2026).
 ## Fortschritt in Save.data["tut"]; „Spielstand zurücksetzen“ startet die Führung neu.
+##
+## Freiwillige Tipps (freigegebenes Mockup „Tutorial · freiwillige Tipps“): keine Abdunklung, nichts
+## gesperrt, Schild „Tipp“ und unten „Alles klar“. Ein Tipp kommt nie wieder, sobald man ihm gefolgt ist
+## (Ziel angetippt) oder „Alles klar“ getippt hat; ignoriert erscheint er höchstens TIP_MAX_SHOWS-mal.
+## Immer nur ein Tipp, nie während eines Pflichtschritts; im Kampf nach TIP_BATTLE_SECS wieder weg.
+## Wer im Tutorial „Ohne Hilfe spielen“ wählt, bekommt auch keine Tipps.
 
 const W := 390.0
 const H := 844.0
@@ -27,12 +33,22 @@ const PLASMA_SECS := 4.0
 
 ## Aus in Prüfbildern und automatischen Tests (dort darf nichts den Bildschirm verdecken)
 static var enabled := true
+const TIP_ORDER := ["luftangriff", "medipack", "munition", "talente", "lager",
+	"taeglich", "gluecksrad", "missionen", "battlepass", "spielmodi"]
+const TIP_MAX_SHOWS := 2
+const TIP_BATTLE_SECS := 6.0
+## Tipp „Luftangriff“: so viele Gegner gleichzeitig auf dem Feld (Prüfbilder setzen es herab)
+static var tip_crowd := 6
 ## Prüfbild eines Schritts (--tutshot=pfad.png,abschnitt): Spielstand nachstellen, Bild speichern
 static var shot_path := ""
 static var shot_stage := ""
 const SHOT_KEY := {"start": "play1", "wahl": "pick", "plasma": "plasma", "kern": "core", "karte": "card",
 	"sieg": "result", "reiter": "nav#helden", "heldkarte": "herocard", "aufleveln": "levelup",
-	"kampf2": "play4", "tech": "tech", "basis": "base01", "bau": "build01", "fertig": "done"}
+	"kampf2": "play4", "tech": "tech", "basis": "base01", "bau": "build01", "fertig": "done",
+	"tipp-luftangriff": "tip:luftangriff", "tipp-medipack": "tip:medipack", "tipp-munition": "tip:munition",
+	"tipp-talente": "tip:talente", "tipp-lager": "tip:lager", "tipp-taeglich": "tip:taeglich",
+	"tipp-gluecksrad": "tip:gluecksrad", "tipp-missionen": "tip:missionen", "tipp-battlepass": "tip:battlepass",
+	"tipp-spielmodi": "tip:spielmodi"}
 
 var main: Node   # main.gd
 var _root: Control
@@ -49,6 +65,11 @@ var _paused := false   # Kampf für einen Hinweis angehalten
 var _focused := false  # Basislager einmal auf die Kommandozentrale gezoomt
 var _note := ""        # Geschenk zum aktuellen Schritt („Geschenk: +8 Karten“)
 var _gift_key := ""
+var _tip := ""          # gerade gezeigter freiwilliger Tipp
+var _tip_arg := ""      # z. B. das Gebäude beim Tipp „Lager einsammeln“
+var _tip_t := 0.0
+var _tip_cool := ""     # nach einem Tipp: auf diesem Bildschirm keinen weiteren zeigen
+var _battle_no := 0
 var _tex := {}
 
 
@@ -115,11 +136,21 @@ static func note_hero(id: String) -> void:
 
 
 ## Hilfe beenden (Abschluss oder „Ohne Hilfe spielen“)
-func finish() -> void:
+func finish(no_help := false) -> void:
 	_tut()["done"] = true
+	if no_help:
+		_tut()["no_help"] = true   # auch keine freiwilligen Tipps
 	Save.save_game()
 	_unpause()
 	_show({})
+
+
+## Freiwillige Tipps erlaubt? (nicht im Test, nicht nach „Ohne Hilfe spielen“)
+static func tips_on() -> bool:
+	if not enabled or Save.test_mode:
+		return false
+	var t = Save.data.get("tut", {})
+	return t is Dictionary and not bool(t.get("no_help", false))
 
 
 static func _wins() -> int:
@@ -144,19 +175,28 @@ static func _base_done() -> bool:
 # --- Ablauf ---------------------------------------------------------------------------------
 
 func _process(delta: float) -> void:
-	if main == null or not active():
+	var on := active()
+	if main == null or not (on or tips_on()):
 		if _root.visible:
 			_unpause()
 			_show({})
+		_tip = ""
 		return
 	_t += delta
 	var st: String = main.state
 	if _prev_state == "hero_select" and st == "battle":
-		_flag("picked")
-	if _prev_state == "cards" and st != "cards":
+		_battle_no += 1
+		if on:
+			_flag("picked")
+	if on and _prev_state == "cards" and st != "cards":
 		_flag("card")
 	_prev_state = st
-	_show(_resolve(delta))
+	var step := _resolve(delta) if on else {}
+	if step.is_empty() and tips_on():
+		step = _tip_step(delta)
+	elif _tip != "":
+		_tip = ""   # ein Pflichtschritt geht vor
+	_show(step)
 	if shot_path != "":
 		_shot(delta)
 	if _root.visible:
@@ -373,12 +413,215 @@ func _view_rect(v: MockView, r: Rect2) -> Rect2:
 	return Rect2(p + v.to_screen(r.position), r.size * v.s)
 
 
+# --- Freiwillige Tipps ---------------------------------------------------------------------
+
+func _tips() -> Dictionary:
+	var t := _tut()
+	if not t.get("tips") is Dictionary:
+		t["tips"] = {}
+	return t["tips"]
+
+
+## Noch zeigen? -1 = erledigt (befolgt oder „Alles klar“), sonst Zahl der Auftritte
+func _tip_open(id: String) -> bool:
+	var n := int(_tips().get(id, 0))
+	return n >= 0 and n < TIP_MAX_SHOWS
+
+
+## Wo wir gerade sind (ein Tipp pro Ort; derselbe Kampf zählt als ein Ort)
+func _ctx() -> String:
+	var st := str(main.state)
+	if st in ["battle", "cards", "paused"]:
+		return "battle:%d" % _battle_no
+	if st == "menu":
+		return "menu:%s:%d" % [main.menu.current_tab, main.menu._boards.size()]
+	return st
+
+
+func _tip_end(done: bool) -> void:
+	if _tip == "":
+		return
+	if done:
+		_tips()[_tip] = -1
+		Save.save_game()
+	_tip = ""
+	_tip_cool = _ctx()
+
+
+## „Alles klar“ in der Tipp-Blase
+func tip_close() -> void:
+	_tip_end(true)
+	_show({})
+
+
+func _tip_step(delta: float) -> Dictionary:
+	if _tip != "":
+		var cur := _tip_def(_tip, true)
+		if cur.is_empty():
+			_tip_end(false)       # Bildschirm gewechselt: später noch einmal
+		elif bool(cur.get("followed", false)):
+			_tip_end(true)        # befolgt: nie wieder
+		elif bool(cur.get("battle", false)) and _tip_t > TIP_BATTLE_SECS:
+			_tip_end(false)
+		else:
+			_tip_t += delta
+			return cur
+		return {}
+	var ctx := _ctx()
+	if _tip_cool != "":
+		if ctx == _tip_cool:
+			return {}
+		_tip_cool = ""
+	for id in TIP_ORDER:
+		if not _tip_open(id):
+			continue
+		var st := _tip_def(id, false)
+		if st.is_empty() or bool(st.get("followed", false)):
+			continue
+		_tip = id
+		_tip_t = 0.0
+		_tips()[id] = int(_tips().get(id, 0)) + 1
+		Save.save_game()
+		return st
+	return {}
+
+
+func _tip_dict(id: String, target: Rect2, title: String, body: String, pose := "zeigen", circle := false) -> Dictionary:
+	return {"key": "tip:" + id, "tip": true, "pose": pose, "target": target, "circle": circle, "mode": "none",
+		"dim": false, "title": title, "body": body}
+
+
+## Ein Tipp: Ziel und Texte, oder {} wenn er hier gerade nicht passt. keep: läuft schon (Auslöser egal),
+## dann meldet "followed", ob der Spieler ihm gefolgt ist.
+func _tip_def(id: String, keep: bool) -> Dictionary:
+	var st := str(main.state)
+	match id:
+		"luftangriff", "medipack":
+			if st != "battle" or bool(main.get("mp")) or _wins() < 1 or not main.battle.running:
+				return {}
+			var i: int = (main._boosters as Array).find(id)
+			var b := _hud_booster(main.hud, i)
+			if i < 0 or b == null:
+				return {}
+			var ready := float(main._booster_cd[i]) <= 0.0
+			if not keep:
+				if not ready:
+					return {}
+				if id == "luftangriff" and main.battle.enemies.size() < tip_crowd:
+					return {}
+				if id == "medipack" and main.battle.fence_hp >= main.battle.fence_max * 0.7:
+					return {}
+			var d := _tip_dict(id, b.get_global_rect(), "Viele Gegner auf einmal?", "Probiere den Luftangriff aus.", "zeigen", true) \
+				if id == "luftangriff" else _tip_dict(id, b.get_global_rect(), "Dein Schild braucht Hilfe.", "Mit dem Medipack heilst du es.", "zeigen", true)
+			d["battle"] = true
+			d["followed"] = not ready
+			return d
+	# alle weiteren Tipps erst nach dem Tutorial, im Menü und ohne offenes Fenster
+	if active() or st != "menu":
+		return {}
+	var menu: MainMenu = main.menu
+	if not menu.visible or is_instance_valid(menu._modal) or is_instance_valid(menu._success):
+		return {}
+	var top: Control = null
+	for b in menu._boards:
+		if is_instance_valid(b) and not b.is_queued_for_deletion():
+			top = b
+	match id:
+		"munition", "talente":
+			if not menu._mock is UpgradesTab:
+				return {}
+			var u := menu._mock as UpgradesTab
+			if id == "munition":
+				if keep and is_instance_valid(u._ammo):
+					return {"followed": true}
+				if top != null or u.talents or is_instance_valid(u._ammo):
+					return {}
+				return _tip_dict(id, _view_rect(u, UpgradesTab.AMMO_BUTTON), "Hier verbesserst du dein Plasma.", "Das hilft dir in jedem Kampf.")
+			if keep and u.talents:
+				return {"followed": true}
+			if top != null or u.talents or not (keep or Save.can_draw_talent()):
+				return {}
+			var tb := u.button("Upgrades-Talente-Neu.dc.html")
+			if tb == null:
+				return {}
+			return _tip_dict(id, tb.get_global_rect(), "Mit Sternen erhältst du Talente.", "Hier findest du sie.")
+		"lager":
+			if not menu._mock is BaseTab or top != null:
+				return {}
+			var map := (menu._mock as BaseTab).map
+			if map == null:
+				return {}
+			if not keep:
+				_tip_arg = ""
+				for d in BaseData.BUILDINGS:
+					if bool(map._cache.get(d["id"], {}).get("ready", false)):
+						_tip_arg = str(d["id"])
+						break
+				if _tip_arg == "":
+					return {}
+			if keep and not bool(map._cache.get(_tip_arg, {}).get("ready", false)):
+				return {"followed": true}
+			var m := map._zoom / BaseMap.K
+			var c := map.get_global_rect().position + map._bubble_center(_tip_arg, m)
+			var r := 16.5 * m
+			return _tip_dict(id, Rect2(c - Vector2(r, r), Vector2(r, r) * 2.0), "Hier wartet Nachschub.", "Tippe auf die Blase und sammle ihn ein.", "zeigen", true)
+	# Tipps auf dem Abenteuer-Pfad: Knopf, Fenster (Teil des Skriptnamens), Auslöser
+	var spec := {}
+	match id:
+		"taeglich":
+			spec = {"label": "Tägliche Belohnung", "board": "taegliche-belohnung", "on": Save.daily_ready("daily_date"),
+				"title": "Dein tägliches Geschenk wartet.", "body": "Du kannst es hier abholen.", "pose": "winken"}
+		"gluecksrad":
+			spec = {"label": "Glücksrad", "board": "artboard-zqpq", "on": Save.daily_ready("wheel_date"),
+				"title": "Eine kostenlose Drehung wartet.", "body": "Du findest sie hier."}
+		"missionen":
+			spec = {"label": "Missionen", "board": "missionen", "on": menu.mission_ready(),
+				"title": "Du hast eine Aufgabe geschafft.", "body": "Hier wartet deine Belohnung.", "pose": "freuen"}
+		"battlepass":
+			spec = {"href": "#pass", "board": "battle-pass", "on": not Save.pass_claimable().is_empty(),
+				"title": "Deine Pass-Punkte zählen hier.", "body": "Schau dir deine Belohnungen an."}
+		"spielmodi":
+			spec = {"label": "Spielmodi", "board": "spielmodi", "on": _wins() >= 5 and int(Save.mp()["games"]) == 0,
+				"title": "Lust auf eine neue Herausforderung?", "body": "Hier findest du weitere Spielmodi.", "pose": "winken"}
+		_:
+			return {}
+	if top != null:
+		var path := str(top.get_script().resource_path) if top.get_script() else ""
+		if keep and path.contains("board_" + str(spec["board"])):
+			return {"followed": true}
+		return {}
+	if keep and not bool(spec["on"]):
+		return {"followed": true}
+	if not bool(spec["on"]) or not menu._mock is HomeScreen:
+		return {}
+	var hb: MockView.MockButton = null
+	for b in menu._mock.buttons():
+		if (spec.has("label") and str(b.info.get("label", "")) == spec["label"]) or (spec.has("href") and str(b.info.get("href", "")) == spec["href"]):
+			hb = b
+	if hb == null:
+		return {}
+	return _tip_dict(id, hb.get_global_rect(), spec["title"], spec["body"], str(spec.get("pose", "zeigen")))
+
+
+func _hud_booster(hud: BattleHud, i: int) -> MockView.MockButton:
+	if i < 0 or i > 1:
+		return null
+	var pre: String = ["Luftschlag", "Reparatur"][i]
+	for b in hud.buttons():
+		if str(b.info.get("label", "")).begins_with(pre):
+			return b
+	return null
+
+
 # --- Prüfbilder ------------------------------------------------------------------------------
 
 ## Spielstand für einen Abschnitt nachstellen (nur für Prüfbilder, wird nicht gespeichert)
 static func setup_stage(stage: String) -> void:
 	Save.test_mode = false
 	Save.data = Save.default_data()
+	if stage.begins_with("tipp-"):
+		_setup_tip(stage.trim_prefix("tipp-"))
+		return
 	var wins := 0
 	match stage:
 		"reiter", "heldkarte", "aufleveln", "kampf2":
@@ -409,6 +652,29 @@ static func setup_stage(stage: String) -> void:
 		Save.base()["01"] = {"level": 2, "stock": 0.0, "time": int(Time.get_unix_time_from_system())}
 
 
+## Tipp-Prüfbild: Tutorial erledigt, alle anderen Tipps schon gesehen, Auslöser erfüllt
+static func _setup_tip(id: String) -> void:
+	var wins := 1 if id in ["luftangriff", "medipack"] else 5
+	for n in range(1, wins + 1):
+		Save.data["won_levels"].append("N%d" % n)
+	Save.data["max_level"] = wins + 1
+	var tips := {}
+	for o in TIP_ORDER:
+		if o != id:
+			tips[o] = -1
+	Save.data["tut"] = {"done": true, "tips": tips}
+	tip_crowd = 1
+	match id:
+		"lager":
+			Save.base()["01"] = {"level": 1, "stock": 999.0, "time": int(Time.get_unix_time_from_system())}
+		"missionen":
+			var m := Save.missions()
+			var mid: String = m["ids"][0]
+			m["progress"][mid] = int(Save.mission_def(mid)["goal"])
+		"battlepass":
+			Save.data["pass_points"] = 500
+
+
 var _shot_t := 0.0
 
 
@@ -426,6 +692,11 @@ func _shot(delta: float) -> void:
 				main._open_card_pick()
 			"sieg":
 				main._on_level_won()
+			"tipp-luftangriff", "tipp-medipack":
+				for i in main._booster_cd.size():
+					main._booster_cd[i] = 0.0
+				if shot_stage == "tipp-medipack":
+					main.battle.fence_hp = minf(main.battle.fence_hp, main.battle.fence_max * 0.5)
 	var want: String = SHOT_KEY.get(shot_stage, "?")
 	if (_key.begins_with(want) and _t > 0.6) or _shot_t > 60.0:
 		get_viewport().get_texture().get_image().save_png(shot_path)
@@ -538,7 +809,8 @@ func _show(step: Dictionary) -> void:
 	_shade.mode = str(step.get("mode", "pass"))
 	_shade.hole = hole
 	_shade.set_box(hole, (hole.size.x * 0.5) if circle else 24.0 * s,
-		DIM_A * (0.75 if _shade.mode == "close" else 1.0) if bool(step.get("dim", true)) else 0.0, has_target, 2.0 * s)
+		DIM_A * (0.75 if _shade.mode == "close" else 1.0) if bool(step.get("dim", true)) else 0.0, has_target, 2.0 * s,
+		s if bool(step.get("tip", false)) else 0.0)
 	# Hinweisblase: über dem Ziel, wenn es in der unteren Hälfte liegt, sonst darunter
 	var d := Rect2((target.position - off) / s, target.size / s)
 	_bubble.setup(step, s)
@@ -560,10 +832,17 @@ func _show(step: Dictionary) -> void:
 	if _hand.visible:
 		var hs := 50.0 * s
 		var tip: Vector2
+		_hand.flip_h = false
 		if flip:
 			tip = target.position + Vector2(target.size.x * 0.5 + target.size.x * 0.3, target.size.y * 0.2)
 			_hand.flip_v = true
 			_hand.pivot_offset = Vector2(0.14, 0.9) * hs
+		elif d.get_center().x > 300.0:
+			# am rechten Rand: gespiegelt von links, Finger zeigt nach rechts oben
+			tip = target.position + Vector2(target.size.x * 0.3, target.size.y * 0.63)
+			_hand.flip_v = false
+			_hand.flip_h = true
+			_hand.pivot_offset = Vector2(0.86, 0.1) * hs
 		else:
 			tip = Vector2(target.end.x - minf(59.0 * s, target.size.x * 0.25), target.position.y + target.size.y * 0.63)
 			_hand.flip_v = false
@@ -598,6 +877,7 @@ uniform float dim_a = 0.62;
 uniform float ring_a = 1.0;
 uniform float ring_w = 2.0;
 uniform float has_box = 0.0;
+uniform float glow = 0.0;   // Glanz außen (Tipps): Pixel je Mockup-Punkt, 0 = aus
 float sd(vec2 p, vec2 b, float r) {
 	vec2 q = abs(p) - b + r;
 	return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
@@ -610,6 +890,12 @@ void fragment() {
 	vec4 dimc = vec4(0.043, 0.027, 0.11, dim_a * outside);
 	vec4 gold = vec4(1.0, 0.835, 0.416, ring_a);
 	COLOR = mix(dimc, gold, ring);
+	if (glow > 0.0 && has_box > 0.0 && d > 0.0) {
+		// wie im Mockup: 3 pt heller Saum, dahinter 18 pt weicher Schein
+		float a = d < 3.0 * glow ? 0.22 : 0.0;
+		a = max(a, 0.55 * exp(-d / (7.0 * glow)));
+		COLOR = vec4(1.0, 0.835, 0.416, a * ring_a);
+	}
 }
 """
 
@@ -628,7 +914,8 @@ void fragment() {
 		material = _mat
 		mouse_filter = Control.MOUSE_FILTER_STOP
 
-	func set_box(r: Rect2, radius: float, dim_a: float, has_box: bool, ring_w: float) -> void:
+	func set_box(r: Rect2, radius: float, dim_a: float, has_box: bool, ring_w: float, glow := 0.0) -> void:
+		_mat.set_shader_parameter("glow", glow)
 		var p := r.position - global_position
 		_mat.set_shader_parameter("px_size", size)
 		_mat.set_shader_parameter("box_pos", p)
@@ -826,7 +1113,8 @@ void fragment() {
 		var ci := _front
 		# „Schritt N von 5“
 		var done := bool(_step.get("done", false))
-		var chip := "Schritt %d von 5%s" % [int(_step.get("n", 1)), " ✓" if done else ""]
+		var is_tip := bool(_step.get("tip", false))
+		var chip := "Tipp" if is_tip else "Schritt %d von 5%s" % [int(_step.get("n", 1)), " ✓" if done else ""]
 		var f := MockFonts.font("Nunito", 800)
 		var fs := roundi(11.5 * s)
 		var tw := f.get_string_size(chip, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
@@ -853,7 +1141,7 @@ void fragment() {
 		# „Ohne Hilfe spielen“ (beim Abschluss: „Tippen zum Weiterspielen“)
 		var lf := MockFonts.font("Nunito", 700)
 		var ls := roundi(10.5 * s)   # wie im Mockup (10,5 pt)
-		var link := "Tippen zum Weiterspielen" if done else "Ohne Hilfe spielen"
+		var link := "Alles klar" if is_tip else ("Tippen zum Weiterspielen" if done else "Ohne Hilfe spielen")
 		var lw := lf.get_string_size(link, HORIZONTAL_ALIGNMENT_LEFT, -1, ls).x
 		var base := Vector2(96.0 * s, size.y - 8.0 * s - 3.0 * s)
 		ci.draw_string(lf, base, link, HORIZONTAL_ALIGNMENT_LEFT, -1, ls, Tutorial.LILAC)
@@ -872,11 +1160,22 @@ void fragment() {
 			var pts := PackedVector2Array([c + Vector2(-7, 0.5) * q, c + Vector2(-2.5, 5) * q, c + Vector2(7, -4.5) * q])
 			ci.draw_polyline(pts, Color("14320e"), 3.4 * q, true)
 
+	## Bei Tipps lässt die Blase alles durch außer „Alles klar“ (nichts wird gesperrt)
+	func _has_point(p: Vector2) -> bool:
+		if bool(_step.get("tip", false)):
+			return _link.has_point(p)
+		return Rect2(Vector2.ZERO, size).has_point(p)
+
 	func _gui_input(e: InputEvent) -> void:
 		if not (e is InputEventMouseButton and (e as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT):
 			return
 		accept_event()
 		if e.pressed:
 			return
-		if bool(_step.get("done", false)) or _link.has_point(get_local_mouse_position()):
+		if bool(_step.get("done", false)):
 			tut.finish()
+		elif _link.has_point(get_local_mouse_position()):
+			if bool(_step.get("tip", false)):
+				tut.tip_close()
+			else:
+				tut.finish(true)   # „Ohne Hilfe spielen“: auch keine Tipps

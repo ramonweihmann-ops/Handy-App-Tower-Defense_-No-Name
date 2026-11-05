@@ -144,16 +144,39 @@ func _run() -> bool:
 			_expect("done")
 			tut.finish()
 		24:
-			_check(not Tutorial.active() and tut._key == "", "abgeschlossen")
+			_check(not Tutorial.active(), "abgeschlossen")
+			m.show_tab("kampf")
+		25:
+			# freiwilliger Tipp nach dem Tutorial: „Alles klar“ = nie wieder
+			_expect("tip:taeglich")
+			tut.tip_close()
+		26:
+			_check(int(Save.data["tut"]["tips"].get("taeglich", 0)) == -1 and tut._key == "", "tipp-alles-klar")
+			m.show_tab("shop")
+		27:
+			m.show_tab("kampf")
+		28:
+			# nächster Tipp; ihm folgen (Glücksrad öffnen) = nie wieder
+			_expect("tip:gluecksrad")
+			_check(not tut._key.begins_with("tip:taeglich"), "tipp-kommt-nicht-wieder")
+			m.open_board("Artboard-zqpq.dc.html")
+		29:
+			_check(int(Save.data["tut"]["tips"].get("gluecksrad", 0)) == -1, "tipp-befolgt")
+			m.close_board(m._boards[-1])
+		30:
 			# „Spielstand zurücksetzen“ (Einstellungen) startet die Führung wieder von vorn
 			m.open_settings()
-		25:
+		31:
 			_check(tut._key == "", "einstellungen-frei")
 			Save.reset()
 			m.selected_level = 1
 			m._close_modal()
 			m.show_tab("kampf")
-		26:
+		32:
 			_expect("play1", "(nach dem Zurücksetzen)")
+			# „Ohne Hilfe spielen“ schaltet auch die Tipps ab
+			tut.finish(true)
+		33:
+			_check(not Tutorial.active() and not Tutorial.tips_on() and tut._key == "", "ohne-hilfe-keine-tipps")
 			return true
 	return false
