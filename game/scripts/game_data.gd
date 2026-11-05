@@ -248,7 +248,7 @@ static var DPS_GROWTH := 1.035
 ## Ab Level 21 (Spiel-Phase 2) ein spürbarer Sprung, danach wächst es im Gleichschritt mit
 ## einem Spieler, der regelmäßig aufwertet (abgestimmt mit dem Balance-Labor, docs/BALANCE.md).
 const PHASE2_FROM := 21
-static var HP_STEP := 10.0
+static var HP_STEP := 6.0   # vorher 10; mit der doppelt langen Bahn treffen Flächenwaffen weniger (Labor 06.11.2026)
 static var HP_GROWTH_LATE := 1.01
 static var DPS_STEP := 1.6
 static var DPS_GROWTH_LATE := 1.0
@@ -258,7 +258,7 @@ static var HARD_BOSS_HP := 0.8
 ## Feinabstimmung der Boss-Level (Level -> Faktor auf das Leben aller Gegner dieses Levels).
 ## Boss-Level haben mehr und gemischtere Wellen; verloren wird meist mitten im Level, nicht am
 ## Boss. Die Welten sind unterschiedlich, ein gemeinsamer Wert trifft die Zielkurve nicht.
-static var BOSS_TUNE := {25: 0.7, 30: 0.85, 40: 1.05, 45: 0.95, 50: 0.6}
+static var BOSS_TUNE := {24: 0.7, 25: 0.7, 30: 0.85, 40: 1.05, 44: 0.85, 45: 0.95, 50: 0.6}
 
 
 static func world_of(level: int) -> int:

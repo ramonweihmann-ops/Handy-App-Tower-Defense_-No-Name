@@ -11,7 +11,6 @@ extends MockScreen
 const PAGES := ["angebote", "truhen", "aufladen", "event"]
 const PLAY_STORE := "Echte Käufe kommen, wenn die App im Play Store ist. In der Testphase gibt es Edelsteine über den Battle Pass, das Glücksrad und die tägliche Belohnung."
 const TEMPO_HINT := "2× Tempo ist in der Testphase für alle frei. Kaufen kannst du es, wenn die App im Play Store ist."
-const BOOSTER_HINT := "Booster-Teile verbessern bald Luftangriff und Medipack. Sie kommen zusammen mit dem neuen Booster-Fenster."
 ## Inhaltsbereich zwischen Kopfleiste und Reitern (Mockup-Punkte des Rahmens)
 const AREA := Rect2(0, 64, 390, 668)
 ## Höhe unter dem Inhalt (Reiter und Menü) auf den langen Seiten
@@ -186,8 +185,9 @@ func bind() -> void:
 	var daily := Save.shop_daily()
 	var free_offer := not bool(daily["bought"][0])
 	var chest := Save.daily_ready("shop_chest_date")
+	var chests_free := chest or Save.daily_ready("shop_silver_date")
 	var gold := Save.daily_ready("shop_free_date") or Save.daily_ready("shop_gold_date")
-	for pair in [["ANGEBOTE", free_offer], ["TRUHEN", chest], ["AUFLADEN", gold]]:
+	for pair in [["ANGEBOTE", free_offer], ["TRUHEN", chests_free], ["AUFLADEN", gold]]:
 		var tab := _tab_button(pair[0])
 		if tab:
 			tab.badge = bool(pair[1])
@@ -224,6 +224,13 @@ func bind() -> void:
 			v.set_text(_ptext(v, "GRATIS", 0), "GRATIS" if chest else "MORGEN")
 			_pdim(v, "#gratis-truhe", not chest)
 			_pdim(v, "#truhe", Save.gems() < MetaData.SHOP_CHEST_COST)
+			var silver := Save.daily_ready("shop_silver_date")
+			v.set_text(_ptext(v, "GRATIS", 1), "GRATIS" if silver else "MORGEN")
+			_pdim(v, "#silbertruhe", not silver)
+			v.set_text("150", num(MetaData.GOLD_CHEST_COST))
+			_pdim(v, "#goldtruhe", Save.gems() < MetaData.GOLD_CHEST_COST)
+			v.set_text("Bis zu 6 Booster-Teile", "Bis zu %d Booster-Teile" % MetaData.SILVER_CHEST_PARTS[1])
+			v.set_text("Bis zu 30 Booster-Teile", "Bis zu %d Booster-Teile" % MetaData.GOLD_CHEST_PARTS[1])
 		"aufladen":
 			v.set_text("Sofort wieder voll: 30/30", "Sofort wieder voll: %d/%d" % [Save.energy_max(), Save.energy_max()])
 			v.set_text("20", str(MetaData.SHOP_ENERGY_COST))
@@ -278,8 +285,11 @@ func handle(b: Dictionary) -> bool:
 		"#gratis-truhe":
 			_free_chest()
 			return true
-		"#silbertruhe", "#goldtruhe":
-			menu.info("Kommt bald", BOOSTER_HINT)
+		"#silbertruhe":
+			_silver_chest()
+			return true
+		"#goldtruhe":
+			_gold_chest()
 			return true
 		"#energie":
 			_buy_energy()
@@ -328,9 +338,31 @@ func _buy_chest() -> void:
 	if not Save.spend("gems", cost):
 		_missing_gems(cost)
 		return
-	Save.add("cards", cards)
+	Save.add_squad_cards(cards)   # nur Helden der Aufstellung
 	Sfx.play("win")
 	menu.reward_success([{"type": "cards", "amount": cards}], "Heldentruhe")
+	refresh()
+
+
+func _silver_chest() -> void:
+	if not Save.daily_ready("shop_silver_date"):
+		menu.toast("Heute schon geöffnet. Morgen wartet die nächste Silbertruhe!")
+		return
+	Save.mark_daily("shop_silver_date")
+	_got_parts(randi_range(MetaData.SILVER_CHEST_PARTS[0], MetaData.SILVER_CHEST_PARTS[1]))
+
+
+func _gold_chest() -> void:
+	if not Save.spend("gems", MetaData.GOLD_CHEST_COST):
+		_missing_gems(MetaData.GOLD_CHEST_COST)
+		return
+	_got_parts(randi_range(MetaData.GOLD_CHEST_PARTS[0], MetaData.GOLD_CHEST_PARTS[1]))
+
+
+func _got_parts(n: int) -> void:
+	Save.add_booster_parts(n)
+	Sfx.play("win")
+	menu.celebrate("check", "+%d Booster-Teile" % n, Color(1.0, 0.65, 0.25))
 	refresh()
 
 

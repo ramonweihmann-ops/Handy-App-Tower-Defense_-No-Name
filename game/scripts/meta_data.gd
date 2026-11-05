@@ -21,12 +21,28 @@ const STAGE_NAME := "Schleim-Welt"
 
 
 ## Karten, die ein Held für die nächste Stufe braucht.
+## Aufschlag auf Karten und Gold je Heldenstufe (Balancing ab Level 21, freigegeben 06.11.2026):
+## Stufe 1–8 wie früher, ab Stufe 9 steigend bis ×2,5 (ab Stufe 10), ab Stufe 21 gleichmäßig je Stufe
+## +0,15 (kein Zinseszins). Simulation: scripts/progress-sim.py, Bericht „Balancing ab Level 21“.
+static func hero_cost_mult(level: int) -> float:
+	if level <= 8:
+		return 1.0
+	if level <= 20:
+		return minf(2.5, 1.0 + 0.75 * (level - 8))
+	return 2.5 + 0.15 * (level - 20)
+
+
 static func hero_cards_needed(level: int) -> int:
-	return 4 + level * 4
+	return int(round((4 + level * 4) * hero_cost_mult(level)))
 
 
 static func hero_gold_needed(level: int) -> int:
-	return 60 * level
+	return int(round(60 * level * hero_cost_mult(level) / 10.0)) * 10
+
+
+## Höchste Heldenstufe bei dieser Stufe der Kommandozentrale (Basislager, Gebäude 01)
+static func hero_cap(hq_level: int) -> int:
+	return mini(HERO_MAX_LEVEL, 2 * maxi(1, hq_level) + 10)
 
 
 ## Schadensbonus durch die Heldenstufe: +7 % je Stufe, prozentual (wie das Gegnerleben),
@@ -62,6 +78,17 @@ static func booster_cd(id: String, level: int) -> float:
 
 static func booster_cost(level: int) -> int:
 	return 200 * level
+
+
+## Booster-Teile fürs Verbessern (dazu Gold), Reihenfolge im Booster-Fenster und die Booster-Truhen
+static func booster_parts_cost(level: int) -> int:
+	return 4 * level
+const BOOSTER_ORDER := ["luftangriff", "medipack", "munition", "zeitlupe", "kuppel"]
+const SILVER_CHEST_PARTS := [3, 6]       # Silbertruhe: gratis 1× am Tag
+const GOLD_CHEST_PARTS := [15, 30]       # Goldtruhe
+const GOLD_CHEST_COST := 150             # Edelsteine
+## Werbevideo nach einem Sieg: Belohnung verdoppeln, so oft am Tag (mit Prime ohne Video)
+const VIDEO_DOUBLE_PER_DAY := 5
 
 
 # --- Tech-Werft: drei Bereiche, je ein Grundmodul und zwei Äste, die parallel ausbaubar sind ---
@@ -199,12 +226,18 @@ static func win_gold(level: int) -> int:
 
 ## Karten je Held im Kampf bei einem Sieg (Niederlage: die Hälfte).
 static func win_cards(level: int) -> int:
-	return int(5 + 0.55 * level)
+	var n := 5 + 0.55 * level
+	if level > 50:
+		n *= 0.5
+	elif level > 20:
+		n *= 0.8
+	return int(n)
 
 
 ## Heldentruhe im Shop: wächst mit dem Fortschritt, damit ein Kauf immer gleich viel bringt.
+## Seit 05.11.2026 nur für Helden der Aufstellung und deutlich mehr (6 × höchstes Level).
 static func chest_cards(max_level: int) -> int:
-	return 10 + int(1.5 * max_level)
+	return 6 * maxi(5, max_level)
 const SHOP_ENERGY_COST := 20
 ## Edelstein-Shop (Echtgeld, kommt mit dem Play Store; beim ersten Kauf jedes Pakets doppelt)
 const GEM_PACKS := [

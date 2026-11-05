@@ -261,9 +261,9 @@ func _refresh_top() -> void:
 func _update_badges() -> void:
 	var want := {
 		"shop": Save.shop_free_ready(),
-		"sammlung": Save.any_hero_ready() or Save.any_booster_upgrade(),
+		"sammlung": Save.any_hero_ready(),
 		"kampf": not Save.pass_claimable().is_empty() or _mission_ready() or Save.daily_ready("daily_date") or Save.daily_ready("wheel_date"),
-		"upgrades": Save.can_buy_tech() or Save.any_ammo_upgrade() or Save.can_draw_talent(),
+		"upgrades": Save.can_buy_tech() or Save.any_ammo_upgrade() or Save.any_booster_upgrade() or Save.can_draw_talent(),
 		"basis": Save.any_building_ready(),
 	}
 	for id in _nav_icons.keys():

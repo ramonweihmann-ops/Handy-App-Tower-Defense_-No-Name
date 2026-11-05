@@ -8,7 +8,7 @@ fail=0
 echo "== Menü-Rundgang =="
 out=$("$GODOT" --headless --fixed-fps 60 --path game -- --smoke 2>&1)
 echo "$out" | grep -E "SMOKE"
-if grep -qE "SCRIPT ERROR|ERROR:" <<< "$out"; then echo "$out" | grep -E "ERROR" | head -5; fail=1; fi
+if grep -qE "SCRIPT ERROR|ERROR:|SMOKE FEHLER" <<< "$out"; then echo "$out" | grep -E "ERROR|FEHLER" | head -5; fail=1; fi
 echo "== Tutorial: ganzer Durchlauf =="
 out=$("$GODOT" --headless --fixed-fps 60 --path game -- --tutflow 2>&1)
 echo "$out" | grep -E "TUTFLOW fertig"

@@ -362,6 +362,10 @@ func _level_up() -> void:
 	if lvl >= MetaData.HERO_MAX_LEVEL:
 		menu.toast("%s hat schon die höchste Stufe" % GameData.HEROES[hero]["name"])
 		return
+	var hq := Save.hq_needed(hero)
+	if hq > 0:
+		menu.toast("Für Stufe %d braucht die Kommandozentrale Stufe %d (Basislager)" % [lvl + 1, hq])
+		return
 	var need := MetaData.hero_cards_needed(lvl)
 	if Save.hero_cards(hero) < need:
 		menu.toast("Noch %d Karten bis zur nächsten Stufe" % (need - Save.hero_cards(hero)))

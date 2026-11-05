@@ -305,3 +305,26 @@ eine Zielkurve.
   gleich viel stärker (rund 30 %, entspricht 4 Heldenstufen, dazu Prime; vom Nutzer bestätigt). Kaufangebote wachsen mit
   dem Fortschritt (z. B. Heldentruhe: 10 + 1,5 × höchstes Level Karten), damit ein Kauf immer
   ungefähr gleich viel bringt.
+
+### 9.3 Zwei Phasen: binden und verdienen (freigegeben 05.11.2026, Version 0.9.3)
+
+Abgestimmt mit `scripts/progress-sim.py` (Variante `schritt1`, Simulation über Tage) und dem
+Balance-Labor. Abschnitt 9.1 und 9.2 gelten weiter, soweit hier nichts anderes steht.
+
+- **Level 1–50 bindet:** läuft flüssig, knapp 2 Versuche je Level, nie ein Tag ohne Fortschritt.
+  Ohne Käufe ist Level 50 nach etwa 12 Tagen erreicht, zahlend nach 8–10 Tagen.
+- **Level 51–150 bringt das Geld (Schritt 2, noch nicht gebaut):** gleichmäßig zäher, ohne steile
+  Kurve am Ende. Ziel für Level 150: viel zahlend etwa 2 Monate, mittel knapp 3, wenig 4, ohne
+  Käufe knapp 5 Monate. Dafür kommen 10 neue Planeten, Heldenstufe bis 60 und mehr Basis-Stufen.
+- **Kämpfe:** Die gemalten Schlachtfelder (2. November) haben die Bahn verdoppelt; Flächenwaffen
+  treffen seitdem weniger Gegner. Ausgleich: Lebens-Sprung bei Level 21 ×6 statt ×10, eigene
+  Korrektur für Level 24 und 44 (`GameData.HP_STEP`, `BOSS_TUNE`).
+- **Heldenstufen kosten mehr:** Stufe 1–8 wie bisher, ab Stufe 9 steigend bis ×2,5 (ab Stufe 10),
+  ab Stufe 21 je Stufe +0,15 dazu, also gleichmäßig, kein Zinseszins (`MetaData.hero_cost_mult`).
+- **Kommandozentrale begrenzt die Heldenstufe:** höchstens 2 × Stufe der Kommandozentrale + 10.
+- **Karten je Sieg:** Level 21–50 80 %, ab Level 51 50 % der Menge aus 9.2.
+- **Heldentruhe** (100 Edelsteine): 6 × höchstes Level Karten, nur für Helden der Aufstellung.
+- **Booster-Teile:** Booster verbessern kostet Gold plus 4 × Stufe Teile. Teile aus der Silbertruhe
+  (gratis 1× am Tag, 3–6) und der Goldtruhe (150 Edelsteine, 15–30).
+- **Belohnung verdoppeln:** nach einem Sieg bis 5× am Tag per Werbevideo Gold und Karten doppelt
+  (Mockup zur Prüfung). Mit Prime ohne Video.

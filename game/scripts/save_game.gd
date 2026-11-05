@@ -51,6 +51,10 @@ func default_data() -> Dictionary:
 		"shop_gold_date": "",
 		"shop_chest_date": "",
 		"shop_daily": {},
+		"shop_silver_date": "",
+		"booster_parts": 0,
+		"video_date": "",
+		"video_used": 0,
 		# Geführter Einstieg (scripts/ui/tutorial.gd): erledigte Schritte; leer = startet von vorn
 		"tut": {},
 		"unlocked": [],
@@ -274,6 +278,7 @@ func shop_daily_buy(k: int) -> Dictionary:
 ## Wartet im Shop etwas Kostenloses? (roter Punkt am Reiter)
 func shop_free_ready() -> bool:
 	return daily_ready("shop_free_date") or daily_ready("shop_gold_date") or daily_ready("shop_chest_date") \
+		or daily_ready("shop_silver_date") \
 		or not bool(shop_daily()["bought"][0])
 
 
@@ -414,7 +419,22 @@ func hero_cards(id: String) -> int:
 
 func can_level_hero(id: String) -> bool:
 	var lvl := hero_level(id)
-	return lvl < MetaData.HERO_MAX_LEVEL and hero_cards(id) >= MetaData.hero_cards_needed(lvl) and gold() >= MetaData.hero_gold_needed(lvl)
+	return lvl < hero_cap() and hero_cards(id) >= MetaData.hero_cards_needed(lvl) and gold() >= MetaData.hero_gold_needed(lvl)
+
+
+## Höchste Heldenstufe, die die Kommandozentrale gerade erlaubt (2 × Stufe + 10)
+func hero_cap() -> int:
+	if _neutral():
+		return MetaData.HERO_MAX_LEVEL
+	return MetaData.hero_cap(base_level("01"))
+
+
+## Stufe der Kommandozentrale, die für die nächste Stufe dieses Helden nötig ist (0 = keine Grenze)
+func hq_needed(id: String) -> int:
+	var lvl := hero_level(id)
+	if lvl < hero_cap() or lvl >= MetaData.HERO_MAX_LEVEL:
+		return 0
+	return int(ceil((lvl + 1 - 10) / 2.0))
 
 
 func level_hero(id: String) -> bool:
@@ -424,6 +444,39 @@ func level_hero(id: String) -> bool:
 	data["heroes"][id]["cards"] = hero_cards(id) - MetaData.hero_cards_needed(lvl)
 	data["gold"] = gold() - MetaData.hero_gold_needed(lvl)
 	data["heroes"][id]["level"] = lvl + 1
+	save_game()
+	return true
+
+
+## Karten zufällig auf die Helden der Aufstellung verteilen (Heldentruhe): {Held: Anzahl}
+func add_squad_cards(n: int) -> Dictionary:
+	var ids := squad()
+	if ids.is_empty():
+		ids = unlocked_heroes()
+	var got := {}
+	for i in n:
+		var id: String = ids[randi() % ids.size()]
+		got[id] = int(got.get(id, 0)) + 1
+	for id in got:
+		data["heroes"][id]["cards"] = hero_cards(id) + int(got[id])
+	save_game()
+	return got
+
+
+## Werbevideo: Siegbelohnung verdoppeln, VIDEO_DOUBLE_PER_DAY-mal am Tag
+func videos_left() -> int:
+	if str(data.get("video_date", "")) != today():
+		return MetaData.VIDEO_DOUBLE_PER_DAY
+	return maxi(0, MetaData.VIDEO_DOUBLE_PER_DAY - int(data.get("video_used", 0)))
+
+
+func use_video() -> bool:
+	if videos_left() <= 0:
+		return false
+	if str(data.get("video_date", "")) != today():
+		data["video_date"] = today()
+		data["video_used"] = 0
+	data["video_used"] = int(data["video_used"]) + 1
 	save_game()
 	return true
 
@@ -515,10 +568,21 @@ func toggle_booster(id: String) -> String:
 	return ""
 
 
+func booster_parts() -> int:
+	return int(data.get("booster_parts", 0))
+
+
+func add_booster_parts(n: int) -> void:
+	data["booster_parts"] = booster_parts() + n
+	save_game()
+
+
 func upgrade_booster(id: String) -> bool:
-	var lvl := booster_level(id)
-	if lvl >= MetaData.BOOSTER_MAX or not spend("gold", MetaData.booster_cost(lvl)):
+	if not can_upgrade_booster(id):
 		return false
+	var lvl := booster_level(id)
+	data["gold"] = gold() - MetaData.booster_cost(lvl)
+	data["booster_parts"] = booster_parts() - MetaData.booster_parts_cost(lvl)
 	data["boosters"][id] = lvl + 1
 	save_game()
 	return true
@@ -579,7 +643,8 @@ func can_draw_talent() -> bool:
 
 func can_upgrade_booster(id: String) -> bool:
 	var lvl := booster_level(id)
-	return booster_unlocked(id) and lvl < MetaData.BOOSTER_MAX and gold() >= MetaData.booster_cost(lvl)
+	return booster_unlocked(id) and lvl < MetaData.BOOSTER_MAX and gold() >= MetaData.booster_cost(lvl) \
+		and booster_parts() >= MetaData.booster_parts_cost(lvl)
 
 
 func any_booster_upgrade() -> bool:

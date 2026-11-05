@@ -44,7 +44,8 @@ const TITLE := Rect2(90, 62, 210, 33)
 const DETAIL := Rect2(26, 474, 338, 122)
 const BUILD := Rect2(93, 546, 204, 42)
 const TECH_ICON := {"crit": "tech_crit", "crit2": "tech_crit", "damage": "tech_damage", "xp": "tech_xp", "xp2": "tech_xp", "gold": "tech_gold"}
-const AMMO_BUTTON := Rect2(125, 674, 140, 34)
+const AMMO_BUTTON := Rect2(57, 674, 134, 34)
+const BOOSTER_BUTTON := Rect2(199, 674, 134, 34)
 
 var talents := false
 var area := "schutz"
@@ -55,6 +56,8 @@ var _grid: TalentGrid
 var _ammo: AmmoPanel
 var _talent_pop: TalentPop
 var _ammo_btn: AmmoButton
+var _booster_btn: AmmoButton
+var _booster: BoosterPanel
 
 
 static func _is_talents(m: MainMenu) -> bool:
@@ -84,8 +87,14 @@ func _ready() -> void:
 		_ammo_btn = AmmoButton.new()
 		_ammo_btn.tab = self
 		place_at(_ammo_btn, AMMO_BUTTON, true)
+		_booster_btn = AmmoButton.new()
+		_booster_btn.tab = self
+		_booster_btn.kind = "booster"
+		place_at(_booster_btn, BOOSTER_BUTTON, true)
 		if str(menu.sub_tab.get("upgrades", "")) == "munition":
 			open_ammo()
+		elif str(menu.sub_tab.get("upgrades", "")) == "booster":
+			open_booster()
 	bind()
 
 
@@ -95,7 +104,7 @@ func bind() -> void:
 	var tech := button("Upgrades-Tech-Neu.dc.html")
 	var tal := button("Upgrades-Talente-Neu.dc.html")
 	if tech and tal:
-		tech.badge = talents and (Save.can_buy_tech() or Save.any_ammo_upgrade())
+		tech.badge = talents and (Save.can_buy_tech() or Save.any_ammo_upgrade() or Save.any_booster_upgrade())
 		tal.badge = not talents and Save.can_draw_talent()
 	if talents:
 		var one := button("draw_star")
@@ -110,8 +119,12 @@ func bind() -> void:
 		_tech.queue_redraw()
 	if _ammo_btn:
 		_ammo_btn.queue_redraw()
+	if _booster_btn:
+		_booster_btn.queue_redraw()
 	if is_instance_valid(_ammo):
 		_ammo.redraw()
+	if is_instance_valid(_booster):
+		_booster.redraw()
 
 
 func handle(b: Dictionary) -> bool:
@@ -324,6 +337,22 @@ func open_ammo() -> void:
 	_ammo = AmmoPanel.new()
 	_ammo.tab = self
 	add_child(_ammo)
+
+
+func open_booster() -> void:
+	if is_instance_valid(_booster):
+		return
+	_booster = BoosterPanel.new()
+	_booster.tab = self
+	add_child(_booster)
+
+
+func close_booster() -> void:
+	if is_instance_valid(_booster):
+		_booster.queue_free()
+	_booster = null
+	if str(menu.sub_tab.get("upgrades", "")) == "booster":
+		menu.sub_tab["upgrades"] = "tech"
 
 
 func close_ammo() -> void:
@@ -595,6 +624,7 @@ class TechLayer:
 class AmmoButton:
 	extends Control
 	var tab: UpgradesTab
+	var kind := "munition"   # oder "booster"
 
 	func _ready() -> void:
 		mouse_filter = Control.MOUSE_FILTER_STOP
@@ -608,9 +638,10 @@ class AmmoButton:
 
 	func _draw() -> void:
 		var s := tab.s
-		tab.pill(self, "knopf_violett_normal", AMMO_BUTTON, AMMO_BUTTON.position)
-		tab.label_at(self, "MUNITION", size * 0.5, "Fredoka", 700, 15.0, Color.WHITE, 0, Color("#4a1a90"), Vector2(0, 1))
-		if Save.any_ammo_upgrade():
+		var r := BOOSTER_BUTTON if kind == "booster" else AMMO_BUTTON
+		tab.pill(self, "knopf_violett_normal", r, r.position)
+		tab.label_at(self, "BOOSTER" if kind == "booster" else "MUNITION", size * 0.5, "Fredoka", 700, 15.0, Color.WHITE, 0, Color("#4a1a90"), Vector2(0, 1))
+		if Save.any_booster_upgrade() if kind == "booster" else Save.any_ammo_upgrade():
 			tab.draw_dot(self, Vector2(size.x - 4.0 * s, 2.0 * s))
 
 	func _gui_input(e: InputEvent) -> void:
@@ -621,7 +652,10 @@ class AmmoButton:
 				scale = Vector2.ONE
 				if Rect2(Vector2.ZERO, size).has_point(e.position):
 					Sfx.play("click")
-					tab.open_ammo()
+					if kind == "booster":
+						tab.open_booster()
+					else:
+						tab.open_ammo()
 			accept_event()
 
 
@@ -856,3 +890,217 @@ class TalentPop:
 		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
 			accept_event()
 			queue_free()
+
+
+## Fenster „Booster“ nach dem freigegebenen Mockup „Upgrades · Booster“: alle fünf Booster mit Stufe,
+## Verbessern (Gold + Booster-Teile) und Mitnehmen (zwei passen in einen Kampf), unten rechts der Vorrat
+## an Booster-Teilen. Rahmen, Symbole und Texte kommen aus dem Export ui_mock/booster; Stufe, Segmente,
+## Knöpfe, Haken und „IM KAMPF“ zeichnet das Spiel je nach Spielstand.
+class BoosterPanel:
+	extends MockView
+	const DIALOG := Rect2(13, 80, 364, 655)
+	const CELL := Vector2(168, 185)
+	var tab: UpgradesTab
+	var _layer: Control
+	var _coin: Texture2D
+	var _parts: Texture2D
+
+	func _init() -> void:
+		super("booster")
+
+	func _ready() -> void:
+		super()
+		_fill.visible = false
+		_coin = load("res://ui/icons/gold.webp")
+		_parts = BoosterPanel.parts_icon(64)
+		_layer = Control.new()
+		_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_layer.draw.connect(_draw_layer)
+		place_at(_layer, Rect2(0, 0, W, H), true)
+		button_pressed.connect(func(b: Dictionary) -> void:
+			if str(b.get("label", "")) == "Schließen":
+				Sfx.play("click")
+				tab.close_booster()
+			elif str(b.get("href", "")) == "#zu-den-truhen":
+				Sfx.play("click")
+				tab.close_booster()
+				tab.menu.sub_tab["shop"] = "truhen"
+				tab.menu.show_tab("shop"))
+		modulate.a = 0.0
+		create_tween().tween_property(self, "modulate:a", 1.0, 0.15)
+		redraw()
+
+	## Symbol der Booster-Teile (Zahnrad mit Blitz, wie im Mockup)
+	static func parts_icon(px: int) -> Texture2D:
+		var svg := '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">' \
+			+ '<path d="M32 6l5 7 8-2 2 8 8 3-3 8 5 6-6 6 2 8-8 2-3 8-8-2-5 6-5-6-8 2-2-8-8-3 3-8-5-6 6-6-2-8 8-2 3-8 8 2z" fill="#ff9a3d" stroke="#8a3a00" stroke-width="2.5" stroke-linejoin="round"/>' \
+			+ '<circle cx="32" cy="32" r="14" fill="#ffd56a" stroke="#8a3a00" stroke-width="2.5"/><path d="M34 21l-9 13h7l-3 10 10-14h-7z" fill="#5a2ad0"/></svg>'
+		var img := Image.new()
+		if img.load_svg_from_string(svg, px / 64.0) != OK:
+			return null
+		return ImageTexture.create_from_image(img)
+
+	func redraw() -> void:
+		set_text("12", MockScreen.num(Save.booster_parts()))
+		if is_instance_valid(_layer):
+			_layer.queue_redraw()
+
+	static func cell(k: int) -> Rect2:
+		return Rect2(Vector2(23 + (k % 2) * 176, 151 + (k / 2) * 191), CELL)
+
+	static func button_rect(k: int) -> Rect2:
+		var c := cell(k)
+		return Rect2(c.position + Vector2(10, 149), Vector2(CELL.x - 20, 28))
+
+	static func toggle_rect(k: int) -> Rect2:
+		var c := cell(k)
+		return Rect2(c.position + Vector2(CELL.x - 34, 26), Vector2(28, 28))
+
+	func _box(r: Rect2, fill: Color, radius: float, shadow := Color(0, 0, 0, 0), sh_y := 0.0, border := Color(0, 0, 0, 0), bw := 0.0) -> void:
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = fill
+		sb.set_corner_radius_all(roundi(radius * s))
+		if shadow.a > 0.0:
+			sb.shadow_color = shadow
+			sb.shadow_offset = Vector2(0, sh_y * s)
+			sb.shadow_size = 0
+		if border.a > 0.0:
+			sb.border_color = border
+			sb.set_border_width_all(maxi(1, roundi(bw * s)))
+		sb.anti_aliasing = true
+		_layer.draw_style_box(sb, Rect2(r.position * s, r.size * s))
+
+	func _text(t: String, cx: float, mid_y: float, fam: String, weight: int, px: float, col: Color, align := 0.5) -> float:
+		var f := MockFonts.font(fam, weight)
+		var fs := maxi(1, roundi(px * s))
+		var w := f.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		var base := mid_y * s + (f.get_ascent(fs) - f.get_descent(fs)) * 0.5
+		_layer.draw_string(f, Vector2(cx * s - w * align, base), t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, col)
+		return w / s
+
+	func _text_w(t: String, px: float) -> float:
+		return MockFonts.font("Fredoka", 700).get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, maxi(1, roundi(px * s))).x / s
+
+	func _draw_layer() -> void:
+		var slots := Save.booster_slots()
+		for k in MetaData.BOOSTER_ORDER.size():
+			_booster(k, str(MetaData.BOOSTER_ORDER[k]), slots)
+
+	func _booster(k: int, id: String, slots: Array[String]) -> void:
+		var c := cell(k)
+		var cx := c.get_center().x
+		var open := Save.booster_unlocked(id)
+		var eq := open and slots.has(id)
+		var lvl := Save.booster_level(id)
+		var mx := MetaData.BOOSTER_MAX
+		var full := lvl >= mx
+		if eq:
+			# Goldrand und Schild „IM KAMPF“
+			_box(Rect2(c.position, c.size), Color(0, 0, 0, 0), 14, Color(0, 0, 0, 0), 0, Color("#ffd56a"), 1.5)
+			var chip := Rect2(c.position + Vector2(6, 30), Vector2(_text_w("IM KAMPF", 9.0) + 12, 14))
+			_box(chip, Color("#2f8a3a"), 8, Color(0, 0, 0, 0), 0, Color("#b6ffcf"), 1.5)
+			_text("IM KAMPF", chip.get_center().x, chip.get_center().y, "Nunito", 800, 9.0, Color.WHITE)
+		if not open:
+			# gesperrt: Symbol abgedunkelt, Knopf mit Schloss und „Ab Level N“
+			_box(Rect2(c.position + Vector2(40, 22), Vector2(88, 66)), Color(0.17, 0.13, 0.31, 0.6), 12)
+		_text("Stufe %d/%d" % [lvl, mx], cx, c.position.y + 124.0, "Fredoka", 700, 13.0, Color("#ffd56a"))
+		var seg := Vector2(20, 10)
+		var gap := 3.0
+		var x0 := cx - (mx * seg.x + (mx - 1) * gap) * 0.5
+		for i in mx:
+			var r := Rect2(Vector2(x0 + i * (seg.x + gap), c.position.y + 134.0), seg)
+			if i < lvl:
+				var col := Color("#f0b53a") if full else Color("#52e7ff")
+				var hi := Color("#ffe58a") if full else Color("#9ef4ff")
+				_box(r.grow(1.5), Color(col.r, col.g, col.b, 0.25), 4.5)
+				_box(r, col, 3)
+				_box(Rect2(r.position, Vector2(r.size.x, r.size.y * 0.5)), hi, 3)
+			else:
+				_box(r, Color("#514266"), 3)
+		var b := button_rect(k)
+		if not open:
+			_box(b, Color(0.08, 0.05, 0.19, 0.7), 14, Color(0, 0, 0, 0), 0, Color("#6c5298"), 1.5)
+			_text("Ab Level %d" % (int(MetaData.BOOSTERS[id]["unlock"]) + 1), cx, b.get_center().y + 0.5, "Fredoka", 700, 14.0, Color("#ddd6f3"))
+			return
+		# Mitnehmen: grüner Haken (dabei) oder gestrichelter Kreis mit „+“
+		var t := toggle_rect(k)
+		if eq:
+			_box(t, Color("#4bc62d"), 14, Color("#23802a"), 2, Color("#eaffd8"), 2)
+			var cc := t.get_center() * s
+			var q := s
+			_layer.draw_polyline(PackedVector2Array([cc + Vector2(-5.5, 0.5) * q, cc + Vector2(-1.5, 4.5) * q, cc + Vector2(6, -4) * q]), Color("#14320e"), 3.0 * s, true)
+		else:
+			_box(t, Color(0.08, 0.05, 0.19, 0.7), 14, Color(0, 0, 0, 0), 0, Color("#9b86d0"), 2)
+			_text("+", t.get_center().x, t.get_center().y, "Fredoka", 700, 18.0, Color("#d9d0ff"))
+		if full:
+			var mb := Rect2(c.position + Vector2(26, 149), Vector2(CELL.x - 52, 28))
+			_box(mb, Color("#d99b31"), 14, Color("#8a5a10"), 3)
+			_box(Rect2(mb.position, Vector2(mb.size.x, mb.size.y * 0.55)), Color("#ffe58a"), 14)
+			_text("MAX", cx, mb.get_center().y + 0.5, "Fredoka", 700, 16.0, Color("#613a0a"))
+			return
+		var gold := MetaData.booster_cost(lvl)
+		var parts := MetaData.booster_parts_cost(lvl)
+		var ok_g := Save.gold() >= gold
+		var ok_p := Save.booster_parts() >= parts
+		var can := ok_g and ok_p
+		if can:
+			_box(b, Color("#4bc62d"), 14, Color("#23802a"), 3)
+			_box(Rect2(b.position, Vector2(b.size.x, b.size.y * 0.55)), Color("#8fe85c"), 14)
+		else:
+			_box(b, Color("#514d68"), 14, Color("#2e2b40"), 3)
+			_box(Rect2(b.position, Vector2(b.size.x, b.size.y * 0.55)), Color("#6a6684"), 14)
+		var g_txt := MockScreen.num(gold)
+		var p_txt := str(parts)
+		var w := 17.0 + 3.0 + _text_w(g_txt, 15.0) + 8.0 + 17.0 + 3.0 + _text_w(p_txt, 15.0)
+		var x := cx - w * 0.5
+		var cy := b.get_center().y
+		var dark := Color("#14320e")
+		var grey := Color("#e8e4f4")
+		var red := Color("#ff8a8a")
+		if _coin:
+			_layer.draw_texture_rect(_coin, Rect2(Vector2(x, cy - 8.5) * s, Vector2(17, 17) * s), false, Color(1, 1, 1, 1.0 if can else 0.8))
+		x += 20.0
+		x += _text(g_txt, x, cy + 0.5, "Fredoka", 700, 15.0, dark if can else (grey if ok_g else red), 0.0) + 8.0
+		if _parts:
+			_layer.draw_texture_rect(_parts, Rect2(Vector2(x, cy - 8.5) * s, Vector2(17, 17) * s), false, Color(1, 1, 1, 1.0 if can else 0.8))
+		x += 20.0
+		_text(p_txt, x, cy + 0.5, "Fredoka", 700, 15.0, dark if can else (grey if ok_p else red), 0.0)
+
+	func _gui_input(e: InputEvent) -> void:
+		if not (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT):
+			return
+		accept_event()
+		var p: Vector2 = (e.position - off) / s
+		if not DIALOG.has_point(p):
+			Sfx.play("click")
+			tab.close_booster()
+			return
+		for k in MetaData.BOOSTER_ORDER.size():
+			var id := str(MetaData.BOOSTER_ORDER[k])
+			if not Save.booster_unlocked(id):
+				if button_rect(k).grow(6.0).has_point(p):
+					Sfx.play("click")
+					tab.menu.toast("%s gibt es ab Level %d" % [MetaData.BOOSTERS[id]["title"], int(MetaData.BOOSTERS[id]["unlock"]) + 1])
+				continue
+			if toggle_rect(k).grow(8.0).has_point(p):
+				Sfx.play("click")
+				var msg := Save.toggle_booster(id)
+				if msg != "":
+					tab.menu.toast(msg)
+				tab.refresh()
+				return
+			if button_rect(k).grow(6.0).has_point(p):
+				var lvl := Save.booster_level(id)
+				if lvl >= MetaData.BOOSTER_MAX:
+					return
+				if Save.upgrade_booster(id):
+					Sfx.play("levelup")
+					tab.menu.toast("%s: Stufe %d" % [MetaData.BOOSTERS[id]["title"], Save.booster_level(id)])
+				else:
+					Sfx.play("click")
+					if Save.gold() < MetaData.booster_cost(lvl):
+						tab.menu.toast("Nicht genug Gold.")
+					else:
+						tab.menu.toast("Dir fehlen %d Booster-Teile. Es gibt sie in den Booster-Truhen im Shop." % (MetaData.booster_parts_cost(lvl) - Save.booster_parts()))
+				tab.refresh()
+				return

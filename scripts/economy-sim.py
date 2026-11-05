@@ -17,11 +17,16 @@ GOLD_PER_KILL = 2
 GOLD_WIN_PER_LEVEL = 80
 GOLD_WIN_BASE = 800
 GOLD_LOSS = 400
-CARDS_WIN = lambda L: int(5 + 0.55 * L)   # je Held im Kampf
-CARDS_LOSS = lambda L: int(5 + 0.55 * L) // 2
+CARDS_FACTOR = lambda L: 0.5 if L > 50 else (0.8 if L > 20 else 1.0)   # seit 05.11.2026
+CARDS_WIN = lambda L: int((5 + 0.55 * L) * CARDS_FACTOR(L))   # je Held im Kampf
+CARDS_LOSS = lambda L: CARDS_WIN(L) // 2
 BUILDING_CARDS_PER_DAY = 10          # je Teamheld: frühere Quartiere je Held (nur noch für --alt)
-HERO_CARDS = lambda h: 4 + 4 * h     # für Stufe h -> h+1
-HERO_GOLD = lambda h: 60 * h
+def HERO_MULT(h):                     # Kostenfaktor je Heldenstufe (MetaData.hero_cost_mult)
+    if h <= 8: return 1.0
+    if h <= 20: return min(2.5, 1.0 + 0.75 * (h - 8))
+    return 2.5 + 0.15 * (h - 20)
+HERO_CARDS = lambda h: int(round((4 + 4 * h) * HERO_MULT(h)))   # für Stufe h -> h+1
+HERO_GOLD = lambda h: int(round(60 * h * HERO_MULT(h) / 10.0)) * 10
 HERO_MAX = 30
 TECH = [100, 200, 350, 550, 800, 1100, 1500, 2000, 2600, 3300]
 AMMO = {"rate": (10, 80), "cap": (10, 60), "start": (10, 50), "lever": (5, 150), "count": (3, 500), "gate": (2, 1200)}

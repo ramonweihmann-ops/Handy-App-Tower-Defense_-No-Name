@@ -247,8 +247,21 @@ def summarize(V, prof, seeds):
     return {k: med(v) for k, v in days.items()}, world
 
 
+def _cost_mult(h):          # MetaData.hero_cost_mult (seit 05.11.2026): gleichmäßig, nicht exponentiell
+    if h <= 8: return 1.0
+    if h <= 20: return min(2.5, 1.0 + 0.75 * (h - 8))
+    return 2.5 + 0.15 * (h - 20)
+
+
 VARIANTEN = {
     "ist": {},
+    # Schritt 1 (freigegeben 05.11.2026, Version 0.9.3): Level 1–50 binden, ab 51 Geldphase
+    "schritt1": dict(
+        cards_needed=lambda h: round((4 + 4 * h) * _cost_mult(h)),
+        gold_needed=lambda h: round(60 * h * _cost_mult(h) / 10) * 10,
+        win_cards=lambda L: int((5 + 0.55 * L) * (0.5 if L > 50 else 0.8 if L > 20 else 1.0)),
+        chest_cards=lambda L: 6 * max(5, L), chest_team=True, videos=5,
+        hq_cap=lambda q: 2 * max(1, q) + 10, slope_neg=SLOPE * 1.5),
 }
 
 

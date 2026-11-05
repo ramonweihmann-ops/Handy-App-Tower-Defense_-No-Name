@@ -115,6 +115,46 @@ func _run() -> bool:
 			print("SMOKE aufstellung ändern: '", save.toggle_squad("iska"), "' jetzt ", save.squad())
 			print("SMOKE boni: ", save.battle_bonus())
 			print("SMOKE booster: ", save.booster_slots(), " aufwerten ", save.upgrade_booster("medipack"), " tauschen '", save.toggle_booster("zeitlupe"), "'")
+			# Booster-Teile: ohne Teile kein Ausbau, mit Teilen geht es
+			save.data["gold"] = 5000
+			var b_lvl: int = save.booster_level("luftangriff")
+			save.data["booster_parts"] = 0
+			var ohne := save.can_upgrade_booster("luftangriff")
+			save.add_booster_parts(MetaData.booster_parts_cost(b_lvl))
+			var mit := save.upgrade_booster("luftangriff")
+			print("SMOKE booster-teile: ohne ", ohne, " mit ", mit, " teile übrig ", save.booster_parts())
+			if ohne or not mit or save.booster_parts() != 0:
+				print("SMOKE FEHLER: Booster-Teile werden nicht richtig verlangt")
+			m.sub_tab["upgrades"] = "booster"
+			m.show_tab("upgrades")
+			m.sub_tab["upgrades"] = "tech"
+			# Kommandozentrale begrenzt die Heldenstufe (2 × Stufe + 10)
+			var hq: int = save.base_level("01")
+			save.data["heroes"]["dusty"]["level"] = save.hero_cap()
+			save.add_hero_cards("dusty", 99999)
+			save.data["gold"] = 999999
+			var gesperrt := not save.can_level_hero("dusty") and save.hq_needed("dusty") == hq + 1
+			save.base()["01"]["level"] = hq + 1
+			var frei := save.can_level_hero("dusty") and save.hq_needed("dusty") == 0
+			print("SMOKE heldenstufe begrenzt: zentrale ", hq, " grenze ", MetaData.hero_cap(hq), " gesperrt ", gesperrt, " nach ausbau frei ", frei)
+			if not gesperrt or not frei:
+				print("SMOKE FEHLER: Kommandozentrale begrenzt die Heldenstufe nicht")
+			save.base()["01"]["level"] = hq
+			save.data["heroes"]["dusty"]["level"] = 1
+			# Heldentruhe: Karten nur für Helden der Aufstellung
+			var got: Dictionary = save.add_squad_cards(30)
+			var fremd := got.keys().filter(func(h: String) -> bool: return not save.squad().has(h))
+			print("SMOKE heldentruhe: ", got, " nur aufstellung ", fremd.is_empty())
+			if not fremd.is_empty():
+				print("SMOKE FEHLER: Heldentruhe gibt Karten außerhalb der Aufstellung")
+			# Werbevideo: höchstens 5× am Tag
+			var vids := 0
+			while save.use_video() and vids < 10:
+				vids += 1
+			print("SMOKE videos am tag: ", vids, " übrig ", save.videos_left())
+			if vids != MetaData.VIDEO_DOUBLE_PER_DAY:
+				print("SMOKE FEHLER: Werbevideos nicht auf 5 am Tag begrenzt")
+			save.data["video_used"] = 0
 		3:
 			# Reiter aus den Mockups liegen nicht in _content, sondern als eigener Bildschirm darüber
 			var page: Control = m._content.get_child(m._content.get_child_count() - 1) if m._content.get_child_count() > 0 else m._mock

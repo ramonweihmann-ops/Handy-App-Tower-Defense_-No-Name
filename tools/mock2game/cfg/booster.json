@@ -1,0 +1,5 @@
+{"board": "Upgrades-Booster-Neu.dc.html", "out": "out/booster",
+ "states": [{"name": "main", "eval": "document.querySelectorAll('#dc-root div[role=\"group\"]').forEach(g => { if ((g.getAttribute('aria-label') || '').startsWith('Booster-Teile')) return; g.style.borderColor = '#6c5298'; g.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.08)'; [...g.children].forEach(c => { const t = c.textContent.trim(); if (t.startsWith('Stufe ') || t === 'IM KAMPF') c.remove(); else if (c.tagName === 'DIV' && c.getAttribute('aria-hidden') === 'true') c.remove(); else if (c.tagName === 'A' || (c.tagName === 'DIV' && (c.getAttribute('aria-label') || '').length > 0)) c.remove(); else if (c.tagName === 'IMG' || c.tagName === 'svg') { c.style.opacity = '1'; c.style.filter = 'drop-shadow(0 3px 3px rgba(0,0,0,0.4))'; } }); });"}],
+ "only": ["#dc-root > div > div[style*=\"top: 66px\"]", "#dc-root > div > div[role=\"dialog\"]", "#dc-root > div > div[style*=\"top: 88px\"]",
+   "#dc-root > div > div[style*=\"top: 124px\"]", "#dc-root > div > a[aria-label=\"Schließen\"]", "#dc-root > div > div[role=\"group\"]"],
+ "live": []}
