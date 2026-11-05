@@ -1,11 +1,13 @@
 // Mockup -> Spiel: zerlegt einen Mockup-Bildschirm in Hintergrund, Knöpfe und Texte.
 // node export.js <config.json>
-// Config: {board, out, states:[{name, set:{...}, eval|eval_file}], overlays:[{name, base, set, only_live}], live:[{sel, id, img, pad}], scale, only, lossy_alpha}
+// Config: {board, out, h (Höhe, Standard 844), states:[{name, set:{...}, eval|eval_file}], overlays:[{name, base, set, only_live}], live:[{sel, id, img, pad}], scale, only, lossy_alpha}
 //  - overlays mit only_live: nur die Live-Bilder des Popups (z. B. das Symbol je Held und Fähigkeit)
 //  - live: Elemente, die das Spiel selbst darstellt (z. B. 3D-Helden); sie fehlen im Hintergrund,
 //    ihr Rechteck steht in der JSON-Datei.
 const fs = require('fs'); const path = require('path');
 const { open } = require('./shoot.js');
+// Höhe des Mockups (lange Seiten zum Scrollen: "h" in der Konfiguration)
+let BH = 844;
 
 const PREP = `(() => {
   // 1) Texte in Spans packen, damit sie messbar und ausblendbar sind
@@ -101,7 +103,7 @@ async function shootLive(p, data, pre) {
       // Kinder des Elements (z. B. Pfade eines SVG in einem Popup) nicht einzeln verstecken, Knöpfe schon
       el.querySelectorAll('*').forEach(c => { if (!c.hasAttribute('data-m2g-btn')) c.style.removeProperty('visibility'); }); }, l.id);
     const [x, y, w, h] = l.rect; const pad = l.pad || 8;  // pad: Rand für Leuchten/Schatten (Konfiguration)
-    const clip = { x: Math.max(0, x - pad), y: Math.max(0, y - pad), width: Math.min(390, x + w + pad) - Math.max(0, x - pad), height: Math.min(844, y + h + pad) - Math.max(0, y - pad) };
+    const clip = { x: Math.max(0, x - pad), y: Math.max(0, y - pad), width: Math.min(390, x + w + pad) - Math.max(0, x - pad), height: Math.min(BH, y + h + pad) - Math.max(0, y - pad) };
     l.img_rect = [clip.x, clip.y, clip.width, clip.height];
     await p.screenshot({ path: `${pre}_live_${l.id}.png`, clip, omitBackground: true });
     await p.evaluate((id) => { document.querySelector('[data-m2g-live="' + id + '"]').style.removeProperty('visibility'); }, l.id);
@@ -115,10 +117,11 @@ async function shootLive(p, data, pre) {
   // eval_file: JavaScript aus einer Datei neben der Konfiguration (statt eval als Zeichenkette)
   for (const st of [...(cfg.states || []), ...(cfg.overlays || [])]) if (st.eval_file) st.eval = fs.readFileSync(path.join(path.dirname(process.argv[2]), st.eval_file), 'utf8');
   const scale = cfg.scale || 3;
+  BH = cfg.h || 844;
   fs.mkdirSync(cfg.out, { recursive: true });
-  const result = { board: cfg.board, size: [390, 844], scale, states: {}, transparent: !!cfg.only, lossy_alpha: !!cfg.lossy_alpha };
+  const result = { board: cfg.board, size: [390, BH], scale, states: {}, transparent: !!cfg.only, lossy_alpha: !!cfg.lossy_alpha };
   for (const st of cfg.states || [{ name: 'main' }]) {
-    const { b, p } = await open(cfg.board, scale);
+    const { b, p } = await open(cfg.board, scale, BH);
     if (st.set) { await p.evaluate((o) => window.__dcComp.setState(o), st.set); await p.waitForTimeout(200); }
     if (st.eval) { if (helper) await p.evaluate(helper); await p.evaluate(st.eval); await p.evaluate(() => document.fonts.ready); await p.waitForTimeout(300); }
     await p.evaluate(PREP);
@@ -139,7 +142,7 @@ async function shootLive(p, data, pre) {
       const pad = 12; const [x, y, w, h] = await p.evaluate((i) => { const el = document.querySelector('[data-m2g-btn="' + i + '"]'); let r = el.getBoundingClientRect(); let a = [r.left, r.top, r.right, r.bottom];
         el.querySelectorAll('*').forEach(c => { const q = c.getBoundingClientRect(); if (q.width > 0 && q.height > 0) a = [Math.min(a[0], q.left), Math.min(a[1], q.top), Math.max(a[2], q.right), Math.max(a[3], q.bottom)]; });
         return [a[0], a[1], a[2] - a[0], a[3] - a[1]]; }, btn.i);
-      const clip = { x: Math.max(0, x - pad), y: Math.max(0, y - pad), width: Math.min(390, x + w + pad) - Math.max(0, x - pad), height: Math.min(844, y + h + pad) - Math.max(0, y - pad) };
+      const clip = { x: Math.max(0, x - pad), y: Math.max(0, y - pad), width: Math.min(390, x + w + pad) - Math.max(0, x - pad), height: Math.min(BH, y + h + pad) - Math.max(0, y - pad) };
       if (clip.width < 1 || clip.height < 1) continue;
       btn.img_rect = [clip.x, clip.y, clip.width, clip.height];
       await p.screenshot({ path: `${pre}_btn${btn.i}.png`, clip, omitBackground: true });
@@ -152,7 +155,7 @@ async function shootLive(p, data, pre) {
   // Popups: nur die Elemente, die gegenüber dem Grundzustand neu sind
   result.overlays = {};
   for (const ov of cfg.overlays || []) {
-    const { b, p } = await open(cfg.board, scale);
+    const { b, p } = await open(cfg.board, scale, BH);
     if (ov.base) await p.evaluate((o) => window.__dcComp.setState(o), ov.base);
     const base = await p.evaluate(SIGS);
     await p.evaluate((o) => window.__dcComp.setState(o), ov.set || {});
@@ -175,7 +178,7 @@ async function shootLive(p, data, pre) {
     const box = await p.evaluate(() => { let a = null; document.querySelectorAll('[data-m2g-ov], [data-m2g-ov] *').forEach(e => { const q = e.getBoundingClientRect(); if (q.width < 0.5 || q.height < 0.5) return; const cs = getComputedStyle(e);
       const shadow = parseFloat((cs.boxShadow.match(/(\d+)px\)?\s*$/) || [0, 0])[1]) || 0; const g = Math.min(40, 6 + (cs.boxShadow !== 'none' ? 24 : 0));
       const r = [q.left - g, q.top - g, q.right + g, q.bottom + g]; a = a ? [Math.min(a[0], r[0]), Math.min(a[1], r[1]), Math.max(a[2], r[2]), Math.max(a[3], r[3])] : r; });
-      if (!a) return [0, 0, 1, 1]; a = [Math.max(0, a[0]), Math.max(0, a[1]), Math.min(390, a[2]), Math.min(844, a[3])]; return [a[0], a[1], a[2] - a[0], a[3] - a[1]]; });
+      if (!a) return [0, 0, 1, 1]; a = [Math.max(0, a[0]), Math.max(0, a[1]), Math.min(390, a[2]), Math.min(BH, a[3])]; return [a[0], a[1], a[2] - a[0], a[3] - a[1]]; });
     const pre = path.join(cfg.out, 'ov_' + ov.name);
     await p.screenshot({ path: pre + '_bg.png', clip: { x: box[0], y: box[1], width: box[2], height: box[3] }, omitBackground: true });
     data.rect = box;
@@ -184,7 +187,7 @@ async function shootLive(p, data, pre) {
       await p.evaluate((i) => { document.querySelectorAll('[data-m2g-ov]').forEach(e => e.style.setProperty('visibility', 'hidden', 'important')); document.querySelectorAll('[data-m2g-btn]').forEach(e => e.style.setProperty('visibility', e.getAttribute('data-m2g-btn') == i ? 'visible' : 'hidden', 'important')); }, btn.i);
       const [x, y, w, h] = await p.evaluate((i) => { const el = document.querySelector('[data-m2g-btn="' + i + '"]'); let r = el.getBoundingClientRect(); let a = [r.left, r.top, r.right, r.bottom];
         el.querySelectorAll('*').forEach(c => { const q = c.getBoundingClientRect(); if (q.width > 0 && q.height > 0) a = [Math.min(a[0], q.left), Math.min(a[1], q.top), Math.max(a[2], q.right), Math.max(a[3], q.bottom)]; }); return [a[0], a[1], a[2] - a[0], a[3] - a[1]]; }, btn.i);
-      const pad = 12; const clip = { x: Math.max(0, x - pad), y: Math.max(0, y - pad), width: Math.min(390, x + w + pad) - Math.max(0, x - pad), height: Math.min(844, y + h + pad) - Math.max(0, y - pad) };
+      const pad = 12; const clip = { x: Math.max(0, x - pad), y: Math.max(0, y - pad), width: Math.min(390, x + w + pad) - Math.max(0, x - pad), height: Math.min(BH, y + h + pad) - Math.max(0, y - pad) };
       if (clip.width < 1 || clip.height < 1) continue;
       btn.img_rect = [clip.x, clip.y, clip.width, clip.height];
       await p.screenshot({ path: `${pre}_btn${btn.i}.png`, clip, omitBackground: true });

@@ -206,11 +206,35 @@ static func win_cards(level: int) -> int:
 static func chest_cards(max_level: int) -> int:
 	return 10 + int(1.5 * max_level)
 const SHOP_ENERGY_COST := 20
+## Edelstein-Shop (Echtgeld, kommt mit dem Play Store; beim ersten Kauf jedes Pakets doppelt)
 const GEM_PACKS := [
-	{"gems": 80, "price": "1,99 €"},
-	{"gems": 500, "price": "9,99 €"},
-	{"gems": 1200, "price": "19,99 €"},
+	{"gems": 100, "price": "0,99 €"},
+	{"gems": 320, "price": "2,99 €"},
+	{"gems": 550, "price": "4,99 €"},
+	{"gems": 1200, "price": "9,99 €"},
+	{"gems": 2600, "price": "19,99 €"},
+	{"gems": 5500, "price": "39,99 €"},
 ]
+## Gold-Shop: zwei Gratis-Pakete am Tag, dann Gold gegen Edelsteine
+const GOLD_PACKS := [
+	{"gold": 200, "daily": "shop_free_date"},
+	{"gold": 500, "daily": "shop_gold_date"},
+	{"gold": 1000, "gems": 60},
+	{"gold": 5000, "gems": 250},
+	{"gold": 15000, "gems": 650},
+	{"gold": 40000, "gems": 1500},
+]
+## Tägliche Angebote im Shop: Heldenkarten für drei zufällige eigene Helden, jeden Tag neu
+const DAILY_OFFERS := [
+	{"cards": 5, "gems": 0},
+	{"cards": 20, "gems": 40},
+	{"cards": 60, "gems": 120},
+]
+
+
+## Gratis-Truhe im Shop (1× am Tag): bis zu so viele Heldenkarten, mehr mit jedem Level
+static func free_chest_max(max_level: int) -> int:
+	return 10 + int(max_level / 2.0)
 
 ## Tägliche Belohnung: Gewinne je Tag im 7-Tage-Kalender (Mockup „Tägliche Belohnung“).
 ## Abgestimmt auf die Wirtschaft (scripts/economy-sim.py): eine volle Woche bringt so viel Gold

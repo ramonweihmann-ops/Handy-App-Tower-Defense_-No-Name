@@ -30,6 +30,8 @@ var _hidden := {}      # Text-Nummer -> true
 var _live := {}        # Live-Kennung -> Rect2 (Mockup-Punkte)
 var _placed := {}      # Live-Kennung -> Control
 var _live_info := {}   # Live-Kennung -> Daten aus dem Export (Bild, Drehung)
+## Höhe des Mockups in Punkten: 844, bei langen Seiten zum Scrollen mehr (layout.json „size“)
+var page_h := H
 
 static var _layouts := {}
 
@@ -90,6 +92,8 @@ func show_state(state_name: String) -> void:
 		data = lay.get("overlays", {}).get(overlay, {})
 	else:
 		data = lay.get("states", {}).get(state_name, {})
+	if overlay == "":
+		page_h = float((lay.get("size", [W, H]) as Array)[1])
 	var dir := "res://ui_mock/%s/" % screen
 	var tex: Texture2D = load(dir + str(data.get("bg", ""))) if str(data.get("bg", "")) != "" else null
 	if tex:
@@ -97,6 +101,7 @@ func show_state(state_name: String) -> void:
 	_bg.texture = tex
 	_bg_rows.texture = tex
 	_bg_rows.rows = data.get("bg_rows", [])
+	_bg_rows.page_h = page_h
 	_bg_rows.visible = not _bg_rows.rows.is_empty()
 	_bg.visible = not _bg_rows.visible
 	if overlay == "":
@@ -132,15 +137,15 @@ func show_state(state_name: String) -> void:
 func _layout() -> void:
 	if size.x <= 0.0 or size.y <= 0.0:
 		return
-	s = minf(size.x / W, size.y / H)
-	off = Vector2((size.x - W * s) * 0.5, (size.y - H * s) * 0.5)
+	s = minf(size.x / W, size.y / page_h)
+	off = Vector2((size.x - W * s) * 0.5, (size.y - page_h * s) * 0.5)
 	if overlay != "" and data.has("rect"):
 		var br: Array = data["rect"]
 		_bg.position = to_screen(Vector2(br[0], br[1]))
 		_bg.size = Vector2(br[2], br[3]) * s
 	else:
 		_bg.position = off
-		_bg.size = Vector2(W, H) * s
+		_bg.size = Vector2(W, page_h) * s
 	_fill.inner = Rect2(_bg.position, _bg.size)
 	_fill.queue_redraw()
 	_bg_rows.position = _bg.position
@@ -435,13 +440,14 @@ class RowBands:
 	extends Control
 	var texture: Texture2D
 	var rows: Array = []
+	var page_h := H
 
 	func _draw() -> void:
 		if texture == null or size.x <= 0.0:
 			return
 		var ts := texture.get_size()
 		var k := ts.x / W   # Bildpunkte je Mockup-Punkt (die Breite bleibt beim Verkleinern gleich)
-		var sc := size.y / H
+		var sc := size.y / page_h
 		for r in rows:
 			var y0 := float(r[0])
 			var y1 := float(r[1])

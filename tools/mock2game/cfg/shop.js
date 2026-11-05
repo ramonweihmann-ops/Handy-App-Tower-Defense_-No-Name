@@ -120,6 +120,13 @@ window.m2g = (() => {
       const talent = Array.from(area().children).find(d => d.style.top === '624px');
       talent.setAttribute('data-on', 'talent');
     },
+    // Nur der Rahmen (Kopfleiste, Reiter, Menü): den Inhalt zeichnet das Spiel aus den langen
+    // Seiten Shop-<Reiter>-Neu.dc.html darüber und lässt ihn scrollen (cfg/shop_seiten.js)
+    frame(name) {
+      this.clean();
+      area().innerHTML = '';
+      tabs(name);
+    },
     page(name) {
       this.clean();
       const I = icons();

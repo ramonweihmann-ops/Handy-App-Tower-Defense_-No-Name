@@ -48,6 +48,9 @@ func default_data() -> Dictionary:
 		"daily_streak": 0,
 		"wheel_date": "",
 		"shop_free_date": "",
+		"shop_gold_date": "",
+		"shop_chest_date": "",
+		"shop_daily": {},
 		# Geführter Einstieg (scripts/ui/tutorial.gd): erledigte Schritte; leer = startet von vorn
 		"tut": {},
 		"unlocked": [],
@@ -218,6 +221,60 @@ func spend(type: String, amount: int) -> bool:
 	data[type] = int(data[type]) - amount
 	save_game()
 	return true
+
+
+# --- Shop ---------------------------------------------------------------------
+
+## Tägliche Angebote: drei eigene Helden, jeden Tag neu gewürfelt (Mockup „Shop · Angebote“)
+func shop_daily() -> Dictionary:
+	var d = data.get("shop_daily", {})
+	if not d is Dictionary or str(d.get("date", "")) != today():
+		d = {"date": today(), "heroes": _daily_heroes(3), "bought": [false, false, false], "mixed": false}
+		data["shop_daily"] = d
+		save_game()
+	return d
+
+
+func _daily_heroes(n: int) -> Array:
+	var ids: Array = unlocked_heroes()
+	ids.shuffle()
+	var out := []
+	for k in n:
+		out.append(ids[k % ids.size()])
+	return out
+
+
+## Einmal am Tag „Neu mischen“: noch nicht gekaufte Angebote bekommen neue Helden
+func shop_daily_mix() -> bool:
+	var d := shop_daily()
+	if bool(d.get("mixed", false)):
+		return false
+	var fresh := _daily_heroes(3)
+	for k in 3:
+		if not bool(d["bought"][k]):
+			d["heroes"][k] = fresh[k]
+	d["mixed"] = true
+	save_game()
+	return true
+
+
+## Ein Tagesangebot kaufen (das erste ist gratis): {} wenn es nicht geht
+func shop_daily_buy(k: int) -> Dictionary:
+	var d := shop_daily()
+	var offer: Dictionary = MetaData.DAILY_OFFERS[k]
+	if bool(d["bought"][k]) or not spend("gems", int(offer.get("gems", 0))):
+		return {}
+	var id := str(d["heroes"][k])
+	add_hero_cards(id, int(offer["cards"]))
+	d["bought"][k] = true
+	save_game()
+	return {"hero": id, "amount": int(offer["cards"])}
+
+
+## Wartet im Shop etwas Kostenloses? (roter Punkt am Reiter)
+func shop_free_ready() -> bool:
+	return daily_ready("shop_free_date") or daily_ready("shop_gold_date") or daily_ready("shop_chest_date") \
+		or not bool(shop_daily()["bought"][0])
 
 
 # --- Energie ----------------------------------------------------------------

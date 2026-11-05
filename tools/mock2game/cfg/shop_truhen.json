@@ -1,0 +1,15 @@
+{
+ "board": "Shop-Truhen-Neu.dc.html",
+ "out": "out/shop_truhen",
+ "h": 946,
+ "lossy_alpha": true,
+ "states": [
+  {
+   "name": "main"
+  }
+ ],
+ "only": [
+  "#dc-root > div > div[style*=\"top: 64px;\"]"
+ ],
+ "live": []
+}

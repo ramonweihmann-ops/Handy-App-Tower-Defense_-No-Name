@@ -4,8 +4,8 @@ const {chromium}=require('playwright');const fs=require('fs');const path=require
 const P=(process.env.MOCKUP_DIR||'')+'/';
 const M=__dirname+'/';
 const FONTS=path.join(__dirname,'../../game/fonts')+'/';
-module.exports.open=async function(board,scale){
-  const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:844},deviceScaleFactor:scale||1});
+module.exports.open=async function(board,scale,h){
+  const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:h||844},deviceScaleFactor:scale||1});
   await p.route('**/*',r=>{const u=new URL(r.request().url());
     if(u.pathname.startsWith('/_blob/')){const id=u.pathname.split('/').pop();const f=fs.readdirSync(P).find(x=>x.startsWith(id));return f?r.fulfill({body:fs.readFileSync(P+f),contentType:f.endsWith('webp')?'image/webp':'image/png'}):r.fulfill({status:404,body:''});}
     if(u.pathname.endsWith('support.js'))return r.fulfill({body:fs.readFileSync(M+'dcrt.js'),contentType:'text/javascript'});

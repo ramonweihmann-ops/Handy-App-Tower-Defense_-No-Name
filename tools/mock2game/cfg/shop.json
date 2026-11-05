@@ -1,10 +1,24 @@
-{"board": "Main-c4lv.dc.html", "out": "out/shop", "script": "shop.js",
+{
+ "board": "Main-c4lv.dc.html",
+ "out": "out/shop",
+ "script": "shop.js",
  "states": [
-  {"name": "angebote", "eval": "m2g.offers()"},
-  {"name": "truhen", "eval": "m2g.page('truhen')"},
-  {"name": "aufladen", "eval": "m2g.page('aufladen')"},
-  {"name": "event", "eval": "m2g.page('event')"}
+  {
+   "name": "angebote",
+   "eval": "m2g.frame('angebote')"
+  },
+  {
+   "name": "truhen",
+   "eval": "m2g.frame('truhen')"
+  },
+  {
+   "name": "aufladen",
+   "eval": "m2g.frame('aufladen')"
+  },
+  {
+   "name": "event",
+   "eval": "m2g.page('event')"
+  }
  ],
- "live": [
-  {"sel": "div[style*=\"left: 30px; top: 4px; width: 100px; height: 108px\"]", "id": "chest", "img": true}
- ]}
+ "live": []
+}

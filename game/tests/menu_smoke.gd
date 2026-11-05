@@ -214,6 +214,35 @@ func _run() -> bool:
 			if is_instance_valid(m._success):
 				m._success.queue_free()
 			m.close_board(board)
+			# Shop: lange Seiten mit Scrollen, Gold-Shop, Tagesangebot, Gratis-Truhe
+			m.show_tab("shop")
+			var shop = m._mock
+			shop.show_page("aufladen")
+			var g0: int = save.gold()
+			shop._buy_gold(0)
+			var free_ok: bool = save.gold() == g0 + 200 and not save.daily_ready("shop_free_date")
+			var gems0: int = save.gems()
+			var gold1: int = save.gold()
+			shop._buy_gold(2)
+			var paid_ok: bool = save.gems() == gems0 - 60 and save.gold() == gold1 + 1000
+			shop._set_scroll(99999.0)
+			var scroll_ok: bool = shop._scroll > 100.0 and shop._scroll == shop._max_scroll()
+			shop.show_page("angebote")
+			var daily: Dictionary = save.shop_daily()
+			var hero := str(daily["heroes"][0])
+			var c0: int = save.hero_cards(hero)
+			shop._buy_daily(0)
+			var daily_ok: bool = save.hero_cards(hero) == c0 + 5 and bool(save.shop_daily()["bought"][0])
+			shop.show_page("truhen")
+			shop._free_chest()
+			var chest_ok: bool = not save.daily_ready("shop_chest_date")
+			print("SMOKE shop: gratis-gold ", free_ok, " gold für edelsteine ", paid_ok, " scrollen ", scroll_ok,
+				" tagesangebot ", daily_ok, " gratis-truhe ", chest_ok, " seite ", shop._page_view != null)
+			if not (free_ok and paid_ok and scroll_ok and daily_ok and chest_ok):
+				print("SMOKE FEHLER: Shop")
+			m._success_queue.clear()
+			if is_instance_valid(m._success):
+				m._success.queue_free()
 		10:
 			m._close_modal()
 			main.start_level(1, false)

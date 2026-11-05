@@ -211,6 +211,8 @@ func _parse_args() -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg == "--autotest":
 			_autotest = true
+		elif arg.begins_with("--shop-scroll="):
+			load("res://scripts/ui/screens/tab_shop.gd").debug_scroll = float(arg.get_slice("=", 1))
 		elif arg == "--tut":
 			_tut_shot = true
 		elif arg.begins_with("--tutshot="):

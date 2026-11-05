@@ -260,7 +260,7 @@ func _refresh_top() -> void:
 ## Rote Punkte an den Reitern unten: Dort wartet etwas (aufwerten, abholen, ziehen).
 func _update_badges() -> void:
 	var want := {
-		"shop": Save.daily_ready("shop_free_date"),
+		"shop": Save.shop_free_ready(),
 		"sammlung": Save.any_hero_ready() or Save.any_booster_upgrade(),
 		"kampf": not Save.pass_claimable().is_empty() or _mission_ready() or Save.daily_ready("daily_date") or Save.daily_ready("wheel_date"),
 		"upgrades": Save.can_buy_tech() or Save.any_ammo_upgrade() or Save.can_draw_talent(),

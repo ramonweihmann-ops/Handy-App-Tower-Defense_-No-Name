@@ -61,7 +61,7 @@ func refresh_top() -> void:
 	if top_texts.has("level"):
 		set_text(top_texts["level"], str(Save.max_level()))
 	var want := {
-		"#shop": Save.daily_ready("shop_free_date"),
+		"#shop": Save.shop_free_ready(),
 		"#helden": Save.any_hero_ready() or Save.any_booster_upgrade(),
 		"#upgrades": Save.can_buy_tech() or Save.any_ammo_upgrade() or Save.can_draw_talent(),
 		"#basis": Save.any_building_ready(),
