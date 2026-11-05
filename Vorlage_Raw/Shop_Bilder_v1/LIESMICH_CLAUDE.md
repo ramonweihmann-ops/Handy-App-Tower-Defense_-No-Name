@@ -1,5 +1,9 @@
 # Acht fehlende Shop-Symbole
 
+## Freigegebene Anpassung vom 5. November 2026
+
+`icon_werbefrei.png` enthält die bestätigte, etwas ernsthaftere Variante: schlankerer Rahmen mit klaren gefasten Kanten, kompakte Bedienelemente und zurückhaltender Glanz. Violettblauer Bildschirm, Abspiel-Dreieck und rotes Verbotszeichen bleiben erhalten. Die Übersicht zeigt bereits diese neue Fassung. Die übrigen sieben Symbole bleiben in ihrer freigegebenen Form. Die zusätzliche Bildanweisung steht unter „Korrektur“ in `BILDANWEISUNG.txt`.
+
 Nur die acht angeforderten Symbole ergänzen. Vorhandene Münz-/Edelstein-Stapel, Truhe, Uhr, Booster, Shop-Seiten, Preise und Knöpfe bleiben unverändert. Die Bilder enthalten keine Preise oder Texte; einzige Ausnahme ist `×2` im Tempo-Symbol.
 
 | Datei | Motiv | Größe | Einsatz im bestehenden Shop |
