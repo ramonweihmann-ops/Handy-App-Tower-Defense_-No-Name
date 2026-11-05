@@ -9,6 +9,10 @@ echo "== Menü-Rundgang =="
 out=$("$GODOT" --headless --fixed-fps 60 --path game -- --smoke 2>&1)
 echo "$out" | grep -E "SMOKE"
 if grep -qE "SCRIPT ERROR|ERROR:" <<< "$out"; then echo "$out" | grep -E "ERROR" | head -5; fail=1; fi
+echo "== Tutorial: ganzer Durchlauf =="
+out=$("$GODOT" --headless --fixed-fps 60 --path game -- --tutflow 2>&1)
+echo "$out" | grep -E "TUTFLOW fertig"
+if grep -qE "SCRIPT ERROR|ERROR:|FEHLER" <<< "$out" || ! grep -q "TUTFLOW fertig" <<< "$out"; then echo "$out" | grep -E "ERROR|FEHLER" | head -5; fail=1; fi
 echo "== Superfähigkeiten =="
 out=$("$GODOT" --headless --fixed-fps 60 --path game -- --autotest --level=4 --seed=1 --ultcheck 2>&1)
 echo "$out" | grep -E "ULTCHECK fertig"

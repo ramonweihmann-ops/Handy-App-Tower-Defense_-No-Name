@@ -48,7 +48,8 @@ func default_data() -> Dictionary:
 		"daily_streak": 0,
 		"wheel_date": "",
 		"shop_free_date": "",
-		"tutorial_seen": false,
+		# Geführter Einstieg (scripts/ui/tutorial.gd): erledigte Schritte; leer = startet von vorn
+		"tut": {},
 		"unlocked": [],
 		"squad": [],
 		"ammo_up": {},
@@ -73,6 +74,9 @@ func load_game() -> void:
 		if stored is Dictionary and not stored.is_empty():
 			for k in stored.keys():
 				data[k] = stored[k]
+			# Spielstände von vor dem Tutorial: diese Spieler kennen das Spiel schon
+			if not stored.has("tut"):
+				data["tut"] = {"done": true}
 		elif account == "voll":
 			data = full_data()
 	_ensure_heroes()
@@ -105,6 +109,7 @@ func full_data() -> Dictionary:
 	d["energy"] = MetaData.ENERGY_MAX
 	d["max_level"] = GameData.LEVEL_COUNT
 	d["hard_unlocked"] = true
+	d["tut"] = {"done": true}
 	d["prime"] = true
 	d["pass_premium"] = true
 	d["unlocked"] = GameData.HERO_IDS.duplicate()

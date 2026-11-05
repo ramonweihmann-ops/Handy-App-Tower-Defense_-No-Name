@@ -69,6 +69,7 @@ var _shot_path := ""
 var _menu_shot := ""
 var _squad := ""
 var _pick_shot := ""
+var _tut_shot := false   # --tut: Tutorial auch in Prüfbildern zeigen
 var _world_holder: Control
 var _world_container: SubViewportContainer
 ## Gemaltes Schlachtfeld hinter dem Kampf; _field_fill füllt Ränder bei anderem Seitenverhältnis
@@ -92,7 +93,14 @@ func _ready() -> void:
 			if _squad != "":
 				Save.data["squad"] = Array(_squad.split(","))
 	_build_layout()
-	if _autotest and mp:
+	# Geführter Einstieg; in Prüfbildern nur mit --tut
+	Tutorial.enabled = not _autotest and (_tut_shot or (_menu_shot == "" and _pick_shot == "" and _shot_path == ""))
+	var tut := Tutorial.new()
+	tut.main = self
+	add_child(tut)
+	if Tutorial.shot_path != "":
+		_tut_stage()
+	elif _autotest and mp:
 		start_mp(level)
 	elif _autotest:
 		start_level(level)
@@ -100,6 +108,33 @@ func _ready() -> void:
 		show_menu()
 	else:
 		_warm_up()
+
+
+## Prüfbild eines Tutorial-Schritts: Spielstand nachstellen und den passenden Bildschirm öffnen
+func _tut_stage() -> void:
+	var stage := Tutorial.shot_stage
+	Tutorial.setup_stage(stage)
+	if stage in ["wahl", "plasma", "kern", "karte", "sieg"]:
+		start_level(1)
+		return
+	show_menu()
+	await _frames(5)
+	match stage:
+		"heldkarte":
+			menu.show_tab("sammlung")
+		"aufleveln":
+			menu.show_tab("sammlung")
+			HeroBoard.start_hero = Save.squad()[0]
+			menu.open_board("Artboard-seqx-c6i2.dc.html")
+		"tech":
+			menu.show_tab("upgrades")
+		"basis":
+			menu.show_tab("basis")
+		"bau":
+			menu.show_tab("basis")
+			menu.open_building("01")
+		"fertig":
+			menu.show_tab("basis")
 
 
 ## Setzt das Spieltempo (x1 oder x2). Die Physik bleibt bei 60 Schritten pro Spielsekunde,
@@ -174,6 +209,18 @@ func _parse_args() -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg == "--autotest":
 			_autotest = true
+		elif arg == "--tut":
+			_tut_shot = true
+		elif arg.begins_with("--tutshot="):
+			# Prüfbild eines Tutorial-Schritts: --tutshot=pfad.png,abschnitt (siehe Tutorial.SHOT_KEY)
+			var spec := arg.get_slice("=", 1)
+			Tutorial.shot_path = spec.get_slice(",", 0)
+			Tutorial.shot_stage = spec.get_slice(",", 1)
+			_tut_shot = true
+		elif arg == "--tutflow":
+			var tf: Node = load("res://tests/tutorial_flow.gd").new()
+			tf.set("main", self)
+			add_child.call_deferred(tf)
 		elif arg == "--smoke":
 			var smoke: Node = load("res://tests/menu_smoke.gd").new()
 			smoke.set("main", self)
@@ -772,6 +819,7 @@ func _show_hero_picker(options: Array) -> void:
 
 func _on_hero_picked(id: String) -> void:
 	_set_screen(null)
+	Tutorial.note_hero(id)
 	battle.add_hero(id)
 	cards_taken.append("start:" + id)
 	state = "battle"

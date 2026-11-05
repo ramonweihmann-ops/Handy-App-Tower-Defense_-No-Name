@@ -35,6 +35,21 @@ func _run() -> bool:
 			save.add_hero_cards("dusty", 20)
 			print("SMOKE menü da, Reiter: ", m.current_tab)
 		1:
+			# Tutorial: nach „Spielstand zurücksetzen“ startet die Führung neu und zeigt auf „Spielen“
+			var tut: Tutorial = null
+			for c in main.get_children():
+				if c is Tutorial:
+					tut = c
+			var play_ok := false
+			if tut and tut._key == "play1":
+				var b := tut._find(m._mock, "#kampf", 600.0, 740.0)
+				play_ok = b != null and tut._shade.hole.encloses(b.get_global_rect())
+			print("SMOKE tutorial nach zurücksetzen: aktiv ", Tutorial.active(), " schritt ", tut._key if tut else "-", " spielen hervorgehoben ", play_ok,
+				" voll-konto erledigt ", bool(save.full_data()["tut"].get("done", false)))
+			if not Tutorial.active() or not play_ok:
+				print("SMOKE FEHLER: Tutorial startet nach dem Zurücksetzen nicht")
+			# für den restlichen Rundgang aus (er tippt nicht wie ein Spieler)
+			Tutorial.enabled = false
 			_report(m._content, 0)
 			for t in ["shop", "sammlung", "upgrades", "basis", "kampf"]:
 				m.show_tab(t)
