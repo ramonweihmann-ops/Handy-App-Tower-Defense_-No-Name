@@ -1,0 +1,78 @@
+[
+  {
+    "datei": "01_abenteuer_pfad.png",
+    "quelle_repo": "Vorlage_Raw/Hauptbildschirm_Comic_v4/hauptbildschirm_symbole_v4.png",
+    "quelle_lokal": "hauptbildschirm_comic_v1/hauptbildschirm_symbole_v4.png",
+    "pixel": [
+      852,
+      1846
+    ],
+    "art": "vorhandene Gestaltungsvorlage",
+    "hinweis": "Freigegebener Bildschirm-Mockup; dargestellte Zahlen sind vorhandene Beispielstände."
+  },
+  {
+    "datei": "02_kampf_heldenauswahl.png",
+    "quelle_repo": "Vorlage_Raw/Heldenauswahl_Start_v1/heldenauswahl_entwurf_v1.png",
+    "quelle_lokal": "heldenauswahl_start_v1/heldenauswahl_entwurf_v1.png",
+    "pixel": [
+      852,
+      1846
+    ],
+    "art": "vorhandene Gestaltungsvorlage",
+    "hinweis": "Freigegebener Bildschirm-Mockup mit Auswahl der drei Starter."
+  },
+  {
+    "datei": "03_sieg_ui_export.png",
+    "quelle_repo": "game/ui_mock/belohnung_sieg/",
+    "pixel": [
+      852,
+      1846
+    ],
+    "art": "Rekonstruktion aus vorhandenem UI-Export",
+    "hinweis": "Originalgrafiken und Original-Textpositionen aus layout.json; Arial als lokale Render-Schrift. Dynamische Heldenkarten nur mit vorhandenem Karten-Symbol vertreten. Kein neuer echter Spiel-Screenshot, keine neue Belohnungsmenge."
+  },
+  {
+    "datei": "04_helden.png",
+    "quelle_repo": "Vorlage_Raw/Helden_Baukasten_v1/helden_design_freigegeben.png",
+    "quelle_lokal": "helden_baukasten_v1/helden_design_freigegeben.png",
+    "pixel": [
+      934,
+      1684
+    ],
+    "art": "vorhandene Gestaltungsvorlage",
+    "hinweis": "Freigegebener Helden-Mockup, Beispielstände nicht als Anfängerwerte übernehmen."
+  },
+  {
+    "datei": "05_held_aufleveln.png",
+    "quelle_repo": null,
+    "quelle_lokal": "helden_comic_v2/brocken_menue_konzept.png",
+    "pixel": [
+      852,
+      1846
+    ],
+    "art": "vorhandene Gestaltungsvorlage",
+    "hinweis": "Vorhandener lokaler freigegebener Konzeptstand der Brocken-Detailseite. Zielposition mit aktuellem Spiel abgleichen."
+  },
+  {
+    "datei": "06_tech_werft.png",
+    "quelle_repo": "Vorlage_Raw/Tech_Werft_v1/tech_werft_freigegeben.png",
+    "quelle_lokal": "tech_werft_freigabe_v1/tech_werft_freigegeben.png",
+    "pixel": [
+      978,
+      1608
+    ],
+    "art": "vorhandene Gestaltungsvorlage",
+    "hinweis": "Freigegebener Tech-Werft-Mockup. Es gelten weiterhin die echten Spielvoraussetzungen."
+  },
+  {
+    "datei": "07_basis.png",
+    "quelle_repo": "Vorlage_Raw/Raumbasis_Wege_v1/raumbasis_mit_wegen_vorschau.png",
+    "quelle_lokal": "raumbasis_wege_v1/raumbasis_mit_wegen_vorschau.png",
+    "pixel": [
+      724,
+      2172
+    ],
+    "art": "vorhandene Gestaltungsvorlage",
+    "hinweis": "Freigegebene Gesamtübersicht der Basisgrafik; kein Screenshot einer voll ausgebauten Anfängerbasis."
+  }
+]

@@ -1,0 +1,9 @@
+Kurzfassung der verwendeten Bildanweisungen
+
+Tutorial-Gestaltung für Station am Wurmloch auf Grundlage der vorhandenen freigegebenen Bildschirmvorlagen. Einzeln sechs vollständige hochkante Entwürfe erzeugen: Spielen im Abenteuer-Pfad; bereit gewordener Energiekern im Kampf; Aufleveln eines Helden; Ausbauen eines Werft-Moduls; Bauen/Ausbauen in der Basis; ruhiger Abschluss über dem vorhandenen Siegbildschirm. Bestehende UI erhalten, keine neuen Preise, Spielwerte oder Freischaltungen erfinden.
+
+Über den Bildschirm eine dunkelviolette Abdunklung mit klarer heller Aussparung nur für das anzutippende Element legen. Dünner Goldring am Ziel, kleine weiß-lila Zeigerhand daneben. Hinweisblase dunkelviolett mit feinem Goldrand und runden Ecken; Fredoka für Überschriften, Nunito für Text. Kleiner Pip daneben, höchstens zwei kurze Hinweiszeilen und ein kleiner Zähler Schritt N von 5. Ohne Hilfe spielen als erreichbarer Ausweg. Kein zusätzliches Weiter bei einer Zielhandlung, keine Werbung und kein Echtgeldvorgang.
+
+Separate freigestellte Bausteine erzeugen: Pip winkend, zeigend und fröhlich, jeweils unveränderte cremeweiße Roboterfigur mit cyanfarbenen Augen und Akzenten; weiße Zeigerhand mit violettem Ärmel; leerer breiter violettgoldener Hinweisrahmen ohne Figur oder Schrift. Tatsächliche Transparenz, kein äußerer Glow oder Hintergrund. Freistellungs-Korrekturen entfernen äußere Schleier und beim Rahmen den zunächst mitgezeichneten Pip.
+
+Die exakten Texte und Bedingungen stehen in TUTORIAL_ABLAUF.json. Vollständige tatsächlich verwendete Bildanweisungen einschließlich Korrekturen: BILDANWEISUNGEN_VOLLSTAENDIG.json. Nur eingebaute Bildgenerierung im bestehenden Konto, keine weiteren kostenpflichtigen Dienste.

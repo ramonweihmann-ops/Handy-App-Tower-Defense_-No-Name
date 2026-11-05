@@ -1,0 +1,143 @@
+{
+  "bildschirme": 6,
+  "einzelteile": 5,
+  "referenzbilder": 7,
+  "dateien": [
+    {
+      "datei": "tutorial_01_spielen.png",
+      "pixel": [
+        852,
+        1846
+      ],
+      "urspruengliche_pixel": [
+        934,
+        1684
+      ],
+      "format": "PNG",
+      "art": "KI-Gestaltungsvorlage, kein Spieltest"
+    },
+    {
+      "datei": "tutorial_02_kampf_energiekern.png",
+      "pixel": [
+        852,
+        1846
+      ],
+      "urspruengliche_pixel": [
+        934,
+        1684
+      ],
+      "format": "PNG",
+      "art": "KI-Gestaltungsvorlage, kein Spieltest"
+    },
+    {
+      "datei": "tutorial_03_held_aufleveln.png",
+      "pixel": [
+        852,
+        1846
+      ],
+      "urspruengliche_pixel": [
+        934,
+        1684
+      ],
+      "format": "PNG",
+      "art": "KI-Gestaltungsvorlage, kein Spieltest"
+    },
+    {
+      "datei": "tutorial_04_tech_werft.png",
+      "pixel": [
+        852,
+        1846
+      ],
+      "urspruengliche_pixel": [
+        934,
+        1684
+      ],
+      "format": "PNG",
+      "art": "KI-Gestaltungsvorlage, kein Spieltest"
+    },
+    {
+      "datei": "tutorial_05_basis.png",
+      "pixel": [
+        852,
+        1846
+      ],
+      "urspruengliche_pixel": [
+        934,
+        1684
+      ],
+      "format": "PNG",
+      "art": "KI-Gestaltungsvorlage, kein Spieltest"
+    },
+    {
+      "datei": "tutorial_06_abschluss.png",
+      "pixel": [
+        852,
+        1846
+      ],
+      "urspruengliche_pixel": [
+        852,
+        1846
+      ],
+      "format": "PNG",
+      "art": "KI-Gestaltungsvorlage, kein Spieltest"
+    },
+    {
+      "datei": "pip_winken.png",
+      "pixel": [
+        512,
+        512
+      ],
+      "modus": "RGBA",
+      "transparenz": true,
+      "aussenrand_min_16px": true
+    },
+    {
+      "datei": "pip_zeigen.png",
+      "pixel": [
+        512,
+        512
+      ],
+      "modus": "RGBA",
+      "transparenz": true,
+      "aussenrand_min_16px": true
+    },
+    {
+      "datei": "pip_freuen.png",
+      "pixel": [
+        512,
+        512
+      ],
+      "modus": "RGBA",
+      "transparenz": true,
+      "aussenrand_min_16px": true
+    },
+    {
+      "datei": "zeigerhand.png",
+      "pixel": [
+        256,
+        256
+      ],
+      "modus": "RGBA",
+      "transparenz": true,
+      "aussenrand_min_16px": true
+    },
+    {
+      "datei": "hinweisblase_rahmen.png",
+      "pixel": [
+        512,
+        256
+      ],
+      "modus": "RGBA",
+      "transparenz": true,
+      "aussenrand_min_16px": true
+    }
+  ],
+  "ablauf_schritte": 28,
+  "markdown_json_texte_gleich": true,
+  "hoechstens_zwei_geplante_textzeilen": true,
+  "vier_hinweise_im_ersten_kampf": true,
+  "neue_zuwendungen_als_vorschlag_markiert": true,
+  "godot_implementierung": false,
+  "godot_spieltest": false,
+  "hinweis": "Texte als echte Labels nach Plan umsetzen; Umbrüche in KI-Bildern sind Gestaltungsbeispiele. Vorlagen enthalten vorhandene Beispielstände, keine neuen Anfängerwerte."
+}

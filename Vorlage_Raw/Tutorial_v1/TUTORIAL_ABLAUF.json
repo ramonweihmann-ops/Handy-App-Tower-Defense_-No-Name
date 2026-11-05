@@ -1,0 +1,601 @@
+{
+  "version": 1,
+  "status": "Ablauf- und Gestaltungsvorschlag, keine Programmierung",
+  "datum": "2026-11-04",
+  "abschnitte": [
+    {
+      "nummer": 1,
+      "name": "Spielen"
+    },
+    {
+      "nummer": 2,
+      "name": "Kampf"
+    },
+    {
+      "nummer": 3,
+      "name": "Helden"
+    },
+    {
+      "nummer": 4,
+      "name": "Upgrades"
+    },
+    {
+      "nummer": 5,
+      "name": "Basis"
+    }
+  ],
+  "fortschritt": "Schritt N von 5 zählt Lernabschnitte, nicht die einzelnen Tabellenzeilen. Freiwillige spätere Tipps haben keinen Zähler.",
+  "pflicht_bedeutung": "Nur im gewählten geführten Modus. Ohne Hilfe spielen, Pause und Einstellungen bleiben erreichbar. Kein verpflichtender Shop-, Werbe- oder Echtgeldvorgang.",
+  "schritte": [
+    {
+      "id": "start_spielen",
+      "abschnitt": 1,
+      "auslöser": "Erster Besuch im Abenteuer-Pfad, Hilfe aktiv",
+      "bildschirm": "Abenteuer-Pfad",
+      "ziel_element": "pfad.spielen",
+      "text": "Bereit für deinen ersten Einsatz?\nTippe auf Spielen.",
+      "pflicht": true,
+      "erledigt_wenn": "Level 1 startet tatsächlich",
+      "geschenk": {
+        "vorschlag": true,
+        "art": "Energie",
+        "umfang": "Nur fehlende Energie für den vorhandenen Eintrittspreis von Level 1; optional einen Wiederholungsversuch berücksichtigen, keine neue Eintrittsgebühr.",
+        "einmal_schluessel": "start_energie",
+        "hinweis": "Noch kein festgelegter Spielwert. Vor Umsetzung vom Entwickler freizugeben; nur den tatsächlichen Fehlbetrag geben."
+      },
+      "kampf_pause": false,
+      "vorbedingung": "",
+      "fallback": "",
+      "sperre": "Nur Zielhandlung, Pause/Einstellungen und Ohne Hilfe spielen erreichbar",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "kampf_held_waehlen",
+      "abschnitt": 2,
+      "auslöser": "Erste Heldenauswahl vor Kampf 1",
+      "bildschirm": "Kampf – Heldenauswahl",
+      "ziel_element": "kampf.heldenkarten",
+      "text": "Wähle deinen ersten Helden.\nAlle drei können die Station schützen.",
+      "pflicht": true,
+      "erledigt_wenn": "Eine der drei gültigen Karten wurde bestätigt; gewählter Held gespeichert",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": true,
+      "vorbedingung": "",
+      "fallback": "",
+      "sperre": "Nur Zielhandlung, Pause/Einstellungen und Ohne Hilfe spielen erreichbar",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "kampf_plasma",
+      "abschnitt": 2,
+      "auslöser": "Erster sichtbarer Plasma-Verbrauch, kein anderer Hinweis aktiv",
+      "bildschirm": "Kampf",
+      "ziel_element": "kampf.plasma_anzeige",
+      "text": "Dein Plasma füllt sich wieder auf.\nDamit schießen deine Helden.",
+      "pflicht": false,
+      "erledigt_wenn": "Hinweis einmal sichtbar gewesen und nach vier Sekunden ausgeblendet",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": false,
+      "vorbedingung": "Schild nicht akut bedroht; keine Kartenwahl, kein gleichzeitiger Kern-Hinweis",
+      "fallback": "Bei ungünstiger Situation auf späteren ruhigen Moment verschieben",
+      "sperre": "Keine Eingabesperre",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "kampf_energiekern",
+      "abschnitt": 2,
+      "auslöser": "Energiekern in Kampf 1 erstmals bereit",
+      "bildschirm": "Kampf",
+      "ziel_element": "kampf.energiekern",
+      "text": "Der Energiekern ist bereit!\nTippe darauf und hol dir Plasma.",
+      "pflicht": true,
+      "erledigt_wenn": "Der Kernschuss wurde wirklich ausgelöst; bloßer Tastendruck genügt nicht",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": true,
+      "vorbedingung": "Kern bereit und sichtbarer Zielbereich erreichbar",
+      "fallback": "Nicht auf einen noch ladenden Kern zeigen. Bis bereit normal weiterspielen lassen",
+      "sperre": "Nur Zielhandlung, Pause/Einstellungen und Ohne Hilfe spielen erreichbar",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "kampf_wellenkarte",
+      "abschnitt": 2,
+      "auslöser": "Erste Kartenwahl nach einer überstandenen Welle",
+      "bildschirm": "Kampf – Kartenwahl",
+      "ziel_element": "kampf.wellenkarten",
+      "text": "Wähle eine Karte für dein Team.\nNimm einen Helden oder eine Verbesserung.",
+      "pflicht": true,
+      "erledigt_wenn": "Eine tatsächlich angebotene Karte wurde angewendet",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": true,
+      "vorbedingung": "",
+      "fallback": "",
+      "sperre": "Nur Zielhandlung, Pause/Einstellungen und Ohne Hilfe spielen erreichbar",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "sieg_beute",
+      "abschnitt": 3,
+      "auslöser": "Erster Sieg; reguläre Beute bereits korrekt verbucht",
+      "bildschirm": "Sieg",
+      "ziel_element": "sieg.beute",
+      "text": "Geschafft! Das ist deine Beute.\nDamit stärkst du deine Station.",
+      "pflicht": false,
+      "erledigt_wenn": "Spieler setzt den normalen Ablauf fort; kein zusätzlicher Abholklick durch das Tutorial",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": false,
+      "vorbedingung": "Nur vorhandene Gold-, Karten- und Pass-Anzeigen erklären; keine neuen Mengen",
+      "fallback": "",
+      "sperre": "Keine Eingabesperre",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "helden_reiter",
+      "abschnitt": 3,
+      "auslöser": "Siegbildschirm verlassen, erster Heldenausbau noch offen",
+      "bildschirm": "Abenteuer-Pfad",
+      "ziel_element": "navigation.helden",
+      "text": "Dein Held kann stärker werden.\nÖffne den Reiter Helden.",
+      "pflicht": true,
+      "erledigt_wenn": "Heldenübersicht wurde geöffnet",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": false,
+      "vorbedingung": "",
+      "fallback": "",
+      "sperre": "Nur Zielhandlung, Pause/Einstellungen und Ohne Hilfe spielen erreichbar",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "helden_held_oeffnen",
+      "abschnitt": 3,
+      "auslöser": "Heldenübersicht geöffnet",
+      "bildschirm": "Helden",
+      "ziel_element": "helden.starter_karte",
+      "text": "Tippe auf deinen ersten Helden.\nWir schauen uns seinen Ausbau an.",
+      "pflicht": true,
+      "erledigt_wenn": "Detailseite des im ersten Kampf gewählten Helden ist offen",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": false,
+      "vorbedingung": "Starter frei gewählt; kein erzwungener Wechsel zu Brocken",
+      "fallback": "Ist dieser Held maximal oder nicht ausbaubar: einen anderen freigeschalteten ausbaubaren Helden nehmen. Keine Maximalstufe erhöhen",
+      "sperre": "Nur Zielhandlung, Pause/Einstellungen und Ohne Hilfe spielen erreichbar",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "helden_aufleveln",
+      "abschnitt": 3,
+      "auslöser": "Gültiger Heldenausbau sichtbar, Hilfsmittel vor dem Hinweis gesichert",
+      "bildschirm": "Held aufleveln",
+      "ziel_element": "held.aufleveln",
+      "text": "Tippe auf Aufleveln.\nSo wird dein Held dauerhaft stärker.",
+      "pflicht": true,
+      "erledigt_wenn": "Eine echte Erhöhung der Heldenstufe wurde gespeichert",
+      "geschenk": {
+        "vorschlag": true,
+        "art": "Gold und Karten für genau diesen Helden",
+        "umfang": "Gold = max(0, aktueller Ausbaupreis − verfügbares Gold). Karten = max(0, benötigte Karten − eigene Karten dieses Helden). Bereits verdiente Siegbeute zuerst berücksichtigen.",
+        "einmal_schluessel": "helden_fehlbetrag",
+        "hinweis": "Noch kein festgelegter Spielwert. Vor Umsetzung vom Entwickler freizugeben; nur den tatsächlichen Fehlbetrag geben."
+      },
+      "kampf_pause": false,
+      "vorbedingung": "Held freigeschaltet und unter Maximalstufe; tatsächlicher Preis und Kartenbedarf werden aus den Spieldaten gelesen",
+      "fallback": "Bereits ausgeführter passender Ausbau zählt als erledigt. Falls kein Ausbau möglich ist, ohne Hilfe fortsetzen anbieten und nicht festhalten",
+      "sperre": "Nur Zielhandlung, Pause/Einstellungen und Ohne Hilfe spielen erreichbar",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "kampf_zwei_start",
+      "abschnitt": 4,
+      "auslöser": "Erster Heldenausbau abgeschlossen, zweiter Lernkampf noch offen",
+      "bildschirm": "Abenteuer-Pfad",
+      "ziel_element": "pfad.spielen",
+      "text": "Teste deinen stärkeren Helden.\nTippe auf Spielen.",
+      "pflicht": true,
+      "erledigt_wenn": "Nächster regulär verfügbarer Kampf startet",
+      "geschenk": {
+        "vorschlag": true,
+        "art": "Energie",
+        "umfang": "Nur fehlende Energie für den vorhandenen Eintrittspreis des zweiten Lernkampfs.",
+        "einmal_schluessel": "kampf_zwei_energie",
+        "hinweis": "Noch kein festgelegter Spielwert. Vor Umsetzung vom Entwickler freizugeben; nur den tatsächlichen Fehlbetrag geben."
+      },
+      "kampf_pause": false,
+      "vorbedingung": "",
+      "fallback": "",
+      "sperre": "Nur Zielhandlung, Pause/Einstellungen und Ohne Hilfe spielen erreichbar",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "kampf_luftangriff",
+      "abschnitt": 4,
+      "auslöser": "Kampf 2: Gegnergruppe sichtbar und Luftangriff tatsächlich verfügbar",
+      "bildschirm": "Kampf",
+      "ziel_element": "kampf.luftangriff",
+      "text": "Viele Gegner auf einmal?\nProbiere den Luftangriff aus.",
+      "pflicht": false,
+      "erledigt_wenn": "Luftangriff wurde wirklich ausgelöst oder Spieler hat den freiwilligen Tipp geschlossen",
+      "geschenk": {
+        "vorschlag": true,
+        "art": "Ein Probe-Luftangriff",
+        "umfang": "Vorschlag: genau eine Nutzung aus dem vorhandenen Booster-System, nur wenn nötig und freigegeben. Keine private gekaufte Nutzung erzwingen.",
+        "einmal_schluessel": "luftangriff_probe",
+        "hinweis": "Noch kein festgelegter Spielwert. Vor Umsetzung vom Entwickler freizugeben; nur den tatsächlichen Fehlbetrag geben."
+      },
+      "kampf_pause": false,
+      "vorbedingung": "Freigegebene kostenlose Probe oder vorhandener nutzbarer Booster; keine Echtgeld-/Werbeansicht öffnen",
+      "fallback": "Ohne freigegebene Probe den Hinweis verschieben; keine neue Booster-Funktion voraussetzen",
+      "sperre": "Keine Eingabesperre",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "kampf_medipack",
+      "abschnitt": 4,
+      "auslöser": "Ab Kampf 2: Schild beschädigt und Medipack verfügbar",
+      "bildschirm": "Kampf",
+      "ziel_element": "kampf.medipack",
+      "text": "Dein Schild braucht Hilfe.\nMit dem Medipack kannst du es heilen.",
+      "pflicht": false,
+      "erledigt_wenn": "Medipack wirksam ausgelöst oder Tipp geschlossen",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": false,
+      "vorbedingung": "Nur bei vorhandenem Schaden und nutzbarem Medipack; kein Schaden künstlich für das Tutorial erzeugen",
+      "fallback": "Bei fehlendem Medipack den Tipp nicht zeigen; keine Kaufaufforderung",
+      "sperre": "Keine Eingabesperre",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "upgrades_reiter",
+      "abschnitt": 4,
+      "auslöser": "Zweiter Sieg, reguläre Beute verbucht",
+      "bildschirm": "Abenteuer-Pfad",
+      "ziel_element": "navigation.upgrades",
+      "text": "Jetzt stärken wir die Station.\nÖffne Upgrades.",
+      "pflicht": true,
+      "erledigt_wenn": "Upgrades ist geöffnet",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": false,
+      "vorbedingung": "",
+      "fallback": "",
+      "sperre": "Nur Zielhandlung, Pause/Einstellungen und Ohne Hilfe spielen erreichbar",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "werft_modul_waehlen",
+      "abschnitt": 4,
+      "auslöser": "Tech-Werft geöffnet",
+      "bildschirm": "Tech-Werft",
+      "ziel_element": "werft.verfuegbare_module",
+      "text": "Wähle eine verfügbare Verbesserung.\nSie hilft dir in jedem Kampf.",
+      "pflicht": true,
+      "erledigt_wenn": "Ein tatsächlich ausbaubares Modul ist in der Detailbox ausgewählt",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": false,
+      "vorbedingung": "Bestehende Freischaltregeln der Werft beachten; keine neue Voraussetzung erfinden",
+      "fallback": "",
+      "sperre": "Nur Zielhandlung, Pause/Einstellungen und Ohne Hilfe spielen erreichbar",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "werft_ausbauen",
+      "abschnitt": 4,
+      "auslöser": "Ausbaubares Modul gewählt; tatsächlicher Fehlbetrag geklärt",
+      "bildschirm": "Tech-Werft",
+      "ziel_element": "werft.ausbauen",
+      "text": "Tippe auf Ausbauen.\nDiese Verbesserung bleibt dir erhalten.",
+      "pflicht": true,
+      "erledigt_wenn": "Eine echte Modulstufe wurde erhöht und gespeichert",
+      "geschenk": {
+        "vorschlag": true,
+        "art": "Gold",
+        "umfang": "max(0, tatsächlicher Preis der gewählten verfügbaren Modulstufe − verfügbares Gold). Höchstens für den einen Übungsausbau.",
+        "einmal_schluessel": "werft_fehlbetrag",
+        "hinweis": "Noch kein festgelegter Spielwert. Vor Umsetzung vom Entwickler freizugeben; nur den tatsächlichen Fehlbetrag geben."
+      },
+      "kampf_pause": false,
+      "vorbedingung": "Alle echten Voraussetzungen erfüllt",
+      "fallback": "Ist ein passender Ausbau bereits erfolgt, automatisch anerkennen. Kein erzwungener Kauf eines anderen Moduls nur wegen des Tutorials",
+      "sperre": "Nur Zielhandlung, Pause/Einstellungen und Ohne Hilfe spielen erreichbar",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "munition_tipp",
+      "abschnitt": 4,
+      "auslöser": "Nach dem Werft-Ausbau, bevor Kampf 3 startet",
+      "bildschirm": "Upgrades",
+      "ziel_element": "upgrades.munition",
+      "text": "Hier verbesserst du dein Plasma.\nDie sechs Punkte baust du unabhängig aus.",
+      "pflicht": false,
+      "erledigt_wenn": "Hinweis geschlossen oder vorhandenes Munitionsfenster geöffnet",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": false,
+      "vorbedingung": "Knopf Munition sichtbar; kein zusätzlicher Pflichtkauf",
+      "fallback": "Bei anderem Layout warten, bis der vorhandene Knopf erreichbar ist",
+      "sperre": "Keine Eingabesperre",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "kampf_drei_start",
+      "abschnitt": 5,
+      "auslöser": "Werft-Pflichtausbau abgeschlossen, dritter Lernkampf noch offen",
+      "bildschirm": "Abenteuer-Pfad",
+      "ziel_element": "pfad.spielen",
+      "text": "Die Station ist stärker geworden.\nStarte den nächsten Kampf.",
+      "pflicht": true,
+      "erledigt_wenn": "Dritter regulär verfügbarer Lernkampf startet",
+      "geschenk": {
+        "vorschlag": true,
+        "art": "Energie",
+        "umfang": "Nur Fehlbetrag zum vorhandenen Eintrittspreis des dritten Lernkampfs.",
+        "einmal_schluessel": "kampf_drei_energie",
+        "hinweis": "Noch kein festgelegter Spielwert. Vor Umsetzung vom Entwickler freizugeben; nur den tatsächlichen Fehlbetrag geben."
+      },
+      "kampf_pause": false,
+      "vorbedingung": "",
+      "fallback": "",
+      "sperre": "Nur Zielhandlung, Pause/Einstellungen und Ohne Hilfe spielen erreichbar",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "basis_reiter",
+      "abschnitt": 5,
+      "auslöser": "Dritter Sieg, normale Beute verbucht",
+      "bildschirm": "Abenteuer-Pfad",
+      "ziel_element": "navigation.basis",
+      "text": "Zeit für dein Basislager.\nÖffne den Reiter Basis.",
+      "pflicht": true,
+      "erledigt_wenn": "Basislager ist geöffnet",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": false,
+      "vorbedingung": "",
+      "fallback": "",
+      "sperre": "Nur Zielhandlung, Pause/Einstellungen und Ohne Hilfe spielen erreichbar",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "basis_gebaeude_oeffnen",
+      "abschnitt": 5,
+      "auslöser": "Basislager geöffnet",
+      "bildschirm": "Basis",
+      "ziel_element": "basis.verfuegbares_gebaeude",
+      "text": "Tippe auf ein verfügbares Gebäude.\nHier versorgst du deine Station.",
+      "pflicht": true,
+      "erledigt_wenn": "Baubarer Platz oder ausbaubares vorhandenes Gebäude ist geöffnet",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": false,
+      "vorbedingung": "Nur vorhandene Freischaltungen: Gebäude 01–12 nach Champions, 13–30 nach bestehenden Level-/Goldregeln; kein 13–30-Zwang für Anfänger",
+      "fallback": "Vorhandenes zulässiges Gebäude ausbauen statt ein gesperrtes Gebäude freischalten zu erfinden",
+      "sperre": "Nur Zielhandlung, Pause/Einstellungen und Ohne Hilfe spielen erreichbar",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "basis_bauen",
+      "abschnitt": 5,
+      "auslöser": "Gebäudedetail geöffnet; tatsächliche Voraussetzungen erfüllt",
+      "bildschirm": "Basis – Gebäude",
+      "ziel_element": "basis.bauen_oder_ausbauen",
+      "text": "Baue das Gebäude oder baue es aus.\nEs sammelt mit der Zeit Nachschub.",
+      "pflicht": true,
+      "erledigt_wenn": "Eine echte Bau-/Ausbaustufe ist gespeichert oder ein im bestehenden Spiel zeitgebundener Bauauftrag wurde bestätigt",
+      "geschenk": {
+        "vorschlag": true,
+        "art": "Gold",
+        "umfang": "max(0, tatsächlicher vorhandener Bau-/Ausbaupreis − verfügbares Gold). Nur ein Übungsvorgang.",
+        "einmal_schluessel": "basis_fehlbetrag",
+        "hinweis": "Noch kein festgelegter Spielwert. Vor Umsetzung vom Entwickler freizugeben; nur den tatsächlichen Fehlbetrag geben."
+      },
+      "kampf_pause": false,
+      "vorbedingung": "Keine Wartezeit überspringen oder Levelgrenze ändern",
+      "fallback": "Ist ein geeigneter Bau/Ausbau bereits erfolgt, anerkennen. Wenn zeitlich noch kein Abschluss möglich ist, beim vorhandenen bestätigten Bauauftrag fortsetzen; keine neue Sofortbau-Funktion",
+      "sperre": "Nur Zielhandlung, Pause/Einstellungen und Ohne Hilfe spielen erreichbar",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "basis_einsammeln",
+      "abschnitt": 5,
+      "auslöser": "Erstmals wirklich abholbarer Lagerinhalt, frühestens beim Basisbesuch",
+      "bildschirm": "Basis",
+      "ziel_element": "basis.lager_einsammeln",
+      "text": "Hier wartet Nachschub.\nSammle ihn ein.",
+      "pflicht": false,
+      "erledigt_wenn": "Vorhandener Ertrag wurde tatsächlich ins Inventar gebucht oder freiwilliger Tipp geschlossen",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": false,
+      "vorbedingung": "Lagerinhalt > 0 und normale Sammelaktion möglich",
+      "fallback": "Ist das Lager leer, Lernhilfe normal abschließen. Tipp beim ersten echten Ertrag nachholen. Kein Zwangswarten, kein erfundener Sofortertrag",
+      "sperre": "Keine Eingabesperre",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "abschluss",
+      "abschnitt": 5,
+      "auslöser": "Die drei Pflichtkäufe beziehungsweise bereits erledigten passenden Aktionen sind anerkannt",
+      "bildschirm": "Abenteuer-Pfad oder vorhandener Siegesabschluss",
+      "ziel_element": "tutorial.abschliessen",
+      "text": "Du bist bereit für die Station!\nViel Spaß bei deinem nächsten Einsatz.",
+      "pflicht": false,
+      "erledigt_wenn": "Abschluss geschlossen; Hauptführung als abgeschlossen gespeichert",
+      "geschenk": {
+        "vorschlag": true,
+        "art": "Optionaler Abschlussbonus",
+        "umfang": "Nur als Vorschlag: kleinstes bereits konfiguriertes Goldpaket, falls vom Entwickler freigegeben. Andernfalls nur die normale bereits verbuchte Siegesbeute feiern; keine neue Menge festlegen.",
+        "einmal_schluessel": "abschluss_bonus",
+        "hinweis": "Noch kein festgelegter Spielwert. Vor Umsetzung vom Entwickler freizugeben; nur den tatsächlichen Fehlbetrag geben."
+      },
+      "kampf_pause": false,
+      "vorbedingung": "",
+      "fallback": "",
+      "sperre": "Keine Eingabesperre",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "spaeter_taeglich",
+      "abschnitt": null,
+      "auslöser": "Erster späterer Besuch mit wirklich abholbarer Tagesbelohnung",
+      "bildschirm": "Abenteuer-Pfad",
+      "ziel_element": "aktionen.taeglich",
+      "text": "Dein tägliches Geschenk wartet.\nDu kannst es hier abholen.",
+      "pflicht": false,
+      "erledigt_wenn": "Tipp geschlossen oder bestehende Tagesbelohnung geöffnet",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": false,
+      "vorbedingung": "",
+      "fallback": "",
+      "sperre": "Keine Eingabesperre",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "spaeter_missionen",
+      "abschnitt": null,
+      "auslöser": "Eine erste Mission ist erfüllt und abholbar",
+      "bildschirm": "Abenteuer-Pfad",
+      "ziel_element": "aktionen.missionen",
+      "text": "Du hast eine Aufgabe geschafft.\nHier wartet deine Belohnung.",
+      "pflicht": false,
+      "erledigt_wenn": "Tipp geschlossen oder Missionen geöffnet",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": false,
+      "vorbedingung": "",
+      "fallback": "",
+      "sperre": "Keine Eingabesperre",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "spaeter_battlepass",
+      "abschnitt": null,
+      "auslöser": "Pass bereits freigeschaltet und erstmals ein Eintrag abholbar",
+      "bildschirm": "Abenteuer-Pfad",
+      "ziel_element": "aktionen.battle_pass",
+      "text": "Deine Pass-Punkte zählen hier.\nSchau dir deine Belohnungen an.",
+      "pflicht": false,
+      "erledigt_wenn": "Tipp geschlossen oder vorhandener Pass geöffnet",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": false,
+      "vorbedingung": "Keine Premium-Kaufaufforderung oder Verpflichtung",
+      "fallback": "",
+      "sperre": "Keine Eingabesperre",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "spaeter_talente",
+      "abschnitt": null,
+      "auslöser": "Talente vorhanden und erstmals ein Stern regulär nutzbar",
+      "bildschirm": "Upgrades",
+      "ziel_element": "upgrades.talente",
+      "text": "Mit Sternen erhältst du Talente.\nHier findest du sie.",
+      "pflicht": false,
+      "erledigt_wenn": "Tipp geschlossen oder Talente geöffnet",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": false,
+      "vorbedingung": "Bestehende Freischaltung und Sternkosten beachten; keinen Sternbetrag erfinden",
+      "fallback": "",
+      "sperre": "Keine Eingabesperre",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "spaeter_gluecksrad",
+      "abschnitt": null,
+      "auslöser": "Erste vorhandene kostenlose Drehung wirklich verfügbar",
+      "bildschirm": "Abenteuer-Pfad",
+      "ziel_element": "aktionen.gluecksrad",
+      "text": "Eine kostenlose Drehung wartet.\nDu findest sie hier.",
+      "pflicht": false,
+      "erledigt_wenn": "Tipp geschlossen oder Glücksrad geöffnet",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": false,
+      "vorbedingung": "Nur wenn tatsächlich kostenlos; nie Werbung oder bezahlte Drehung als Pflicht",
+      "fallback": "",
+      "sperre": "Keine Eingabesperre",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    },
+    {
+      "id": "spaeter_modi",
+      "abschnitt": null,
+      "auslöser": "Spielmodi nach bestehenden Regeln erstmals freigeschaltet",
+      "bildschirm": "Abenteuer-Pfad",
+      "ziel_element": "aktionen.modi",
+      "text": "Lust auf eine neue Herausforderung?\nHier findest du weitere Spielmodi.",
+      "pflicht": false,
+      "erledigt_wenn": "Tipp geschlossen oder vorhandene Modi geöffnet",
+      "geschenk": {
+        "vorschlag": false,
+        "art": "keines"
+      },
+      "kampf_pause": false,
+      "vorbedingung": "Keinen neuen Freischaltlevel bestimmen und keine Multiplayer-Partie erzwingen",
+      "fallback": "",
+      "sperre": "Keine Eingabesperre",
+      "ziel_id_hinweis": "Semantische Kennung für den Plan, kein geprüfter Godot-Nodepfad"
+    }
+  ],
+  "belohnungsregeln": {
+    "alle_neuen_zuwendungen_nur_vorschlag": true,
+    "keine_festen_neuen_betraege": true,
+    "normale_siegesbeute_zuerst": true,
+    "einmal_pro_profil_und_schluessel": true,
+    "bei_app_neustart_nicht_erneut": true,
+    "gutschrift_und_bestaetigung_zusammen_speichern": true
+  },
+  "unterbrechungen": {
+    "niederlage": "Kein Lernabschnitt für einen Sieg markieren. Bereits gelernte Kampfhandlungen beibehalten; beim nächsten Versuch nur offene Hinweise. Keine neue Sieg-/Niederlage-Logik.",
+    "app_schliessen": "Nach Rückkehr tatsächlichen Bildschirm und bestätigte Aktionen prüfen. Offenen Schritt erst bei sicher erreichtem Ziel wieder anzeigen.",
+    "bekannt": "Ohne Hilfe spielen jederzeit erreichbar. Tatsächlich bereits erledigte Lernziele anerkennen; keine Doppelkäufe oder doppelten Geschenke.",
+    "fehlendes_ziel": "Overlay ausblenden und Eingaben wieder freigeben; nie einen unsichtbaren oder deaktivierten Knopf zwingend verlangen."
+  }
+}
