@@ -852,7 +852,7 @@ void fragment() {
 			ci.draw_string(f, Vector2(nr.position.x + 10.0 * s, nr.get_center().y + fs * 0.36), note, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color.WHITE)
 		# „Ohne Hilfe spielen“ (beim Abschluss: „Tippen zum Weiterspielen“)
 		var lf := MockFonts.font("Nunito", 700)
-		var ls := roundi(12.0 * s)
+		var ls := roundi(10.5 * s)   # wie im Mockup (10,5 pt)
 		var link := "Tippen zum Weiterspielen" if done else "Ohne Hilfe spielen"
 		var lw := lf.get_string_size(link, HORIZONTAL_ALIGNMENT_LEFT, -1, ls).x
 		var base := Vector2(96.0 * s, size.y - 8.0 * s - 3.0 * s)
