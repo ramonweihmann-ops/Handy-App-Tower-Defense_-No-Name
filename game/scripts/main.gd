@@ -572,11 +572,19 @@ func _process(delta: float) -> void:
 			Performance.get_monitor(Performance.OBJECT_NODE_COUNT),
 			Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0,
 			Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0])
-	if _menu_shot != "" and state == "menu":
+	if _menu_shot != "" and (state == "menu" or _menu_shot_t > 0):
 		_menu_shot_t += 1
 		var parts := _menu_shot.split(",")
+		if _menu_shot_t == 40 and parts.size() > 1 and parts[1] == "sieg-doppelt" and _screen is ResultScreen:
+			(_screen as ResultScreen).double_pressed.emit()
 		if _menu_shot_t == 5 and parts.size() > 1:
-			if parts[1] == "feier":
+			if parts[1] == "sieg" or parts[1] == "sieg-doppelt":
+				# Siegfenster fürs Bild (wie im Mockup: Level 4, drei Helden); „sieg-doppelt“ tippt „Verdoppeln“
+				level = 4
+				Save.add_hero_cards("dusty", 30)
+				_show_result(true, {"gold": 1366, "stars": 3, "pass": 20, "cards": [{"hero": "dusty", "amount": 7},
+					{"hero": "iska", "amount": 7}, {"hero": "margot", "amount": 7}]})
+			elif parts[1] == "feier":
 				menu.celebrate("gold", "+150 Gold")
 			else:
 				if parts.size() > 2 and parts[2] == "lager-voll":
@@ -1280,6 +1288,11 @@ func _show_result(won: bool, rewards: Dictionary) -> void:
 	r.heroes_pressed.connect(func() -> void:
 		show_menu()
 		menu.show_tab("sammlung"))
+	# Testphase: noch kein echtes Werbevideo, Antippen verdoppelt sofort
+	r.double_pressed.connect(func() -> void:
+		var d := double_rewards(r.info)
+		if not d.is_empty():
+			r.apply_double(d))
 	_set_screen(r)
 
 

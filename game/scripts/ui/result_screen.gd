@@ -9,6 +9,10 @@ signal next_pressed
 signal retry_pressed
 signal menu_pressed
 signal heroes_pressed
+## „Belohnung verdoppeln“ angetippt (main.gd vergibt und ruft apply_double auf)
+signal double_pressed
+
+const DOUBLE_HREF := "Belohnung-Sieg-Verdoppelt.dc.html"
 
 ## Farbverlauf des Bilderrahmens je Held (wie in der Helden-Übersicht)
 const FRAME := {
@@ -19,8 +23,9 @@ const FRAME := {
 
 var won := true
 ## Werte für die Anzeige: level, world, kills, secs, shield (0..1), wave, waves, gold, stars,
-## pass, cards (Array von {hero, amount}), last_level (bool)
+## pass, cards (Array von {hero, amount}), last_level (bool), doubled (bool)
 var info := {}
+var _double_t := -1.0   # Zeit seit dem Verdoppeln (für das kurze Aufploppen des Hinweises)
 var _heroes: Array = []        # [{hero, amount, rect}]
 var _layer: Layer
 var _figs: Control
@@ -77,6 +82,8 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if _double_t >= 0.0:
+		_double_t += delta
 	if _rays:
 		_rays.rotation += delta * TAU / 40.0
 
@@ -99,9 +106,10 @@ func _fill_texts() -> void:
 			set_text("WEITER · LEVEL 5", "NOCHMAL")
 		else:
 			set_text("WEITER · LEVEL 5", "WEITER · LEVEL %d" % (lv + 1))
-		for t in texts_of_button(0) + texts_of_button(1):
+		for t in texts_of_button(1) + texts_of_button(2):
 			if str(t["text"]) == "5":
 				set_text(int(t["i"]), cost)
+		_bind_double()
 	else:
 		var wave := int(info.get("wave", 1))
 		var waves := int(info.get("waves", 1))
@@ -113,6 +121,32 @@ func _fill_texts() -> void:
 		for t in texts_of_button(0):
 			if str(t["text"]) == "5":
 				set_text(int(t["i"]), cost)
+
+
+## Knopf „Belohnung verdoppeln“: 5× am Tag, mit Prime ohne Video; aufgebraucht oder verdoppelt: weg
+func _bind_double() -> void:
+	var b := button(DOUBLE_HREF)
+	if b == null:
+		return
+	var left := Save.videos_left()
+	b.visible = won and not bool(info.get("doubled", false)) and left > 0
+	set_text("Kurzes Video · noch 5× heute", "%s · noch %d× heute" % ["Kein Video nötig" if Save.has_prime() else "Kurzes Video", left])
+
+
+## Nach dem Verdoppeln: neue Werte zeigen, Knopf wird zum grünen Hinweis
+func apply_double(rewards: Dictionary) -> void:
+	info["gold"] = rewards["gold"]
+	info["cards"] = rewards["cards"]
+	info["doubled"] = true
+	set_text("×1.366", "×" + MockScreen.num(int(info["gold"])))
+	for e in _heroes:
+		for c in rewards["cards"]:
+			if str(c["hero"]) == e["hero"]:
+				e["amount"] = int(c["amount"])
+	hide_text("HELDENKARTEN")
+	_bind_double()
+	_double_t = 0.0
+	Sfx.play("levelup")
 
 
 ## Tipp nach der Niederlage: zuerst ein Held, der aufsteigen kann, sonst Plasma
@@ -215,6 +249,43 @@ func _draw_heroes(ci: CanvasItem, front: bool) -> void:
 		MockPaint.text(self, ci, label, lr, "Nunito", 800, size, "rgb(125, 255, 138)" if ready else "rgb(207, 200, 240)")
 
 
+## Zustand nach dem Video (Mockup „Sieg nach dem Video“): grüner Hinweis, ×2 an Gold und Heldenkarten
+func _draw_doubled(ci: CanvasItem) -> void:
+	if not bool(info.get("doubled", false)):
+		return
+	var k := clampf(_double_t / 0.25, 0.0, 1.0) if _double_t >= 0.0 else 1.0
+	var r := Rect2(40, 602, 310, 52)
+	var g := r.grow(-(1.0 - k) * 10.0)
+	MockPaint.rrect(ci, _px(g), 16 * s, Color(20 / 255.0, 70 / 255.0, 30 / 255.0, 0.55 * k))
+	MockPaint.border(ci, _px(g), 16 * s, Color(125 / 255.0, 1.0, 138 / 255.0, k), 2 * s)
+	if k < 1.0:
+		return
+	var l1 := "VERDOPPELT!"
+	var l2 := "Gold und Heldenkarten ×2 · noch %d× heute" % Save.videos_left()
+	var w1 := MockPaint.text_width(l1, "Fredoka", 700, 19)
+	var w2 := MockPaint.text_width(l2, "Nunito", 800, 11)
+	var x0 := r.get_center().x - (36.0 + maxf(w1, w2)) * 0.5
+	var c := Vector2(x0 + 13, r.get_center().y)
+	ci.draw_circle(c * s, 12 * s, Color("#3fbf3a"))
+	ci.draw_arc(c * s, 12 * s, 0, TAU, 32, Color("#d8ffd0"), 2 * s, true)
+	var tick := PackedVector2Array([(c + Vector2(-5.5, 0.5)) * s, (c + Vector2(-1.5, 4.5)) * s, (c + Vector2(5.5, -3.5)) * s])
+	ci.draw_polyline(tick, Color.WHITE, 3 * s, true)
+	MockPaint.text(self, ci, l1, Rect2(x0 + 36, 611.5, w1, 21), "Fredoka", 700, 19, "rgb(182, 255, 138)")
+	MockPaint.text(self, ci, l2, Rect2(x0 + 36, 632.5, w2, 12), "Nunito", 800, 11, "rgb(216, 255, 208)")
+	# „×2“-Marke oben rechts an der Gold-Kachel
+	var bw := MockPaint.text_width("×2", "Fredoka", 700, 11) + 13.0
+	var badge := Rect2(128.0 - bw, 318.5, bw, 18)
+	MockPaint.rrect(ci, _px(badge), 8 * s, Color("#7dff8a"))
+	MockPaint.border(ci, _px(badge), 8 * s, Color("#145a2e"), 1.5 * s)
+	MockPaint.text(self, ci, "×2", badge, "Fredoka", 700, 11, "rgb(15, 61, 18)")
+	# Überschrift „HELDENKARTEN ×2“ (×2 in Grün)
+	var wa := MockPaint.text_width("HELDENKARTEN ", "Nunito", 800, 11, 0.88)
+	var wb := MockPaint.text_width("×2", "Nunito", 800, 11, 0.88)
+	var hx := r.get_center().x - (wa + wb) * 0.5
+	MockPaint.text(self, ci, "HELDENKARTEN ", Rect2(hx, 424, wa, 15), "Nunito", 800, 11, "rgb(207, 200, 240)", "", 0.88)
+	MockPaint.text(self, ci, "×2", Rect2(hx + wa, 424, wb, 15), "Nunito", 800, 11, "rgb(125, 255, 138)", "", 0.88)
+
+
 ## Wellen-Leiste der Niederlage: erreichte Wellen orange, der Rest dunkel
 func _draw_waves(ci: CanvasItem) -> void:
 	if won or not _live.has("waves"):
@@ -238,11 +309,13 @@ func _draw_waves(ci: CanvasItem) -> void:
 
 func _on_button(b: Dictionary) -> void:
 	var href := str(b.get("href", ""))
-	if href.begins_with("Main"):
+	if href == DOUBLE_HREF:
+		double_pressed.emit()
+	elif href.begins_with("Main"):
 		menu_pressed.emit()
 	elif href.begins_with("Artboard-seqx"):
 		heroes_pressed.emit()
-	elif won and int(b.get("i", -1)) == 0 and not bool(info.get("last_level", false)):
+	elif won and int(b.get("i", -1)) == 1 and not bool(info.get("last_level", false)):
 		next_pressed.emit()
 	else:
 		retry_pressed.emit()
@@ -275,3 +348,4 @@ class FrontLayer:
 
 	func _draw() -> void:
 		view._draw_heroes(self, true)
+		view._draw_doubled(self)

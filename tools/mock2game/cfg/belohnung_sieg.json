@@ -1,4 +1,4 @@
-{"board": "Belohnung-Sieg.dc.html", "out": "out/belohnung_sieg",
+{"board": "Belohnung-Sieg-Verdoppeln.dc.html", "out": "out/belohnung_sieg",
  "states": [{"name": "main", "eval": "document.querySelectorAll('#dc-root > div > img, #dc-root > div > div[style*=\"inset: 0\"]').forEach(e => e.remove()); document.querySelectorAll('.pop').forEach(e => { e.style.animation = 'none'; }); document.querySelectorAll('[style*=\"animation\"]').forEach(e => { e.style.animation = 'none'; });"}],
  "only": ["#dc-root > div > *"],
  "live": [

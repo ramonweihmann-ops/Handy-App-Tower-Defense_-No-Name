@@ -321,6 +321,19 @@ func _run() -> bool:
 				main._show_result(true, {"gold": 1200, "stars": 3, "pass": 20, "cards": [{"hero": "dusty", "amount": 7}, {"hero": "iska", "amount": 7}]})
 			elif step == 630:
 				print("SMOKE sieg-fenster: ", (main._screen as ResultScreen) != null)
+				# „Belohnung verdoppeln“: Gold und Karten noch einmal, nur einmal je Sieg
+				var rs := main._screen as ResultScreen
+				if rs:
+					var g0: int = save.gold()
+					var k0: int = save.hero_cards("dusty")
+					var v0: int = save.videos_left()
+					rs.double_pressed.emit()
+					rs.double_pressed.emit()
+					var ok: bool = save.gold() - g0 == 1200 and save.hero_cards("dusty") - k0 == 7 and save.videos_left() == v0 - 1 \
+						and bool(rs.info.get("doubled", false)) and int(rs.info["gold"]) == 2400
+					print("SMOKE verdoppeln: gold +", save.gold() - g0, " karten +", save.hero_cards("dusty") - k0, " videos ", v0, "->", save.videos_left())
+					if not ok:
+						print("SMOKE FEHLER: Belohnung verdoppeln stimmt nicht")
 				# Mehrere Level geschafft, gestartet bei Level 1: zurück im Menü muss das aktuelle Level gewählt sein
 				save.data["max_level"] = maxi(save.max_level(), 4)
 				m.selected_level = 1
