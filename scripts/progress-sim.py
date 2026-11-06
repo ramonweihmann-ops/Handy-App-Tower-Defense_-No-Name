@@ -32,6 +32,7 @@ BASE = dict(
     daily_offer_cards=5,                       # Tagesangebot gratis (ein Held)
     base_mult=1.0,                             # Basislager-Ertrag
     hero_max=30,
+    base_max=10,                               # höchste Stufe im Basislager
     farm_below=0.30,
     chest_team=False,                          # Heldentruhe nur für Helden der Aufstellung
     videos=0,                                  # Werbevideos am Tag: Siegbelohnung verdoppeln (nur ohne Werbefrei)
@@ -59,7 +60,7 @@ SLOPE = (math.log(0.9 / 0.1) - C_NORMAL) / 4.0      # je Heldenstufe Vorsprung
 
 
 def target_hero(L):
-    return min(30, 1 + int((L - 1) / 2.5))
+    return min(60, 1 + int((L - 1) / 2.5))
 
 
 def p_win(L, delta, slope_neg=None):
@@ -70,13 +71,24 @@ def p_win(L, delta, slope_neg=None):
     return min(0.98, max(0.02, 1 / (1 + math.exp(-x))))
 
 
-def bval(v1, v10, lvl):
-    return v1 + (v10 - v1) * (lvl - 1) / 9
+def bval(v1, v10, lvl):     # BaseData.value: bis Stufe 10 gleichmäßig, danach halbe Steigung
+    if lvl <= 10:
+        return v1 + (v10 - v1) * (lvl - 1) / 9
+    return v10 + (v10 - v1) / 9 * 0.5 * (lvl - 10)
 
 
-def bcost(bid, lvl):
-    return int(round(150 * lvl * (1 + (int(bid) - 1) * 0.1) / 10) * 10), max(0, lvl - 5)
+def bcost(bid, lvl):        # BaseData.upgrade_cost: ab Stufe 10 je Stufe +20 %
+    late = 1 + 0.2 * max(0, lvl - 10)
+    return int(round(150 * lvl * (1 + (int(bid) - 1) * 0.1) * late / 10) * 10), max(0, lvl - 5)
 
+
+## Für Level 1–150 (Geldphase): vier Zahlertypen wie auf der Balancing-Seite
+PROFILES_150 = {
+    "ohne Käufe": dict(battles=10, gems_at21=0, gems_month=0, prime=False, premium=False),
+    "wenig (5 €/Monat)": dict(battles=10, gems_at21=0, gems_month=1100, prime=False, premium=False),
+    "mittel (20 €/Monat)": dict(battles=10, gems_at21=0, gems_month=2600, prime=True, premium=True),
+    "viel (50 €/Monat)": dict(battles=10, gems_at21=0, gems_month=7000, prime=True, premium=True),
+}
 
 PROFILES = {
     # Kämpfe/Tag, Startkauf (Edelsteine bei Level 21), Edelsteine/Monat, Prime, Pass-Premium
@@ -142,8 +154,8 @@ def simulate(V, prof, seed, levels=50, days_max=400):
             nxt = next((b for b in sorted(BUILD) if b not in blv), None)
             if nxt and s["L"] >= BUILD[nxt][0] and f"{int(nxt) - 1:02d}" in blv and budget >= BUILD[nxt][1]:
                 budget -= BUILD[nxt][1]; s["gold"] -= BUILD[nxt][1]; blv[nxt] = 1; continue
-            opts = [(bcost(b, l), b) for b, l in blv.items() if l < 10 and (b == "01" or l < blv["01"])]
-            if V["hq_cap"] and s["hero"] >= V["hq_cap"](blv["01"]) and blv["01"] < 10:
+            opts = [(bcost(b, l), b) for b, l in blv.items() if l < V["base_max"] and (b == "01" or l < blv["01"])]
+            if V["hq_cap"] and s["hero"] >= V["hq_cap"](blv["01"]) and blv["01"] < V["base_max"]:
                 opts = [(bcost("01", blv["01"]), "01")]
             if not opts:
                 break
@@ -263,6 +275,24 @@ VARIANTEN = {
         chest_cards=lambda L: 6 * max(5, L), chest_team=True, videos=5,
         hq_cap=lambda q: 2 * max(1, q) + 10, slope_neg=SLOPE * 1.5),
 }
+# Schritt 2 (06.11.2026): Heldenstufe bis 60, Basislager bis Stufe 25
+VARIANTEN["schritt2"] = dict(VARIANTEN["schritt1"], hero_max=60, base_max=25)
+
+
+def worlds_150(V, prof, seeds, days_max=400):
+    """Median der Tage je 10 Level und bis Level 50/100/150."""
+    per = [[] for _ in range(15)]
+    for sd in range(seeds):
+        log, _, _ = simulate(V, prof, sd, levels=150, days_max=days_max)
+        prev = 0
+        for w in range(15):
+            L = 10 * (w + 1)
+            d = log[L][1] if L in log and log[L][1] else days_max
+            per[w].append(d - prev)
+            prev = d
+    med = [statistics.median(x) for x in per]
+    tot = [sum(med[:k]) for k in (5, 10, 15)]
+    return med, tot
 
 
 if __name__ == "__main__":
@@ -270,7 +300,16 @@ if __name__ == "__main__":
     ap.add_argument("--variante", default="ist")
     ap.add_argument("--seeds", type=int, default=40)
     ap.add_argument("--alle", action="store_true")
+    ap.add_argument("--bis150", action="store_true", help="Level 1–150 mit vier Zahlertypen")
     a = ap.parse_args()
+    if a.bis150:
+        V = dict(BASE); V.update(VARIANTEN[a.variante])
+        print(f"== Variante {a.variante}, Level 1–150 (Median aus {a.seeds} Läufen)")
+        print("Spielertyp           | L50 | L100 | L150 | Tage je 10 Level")
+        for pn, prof in PROFILES_150.items():
+            med, tot = worlds_150(V, prof, a.seeds)
+            print(f"{pn:20} | {tot[0]:3.0f} | {tot[1]:4.0f} | {tot[2]:4.0f} | " + " ".join(f"{x:.0f}" for x in med))
+        raise SystemExit
     names = list(VARIANTEN) if a.alle else [a.variante]
     for name in names:
         V = dict(BASE); V.update(VARIANTEN[name])

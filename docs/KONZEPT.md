@@ -329,3 +329,19 @@ Balance-Labor. Abschnitt 9.1 und 9.2 gelten weiter, soweit hier nichts anderes s
   (gratis 1× am Tag, 3–6) und der Goldtruhe (150 Edelsteine, 15–30).
 - **Belohnung verdoppeln:** nach einem Sieg bis 5× am Tag per Werbevideo Gold und Karten doppelt
   (Mockup zur Prüfung). Mit Prime ohne Video.
+
+### 9.4 Level 51–150 (Schritt 2, 06.11.2026)
+
+- **Zehn neue Planeten** (je 10 Level, Auftrag an ChatGPT: `Vorlage_Raw/PLANETEN_FUER_CHATGPT.md`):
+  Dschungelmond, Ozeanwelt, Kristallplanet, Sturmriese, Schrottwelt, Wolkenstadt, Sporenwelt,
+  Geistermond, Tempelplanet, Schwarzes Loch. Bis die Bilder da sind, zeigt jeder einen bisherigen
+  Planeten (`Battlefields.FIELDS[…]["fallback"]`).
+- **20 neue Gegnerwelten** (je 5 Level, zwei je Planet) mit Namen und Levelnamen; vorerst die acht
+  bekannten Gegnerarten mit Färbung und Vorsilbe, eigene Gegner folgen.
+- **Heldenstufe bis 60**, begrenzt durch die Kommandozentrale (2 × Stufe + 10). **Basislager bis Stufe 25:**
+  Werte ab Stufe 11 mit halber Steigung, Ausbau ab Stufe 10 je Stufe +20 % teurer.
+- **Gegnerleben ab Level 51:** eigene Wachstumsrate `GameData.HP_GROWTH_P3`, im Gleichschritt mit dem
+  Profil „Durchschnitt“ (0,4 Heldenstufen je Level), abgestimmt im Balance-Labor.
+- **Zeit-Simulation** (`scripts/progress-sim.py --variante schritt2 --bis150`): Level 150 nach etwa
+  140 Tagen ohne Käufe, 122 bei 5 € im Monat, 82 bei 20 € und 59 bei 50 €. Jede Welt dauert ein bis
+  zwei Tage länger als die vorige, ohne Sprung.
