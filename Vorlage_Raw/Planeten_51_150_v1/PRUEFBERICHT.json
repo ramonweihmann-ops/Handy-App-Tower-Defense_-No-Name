@@ -1,0 +1,172 @@
+{
+  "stand": "2026-11-06",
+  "lieferung": "Erste Abstimmung: zwei von zehn neuen Welten, zwei von fünfzehn vorgesehenen Symbolen",
+  "toleranz_px": 6,
+  "ziel_trapez": [
+    [
+      280,
+      294
+    ],
+    [
+      500,
+      294
+    ],
+    [
+      716,
+      1158
+    ],
+    [
+      64,
+      1158
+    ]
+  ],
+  "mitte_x": 390,
+  "spieltest_durchgefuehrt": false,
+  "methode": "Sichtprüfung mit überlagerten Soll-Linien und Pixel-Stichproben an den Kanten; keine vollständige automatische Segmentierung. Werte sind Näherungswerte.",
+  "dateien": [
+    {
+      "datei": "jungle_moon.png",
+      "breite": 780,
+      "hoehe": 1688,
+      "modus": "RGB",
+      "brueckenmasse_eingehalten": true,
+      "pruefstatus": "Visuelle Stichproben ungefähr innerhalb ±6 Pixel; Spieltest ausstehend.",
+      "max_abweichung_geschaetzt_px": 6,
+      "messunsicherheit_px": 2,
+      "brueckenbeginn_y_ca": 294,
+      "brueckenende_y_ca": 1164,
+      "stichproben": [
+        {
+          "y": 400,
+          "soll_links": 253.5,
+          "ist_links_ca": 252,
+          "soll_rechts": 526.5,
+          "ist_rechts_ca": 526
+        },
+        {
+          "y": 600,
+          "soll_links": 203.5,
+          "ist_links_ca": 204,
+          "soll_rechts": 576.5,
+          "ist_rechts_ca": 577
+        },
+        {
+          "y": 800,
+          "soll_links": 153.5,
+          "ist_links_ca": 154,
+          "soll_rechts": 626.5,
+          "ist_rechts_ca": 628
+        },
+        {
+          "y": 1000,
+          "soll_links": 103.5,
+          "ist_links_ca": 104,
+          "soll_rechts": 676.5,
+          "ist_rechts_ca": 673
+        },
+        {
+          "y": 1140,
+          "soll_links": 68.5,
+          "ist_links_ca": 68,
+          "soll_rechts": 711.5,
+          "ist_rechts_ca": 711
+        }
+      ],
+      "hinweise": [
+        "Die untere Abschlussfuge liegt im Grenzbereich der Toleranz.",
+        "Das Ergebnis ist eine Näherung aus Sichtprüfung und Kanten-Stichproben, keine lückenlose Pixel-Zertifizierung."
+      ],
+      "formatierung": {
+        "quelle_px": [
+          853,
+          1844
+        ],
+        "skalierung_einheitlich": 0.9175704989154013,
+        "beschnitt_links_px": 1,
+        "beschnitt_oben_px": 4,
+        "ziel_px": [
+          780,
+          1688
+        ]
+      }
+    },
+    {
+      "datei": "icon_jungle_moon.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "transparenz": true,
+      "brueckenmasse_eingehalten": null,
+      "hinweis": "Für ein Planetensymbol nicht anwendbar."
+    },
+    {
+      "datei": "ocean_world.png",
+      "breite": 780,
+      "hoehe": 1688,
+      "modus": "RGB",
+      "brueckenmasse_eingehalten": false,
+      "pruefstatus": "Nur Gestaltungsentwurf: Maßtoleranz nicht bestanden, vor produktivem Einbau korrigieren.",
+      "max_abweichung_geschaetzt_px": 35,
+      "messunsicherheit_px": 3,
+      "brueckenbeginn_y_ca": 275,
+      "brueckenende_y_ca": 1150,
+      "stichproben": [
+        {
+          "y": 400,
+          "soll_links": 253.5,
+          "ist_links_ca": 246,
+          "soll_rechts": 526.5,
+          "ist_rechts_ca": 534
+        },
+        {
+          "y": 800,
+          "soll_links": 153.5,
+          "ist_links_ca": 132,
+          "soll_rechts": 626.5,
+          "ist_rechts_ca": 647
+        },
+        {
+          "y": 1000,
+          "soll_links": 103.5,
+          "ist_links_ca": 73,
+          "soll_rechts": 676.5,
+          "ist_rechts_ca": 706
+        },
+        {
+          "y": 1140,
+          "soll_links": 68.5,
+          "ist_links_ca": 37,
+          "soll_rechts": 711.5,
+          "ist_rechts_ca": 746
+        }
+      ],
+      "hinweise": [
+        "Obere Fahrbahnkante etwa 19 Pixel zu hoch; untere Fahrbahn zu breit.",
+        "Die zweite örtliche Generierung vergrößerte die Abweichungen und wurde verworfen.",
+        "Diese Datei ist zur Stilabstimmung geliefert und noch kein maßhaltig freigegebener Hintergrund."
+      ],
+      "formatierung": {
+        "quelle_px": [
+          853,
+          1844
+        ],
+        "skalierung_einheitlich": 0.9154013015184381,
+        "beschnitt_links_px": 0,
+        "beschnitt_oben_px": 0,
+        "ziel_px": [
+          780,
+          1688
+        ]
+      }
+    },
+    {
+      "datei": "icon_ocean_world.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "transparenz": true,
+      "brueckenmasse_eingehalten": null,
+      "hinweis": "Für ein Planetensymbol nicht anwendbar."
+    }
+  ]
+}
