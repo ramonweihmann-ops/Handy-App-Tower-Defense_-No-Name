@@ -346,7 +346,8 @@ static var DPS_GROWTH_LATE := 1.0
 ## Ab Level 51 (Geldphase, Schritt 2) wachsen fast nur noch die Heldenstufen (Profil „Durchschnitt“:
 ## 0,4 Stufen je Level, +7 % je Stufe); das Gegnerleben wächst hier im Gleichschritt (Balance-Labor).
 const PHASE3_FROM := 51
-static var HP_GROWTH_P3 := 1.025
+static var HP_STEP3 := 1.18
+static var HP_GROWTH_P3 := 1.0355
 ## Ab diesem Level brauchen Bosse ohne Käufe in der Regel einen Versuch mehr (Konzept, Abschnitt 9).
 const HARD_BOSS_FROM := 21
 static var HARD_BOSS_HP := 0.8
@@ -400,7 +401,7 @@ static func level_hp(level: int) -> float:
 		return 2.8 * pow(HP_GROWTH, level - 10)
 	var late := pow(HP_GROWTH_LATE, mini(level, PHASE3_FROM - 1) - PHASE2_FROM)
 	if level >= PHASE3_FROM:
-		late *= pow(HP_GROWTH_P3, level - PHASE3_FROM + 1) * world_hp_norm(level)
+		late *= HP_STEP3 * pow(HP_GROWTH_P3, level - PHASE3_FROM + 1) * world_hp_norm(level)
 	return 2.8 * pow(HP_GROWTH, PHASE2_FROM - 11) * HP_STEP * late * float(BOSS_TUNE.get(level, 1.0))
 
 
