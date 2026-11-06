@@ -400,8 +400,17 @@ static func level_hp(level: int) -> float:
 		return 2.8 * pow(HP_GROWTH, level - 10)
 	var late := pow(HP_GROWTH_LATE, mini(level, PHASE3_FROM - 1) - PHASE2_FROM)
 	if level >= PHASE3_FROM:
-		late *= pow(HP_GROWTH_P3, level - PHASE3_FROM + 1)
+		late *= pow(HP_GROWTH_P3, level - PHASE3_FROM + 1) * world_hp_norm(level)
 	return 2.8 * pow(HP_GROWTH, PHASE2_FROM - 11) * HP_STEP * late * float(BOSS_TUNE.get(level, 1.0))
+
+
+## Ab Level 51: gleicht aus, dass manche Gegnerarten von Haus aus mehr Leben haben (z. B. Krabbler,
+## Zombie, Brecher gegenüber Schleimling, Tentakler, Panzerkäfer), damit keine Welt aus der Reihe fällt.
+static func world_hp_norm(level: int) -> float:
+	var k: Array = WORLDS[world_of(level)]["kinds"]
+	var hp := 0.5 * float(ENEMIES[k[0]]["hp"]) + 0.35 * float(ENEMIES[k[1]]["hp"]) + 0.15 * float(ENEMIES[k[2]]["hp"])
+	var ref := 0.5 * 28.0 + 0.35 * 95.0 + 0.15 * 320.0
+	return ref / hp
 
 
 ## Schild der Station in diesem Level (vor Boni).
