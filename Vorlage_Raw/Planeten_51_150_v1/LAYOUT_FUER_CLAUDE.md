@@ -1,30 +1,40 @@
-# Neue Planeten – erste Abstimmungsrunde
+# Planeten 51–150: vollständige Gestaltungslieferung
 
-Diese Lieferung enthält zunächst die zwei beauftragten Testwelten mit ihren Symbolen. Die acht weiteren Welten und die Symbole der bisherigen fünf Welten folgen nach der Abstimmung. Keine Änderungen am Spielcode.
+Acht weitere Schlachtfelder und dreizehn neue Symbole ergänzen die freigegebenen Dateien. Insgesamt stehen zehn neue Welten und fünfzehn Planetensymbole bereit. Alle Schlachtfelder sind PNG/RGB mit genau 780 × 1688 Pixeln. Die Symbole sind PNG/RGBA mit 512 × 512 Pixeln, echtem transparentem Hintergrund und etwa 8 % Außenrand. Farbraum sRGB.
 
-**Wichtiger Prüfstatus:** Dschungelmond: geprüfte Kanten ungefähr innerhalb der gewünschten ±6 Pixel, am unteren Abschluss im Grenzbereich. Ozeanwelt: Gestaltungsentwurf, Maßprüfung NICHT bestanden; Abweichungen von etwa 20–35 Pixeln. Die Ozeanwelt vor produktivem Einbau geometrisch korrigieren. Nicht als fertig maßhaltige Karte behandeln. Beide Bilder sind noch nicht in Godot getestet.
+## Bereits freigegebene Dateien
 
-| Datei | Welt | Level | Format |
-|---|---|---|---|
-| jungle_moon.png | 06 – Dschungelmond | 51–60 | 780 × 1688, PNG, RGB |
-| ocean_world.png | 07 – Ozeanwelt | 61–70 | 780 × 1688, PNG, RGB |
-| icon_jungle_moon.png | Planetensymbol Dschungelmond | 51–60 | 512 × 512, PNG, RGBA, transparenter Hintergrund |
-| icon_ocean_world.png | Planetensymbol Ozeanwelt | 61–70 | 512 × 512, PNG, RGBA, transparenter Hintergrund |
+`jungle_moon.png`, `icon_jungle_moon.png` und `icon_ocean_world.png` bleiben unverändert. Für die Ozeanwelt **`ocean_world_korrigiert.png`** verwenden: Claude hat diese Datei bereits entzerrt und im Spiel eingebaut. Sie wurde weder verändert noch neu generiert. Das alte `ocean_world.png` bleibt aus Gründen der Nachvollziehbarkeit erhalten und soll die korrigierte Fassung nicht ersetzen. Die Gesamtübersicht zeigt die korrigierte Fassung.
 
-## Verbindliche Zielgeometrie
+## Gemessene Geometrie für Claude
 
-Ursprung links oben, Bezug 780 × 1688 Pixel. Fahrbahntrapez: oben `(280,294)` bis `(500,294)`, unten `(64,1158)` bis `(716,1158)`. Mitte `x = 390`. Gerade Seitenkanten: `x_links = 280 − (y − 294)/4`, `x_rechts = 500 + (y − 294)/4`.
+Reihenfolge in dieser Tabelle und im Array: **oben links / oben rechts / unten links / unten rechts**. Koordinaten beziehen sich auf die gelieferten PNGs. Die Messung folgt der inneren Fahrbahnkante vor den seitlichen Lichtleisten. Abgelesen am Pixelraster, ungefähr ±4 Pixel Messunsicherheit. Der letzte Wert ist der größte euklidische Abstand eines gemessenen Eckpunkts vom Sollpunkt, nicht nur eine einzelne x- oder y-Abweichung.
 
-Mauer im Spiel ungefähr bei `y = 1134`; sie gehört nicht zum Hintergrund. Brückenende bei `y = 1158`. Heldenfläche `y = 1169–1410`, Anzeige-/Fähigkeitsfläche `y = 1410–1688`, Kopfleiste `y = 0–110`. Die eigentliche Spielfläche bleibt frei von Figuren, Mauer und Bedienelementen.
+| Datei | Welt | Level | Gemessene Ecken in Pixeln (OL / OR / UL / UR) | Größter Abstand zum Soll |
+|---|---|---|---|---|
+| jungle_moon.png | Dschungelmond | 51–60 | [280, 294] / [500, 294] / [66, 1164] / [715, 1164] | 6.3 px |
+| ocean_world_korrigiert.png | Ozeanwelt | 61–70 | [278, 293] / [501, 293] / [64, 1158] / [715, 1158] | 2.2 px |
+| crystal_planet.png | Kristallplanet | 71–80 | [280, 279] / [500, 279] / [66, 1164] / [715, 1164] | 15.0 px |
+| storm_giant.png | Sturmriese | 81–90 | [251, 296] / [528, 296] / [40, 1130] / [741, 1130] | 37.5 px |
+| scrap_world.png | Schrottwelt | 91–100 | [249, 296] / [528, 296] / [38, 1131] / [743, 1131] | 38.2 px |
+| cloud_city.png | Wolkenstadt | 101–110 | [276, 264] / [502, 264] / [77, 1163] / [698, 1163] | 30.3 px |
+| spore_world.png | Sporenwelt | 111–120 | [279, 286] / [501, 286] / [61, 1164] / [719, 1164] | 8.1 px |
+| ghost_moon.png | Geistermond | 121–130 | [267, 285] / [528, 285] / [43, 1164] / [739, 1164] | 29.4 px |
+| temple_planet.png | Tempelplanet | 131–140 | [279, 287] / [501, 287] / [54, 1162] / [725, 1162] | 10.8 px |
+| black_hole.png | Schwarzes Loch | 141–150 | [250, 278] / [527, 278] / [59, 1127] / [720, 1127] | 34.0 px |
 
-## Erzeugung und Prüfung
+Die einzelnen Werte stehen unter `fahrbahn_ecken_px` und `fahrbahn_ecken_array` in `PRUEFBERICHT.json`. Die Sollpunkte sind getrennt hinterlegt: OL `(280,294)`, OR `(500,294)`, UL `(64,1158)`, UR `(716,1158)`. Mitte `x = 390`, Mauer ungefähr `y = 1134`, Plattform ab `y = 1169`, ruhiger Anzeigenbereich ab `y = 1410`. Unter `pruefung/` zeigen die acht neuen Prüfbilder die Sollkontur in Magenta und die gemessene Kontur in Türkis. Prüfbilder niemals als Hintergrund einsetzen.
 
-Die Bilder wurden mit der eingebauten Bildgenerierung als Bearbeitung von `space_dock.png` erstellt. Die übrigen Referenzen dienten als Stil-, Geometrie- und Einbauvorlage. Eine Geometriekorrektur verwendet zusätzlich ein Prüfbild mit überlagerten Ziellinien. Die finalen Bilder enthalten keine Hilfslinien. Technische Formatierung: ausschließlich einheitliche Skalierung und Beschnitt, keine perspektivische Verformung.
+Die Brücken sind visuell gerade und werden gleichmäßig breiter. Die acht neuen Karten sind zur Implementierung geliefert; Claude kann kleine Abweichungen anhand der vier Ecken entzerren. Die Maßwerte sind keine Behauptung pixelgenauer Deckung mit der Schablone. Neue Karten wurden von ChatGPT nicht in Godot getestet. Nach dem Entzerren die Kanten, die Mauerhöhe und den Übergang zur Plattform im Spiel prüfen. Die beiden bereits eingebauten Welten sind laut Nutzer freigegeben.
 
-Die Ergebnisse der Maßprüfung und verbleibende Abweichungen stehen je Bild in `PRUEFBERICHT.json`. Eine Sichtprüfung am Schablonenbild ersetzt keinen Test mit Godots tatsächlicher Kamera und Skalierung. Die Prüfabbildungen unter `pruefung/` dienen nur zur Kontrolle; sie sind keine Spielhintergründe.
+## Symbole
 
-Die Symbole haben mindestens ungefähr 8 % transparenten Außenrand. Beim Einbau das Seitenverhältnis erhalten. `uebersicht.png` enthält ausschließlich eine verkleinerte Kontrollansicht; daraus keine Spielflächen ausschneiden.
+Dateien: `icon_space_dock.png`, `icon_ice_world.png`, `icon_desert_outpost.png`, `icon_lava_asteroid.png`, `icon_nebula_portal.png`, `icon_jungle_moon.png`, `icon_ocean_world.png`, `icon_crystal_planet.png`, `icon_storm_giant.png`, `icon_scrap_world.png`, `icon_cloud_city.png`, `icon_spore_world.png`, `icon_ghost_moon.png`, `icon_temple_planet.png`, `icon_black_hole.png`.
 
-## Noch ausstehend nach Freigabe
+Die fünf bisherigen Schlachtfelder werden nicht ersetzt; ergänzt werden nur ihre Symbole. Symbole proportional skalieren, ungefähr 60 logische Punkte breit einsetzen; keinen violetten Hintergrund aus der Übersicht mit übernehmen. Die zwei freigegebenen Symbole bleiben unverändert.
 
-Kristallplanet (71–80), Sturmriese (81–90), Schrottwelt (91–100), Wolkenstadt (101–110), Sporenwelt (111–120), Geistermond (121–130), Tempelplanet (131–140), Schwarzes Loch (141–150). Insgesamt sind danach zehn Schlachtfelder und fünfzehn Planetensymbole vorgesehen. Die bisherigen fünf Karten werden durch diese Lieferung nicht ersetzt.
+## Herstellung und Kontrolle
+
+Nur eingebaute Bildgenerierung im bestehenden Konto verwendet. Keine weiteren kostenpflichtigen Dienste. Jede Karte und jedes Symbol wurde einzeln erstellt. Die neuen Karten sind Bearbeitungen von `space_dock.png` mit dem freigegebenen Dschungelmond als Geometrie-/Stilreferenz. Wolkenstadt und Schwarzes Loch erhielten zusätzlich eine Breitenkorrektur über die Bildgenerierung. Technische Formatierung: einheitliche Skalierung und Beschnitt, keine perspektivische Entzerrung. Alle tatsächlichen Bildanweisungen und Formatierungswerte stehen in `BILDANWEISUNGEN.json`.
+
+`uebersicht.png` zeigt die zehn neuen Welten nebeneinander und darunter alle fünfzehn Symbole. Alle Dateimaße, PNG-Modi, Transparenz und Symbolränder wurden technisch geprüft. Spielcode und bestehende freigegebene Bilddateien werden durch diese Lieferung nicht geändert.

@@ -1,94 +1,1136 @@
 {
   "stand": "2026-11-06",
-  "lieferung": "Erste Abstimmung: zwei von zehn neuen Welten, zwei von fünfzehn vorgesehenen Symbolen",
-  "toleranz_px": 6,
-  "ziel_trapez": [
-    [
+  "lieferung": "Acht weitere Welten, dreizehn neue Symbole; insgesamt zehn neue Welten und fünfzehn Planetensymbole.",
+  "bezugsgroesse_px": [
+    780,
+    1688
+  ],
+  "ursprung": "oben links",
+  "kante_definition": "Innere Kante, an der die seitlichen Lichtleisten beginnen; keine äußeren Geländer oder vorspringenden Dekorationen.",
+  "ecken_reihenfolge": [
+    "oben_links",
+    "oben_rechts",
+    "unten_links",
+    "unten_rechts"
+  ],
+  "soll_ecken_px": {
+    "oben_links": [
       280,
       294
     ],
-    [
+    "oben_rechts": [
       500,
       294
     ],
-    [
-      716,
-      1158
-    ],
-    [
+    "unten_links": [
       64,
       1158
+    ],
+    "unten_rechts": [
+      716,
+      1158
     ]
-  ],
-  "mitte_x": 390,
-  "spieltest_durchgefuehrt": false,
-  "methode": "Sichtprüfung mit überlagerten Soll-Linien und Pixel-Stichproben an den Kanten; keine vollständige automatische Segmentierung. Werte sind Näherungswerte.",
+  },
+  "toleranz_korrektur_durch_claude_px": 40,
+  "hinweis": "Gemessene Eckpunkte sind ungefähre Pixelwerte mit angegebener Messunsicherheit. Sollpunkte stehen separat. Gegebenenfalls die Fahrbahn durch Claude entzerren; die gelieferten neuen Bilder wurden nicht perspektivisch verformt.",
   "dateien": [
     {
       "datei": "jungle_moon.png",
+      "planet": "Dschungelmond",
+      "level": [
+        51,
+        60
+      ],
       "breite": 780,
       "hoehe": 1688,
       "modus": "RGB",
-      "brueckenmasse_eingehalten": true,
-      "pruefstatus": "Visuelle Stichproben ungefähr innerhalb ±6 Pixel; Spieltest ausstehend.",
-      "max_abweichung_geschaetzt_px": 6,
+      "fahrbahn_ecken_px": {
+        "oben_links": [
+          280,
+          294
+        ],
+        "oben_rechts": [
+          500,
+          294
+        ],
+        "unten_links": [
+          66,
+          1164
+        ],
+        "unten_rechts": [
+          715,
+          1164
+        ]
+      },
+      "ecken_reihenfolge": [
+        "oben_links",
+        "oben_rechts",
+        "unten_links",
+        "unten_rechts"
+      ],
+      "fahrbahn_ecken_array": [
+        [
+          280,
+          294
+        ],
+        [
+          500,
+          294
+        ],
+        [
+          66,
+          1164
+        ],
+        [
+          715,
+          1164
+        ]
+      ],
+      "abweichung_zum_soll_px": {
+        "oben_links": [
+          0,
+          0
+        ],
+        "oben_rechts": [
+          0,
+          0
+        ],
+        "unten_links": [
+          2,
+          6
+        ],
+        "unten_rechts": [
+          -1,
+          6
+        ]
+      },
+      "max_koordinatenabweichung_px": 6,
+      "max_eckpunktabstand_px": 6.3,
       "messunsicherheit_px": 2,
-      "brueckenbeginn_y_ca": 294,
-      "brueckenende_y_ca": 1164,
-      "stichproben": [
-        {
-          "y": 400,
-          "soll_links": 253.5,
-          "ist_links_ca": 252,
-          "soll_rechts": 526.5,
-          "ist_rechts_ca": 526
-        },
-        {
-          "y": 600,
-          "soll_links": 203.5,
-          "ist_links_ca": 204,
-          "soll_rechts": 576.5,
-          "ist_rechts_ca": 577
-        },
-        {
-          "y": 800,
-          "soll_links": 153.5,
-          "ist_links_ca": 154,
-          "soll_rechts": 626.5,
-          "ist_rechts_ca": 628
-        },
-        {
-          "y": 1000,
-          "soll_links": 103.5,
-          "ist_links_ca": 104,
-          "soll_rechts": 676.5,
-          "ist_rechts_ca": 673
-        },
-        {
-          "y": 1140,
-          "soll_links": 68.5,
-          "ist_links_ca": 68,
-          "soll_rechts": 711.5,
-          "ist_rechts_ca": 711
-        }
+      "messmethode": "Innere Fahrbahnkante am Beginn der seitlichen Lichtleisten, visuell am Pixelraster abgelesen und im Prüfbild überlagert. Keine Subpixelmessung.",
+      "gerade_und_gleichmaessig_breiter_visuell": true,
+      "innerhalb_etwa_40_px_nach_sichtmessung": true,
+      "entzerrung_durch_claude_empfohlen": true,
+      "spieltest_durch_chatgpt": false,
+      "freigabe": "Vom Nutzer bereits im Spiel bestätigt; Datei unverändert."
+    },
+    {
+      "datei": "ocean_world_korrigiert.png",
+      "planet": "Ozeanwelt",
+      "level": [
+        61,
+        70
       ],
-      "hinweise": [
-        "Die untere Abschlussfuge liegt im Grenzbereich der Toleranz.",
-        "Das Ergebnis ist eine Näherung aus Sichtprüfung und Kanten-Stichproben, keine lückenlose Pixel-Zertifizierung."
+      "breite": 780,
+      "hoehe": 1688,
+      "modus": "RGB",
+      "fahrbahn_ecken_px": {
+        "oben_links": [
+          278,
+          293
+        ],
+        "oben_rechts": [
+          501,
+          293
+        ],
+        "unten_links": [
+          64,
+          1158
+        ],
+        "unten_rechts": [
+          715,
+          1158
+        ]
+      },
+      "ecken_reihenfolge": [
+        "oben_links",
+        "oben_rechts",
+        "unten_links",
+        "unten_rechts"
       ],
+      "fahrbahn_ecken_array": [
+        [
+          278,
+          293
+        ],
+        [
+          501,
+          293
+        ],
+        [
+          64,
+          1158
+        ],
+        [
+          715,
+          1158
+        ]
+      ],
+      "abweichung_zum_soll_px": {
+        "oben_links": [
+          -2,
+          -1
+        ],
+        "oben_rechts": [
+          1,
+          -1
+        ],
+        "unten_links": [
+          0,
+          0
+        ],
+        "unten_rechts": [
+          -1,
+          0
+        ]
+      },
+      "max_koordinatenabweichung_px": 2,
+      "max_eckpunktabstand_px": 2.2,
+      "messunsicherheit_px": 2,
+      "messmethode": "Innere Fahrbahnkante am Beginn der seitlichen Lichtleisten, visuell am Pixelraster abgelesen und im Prüfbild überlagert. Keine Subpixelmessung.",
+      "gerade_und_gleichmaessig_breiter_visuell": true,
+      "innerhalb_etwa_40_px_nach_sichtmessung": true,
+      "entzerrung_durch_claude_empfohlen": false,
+      "spieltest_durch_chatgpt": false,
+      "freigabe": "Vom Nutzer bereits im Spiel bestätigt; Datei unverändert.",
+      "herkunft": "Von Claude korrigierte Originaldatei; nicht neu erzeugt.",
+      "sha_git_blob": "8a41817d5b4382ec1a154b0497eb5f3284daa0a8"
+    },
+    {
+      "datei": "crystal_planet.png",
+      "planet": "Kristallplanet",
+      "level": [
+        71,
+        80
+      ],
+      "breite": 780,
+      "hoehe": 1688,
+      "modus": "RGB",
+      "fahrbahn_ecken_px": {
+        "oben_links": [
+          280,
+          279
+        ],
+        "oben_rechts": [
+          500,
+          279
+        ],
+        "unten_links": [
+          66,
+          1164
+        ],
+        "unten_rechts": [
+          715,
+          1164
+        ]
+      },
+      "ecken_reihenfolge": [
+        "oben_links",
+        "oben_rechts",
+        "unten_links",
+        "unten_rechts"
+      ],
+      "fahrbahn_ecken_array": [
+        [
+          280,
+          279
+        ],
+        [
+          500,
+          279
+        ],
+        [
+          66,
+          1164
+        ],
+        [
+          715,
+          1164
+        ]
+      ],
+      "abweichung_zum_soll_px": {
+        "oben_links": [
+          0,
+          -15
+        ],
+        "oben_rechts": [
+          0,
+          -15
+        ],
+        "unten_links": [
+          2,
+          6
+        ],
+        "unten_rechts": [
+          -1,
+          6
+        ]
+      },
+      "max_koordinatenabweichung_px": 15,
+      "max_eckpunktabstand_px": 15.0,
+      "messunsicherheit_px": 4,
+      "messmethode": "Innere Fahrbahnkante am Beginn der seitlichen Lichtleisten, visuell am Pixelraster abgelesen und im Prüfbild überlagert. Keine Subpixelmessung.",
+      "gerade_und_gleichmaessig_breiter_visuell": true,
+      "innerhalb_etwa_40_px_nach_sichtmessung": true,
+      "entzerrung_durch_claude_empfohlen": true,
+      "spieltest_durch_chatgpt": false,
+      "freigabe": "Neue Welt; Einbau und gegebenenfalls Entzerrung durch Claude noch ausstehend.",
       "formatierung": {
-        "quelle_px": [
+        "quellgroesse": [
           853,
           1844
         ],
-        "skalierung_einheitlich": 0.9175704989154013,
-        "beschnitt_links_px": 1,
-        "beschnitt_oben_px": 4,
-        "ziel_px": [
+        "skalierung_einheitlich": 0.9154013015184381,
+        "beschnitt_links": 0,
+        "beschnitt_oben": 0,
+        "ergebnis": [
           780,
           1688
-        ]
+        ],
+        "perspektivische_verformung": false
       }
+    },
+    {
+      "datei": "storm_giant.png",
+      "planet": "Sturmriese",
+      "level": [
+        81,
+        90
+      ],
+      "breite": 780,
+      "hoehe": 1688,
+      "modus": "RGB",
+      "fahrbahn_ecken_px": {
+        "oben_links": [
+          251,
+          296
+        ],
+        "oben_rechts": [
+          528,
+          296
+        ],
+        "unten_links": [
+          40,
+          1130
+        ],
+        "unten_rechts": [
+          741,
+          1130
+        ]
+      },
+      "ecken_reihenfolge": [
+        "oben_links",
+        "oben_rechts",
+        "unten_links",
+        "unten_rechts"
+      ],
+      "fahrbahn_ecken_array": [
+        [
+          251,
+          296
+        ],
+        [
+          528,
+          296
+        ],
+        [
+          40,
+          1130
+        ],
+        [
+          741,
+          1130
+        ]
+      ],
+      "abweichung_zum_soll_px": {
+        "oben_links": [
+          -29,
+          2
+        ],
+        "oben_rechts": [
+          28,
+          2
+        ],
+        "unten_links": [
+          -24,
+          -28
+        ],
+        "unten_rechts": [
+          25,
+          -28
+        ]
+      },
+      "max_koordinatenabweichung_px": 29,
+      "max_eckpunktabstand_px": 37.5,
+      "messunsicherheit_px": 4,
+      "messmethode": "Innere Fahrbahnkante am Beginn der seitlichen Lichtleisten, visuell am Pixelraster abgelesen und im Prüfbild überlagert. Keine Subpixelmessung.",
+      "gerade_und_gleichmaessig_breiter_visuell": true,
+      "innerhalb_etwa_40_px_nach_sichtmessung": true,
+      "entzerrung_durch_claude_empfohlen": true,
+      "spieltest_durch_chatgpt": false,
+      "freigabe": "Neue Welt; Einbau und gegebenenfalls Entzerrung durch Claude noch ausstehend.",
+      "formatierung": {
+        "quellgroesse": [
+          977,
+          1610
+        ],
+        "skalierung_einheitlich": 1.07,
+        "beschnitt_links": 132,
+        "beschnitt_oben": 0,
+        "ergebnis": [
+          780,
+          1688
+        ],
+        "perspektivische_verformung": false
+      }
+    },
+    {
+      "datei": "scrap_world.png",
+      "planet": "Schrottwelt",
+      "level": [
+        91,
+        100
+      ],
+      "breite": 780,
+      "hoehe": 1688,
+      "modus": "RGB",
+      "fahrbahn_ecken_px": {
+        "oben_links": [
+          249,
+          296
+        ],
+        "oben_rechts": [
+          528,
+          296
+        ],
+        "unten_links": [
+          38,
+          1131
+        ],
+        "unten_rechts": [
+          743,
+          1131
+        ]
+      },
+      "ecken_reihenfolge": [
+        "oben_links",
+        "oben_rechts",
+        "unten_links",
+        "unten_rechts"
+      ],
+      "fahrbahn_ecken_array": [
+        [
+          249,
+          296
+        ],
+        [
+          528,
+          296
+        ],
+        [
+          38,
+          1131
+        ],
+        [
+          743,
+          1131
+        ]
+      ],
+      "abweichung_zum_soll_px": {
+        "oben_links": [
+          -31,
+          2
+        ],
+        "oben_rechts": [
+          28,
+          2
+        ],
+        "unten_links": [
+          -26,
+          -27
+        ],
+        "unten_rechts": [
+          27,
+          -27
+        ]
+      },
+      "max_koordinatenabweichung_px": 31,
+      "max_eckpunktabstand_px": 38.2,
+      "messunsicherheit_px": 4,
+      "messmethode": "Innere Fahrbahnkante am Beginn der seitlichen Lichtleisten, visuell am Pixelraster abgelesen und im Prüfbild überlagert. Keine Subpixelmessung.",
+      "gerade_und_gleichmaessig_breiter_visuell": true,
+      "innerhalb_etwa_40_px_nach_sichtmessung": true,
+      "entzerrung_durch_claude_empfohlen": true,
+      "spieltest_durch_chatgpt": false,
+      "freigabe": "Neue Welt; Einbau und gegebenenfalls Entzerrung durch Claude noch ausstehend.",
+      "formatierung": {
+        "quellgroesse": [
+          977,
+          1610
+        ],
+        "skalierung_einheitlich": 1.124,
+        "beschnitt_links": 159,
+        "beschnitt_oben": 0,
+        "ergebnis": [
+          780,
+          1688
+        ],
+        "perspektivische_verformung": false
+      }
+    },
+    {
+      "datei": "cloud_city.png",
+      "planet": "Wolkenstadt",
+      "level": [
+        101,
+        110
+      ],
+      "breite": 780,
+      "hoehe": 1688,
+      "modus": "RGB",
+      "fahrbahn_ecken_px": {
+        "oben_links": [
+          276,
+          264
+        ],
+        "oben_rechts": [
+          502,
+          264
+        ],
+        "unten_links": [
+          77,
+          1163
+        ],
+        "unten_rechts": [
+          698,
+          1163
+        ]
+      },
+      "ecken_reihenfolge": [
+        "oben_links",
+        "oben_rechts",
+        "unten_links",
+        "unten_rechts"
+      ],
+      "fahrbahn_ecken_array": [
+        [
+          276,
+          264
+        ],
+        [
+          502,
+          264
+        ],
+        [
+          77,
+          1163
+        ],
+        [
+          698,
+          1163
+        ]
+      ],
+      "abweichung_zum_soll_px": {
+        "oben_links": [
+          -4,
+          -30
+        ],
+        "oben_rechts": [
+          2,
+          -30
+        ],
+        "unten_links": [
+          13,
+          5
+        ],
+        "unten_rechts": [
+          -18,
+          5
+        ]
+      },
+      "max_koordinatenabweichung_px": 30,
+      "max_eckpunktabstand_px": 30.3,
+      "messunsicherheit_px": 4,
+      "messmethode": "Innere Fahrbahnkante am Beginn der seitlichen Lichtleisten, visuell am Pixelraster abgelesen und im Prüfbild überlagert. Keine Subpixelmessung.",
+      "gerade_und_gleichmaessig_breiter_visuell": true,
+      "innerhalb_etwa_40_px_nach_sichtmessung": true,
+      "entzerrung_durch_claude_empfohlen": true,
+      "spieltest_durch_chatgpt": false,
+      "freigabe": "Neue Welt; Einbau und gegebenenfalls Entzerrung durch Claude noch ausstehend.",
+      "formatierung": {
+        "quellgroesse": [
+          977,
+          1610
+        ],
+        "skalierung_einheitlich": 1.0484472049689442,
+        "beschnitt_links": 122,
+        "beschnitt_oben": 0,
+        "ergebnis": [
+          780,
+          1688
+        ],
+        "perspektivische_verformung": false
+      }
+    },
+    {
+      "datei": "spore_world.png",
+      "planet": "Sporenwelt",
+      "level": [
+        111,
+        120
+      ],
+      "breite": 780,
+      "hoehe": 1688,
+      "modus": "RGB",
+      "fahrbahn_ecken_px": {
+        "oben_links": [
+          279,
+          286
+        ],
+        "oben_rechts": [
+          501,
+          286
+        ],
+        "unten_links": [
+          61,
+          1164
+        ],
+        "unten_rechts": [
+          719,
+          1164
+        ]
+      },
+      "ecken_reihenfolge": [
+        "oben_links",
+        "oben_rechts",
+        "unten_links",
+        "unten_rechts"
+      ],
+      "fahrbahn_ecken_array": [
+        [
+          279,
+          286
+        ],
+        [
+          501,
+          286
+        ],
+        [
+          61,
+          1164
+        ],
+        [
+          719,
+          1164
+        ]
+      ],
+      "abweichung_zum_soll_px": {
+        "oben_links": [
+          -1,
+          -8
+        ],
+        "oben_rechts": [
+          1,
+          -8
+        ],
+        "unten_links": [
+          -3,
+          6
+        ],
+        "unten_rechts": [
+          3,
+          6
+        ]
+      },
+      "max_koordinatenabweichung_px": 8,
+      "max_eckpunktabstand_px": 8.1,
+      "messunsicherheit_px": 4,
+      "messmethode": "Innere Fahrbahnkante am Beginn der seitlichen Lichtleisten, visuell am Pixelraster abgelesen und im Prüfbild überlagert. Keine Subpixelmessung.",
+      "gerade_und_gleichmaessig_breiter_visuell": true,
+      "innerhalb_etwa_40_px_nach_sichtmessung": true,
+      "entzerrung_durch_claude_empfohlen": true,
+      "spieltest_durch_chatgpt": false,
+      "freigabe": "Neue Welt; Einbau und gegebenenfalls Entzerrung durch Claude noch ausstehend.",
+      "formatierung": {
+        "quellgroesse": [
+          853,
+          1844
+        ],
+        "skalierung_einheitlich": 0.9154013015184381,
+        "beschnitt_links": 0,
+        "beschnitt_oben": 0,
+        "ergebnis": [
+          780,
+          1688
+        ],
+        "perspektivische_verformung": false
+      }
+    },
+    {
+      "datei": "ghost_moon.png",
+      "planet": "Geistermond",
+      "level": [
+        121,
+        130
+      ],
+      "breite": 780,
+      "hoehe": 1688,
+      "modus": "RGB",
+      "fahrbahn_ecken_px": {
+        "oben_links": [
+          267,
+          285
+        ],
+        "oben_rechts": [
+          528,
+          285
+        ],
+        "unten_links": [
+          43,
+          1164
+        ],
+        "unten_rechts": [
+          739,
+          1164
+        ]
+      },
+      "ecken_reihenfolge": [
+        "oben_links",
+        "oben_rechts",
+        "unten_links",
+        "unten_rechts"
+      ],
+      "fahrbahn_ecken_array": [
+        [
+          267,
+          285
+        ],
+        [
+          528,
+          285
+        ],
+        [
+          43,
+          1164
+        ],
+        [
+          739,
+          1164
+        ]
+      ],
+      "abweichung_zum_soll_px": {
+        "oben_links": [
+          -13,
+          -9
+        ],
+        "oben_rechts": [
+          28,
+          -9
+        ],
+        "unten_links": [
+          -21,
+          6
+        ],
+        "unten_rechts": [
+          23,
+          6
+        ]
+      },
+      "max_koordinatenabweichung_px": 28,
+      "max_eckpunktabstand_px": 29.4,
+      "messunsicherheit_px": 4,
+      "messmethode": "Innere Fahrbahnkante am Beginn der seitlichen Lichtleisten, visuell am Pixelraster abgelesen und im Prüfbild überlagert. Keine Subpixelmessung.",
+      "gerade_und_gleichmaessig_breiter_visuell": true,
+      "innerhalb_etwa_40_px_nach_sichtmessung": true,
+      "entzerrung_durch_claude_empfohlen": true,
+      "spieltest_durch_chatgpt": false,
+      "freigabe": "Neue Welt; Einbau und gegebenenfalls Entzerrung durch Claude noch ausstehend.",
+      "formatierung": {
+        "quellgroesse": [
+          977,
+          1610
+        ],
+        "skalierung_einheitlich": 1.0484472049689442,
+        "beschnitt_links": 122,
+        "beschnitt_oben": 0,
+        "ergebnis": [
+          780,
+          1688
+        ],
+        "perspektivische_verformung": false
+      }
+    },
+    {
+      "datei": "temple_planet.png",
+      "planet": "Tempelplanet",
+      "level": [
+        131,
+        140
+      ],
+      "breite": 780,
+      "hoehe": 1688,
+      "modus": "RGB",
+      "fahrbahn_ecken_px": {
+        "oben_links": [
+          279,
+          287
+        ],
+        "oben_rechts": [
+          501,
+          287
+        ],
+        "unten_links": [
+          54,
+          1162
+        ],
+        "unten_rechts": [
+          725,
+          1162
+        ]
+      },
+      "ecken_reihenfolge": [
+        "oben_links",
+        "oben_rechts",
+        "unten_links",
+        "unten_rechts"
+      ],
+      "fahrbahn_ecken_array": [
+        [
+          279,
+          287
+        ],
+        [
+          501,
+          287
+        ],
+        [
+          54,
+          1162
+        ],
+        [
+          725,
+          1162
+        ]
+      ],
+      "abweichung_zum_soll_px": {
+        "oben_links": [
+          -1,
+          -7
+        ],
+        "oben_rechts": [
+          1,
+          -7
+        ],
+        "unten_links": [
+          -10,
+          4
+        ],
+        "unten_rechts": [
+          9,
+          4
+        ]
+      },
+      "max_koordinatenabweichung_px": 10,
+      "max_eckpunktabstand_px": 10.8,
+      "messunsicherheit_px": 4,
+      "messmethode": "Innere Fahrbahnkante am Beginn der seitlichen Lichtleisten, visuell am Pixelraster abgelesen und im Prüfbild überlagert. Keine Subpixelmessung.",
+      "gerade_und_gleichmaessig_breiter_visuell": true,
+      "innerhalb_etwa_40_px_nach_sichtmessung": true,
+      "entzerrung_durch_claude_empfohlen": true,
+      "spieltest_durch_chatgpt": false,
+      "freigabe": "Neue Welt; Einbau und gegebenenfalls Entzerrung durch Claude noch ausstehend.",
+      "formatierung": {
+        "quellgroesse": [
+          853,
+          1844
+        ],
+        "skalierung_einheitlich": 0.9154013015184381,
+        "beschnitt_links": 0,
+        "beschnitt_oben": 0,
+        "ergebnis": [
+          780,
+          1688
+        ],
+        "perspektivische_verformung": false
+      }
+    },
+    {
+      "datei": "black_hole.png",
+      "planet": "Schwarzes Loch",
+      "level": [
+        141,
+        150
+      ],
+      "breite": 780,
+      "hoehe": 1688,
+      "modus": "RGB",
+      "fahrbahn_ecken_px": {
+        "oben_links": [
+          250,
+          278
+        ],
+        "oben_rechts": [
+          527,
+          278
+        ],
+        "unten_links": [
+          59,
+          1127
+        ],
+        "unten_rechts": [
+          720,
+          1127
+        ]
+      },
+      "ecken_reihenfolge": [
+        "oben_links",
+        "oben_rechts",
+        "unten_links",
+        "unten_rechts"
+      ],
+      "fahrbahn_ecken_array": [
+        [
+          250,
+          278
+        ],
+        [
+          527,
+          278
+        ],
+        [
+          59,
+          1127
+        ],
+        [
+          720,
+          1127
+        ]
+      ],
+      "abweichung_zum_soll_px": {
+        "oben_links": [
+          -30,
+          -16
+        ],
+        "oben_rechts": [
+          27,
+          -16
+        ],
+        "unten_links": [
+          -5,
+          -31
+        ],
+        "unten_rechts": [
+          4,
+          -31
+        ]
+      },
+      "max_koordinatenabweichung_px": 31,
+      "max_eckpunktabstand_px": 34.0,
+      "messunsicherheit_px": 4,
+      "messmethode": "Innere Fahrbahnkante am Beginn der seitlichen Lichtleisten, visuell am Pixelraster abgelesen und im Prüfbild überlagert. Keine Subpixelmessung.",
+      "gerade_und_gleichmaessig_breiter_visuell": true,
+      "innerhalb_etwa_40_px_nach_sichtmessung": true,
+      "entzerrung_durch_claude_empfohlen": true,
+      "spieltest_durch_chatgpt": false,
+      "freigabe": "Neue Welt; Einbau und gegebenenfalls Entzerrung durch Claude noch ausstehend.",
+      "formatierung": {
+        "quellgroesse": [
+          977,
+          1610
+        ],
+        "skalierung_einheitlich": 1.0484472049689442,
+        "beschnitt_links": 122,
+        "beschnitt_oben": 0,
+        "ergebnis": [
+          780,
+          1688
+        ],
+        "perspektivische_verformung": false
+      }
+    }
+  ],
+  "symbole": [
+    {
+      "datei": "icon_space_dock.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "transparenz": true,
+      "rand_min_px": 41,
+      "motivgrenzen": [
+        41,
+        68,
+        471,
+        443
+      ]
+    },
+    {
+      "datei": "icon_ice_world.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "transparenz": true,
+      "rand_min_px": 41,
+      "motivgrenzen": [
+        41,
+        47,
+        471,
+        465
+      ]
+    },
+    {
+      "datei": "icon_desert_outpost.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "transparenz": true,
+      "rand_min_px": 41,
+      "motivgrenzen": [
+        41,
+        84,
+        471,
+        427
+      ]
+    },
+    {
+      "datei": "icon_lava_asteroid.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "transparenz": true,
+      "rand_min_px": 41,
+      "motivgrenzen": [
+        45,
+        41,
+        466,
+        471
+      ]
+    },
+    {
+      "datei": "icon_nebula_portal.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "transparenz": true,
+      "rand_min_px": 41,
+      "motivgrenzen": [
+        41,
+        71,
+        471,
+        440
+      ]
+    },
+    {
+      "datei": "icon_crystal_planet.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "transparenz": true,
+      "rand_min_px": 41,
+      "motivgrenzen": [
+        53,
+        41,
+        458,
+        471
+      ]
+    },
+    {
+      "datei": "icon_storm_giant.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "transparenz": true,
+      "rand_min_px": 41,
+      "motivgrenzen": [
+        45,
+        41,
+        467,
+        471
+      ]
+    },
+    {
+      "datei": "icon_scrap_world.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "transparenz": true,
+      "rand_min_px": 41,
+      "motivgrenzen": [
+        71,
+        41,
+        441,
+        471
+      ]
+    },
+    {
+      "datei": "icon_cloud_city.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "transparenz": true,
+      "rand_min_px": 41,
+      "motivgrenzen": [
+        45,
+        41,
+        467,
+        471
+      ]
+    },
+    {
+      "datei": "icon_spore_world.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "transparenz": true,
+      "rand_min_px": 41,
+      "motivgrenzen": [
+        44,
+        41,
+        467,
+        471
+      ]
+    },
+    {
+      "datei": "icon_ghost_moon.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "transparenz": true,
+      "rand_min_px": 41,
+      "motivgrenzen": [
+        45,
+        41,
+        467,
+        471
+      ]
+    },
+    {
+      "datei": "icon_temple_planet.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "transparenz": true,
+      "rand_min_px": 41,
+      "motivgrenzen": [
+        43,
+        41,
+        468,
+        471
+      ]
+    },
+    {
+      "datei": "icon_black_hole.png",
+      "breite": 512,
+      "hoehe": 512,
+      "modus": "RGBA",
+      "transparenz": true,
+      "rand_min_px": 41,
+      "motivgrenzen": [
+        45,
+        41,
+        466,
+        471
+      ]
     },
     {
       "datei": "icon_jungle_moon.png",
@@ -96,68 +1138,7 @@
       "hoehe": 512,
       "modus": "RGBA",
       "transparenz": true,
-      "brueckenmasse_eingehalten": null,
-      "hinweis": "Für ein Planetensymbol nicht anwendbar."
-    },
-    {
-      "datei": "ocean_world.png",
-      "breite": 780,
-      "hoehe": 1688,
-      "modus": "RGB",
-      "brueckenmasse_eingehalten": false,
-      "pruefstatus": "Nur Gestaltungsentwurf: Maßtoleranz nicht bestanden, vor produktivem Einbau korrigieren.",
-      "max_abweichung_geschaetzt_px": 35,
-      "messunsicherheit_px": 3,
-      "brueckenbeginn_y_ca": 275,
-      "brueckenende_y_ca": 1150,
-      "stichproben": [
-        {
-          "y": 400,
-          "soll_links": 253.5,
-          "ist_links_ca": 246,
-          "soll_rechts": 526.5,
-          "ist_rechts_ca": 534
-        },
-        {
-          "y": 800,
-          "soll_links": 153.5,
-          "ist_links_ca": 132,
-          "soll_rechts": 626.5,
-          "ist_rechts_ca": 647
-        },
-        {
-          "y": 1000,
-          "soll_links": 103.5,
-          "ist_links_ca": 73,
-          "soll_rechts": 676.5,
-          "ist_rechts_ca": 706
-        },
-        {
-          "y": 1140,
-          "soll_links": 68.5,
-          "ist_links_ca": 37,
-          "soll_rechts": 711.5,
-          "ist_rechts_ca": 746
-        }
-      ],
-      "hinweise": [
-        "Obere Fahrbahnkante etwa 19 Pixel zu hoch; untere Fahrbahn zu breit.",
-        "Die zweite örtliche Generierung vergrößerte die Abweichungen und wurde verworfen.",
-        "Diese Datei ist zur Stilabstimmung geliefert und noch kein maßhaltig freigegebener Hintergrund."
-      ],
-      "formatierung": {
-        "quelle_px": [
-          853,
-          1844
-        ],
-        "skalierung_einheitlich": 0.9154013015184381,
-        "beschnitt_links_px": 0,
-        "beschnitt_oben_px": 0,
-        "ziel_px": [
-          780,
-          1688
-        ]
-      }
+      "status": "freigegeben, unverändert"
     },
     {
       "datei": "icon_ocean_world.png",
@@ -165,8 +1146,179 @@
       "hoehe": 512,
       "modus": "RGBA",
       "transparenz": true,
-      "brueckenmasse_eingehalten": null,
-      "hinweis": "Für ein Planetensymbol nicht anwendbar."
+      "status": "freigegeben, unverändert"
     }
-  ]
+  ],
+  "historischer_bericht_vor_freigabe": {
+    "stand": "2026-11-06",
+    "lieferung": "Erste Abstimmung: zwei von zehn neuen Welten, zwei von fÃ¼nfzehn vorgesehenen Symbolen",
+    "toleranz_px": 6,
+    "ziel_trapez": [
+      [
+        280,
+        294
+      ],
+      [
+        500,
+        294
+      ],
+      [
+        716,
+        1158
+      ],
+      [
+        64,
+        1158
+      ]
+    ],
+    "mitte_x": 390,
+    "spieltest_durchgefuehrt": false,
+    "methode": "SichtprÃ¼fung mit Ã¼berlagerten Soll-Linien und Pixel-Stichproben an den Kanten; keine vollstÃ¤ndige automatische Segmentierung. Werte sind NÃ¤herungswerte.",
+    "dateien": [
+      {
+        "datei": "jungle_moon.png",
+        "breite": 780,
+        "hoehe": 1688,
+        "modus": "RGB",
+        "brueckenmasse_eingehalten": true,
+        "pruefstatus": "Visuelle Stichproben ungefÃ¤hr innerhalb Â±6 Pixel; Spieltest ausstehend.",
+        "max_abweichung_geschaetzt_px": 6,
+        "messunsicherheit_px": 2,
+        "brueckenbeginn_y_ca": 294,
+        "brueckenende_y_ca": 1164,
+        "stichproben": [
+          {
+            "y": 400,
+            "soll_links": 253.5,
+            "ist_links_ca": 252,
+            "soll_rechts": 526.5,
+            "ist_rechts_ca": 526
+          },
+          {
+            "y": 600,
+            "soll_links": 203.5,
+            "ist_links_ca": 204,
+            "soll_rechts": 576.5,
+            "ist_rechts_ca": 577
+          },
+          {
+            "y": 800,
+            "soll_links": 153.5,
+            "ist_links_ca": 154,
+            "soll_rechts": 626.5,
+            "ist_rechts_ca": 628
+          },
+          {
+            "y": 1000,
+            "soll_links": 103.5,
+            "ist_links_ca": 104,
+            "soll_rechts": 676.5,
+            "ist_rechts_ca": 673
+          },
+          {
+            "y": 1140,
+            "soll_links": 68.5,
+            "ist_links_ca": 68,
+            "soll_rechts": 711.5,
+            "ist_rechts_ca": 711
+          }
+        ],
+        "hinweise": [
+          "Die untere Abschlussfuge liegt im Grenzbereich der Toleranz.",
+          "Das Ergebnis ist eine NÃ¤herung aus SichtprÃ¼fung und Kanten-Stichproben, keine lÃ¼ckenlose Pixel-Zertifizierung."
+        ],
+        "formatierung": {
+          "quelle_px": [
+            853,
+            1844
+          ],
+          "skalierung_einheitlich": 0.9175704989154013,
+          "beschnitt_links_px": 1,
+          "beschnitt_oben_px": 4,
+          "ziel_px": [
+            780,
+            1688
+          ]
+        }
+      },
+      {
+        "datei": "icon_jungle_moon.png",
+        "breite": 512,
+        "hoehe": 512,
+        "modus": "RGBA",
+        "transparenz": true,
+        "brueckenmasse_eingehalten": null,
+        "hinweis": "FÃ¼r ein Planetensymbol nicht anwendbar."
+      },
+      {
+        "datei": "ocean_world.png",
+        "breite": 780,
+        "hoehe": 1688,
+        "modus": "RGB",
+        "brueckenmasse_eingehalten": false,
+        "pruefstatus": "Nur Gestaltungsentwurf: MaÃŸtoleranz nicht bestanden, vor produktivem Einbau korrigieren.",
+        "max_abweichung_geschaetzt_px": 35,
+        "messunsicherheit_px": 3,
+        "brueckenbeginn_y_ca": 275,
+        "brueckenende_y_ca": 1150,
+        "stichproben": [
+          {
+            "y": 400,
+            "soll_links": 253.5,
+            "ist_links_ca": 246,
+            "soll_rechts": 526.5,
+            "ist_rechts_ca": 534
+          },
+          {
+            "y": 800,
+            "soll_links": 153.5,
+            "ist_links_ca": 132,
+            "soll_rechts": 626.5,
+            "ist_rechts_ca": 647
+          },
+          {
+            "y": 1000,
+            "soll_links": 103.5,
+            "ist_links_ca": 73,
+            "soll_rechts": 676.5,
+            "ist_rechts_ca": 706
+          },
+          {
+            "y": 1140,
+            "soll_links": 68.5,
+            "ist_links_ca": 37,
+            "soll_rechts": 711.5,
+            "ist_rechts_ca": 746
+          }
+        ],
+        "hinweise": [
+          "Obere Fahrbahnkante etwa 19 Pixel zu hoch; untere Fahrbahn zu breit.",
+          "Die zweite Ã¶rtliche Generierung vergrÃ¶ÃŸerte die Abweichungen und wurde verworfen.",
+          "Diese Datei ist zur Stilabstimmung geliefert und noch kein maÃŸhaltig freigegebener Hintergrund."
+        ],
+        "formatierung": {
+          "quelle_px": [
+            853,
+            1844
+          ],
+          "skalierung_einheitlich": 0.9154013015184381,
+          "beschnitt_links_px": 0,
+          "beschnitt_oben_px": 0,
+          "ziel_px": [
+            780,
+            1688
+          ]
+        }
+      },
+      {
+        "datei": "icon_ocean_world.png",
+        "breite": 512,
+        "hoehe": 512,
+        "modus": "RGBA",
+        "transparenz": true,
+        "brueckenmasse_eingehalten": null,
+        "hinweis": "FÃ¼r ein Planetensymbol nicht anwendbar."
+      }
+    ]
+  }
 }
