@@ -340,8 +340,11 @@ Balance-Labor. Abschnitt 9.1 und 9.2 gelten weiter, soweit hier nichts anderes s
   bekannten Gegnerarten mit Färbung und Vorsilbe, eigene Gegner folgen.
 - **Heldenstufe bis 60**, begrenzt durch die Kommandozentrale (2 × Stufe + 10). **Basislager bis Stufe 25:**
   Werte ab Stufe 11 mit halber Steigung, Ausbau ab Stufe 10 je Stufe +20 % teurer.
-- **Gegnerleben ab Level 51:** eigene Wachstumsrate `GameData.HP_GROWTH_P3`, im Gleichschritt mit dem
-  Profil „Durchschnitt“ (0,4 Heldenstufen je Level), abgestimmt im Balance-Labor.
+- **Gegnerleben ab Level 51:** kleiner Sprung (×1,28, `HP_STEP3`), danach +3,55 % je Level
+  (`HP_GROWTH_P3`), je Welt nach Gegnerarten ausgeglichen (`world_hp_norm`), Boss-Level mit wachsendem
+  Ausgleich (0,78 bei Level 60 bis 0,58 bei 150), eigene Korrektur für 120, 148 und 150. Labor
+  (4 Durchläufe, schwankt stark): Durchschnitt ohne Käufe gewinnt normale Level im Mittel etwa
+  80 % beim ersten Versuch, Zahlend fast immer.
 - **Zeit-Simulation** (`scripts/progress-sim.py --variante schritt2 --bis150`): Level 150 nach etwa
   140 Tagen ohne Käufe, 122 bei 5 € im Monat, 82 bei 20 € und 59 bei 50 €. Jede Welt dauert ein bis
   zwei Tage länger als die vorige, ohne Sprung.
