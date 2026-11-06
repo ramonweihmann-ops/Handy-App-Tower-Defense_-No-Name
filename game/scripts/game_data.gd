@@ -217,6 +217,77 @@ const WORLDS := [
 	{"name": "Herz des Wurmlochs", "kinds": ["tentakler", "zombie", "panzerkaefer", "koloss"],
 		"prefix": "Wurmloch-", "tint": Color(1.25, 0.55, 1.2),
 		"c1": Color(1.0, 0.2, 0.6), "c2": Color(0.3, 0.9, 1.0), "rim": Color(1.0, 0.4, 0.9)},
+	# --- Level 51–150 (Schritt 2): je Planet zwei Welten, vorerst mit eingefärbten Gegnern ---
+	# Planet Dschungelmond (Level 51–60)
+	{"name": "Rankendickicht", "kinds": ["schleimling", "tentakler", "panzerkaefer", "schleimmutter"],
+		"prefix": "Ranken-", "tint": Color(0.70, 1.20, 0.60),
+		"c1": Color(0.22, 0.93, 0.07), "c2": Color(0.62, 0.28, 0.92), "rim": Color(0.44, 0.96, 0.34)},
+	{"name": "Blütenwipfel", "kinds": ["krabbler", "zombie", "brecher", "koloss"],
+		"prefix": "Blüten-", "tint": Color(1.25, 0.80, 1.00),
+		"c1": Color(0.93, 0.07, 0.45), "c2": Color(0.28, 0.92, 0.44), "rim": Color(0.96, 0.34, 0.61)},
+	# Planet Ozeanwelt (Level 61–70)
+	{"name": "Korallenriff", "kinds": ["schleimling", "tentakler", "panzerkaefer", "schleimmutter"],
+		"prefix": "Riff-", "tint": Color(0.60, 1.15, 1.25),
+		"c1": Color(0.07, 0.79, 0.93), "c2": Color(0.92, 0.28, 0.37), "rim": Color(0.34, 0.87, 0.96)},
+	{"name": "Tiefseegraben", "kinds": ["krabbler", "tentakler", "brecher", "koloss"],
+		"prefix": "Tiefsee-", "tint": Color(0.50, 0.75, 1.30),
+		"c1": Color(0.07, 0.34, 0.93), "c2": Color(0.92, 0.53, 0.28), "rim": Color(0.34, 0.53, 0.96)},
+	# Planet Kristallplanet (Level 71–80)
+	{"name": "Rosenkristalle", "kinds": ["schleimling", "zombie", "panzerkaefer", "schleimmutter"],
+		"prefix": "Rosen-", "tint": Color(1.30, 0.75, 1.10),
+		"c1": Color(0.93, 0.07, 0.62), "c2": Color(0.28, 0.92, 0.32), "rim": Color(0.96, 0.34, 0.74)},
+	{"name": "Glitzerschlucht", "kinds": ["krabbler", "tentakler", "brecher", "koloss"],
+		"prefix": "Glitzer-", "tint": Color(1.15, 1.00, 1.35),
+		"c1": Color(0.44, 0.07, 0.93), "c2": Color(0.84, 0.92, 0.28), "rim": Color(0.60, 0.34, 0.96)},
+	# Planet Sturmriese (Level 81–90)
+	{"name": "Wolkenwirbel", "kinds": ["schleimling", "tentakler", "brecher", "schleimmutter"],
+		"prefix": "Sturm-", "tint": Color(1.20, 1.15, 0.70),
+		"c1": Color(0.93, 0.84, 0.07), "c2": Color(0.28, 0.54, 0.92), "rim": Color(0.96, 0.90, 0.34)},
+	{"name": "Blitzfront", "kinds": ["krabbler", "zombie", "panzerkaefer", "koloss"],
+		"prefix": "Blitz-", "tint": Color(0.85, 1.00, 1.35),
+		"c1": Color(0.07, 0.33, 0.93), "c2": Color(0.92, 0.54, 0.28), "rim": Color(0.34, 0.52, 0.96)},
+	# Planet Schrottwelt (Level 91–100)
+	{"name": "Schrotthalden", "kinds": ["krabbler", "zombie", "brecher", "koloss"],
+		"prefix": "Schrott-", "tint": Color(1.25, 0.85, 0.60),
+		"c1": Color(0.93, 0.40, 0.07), "c2": Color(0.28, 0.87, 0.92), "rim": Color(0.96, 0.58, 0.34)},
+	{"name": "Robo-Fabrik", "kinds": ["schleimling", "tentakler", "panzerkaefer", "schleimmutter"],
+		"prefix": "Robo-", "tint": Color(0.85, 0.95, 1.10),
+		"c1": Color(0.07, 0.41, 0.93), "c2": Color(0.92, 0.47, 0.28), "rim": Color(0.34, 0.59, 0.96)},
+	# Planet Wolkenstadt (Level 101–110)
+	{"name": "Himmelsbrücken", "kinds": ["krabbler", "tentakler", "brecher", "koloss"],
+		"prefix": "Himmels-", "tint": Color(1.15, 1.15, 1.25),
+		"c1": Color(0.07, 0.07, 0.93), "c2": Color(0.92, 0.73, 0.28), "rim": Color(0.34, 0.34, 0.96)},
+	{"name": "Goldene Türme", "kinds": ["schleimling", "zombie", "panzerkaefer", "schleimmutter"],
+		"prefix": "Gold-", "tint": Color(1.30, 1.10, 0.60),
+		"c1": Color(0.93, 0.68, 0.07), "c2": Color(0.28, 0.65, 0.92), "rim": Color(0.96, 0.79, 0.34)},
+	# Planet Sporenwelt (Level 111–120)
+	{"name": "Pilzwald", "kinds": ["schleimling", "tentakler", "panzerkaefer", "schleimmutter"],
+		"prefix": "Pilz-", "tint": Color(1.30, 0.80, 0.50),
+		"c1": Color(0.93, 0.39, 0.07), "c2": Color(0.28, 0.87, 0.92), "rim": Color(0.96, 0.57, 0.34)},
+	{"name": "Sporennebel", "kinds": ["krabbler", "zombie", "brecher", "koloss"],
+		"prefix": "Sporen-", "tint": Color(0.60, 1.25, 1.15),
+		"c1": Color(0.07, 0.93, 0.79), "c2": Color(0.92, 0.28, 0.57), "rim": Color(0.34, 0.96, 0.87)},
+	# Planet Geistermond (Level 121–130)
+	{"name": "Mondruinen", "kinds": ["krabbler", "tentakler", "brecher", "koloss"],
+		"prefix": "Mond-", "tint": Color(0.75, 1.10, 1.10),
+		"c1": Color(0.07, 0.92, 0.93), "c2": Color(0.92, 0.28, 0.47), "rim": Color(0.34, 0.96, 0.96)},
+	{"name": "Geisterhallen", "kinds": ["schleimling", "zombie", "panzerkaefer", "schleimmutter"],
+		"prefix": "Geister-", "tint": Color(0.70, 1.25, 1.00),
+		"c1": Color(0.07, 0.93, 0.54), "c2": Color(0.92, 0.28, 0.76), "rim": Color(0.34, 0.96, 0.68)},
+	# Planet Tempelplanet (Level 131–140)
+	{"name": "Tempelschlucht", "kinds": ["krabbler", "zombie", "panzerkaefer", "koloss"],
+		"prefix": "Tempel-", "tint": Color(1.20, 1.05, 0.75),
+		"c1": Color(0.93, 0.64, 0.07), "c2": Color(0.28, 0.69, 0.92), "rim": Color(0.96, 0.76, 0.34)},
+	{"name": "Goldenes Heiligtum", "kinds": ["schleimling", "tentakler", "brecher", "schleimmutter"],
+		"prefix": "Hüter-", "tint": Color(1.30, 1.15, 0.55),
+		"c1": Color(0.93, 0.75, 0.07), "c2": Color(0.28, 0.60, 0.92), "rim": Color(0.96, 0.84, 0.34)},
+	# Planet Schwarzes Loch (Level 141–150)
+	{"name": "Trümmerfeld", "kinds": ["krabbler", "zombie", "brecher", "koloss"],
+		"prefix": "Trümmer-", "tint": Color(0.90, 0.85, 1.00),
+		"c1": Color(0.36, 0.07, 0.93), "c2": Color(0.90, 0.92, 0.28), "rim": Color(0.55, 0.34, 0.96)},
+	{"name": "Schlund des Schwarzen Lochs", "kinds": ["krabbler", "tentakler", "panzerkaefer", "koloss"],
+		"prefix": "Schlund-", "tint": Color(1.10, 0.60, 1.35),
+		"c1": Color(0.64, 0.07, 0.93), "c2": Color(0.69, 0.92, 0.28), "rim": Color(0.76, 0.34, 0.96)},
 ]
 const LEVELS_PER_WORLD := 5
 ## Namen der Level, je Welt fünf (das fünfte ist der Boss).
@@ -231,9 +302,29 @@ const LEVEL_NAMES := [
 	["Dichter Nebel", "Stimmen im Dunst", "Nebeltentakel", "Unsichtbare Brecher", "Mutter des Nebels"],
 	["Lichtloses Tor", "Schattenläufer", "Flüsternde Horde", "Brecher der Dunkelheit", "Der Schattenkoloss"],
 	["Am Ereignishorizont", "Verzerrte Zeit", "Sturm der Tentakel", "Letzte Verteidigung", "Das Herz des Wurmlochs"],
+	["Grünes Dickicht", "Lianenpfad", "Wuchernde Tentakel", "Panzer im Laub", "Die Rankenmutter"],
+	["Über den Wipfeln", "Duftende Falle", "Blütenzombies", "Brecher im Geäst", "Der Blütenkoloss"],
+	["Brandung", "Korallengärten", "Tentakel im Riff", "Muschelpanzer", "Die Riffmutter"],
+	["Abtauchen", "Leuchtende Tiefe", "Druckwelle", "Brecher der Tiefe", "Der Tiefseekoloss"],
+	["Rosa Funkeln", "Kristallregen", "Gläserne Horde", "Facettenpanzer", "Die Kristallmutter"],
+	["Schluchteingang", "Spiegelwände", "Glitzertentakel", "Splitterbrecher", "Der Glitzerkoloss"],
+	["Aufwind", "Wirbelsturm", "Tentakel im Wind", "Donnerbrecher", "Die Sturmmutter"],
+	["Erstes Grollen", "Elektrische Luft", "Blitzzombies", "Geladene Panzer", "Der Donnerkoloss"],
+	["Rostige Hügel", "Klappernde Teile", "Schrottzombies", "Brecher aus Blech", "Der Schrottkoloss"],
+	["Fließband", "Dampf und Funken", "Greifarme", "Stahlpanzer", "Die Maschinenmutter"],
+	["Über den Wolken", "Windige Stege", "Tentakel im Himmel", "Wolkenbrecher", "Der Himmelskoloss"],
+	["Glänzende Kuppeln", "Turmwache", "Goldener Ansturm", "Goldpanzer", "Die Goldmutter"],
+	["Leuchtende Hüte", "Sporenpfad", "Pilztentakel", "Panzer unterm Hut", "Die Pilzmutter"],
+	["Dichte Sporen", "Husten und Niesen", "Sporenzombies", "Moderbrecher", "Der Sporenkoloss"],
+	["Stille Ruinen", "Mondlicht", "Tentakel im Gemäuer", "Ruinenbrecher", "Der Mondkoloss"],
+	["Knarrende Tore", "Flackernde Lichter", "Geisterzug", "Spukpanzer", "Die Geistermutter"],
+	["Uralte Stufen", "Säulengang", "Tempelwächter", "Steinpanzer", "Der Tempelkoloss"],
+	["Verborgene Kammer", "Goldene Fallen", "Hüter der Tentakel", "Brecher des Heiligtums", "Die Hütermutter"],
+	["Treibende Wracks", "Schwerelos", "Trümmerzombies", "Wrackbrecher", "Der Trümmerkoloss"],
+	["Sog", "Gekrümmtes Licht", "Letzter Ansturm", "Panzer am Abgrund", "Der Schlundkoloss"],
 ]
 ## Anzahl der Level (Welten × 5). Wächst mit jeder neuen Welt.
-const LEVEL_COUNT := 50
+const LEVEL_COUNT := 150
 
 # --- Level-Baukasten -------------------------------------------------------------
 # Jedes Level entsteht aus wenigen Werten: Lebenskurve (level_hp), Wellenzahl und Mischung
@@ -252,6 +343,10 @@ static var HP_STEP := 6.0   # vorher 10; mit der doppelt langen Bahn treffen Fl�
 static var HP_GROWTH_LATE := 1.01
 static var DPS_STEP := 1.6
 static var DPS_GROWTH_LATE := 1.0
+## Ab Level 51 (Geldphase, Schritt 2) wachsen fast nur noch die Heldenstufen (Profil „Durchschnitt“:
+## 0,4 Stufen je Level, +7 % je Stufe); das Gegnerleben wächst hier im Gleichschritt (Balance-Labor).
+const PHASE3_FROM := 51
+static var HP_GROWTH_P3 := 1.025
 ## Ab diesem Level brauchen Bosse ohne Käufe in der Regel einen Versuch mehr (Konzept, Abschnitt 9).
 const HARD_BOSS_FROM := 21
 static var HARD_BOSS_HP := 0.8
@@ -303,7 +398,10 @@ static func level_hp(level: int) -> float:
 		return 1.0 + 0.2 * (level - 1)
 	if level < PHASE2_FROM:
 		return 2.8 * pow(HP_GROWTH, level - 10)
-	return 2.8 * pow(HP_GROWTH, PHASE2_FROM - 11) * HP_STEP * pow(HP_GROWTH_LATE, level - PHASE2_FROM) * float(BOSS_TUNE.get(level, 1.0))
+	var late := pow(HP_GROWTH_LATE, mini(level, PHASE3_FROM - 1) - PHASE2_FROM)
+	if level >= PHASE3_FROM:
+		late *= pow(HP_GROWTH_P3, level - PHASE3_FROM + 1)
+	return 2.8 * pow(HP_GROWTH, PHASE2_FROM - 11) * HP_STEP * late * float(BOSS_TUNE.get(level, 1.0))
 
 
 ## Schild der Station in diesem Level (vor Boni).

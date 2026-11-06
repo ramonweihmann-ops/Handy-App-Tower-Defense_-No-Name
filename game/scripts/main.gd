@@ -275,6 +275,8 @@ func _parse_args() -> void:
 			MetaData.HERO_GROWTH = float(arg.get_slice("=", 1))
 		elif arg.begins_with("--hpstep="):
 			GameData.HP_STEP = float(arg.get_slice("=", 1))
+		elif arg.begins_with("--hpg3="):
+			GameData.HP_GROWTH_P3 = float(arg.get_slice("=", 1))
 		elif arg.begins_with("--hplate="):
 			GameData.HP_GROWTH_LATE = float(arg.get_slice("=", 1))
 		elif arg.begins_with("--dpsstep="):

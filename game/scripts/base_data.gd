@@ -10,7 +10,10 @@ class_name BaseData
 ## sie ersetzt weder das Aufwerten der Helden noch das Sammeln der Karten, und Käufe lohnen sich weiter
 ## (Schaden zusammen höchstens etwa +5,5 %; die volle Basis bringt etwa eine halbe Heldenstufe).
 
-const MAX_LEVEL := 10
+## Bis Stufe 10 wie bisher; Stufe 11–25 kam mit Level 51–150 dazu (Kommandozentrale 25 = Heldenstufe 60)
+const MAX_LEVEL := 25
+## Stufe, bis zu der die Werte von v1 auf v10 steigen; danach wächst es halb so schnell weiter
+const VALUE_LEVEL := 10
 ## Lager der Erzeuger: so viele Stunden Ertrag passen hinein
 const STORE_HOURS := 8.0
 ## Seltene Dinge erzeugen weniger als eins in acht Stunden: deren Lager fasst einen ganzen Tag,
@@ -98,14 +101,20 @@ static func by_champion(id: String) -> bool:
 ## Wert eines Gebäudes auf einer Stufe
 static func value(id: String, level: int) -> float:
 	var d: Dictionary = info(id)
-	var f := clampf(float(level - 1) / float(MAX_LEVEL - 1), 0.0, 1.0)
-	return lerpf(float(d["v1"]), float(d["v10"]), f)
+	var v1 := float(d["v1"])
+	var v10 := float(d["v10"])
+	if level <= VALUE_LEVEL:
+		return lerpf(v1, v10, clampf(float(level - 1) / float(VALUE_LEVEL - 1), 0.0, 1.0))
+	# ab Stufe 11: halbe Steigung, damit die Basis ein Bonus bleibt
+	return v10 + (v10 - v1) / float(VALUE_LEVEL - 1) * 0.5 * float(mini(level, MAX_LEVEL) - VALUE_LEVEL)
 
 
 ## Ausbau von Stufe level auf level+1: [Gold, Sterne]
 static func upgrade_cost(id: String, level: int) -> Array:
 	var i := index_of(id)
-	var gold := int(round(150.0 * level * (1.0 + i * 0.1) / 10.0) * 10)
+	# ab Stufe 10 je Stufe +20 % dazu (Geldphase, abgestimmt mit scripts/progress-sim.py)
+	var late := 1.0 + 0.2 * maxi(0, level - VALUE_LEVEL)
+	var gold := int(round(150.0 * level * (1.0 + i * 0.1) * late / 10.0) * 10)
 	var stars := maxi(0, level - 5)
 	return [gold, stars]
 
