@@ -1,5 +1,5 @@
 {
-  "stand": "2026-11-06",
+  "stand": "2026-11-08",
   "lieferung": "Acht weitere Welten, dreizehn neue Symbole; insgesamt zehn neue Welten und fünfzehn Planetensymbole.",
   "bezugsgroesse_px": [
     780,
@@ -112,7 +112,8 @@
       "innerhalb_etwa_40_px_nach_sichtmessung": true,
       "entzerrung_durch_claude_empfohlen": true,
       "spieltest_durch_chatgpt": false,
-      "freigabe": "Vom Nutzer bereits im Spiel bestätigt; Datei unverändert."
+      "freigabe": "Vom Nutzer bereits im Spiel bestätigt; Datei unverändert.",
+      "gestaltung_vom_nutzer_freigegeben": true
     },
     {
       "datei": "ocean_world_korrigiert.png",
@@ -194,7 +195,8 @@
       "spieltest_durch_chatgpt": false,
       "freigabe": "Vom Nutzer bereits im Spiel bestätigt; Datei unverändert.",
       "herkunft": "Von Claude korrigierte Originaldatei; nicht neu erzeugt.",
-      "sha_git_blob": "8a41817d5b4382ec1a154b0497eb5f3284daa0a8"
+      "sha_git_blob": "8a41817d5b4382ec1a154b0497eb5f3284daa0a8",
+      "gestaltung_vom_nutzer_freigegeben": true
     },
     {
       "datei": "crystal_planet.png",
@@ -288,7 +290,8 @@
           1688
         ],
         "perspektivische_verformung": false
-      }
+      },
+      "gestaltung_vom_nutzer_freigegeben": true
     },
     {
       "datei": "storm_giant.png",
@@ -303,19 +306,19 @@
       "fahrbahn_ecken_px": {
         "oben_links": [
           251,
-          296
+          297
         ],
         "oben_rechts": [
-          528,
-          296
+          529,
+          297
         ],
         "unten_links": [
-          40,
-          1130
+          36,
+          1133
         ],
         "unten_rechts": [
-          741,
-          1130
+          743,
+          1133
         ]
       },
       "ecken_reihenfolge": [
@@ -327,37 +330,37 @@
       "fahrbahn_ecken_array": [
         [
           251,
-          296
+          297
         ],
         [
-          528,
-          296
+          529,
+          297
         ],
         [
-          40,
-          1130
+          36,
+          1133
         ],
         [
-          741,
-          1130
+          743,
+          1133
         ]
       ],
       "abweichung_zum_soll_px": {
         "oben_links": [
           -29,
-          2
+          3
         ],
         "oben_rechts": [
-          28,
-          2
+          29,
+          3
         ],
         "unten_links": [
-          -24,
-          -28
+          -28,
+          -25
         ],
         "unten_rechts": [
-          25,
-          -28
+          27,
+          -25
         ]
       },
       "max_koordinatenabweichung_px": 29,
@@ -368,21 +371,57 @@
       "innerhalb_etwa_40_px_nach_sichtmessung": true,
       "entzerrung_durch_claude_empfohlen": true,
       "spieltest_durch_chatgpt": false,
-      "freigabe": "Neue Welt; Einbau und gegebenenfalls Entzerrung durch Claude noch ausstehend.",
+      "freigabe": "Ringkorrektur und Gestaltung vom Nutzer freigegeben; Godot-Test und gegebenenfalls Entzerrung durch Claude ausstehend.",
       "formatierung": {
         "quellgroesse": [
-          977,
-          1610
+          853,
+          1844
         ],
-        "skalierung_einheitlich": 1.07,
-        "beschnitt_links": 132,
+        "skalierung_einheitlich": 0.9154013015184381,
+        "beschnitt_links": 0,
         "beschnitt_oben": 0,
         "ergebnis": [
           780,
           1688
         ],
         "perspektivische_verformung": false
-      }
+      },
+      "vorherige_fassung": {
+        "fahrbahn_ecken_px": {
+          "oben_links": [
+            251,
+            296
+          ],
+          "oben_rechts": [
+            528,
+            296
+          ],
+          "unten_links": [
+            40,
+            1130
+          ],
+          "unten_rechts": [
+            741,
+            1130
+          ]
+        },
+        "formatierung": {
+          "quellgroesse": [
+            977,
+            1610
+          ],
+          "skalierung_einheitlich": 1.07,
+          "beschnitt_links": 132,
+          "beschnitt_oben": 0,
+          "ergebnis": [
+            780,
+            1688
+          ],
+          "perspektivische_verformung": false
+        }
+      },
+      "aktualisiert_am": "2026-11-08",
+      "gestaltung_vom_nutzer_freigegeben": true
     },
     {
       "datei": "scrap_world.png",
@@ -476,7 +515,8 @@
           1688
         ],
         "perspektivische_verformung": false
-      }
+      },
+      "gestaltung_vom_nutzer_freigegeben": true
     },
     {
       "datei": "cloud_city.png",
@@ -570,7 +610,8 @@
           1688
         ],
         "perspektivische_verformung": false
-      }
+      },
+      "gestaltung_vom_nutzer_freigegeben": true
     },
     {
       "datei": "spore_world.png",
@@ -664,7 +705,8 @@
           1688
         ],
         "perspektivische_verformung": false
-      }
+      },
+      "gestaltung_vom_nutzer_freigegeben": true
     },
     {
       "datei": "ghost_moon.png",
@@ -758,7 +800,8 @@
           1688
         ],
         "perspektivische_verformung": false
-      }
+      },
+      "gestaltung_vom_nutzer_freigegeben": true
     },
     {
       "datei": "temple_planet.png",
@@ -852,7 +895,8 @@
           1688
         ],
         "perspektivische_verformung": false
-      }
+      },
+      "gestaltung_vom_nutzer_freigegeben": true
     },
     {
       "datei": "black_hole.png",
@@ -946,7 +990,8 @@
           1688
         ],
         "perspektivische_verformung": false
-      }
+      },
+      "gestaltung_vom_nutzer_freigegeben": true
     }
   ],
   "symbole": [
@@ -1320,5 +1365,7 @@
         "hinweis": "FÃ¼r ein Planetensymbol nicht anwendbar."
       }
     ]
-  }
+  },
+  "gestaltung_vom_nutzer_freigegeben": true,
+  "aktualisierung": "Freigegebene Ringkorrektur des Sturmriesen übernommen; Eckpunkte erneut gemessen. Weitere Karten und Symbole unverändert."
 }

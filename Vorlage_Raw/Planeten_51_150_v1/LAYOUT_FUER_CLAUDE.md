@@ -1,6 +1,12 @@
-# Planeten 51–150: vollständige Gestaltungslieferung
+# Planeten 51–150: freigegebene Gestaltungslieferung, Stand 08.11.2026
 
 Acht weitere Schlachtfelder und dreizehn neue Symbole ergänzen die freigegebenen Dateien. Insgesamt stehen zehn neue Welten und fünfzehn Planetensymbole bereit. Alle Schlachtfelder sind PNG/RGB mit genau 780 × 1688 Pixeln. Die Symbole sind PNG/RGBA mit 512 × 512 Pixeln, echtem transparentem Hintergrund und etwa 8 % Außenrand. Farbraum sRGB.
+
+## Übergabe nach visueller Freigabe
+
+Der Nutzer hat die zusammengestellte Gestaltung für Claude freigegeben. `storm_giant.png` enthält jetzt die bestätigte Ringkorrektur: zwei klar getrennte Ringebenen, gemeinsame senkrechte Nabe, konzentrische Ringkonturen und radiale Tragarme mit stimmigen Anschlüssen. Die vier Fahrbahnecken wurden für diese neue Bildfassung erneut abgelesen; Werte aus der vorherigen Fassung nicht ungeprüft übernehmen. Die PNG-Abmessungen bleiben 780 × 1688 Pixel. Für neue Karten weiterhin gegebenenfalls entzerren und im Spiel prüfen; die visuelle Freigabe ersetzt keinen Godot-Test.
+
+`uebersicht.png` zeigt jetzt alle 15 Welten mit Symbolen. Für die zehn neuen Welten gibt es zusätzlich `neue_10_welten_detail_v2.png`; `alle_15_symbole_v2.png` zeigt nur die Symbole. `PRUEFLISTE.md` ordnet die Nummern 01–15 den Bildern zu. Die fünf bisherigen Weltkarten erscheinen ausschließlich als Vergleich in der Übersicht und werden nicht ersetzt. Claudes `ocean_world_korrigiert.png` bleibt unverändert und ist weiterhin die aktive Ozean-Fassung.
 
 ## Bereits freigegebene Dateien
 
@@ -15,7 +21,7 @@ Reihenfolge in dieser Tabelle und im Array: **oben links / oben rechts / unten l
 | jungle_moon.png | Dschungelmond | 51–60 | [280, 294] / [500, 294] / [66, 1164] / [715, 1164] | 6.3 px |
 | ocean_world_korrigiert.png | Ozeanwelt | 61–70 | [278, 293] / [501, 293] / [64, 1158] / [715, 1158] | 2.2 px |
 | crystal_planet.png | Kristallplanet | 71–80 | [280, 279] / [500, 279] / [66, 1164] / [715, 1164] | 15.0 px |
-| storm_giant.png | Sturmriese | 81–90 | [251, 296] / [528, 296] / [40, 1130] / [741, 1130] | 37.5 px |
+| storm_giant.png | Sturmriese | 81–90 | [251, 297] / [529, 297] / [36, 1133] / [743, 1133] | 37.5 px |
 | scrap_world.png | Schrottwelt | 91–100 | [249, 296] / [528, 296] / [38, 1131] / [743, 1131] | 38.2 px |
 | cloud_city.png | Wolkenstadt | 101–110 | [276, 264] / [502, 264] / [77, 1163] / [698, 1163] | 30.3 px |
 | spore_world.png | Sporenwelt | 111–120 | [279, 286] / [501, 286] / [61, 1164] / [719, 1164] | 8.1 px |
@@ -37,4 +43,4 @@ Die fünf bisherigen Schlachtfelder werden nicht ersetzt; ergänzt werden nur ih
 
 Nur eingebaute Bildgenerierung im bestehenden Konto verwendet. Keine weiteren kostenpflichtigen Dienste. Jede Karte und jedes Symbol wurde einzeln erstellt. Die neuen Karten sind Bearbeitungen von `space_dock.png` mit dem freigegebenen Dschungelmond als Geometrie-/Stilreferenz. Wolkenstadt und Schwarzes Loch erhielten zusätzlich eine Breitenkorrektur über die Bildgenerierung. Technische Formatierung: einheitliche Skalierung und Beschnitt, keine perspektivische Entzerrung. Alle tatsächlichen Bildanweisungen und Formatierungswerte stehen in `BILDANWEISUNGEN.json`.
 
-`uebersicht.png` zeigt die zehn neuen Welten nebeneinander und darunter alle fünfzehn Symbole. Alle Dateimaße, PNG-Modi, Transparenz und Symbolränder wurden technisch geprüft. Spielcode und bestehende freigegebene Bilddateien werden durch diese Lieferung nicht geändert.
+`uebersicht.png` zeigt alle fünfzehn Welten mit zugehörigen Symbolen; die zusätzliche Detailübersicht zeigt die zehn neuen Welten. Alle Dateimaße, PNG-Modi, Transparenz und Symbolränder wurden technisch geprüft. Der Spielcode bleibt unverändert. Bei den Bilddateien wird ausschließlich die bestätigte neue Ringfassung unter `storm_giant.png` übernommen; alle anderen bereits vorhandenen Karten und Symbole bleiben unverändert.
