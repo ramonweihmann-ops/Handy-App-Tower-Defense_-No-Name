@@ -1,6 +1,6 @@
 {
   "stand": "2026-11-09",
-  "revision": "Ringkorrektur v6, Liefername v5 für bestehenden Einbau erhalten",
+  "revision": "Ringkorrektur v7: horizontaler Saturnring, Liefername v5 für bestehenden Einbau erhalten",
   "groesse": [
     852,
     1846
@@ -8,10 +8,10 @@
   "ausserhalb_bearbeitungsmaske_geaenderte_pixel": 0,
   "innerhalb_ui_schutzmaske_geaenderte_pixel": 0,
   "bearbeitungsbereich": [
-    468,
-    363,
+    460,
+    362,
     852,
-    803
+    804
   ],
-  "geometrie": "Ring deutlich frontal um die Außenkontur; keine helle Ringlinie durch die Wolkenbänder. Hinterer oberer Ringanteil hinter der Kugel, unterer vor der Außenkante."
+  "geometrie": "Flache horizontale Ellipse um den Äquator. Hinterer oberer Ringbogen vollständig von der undurchsichtigen Kugel verdeckt; vorderer unterer Bogen vor der Kugel. Kein vertikaler Halo."
 }
