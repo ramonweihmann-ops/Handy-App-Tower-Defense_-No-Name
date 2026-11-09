@@ -58,6 +58,10 @@ func _ready() -> void:
 		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
 			tempo_pressed.emit())
 	place_at(tempo, TEMPO_RECT, true)
+	# Booster-Symbole über den Knöpfen (die Knopfbilder zeigen Luftangriff und Medipack)
+	_icons = BoosterIcons.new()
+	_icons.hud = self
+	place_at(_icons, Rect2(0, 0, W, H), true)
 	for key in ["−3/s", "−2/s", "80%"]:
 		hide_text(key)
 
@@ -131,12 +135,26 @@ func set_fence(hp: float, max_hp: float) -> void:
 
 func set_boosters(ids: Array[String]) -> void:
 	_boosters = ids
+	if _icons:
+		_icons.queue_redraw()
 	var left := button("Luftschlag bereit")
 	var right := button("Reparatur bereit")
 	if left:
 		left.visible = ids.size() > 0
 	if right:
 		right.visible = ids.size() > 1
+
+
+var _booster_tex := {}
+var _icons: Control
+
+
+## Symbol eines Boosters (Vorlage_Raw/Icons_v1, ui/boosters)
+func booster_icon(id: String) -> Texture2D:
+	if not _booster_tex.has(id):
+		var f := "res://ui/boosters/%s.webp" % id
+		_booster_tex[id] = load(f) if ResourceLoader.exists(f) else null
+	return _booster_tex[id]
 
 
 func set_booster_ready(i: int, ratio: float) -> void:
@@ -559,3 +577,43 @@ class HudLayer:
 		sb.border_color = Color(1.0, 0.6, 0.6, a)
 		draw_style_box(sb, r)
 		draw_string(font, r.position + Vector2(_s(16), _s(20)), hud._banner, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(1, 1, 1, a))
+
+
+## Symbol des mitgenommenen Boosters auf dem Knopf, wenn es nicht Luftangriff (links) bzw. Medipack (rechts) ist
+class BoosterIcons:
+	extends Control
+	var hud: BattleHud
+
+	func _ready() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _process(_delta: float) -> void:
+		# nur neu zeichnen, wenn ein anderer Booster als die beiden im Knopfbild mitgenommen ist (Ladekreis läuft)
+		if hud._boosters.size() > 0 and (hud._boosters[0] != "luftangriff" or (hud._boosters.size() > 1 and hud._boosters[1] != "medipack")):
+			queue_redraw()
+
+	func _draw() -> void:
+		for i in mini(2, hud._boosters.size()):
+			var btn := hud.button("Luftschlag bereit" if i == 0 else "Reparatur bereit")
+			if btn == null or not btn.visible or hud._boosters[i] == ["luftangriff", "medipack"][i]:
+				continue
+			var tex := hud.booster_icon(hud._boosters[i])
+			if tex == null:
+				continue
+			var r: Array = btn.info["rect"]
+			var c := Vector2(r[0] + r[2] * 0.5, r[1] + r[3] * 0.5) * hud.s
+			var inner: float = r[2] * 0.5 * 0.83 * hud.s
+			draw_circle(c, inner, Color8(62, 58, 128))
+			draw_circle(c + Vector2(0, -inner * 0.35), inner * 0.62, Color(1, 1, 1, 0.12))
+			var isz: float = r[2] * 0.72 * hud.s
+			draw_texture_rect(tex, Rect2(c - Vector2(isz, isz) * 0.5, Vector2(isz, isz)), false)
+			# Ladekreis wie in HudLayer._draw_boosters, hier über dem Symbol
+			var ratio: float = hud._booster_ready[i]
+			if ratio >= 1.0:
+				continue
+			var rad: float = r[2] * 0.5 * hud.s
+			var pts := PackedVector2Array([c])
+			for k in 33:
+				pts.append(c + Vector2.from_angle(-PI * 0.5 + TAU * ratio + TAU * (1.0 - ratio) * k / 32.0) * rad)
+			draw_colored_polygon(pts, Color(0.02, 0.02, 0.1, 0.62))
+			draw_arc(c, rad - 1.5 * hud.s, -PI * 0.5, -PI * 0.5 + TAU * ratio, 40, Color("ffd34d"), 3.0 * hud.s, true)

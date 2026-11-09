@@ -65,6 +65,7 @@ var _auto_pull_t := 0.0
 var _profile := ""
 ## Nur für Tests mit Fenster: nach 8 Sekunden Kampf ein Bild speichern und beenden (--shot=pfad.png).
 var _shot_path := ""
+var _boost_override: Array[String] = []
 ## Nur für Tests mit Fenster: Menübild speichern (--menushot=pfad.png[,reiter[,lager-voll|held:<id>|bau:<id>[:leer]|unterreiter]]) und beenden.
 var _menu_shot := ""
 var _squad := ""
@@ -293,6 +294,10 @@ func _parse_args() -> void:
 			MpData.HP_TUNE_FIXED = float(arg.get_slice("=", 1))
 		elif arg.begins_with("--mpboss="):
 			MpData.BOSS_TUNE_FIXED = float(arg.get_slice("=", 1))
+		elif arg.begins_with("--boosters="):
+			# nur für Prüfbilder: diese Booster mitnehmen, z. B. --boosters=zeitlupe,kuppel
+			for b in arg.get_slice("=", 1).split(","):
+				_boost_override.append(b)
 		elif arg.begins_with("--profile="):
 			_profile = arg.get_slice("=", 1)
 		elif arg.begins_with("--pickshot="):
@@ -811,7 +816,7 @@ func _start(n: int, hard_mode: bool, multi: bool, found: MpMatch = null) -> void
 	for g in bonus["gates"]:
 		plasma.add_gate(g)
 	hud.visible = true
-	_boosters = Save.booster_slots()
+	_boosters = Save.booster_slots() if _boost_override.is_empty() else _boost_override.duplicate()
 	_booster_cd.clear()
 	for id in _boosters:
 		# Zu Beginn sind Booster halb geladen
