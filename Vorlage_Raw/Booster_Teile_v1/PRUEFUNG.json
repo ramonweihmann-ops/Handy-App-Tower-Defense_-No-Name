@@ -1,0 +1,15 @@
+{
+  "datei": "booster_teile.png",
+  "groesse": [
+    512,
+    512
+  ],
+  "modus": "RGBA",
+  "motivausdehnung": [
+    53,
+    36,
+    459,
+    476
+  ],
+  "freier_rand_min_px": 36
+}

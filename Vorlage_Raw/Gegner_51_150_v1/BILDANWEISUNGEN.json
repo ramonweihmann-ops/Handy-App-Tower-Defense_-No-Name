@@ -1,0 +1,42 @@
+{
+  "stand": "2026-11-09",
+  "umfang": "Nur Dschungelmond: vier von geplanten vierzig Gegnern. Auf Rückmeldung warten.",
+  "prompts": [
+    {
+      "id": "06_leicht",
+      "folder": "quellen",
+      "transparent": true,
+      "paths": [
+        "C:/Users/ramon/Documents/ChatGPT/App_TowerDefense/ausgabe/drei_auftraege_2026_11_09/referenzen/gegner_bisher.png"
+      ],
+      "prompt": "Einzelne neue Figur als Modellvorlage für Station am Wurmloch, Stil exakt wie die angehängten bisherigen acht Gegner: freundliche freche 3D-Comic-Spielgrafik, weiche plastische Schattierung, große klare Formen, wenige Details, kräftige Farben, klare Silhouette, große Augen, nicht bedrohlich, für Kinder ab sechs. Frontal orthografisch gerade von vorn, ganzer Körper mittig, quadratisches Bild 1024x1024, echte Transparenz, etwa zehn Prozent Rand auf jeder Seite. Kein Boden, keine Bodenplatte, kein Bodenschatten, keine Schrift, kein Rahmen, keine weiteren Ansichten. Keine durchsichtigen Körperteile, keine dünnen Fäden, keine losen Ranken, keine Waffen. Organische Teile kurz, dick und modellierbar. Dschungelmond-Familie: lebhaftes Blattgrün, warme Orangeakzente, Rindenbraun als Nebenfarbe; auf dunkelbrauner Fahrbahn auch bei 30–60 Pixeln erkennbar. Keinen bestehenden bekannten Charakter kopieren.\nRankling, leichter Gegner: kleines rundliches hüpfendes Pflanzenknäuel aus fünf bis sieben BREITEN überlappenden fleischigen Blattplatten, helles Limettengrün mit dunkleren grünen Blattkanten, zwei große freche Augen und ein kleiner schelmischer Mund. Oben zwei dicke kurze Blattzipfel und eine kleine orange Knospe. Kompakter asymmetrischer Klumpen, keine Arme und KEINE Beine, keine Füße und keine Tentakel, keine herabhängenden dünnen Ranken. Glatte geschlossene Unterseite. Nur eine Figur."
+    },
+    {
+      "id": "06_mittel",
+      "folder": "quellen",
+      "transparent": true,
+      "paths": [
+        "C:/Users/ramon/Documents/ChatGPT/App_TowerDefense/ausgabe/drei_auftraege_2026_11_09/referenzen/gegner_bisher.png"
+      ],
+      "prompt": "Einzelne neue Figur als Modellvorlage für Station am Wurmloch, Stil exakt wie die angehängten bisherigen acht Gegner: freundliche freche 3D-Comic-Spielgrafik, weiche plastische Schattierung, große klare Formen, wenige Details, kräftige Farben, klare Silhouette, große Augen, nicht bedrohlich, für Kinder ab sechs. Frontal orthografisch gerade von vorn, ganzer Körper mittig, quadratisches Bild 1024x1024, echte Transparenz, etwa zehn Prozent Rand auf jeder Seite. Kein Boden, keine Bodenplatte, kein Bodenschatten, keine Schrift, kein Rahmen, keine weiteren Ansichten. Keine durchsichtigen Körperteile, keine dünnen Fäden, keine losen Ranken, keine Waffen. Organische Teile kurz, dick und modellierbar. Dschungelmond-Familie: lebhaftes Blattgrün, warme Orangeakzente, Rindenbraun als Nebenfarbe; auf dunkelbrauner Fahrbahn auch bei 30–60 Pixeln erkennbar. Keinen bestehenden bekannten Charakter kopieren.\nBlütenschnapper, mittlerer Gegner: schwebende tropische Alien-Blüte mit rundem korallorangefarbenem Gesicht, genau sechs dicken orange-goldenen Blütenblättern als kompakter Kragen, klaren frechen Augen und breitem harmlosem Mund mit zwei kleinen stumpfen Zähnchen. Unten ein kurzer kompakter grüner Samenkapsel-Körper. GENAU ZWEI große breite dicke grüne Blätter als Flügel, symmetrisch links und rechts seitlich ausgebreitet, je ein durchgehender glatter Flügel ohne Finger. Keine zusätzlichen Arme, KEINE Beine, keine Stängel, kein Blumentopf. Flügelanzahl genau zwei und gut zählbar. Nur eine Figur."
+    },
+    {
+      "id": "06_stark",
+      "folder": "quellen",
+      "transparent": true,
+      "paths": [
+        "C:/Users/ramon/Documents/ChatGPT/App_TowerDefense/ausgabe/drei_auftraege_2026_11_09/referenzen/gegner_bisher.png"
+      ],
+      "prompt": "Einzelne neue Figur als Modellvorlage für Station am Wurmloch, Stil exakt wie die angehängten bisherigen acht Gegner: freundliche freche 3D-Comic-Spielgrafik, weiche plastische Schattierung, große klare Formen, wenige Details, kräftige Farben, klare Silhouette, große Augen, nicht bedrohlich, für Kinder ab sechs. Frontal orthografisch gerade von vorn, ganzer Körper mittig, quadratisches Bild 1024x1024, echte Transparenz, etwa zehn Prozent Rand auf jeder Seite. Kein Boden, keine Bodenplatte, kein Bodenschatten, keine Schrift, kein Rahmen, keine weiteren Ansichten. Keine durchsichtigen Körperteile, keine dünnen Fäden, keine losen Ranken, keine Waffen. Organische Teile kurz, dick und modellierbar. Dschungelmond-Familie: lebhaftes Blattgrün, warme Orangeakzente, Rindenbraun als Nebenfarbe; auf dunkelbrauner Fahrbahn auch bei 30–60 Pixeln erkennbar. Keinen bestehenden bekannten Charakter kopieren.\nBorkenkäfer, starker Gegner: breiter kompakter Alien-Käfer mit dickem Panzer aus drei großen stilisierten Rindenplatten, warmbraun mit großen smaragdgrünen Moospolstern, hellgrünem Gesicht und großen türkisgrünen Augen. Frontale orthografische Ansicht, erhöht sitzender breiter Panzer. GENAU SECHS kräftige Beine, drei klar getrennt auf jeder Seite. Damit alle sechs zählbar sind: hinteres Beinpaar links/rechts etwas höher und weit nach außen, mittleres Beinpaar auf mittlerer Höhe seitlich, vorderes Beinpaar unten neben dem Gesicht. Jedes Bein hat zwei dicke Segmente und einen stumpfen Fuß; deutliche transparente Lücken zwischen den drei Beinen jeder Seite. Keine Arme, keine Fühler, keine Extra-Anhängsel, keine siebte oder achte Gliedmaße. Orangefarbene Fußenden, dunkleres Rindenbraun nur als Nebenfarbe, grüne große Panzerflächen zur Abhebung von braunem Boden. Nur eine Figur."
+    },
+    {
+      "id": "06_boss",
+      "folder": "quellen",
+      "transparent": true,
+      "paths": [
+        "C:/Users/ramon/Documents/ChatGPT/App_TowerDefense/ausgabe/drei_auftraege_2026_11_09/referenzen/gegner_bisher.png"
+      ],
+      "prompt": "Einzelne neue Figur als Modellvorlage für Station am Wurmloch, Stil exakt wie die angehängten bisherigen acht Gegner: freundliche freche 3D-Comic-Spielgrafik, weiche plastische Schattierung, große klare Formen, wenige Details, kräftige Farben, klare Silhouette, große Augen, nicht bedrohlich, für Kinder ab sechs. Frontal orthografisch gerade von vorn, ganzer Körper mittig, quadratisches Bild 1024x1024, echte Transparenz, etwa zehn Prozent Rand auf jeder Seite. Kein Boden, keine Bodenplatte, kein Bodenschatten, keine Schrift, kein Rahmen, keine weiteren Ansichten. Keine durchsichtigen Körperteile, keine dünnen Fäden, keine losen Ranken, keine Waffen. Organische Teile kurz, dick und modellierbar. Dschungelmond-Familie: lebhaftes Blattgrün, warme Orangeakzente, Rindenbraun als Nebenfarbe; auf dunkelbrauner Fahrbahn auch bei 30–60 Pixeln erkennbar. Keinen bestehenden bekannten Charakter kopieren.\nUrwaldriese, Boss: großer breiter freundlicher wandelnder Alien-Baum als Zweibeiner, massiver warmbrauner Stammkörper mit einem hellgrünen Gesicht und großen bernsteinfarbenen Augen im Stamm, markante dicke grüne Augenbrauen, kompakte breite Blattkrone oben und zwei kleinen orangefarbenen Blüten als Farbakzent. Kein filigranes Geäst. Exakt ZWEI starke Ast-Arme und ZWEI kräftige Stamm-Beine. Streng frontal in sauberer A-Pose, beide Arme mit geraden Ellbogen etwa 40 Grad vom Körper abgespreizt, beide Beine gerade hüftbreit und mit klarer Lücke. Einfache Hände mit je drei breiten Fingern und einem deutlich abgesetzten Daumen, Hände vollständig frei vom Körper. Stumpfe blockige Füße, keine zusätzlichen Wurzelbeine oder freistehenden Ranken. Dicke grüne Moos-Schulterpolster gehören fest an den Körper. Eindrucksvoll durch breite Silhouette, freundlich statt gruselig. Nur eine Figur."
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+[
+  {
+    "datei": "06_leicht.png",
+    "groesse": [
+      1024,
+      1024
+    ],
+    "modus": "RGBA",
+    "motivausdehnung": [
+      104,
+      118,
+      920,
+      906
+    ],
+    "freier_rand_min_px": 104,
+    "id": "06_leicht",
+    "name": "Rankling",
+    "planet": "Dschungelmond",
+    "staerke": "leicht",
+    "koerperbau": "Klumpen",
+    "arme": 0,
+    "beine": 0,
+    "fluegel": 0,
+    "anatomie_visuell_geprueft": true,
+    "status": "Entwurf zur Freigabe, kein 3D-Modell"
+  },
+  {
+    "datei": "06_mittel.png",
+    "groesse": [
+      1024,
+      1024
+    ],
+    "modus": "RGBA",
+    "motivausdehnung": [
+      104,
+      240,
+      920,
+      784
+    ],
+    "freier_rand_min_px": 104,
+    "id": "06_mittel",
+    "name": "Blütenschnapper",
+    "planet": "Dschungelmond",
+    "staerke": "mittel",
+    "koerperbau": "Flieger",
+    "arme": 0,
+    "beine": 0,
+    "fluegel": 2,
+    "anatomie_visuell_geprueft": true,
+    "status": "Entwurf zur Freigabe, kein 3D-Modell"
+  },
+  {
+    "datei": "06_stark.png",
+    "groesse": [
+      1024,
+      1024
+    ],
+    "modus": "RGBA",
+    "motivausdehnung": [
+      104,
+      205,
+      920,
+      819
+    ],
+    "freier_rand_min_px": 104,
+    "id": "06_stark",
+    "name": "Borkenkäfer",
+    "planet": "Dschungelmond",
+    "staerke": "stark",
+    "koerperbau": "Sechsbeiner",
+    "arme": 0,
+    "beine": 6,
+    "fluegel": 0,
+    "anatomie_visuell_geprueft": true,
+    "status": "Entwurf zur Freigabe, kein 3D-Modell"
+  },
+  {
+    "datei": "06_boss.png",
+    "groesse": [
+      1024,
+      1024
+    ],
+    "modus": "RGBA",
+    "motivausdehnung": [
+      104,
+      127,
+      920,
+      896
+    ],
+    "freier_rand_min_px": 104,
+    "id": "06_boss",
+    "name": "Urwaldriese",
+    "planet": "Dschungelmond",
+    "staerke": "Boss",
+    "koerperbau": "Zweibeiner",
+    "arme": 2,
+    "beine": 2,
+    "fluegel": 0,
+    "anatomie_visuell_geprueft": true,
+    "status": "Entwurf zur Freigabe, kein 3D-Modell"
+  }
+]

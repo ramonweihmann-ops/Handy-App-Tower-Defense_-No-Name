@@ -1,0 +1,15 @@
+{
+  "bildgroesse": [
+    852,
+    1846
+  ],
+  "geanderter_bereich": [
+    487,
+    364,
+    852,
+    802
+  ],
+  "pixel_ausserhalb_planetenmaske_identisch": true,
+  "ui_schutzmaske_pixelgleich": true,
+  "aenderung": "Planet und zugehörige Ringfläche aus eingebauter Bildgenerierung lokal eingesetzt. Hinterer Ring hinter der Kugel, vorderer Ring davor. UI-Silhouetten und Schrift separat aus den Originalpixeln geschützt; restlicher Bildschirm unverändert."
+}
