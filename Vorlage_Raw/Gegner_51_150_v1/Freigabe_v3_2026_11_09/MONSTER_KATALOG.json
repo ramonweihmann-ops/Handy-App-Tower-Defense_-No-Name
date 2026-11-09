@@ -1,0 +1,335 @@
+{
+  "stand": "2026-11-09",
+  "umfang": {
+    "planeten": 10,
+    "gegner": 40
+  },
+  "status": "Design-Konzeptsammlung; keine neue 3D-Produktion beauftragt",
+  "letzte_welt": {
+    "planet": 15,
+    "verbindliche_fassung": "schwarzes_loch_effekte_freigegeben.png",
+    "nutzerfreigabe": "Das passt super. Übernimm die neue Fassung für die letzte Welt."
+  },
+  "gegner": [
+    {
+      "id": "06_leicht",
+      "planet": "Dschungelmond",
+      "planet_nr": 6,
+      "staerke": "leicht",
+      "name": "Rankling",
+      "konzeptblatt": "planet_06_uebersicht.png"
+    },
+    {
+      "id": "06_mittel",
+      "planet": "Dschungelmond",
+      "planet_nr": 6,
+      "staerke": "mittel",
+      "name": "Blütenschnapper",
+      "konzeptblatt": "planet_06_uebersicht.png"
+    },
+    {
+      "id": "06_stark",
+      "planet": "Dschungelmond",
+      "planet_nr": 6,
+      "staerke": "stark",
+      "name": "Borkenkäfer",
+      "konzeptblatt": "planet_06_uebersicht.png"
+    },
+    {
+      "id": "06_boss",
+      "planet": "Dschungelmond",
+      "planet_nr": 6,
+      "staerke": "boss",
+      "name": "Urwaldriese",
+      "konzeptblatt": "planet_06_uebersicht.png"
+    },
+    {
+      "id": "07_leicht",
+      "planet": "Ozeanwelt",
+      "planet_nr": 7,
+      "staerke": "leicht",
+      "name": "Blubberfisch",
+      "konzeptblatt": "planet_07_uebersicht.png"
+    },
+    {
+      "id": "07_mittel",
+      "planet": "Ozeanwelt",
+      "planet_nr": 7,
+      "staerke": "mittel",
+      "name": "Quallenflieger",
+      "konzeptblatt": "planet_07_uebersicht.png"
+    },
+    {
+      "id": "07_stark",
+      "planet": "Ozeanwelt",
+      "planet_nr": 7,
+      "staerke": "stark",
+      "name": "Krabbenpanzer",
+      "konzeptblatt": "planet_07_uebersicht.png"
+    },
+    {
+      "id": "07_boss",
+      "planet": "Ozeanwelt",
+      "planet_nr": 7,
+      "staerke": "boss",
+      "name": "Tiefseekrake",
+      "konzeptblatt": "planet_07_uebersicht.png"
+    },
+    {
+      "id": "08_leicht",
+      "planet": "Kristallplanet",
+      "planet_nr": 8,
+      "staerke": "leicht",
+      "name": "Kristallwichtel",
+      "konzeptblatt": "planet_08_uebersicht.png"
+    },
+    {
+      "id": "08_mittel",
+      "planet": "Kristallplanet",
+      "planet_nr": 8,
+      "staerke": "mittel",
+      "name": "Glitzerfledermaus",
+      "konzeptblatt": "planet_08_uebersicht.png"
+    },
+    {
+      "id": "08_stark",
+      "planet": "Kristallplanet",
+      "planet_nr": 8,
+      "staerke": "stark",
+      "name": "Quarzkäfer",
+      "konzeptblatt": "planet_08_uebersicht.png"
+    },
+    {
+      "id": "08_boss",
+      "planet": "Kristallplanet",
+      "planet_nr": 8,
+      "staerke": "boss",
+      "name": "Kristallgolem",
+      "konzeptblatt": "planet_08_uebersicht.png"
+    },
+    {
+      "id": "09_leicht",
+      "planet": "Sturmriese",
+      "planet_nr": 9,
+      "staerke": "leicht",
+      "name": "Funkenball",
+      "konzeptblatt": "planet_09_uebersicht.png"
+    },
+    {
+      "id": "09_mittel",
+      "planet": "Sturmriese",
+      "planet_nr": 9,
+      "staerke": "mittel",
+      "name": "Donnervogel",
+      "konzeptblatt": "planet_09_uebersicht.png"
+    },
+    {
+      "id": "09_stark",
+      "planet": "Sturmriese",
+      "planet_nr": 9,
+      "staerke": "stark",
+      "name": "Blitzpanzer",
+      "konzeptblatt": "planet_09_uebersicht.png"
+    },
+    {
+      "id": "09_boss",
+      "planet": "Sturmriese",
+      "planet_nr": 9,
+      "staerke": "boss",
+      "name": "Sturmwolke",
+      "konzeptblatt": "planet_09_uebersicht.png"
+    },
+    {
+      "id": "10_leicht",
+      "planet": "Schrottwelt",
+      "planet_nr": 10,
+      "staerke": "leicht",
+      "name": "Schraubenkrabbler",
+      "konzeptblatt": "planet_10_uebersicht.png"
+    },
+    {
+      "id": "10_mittel",
+      "planet": "Schrottwelt",
+      "planet_nr": 10,
+      "staerke": "mittel",
+      "name": "Propellerdrohne",
+      "konzeptblatt": "planet_10_uebersicht.png"
+    },
+    {
+      "id": "10_stark",
+      "planet": "Schrottwelt",
+      "planet_nr": 10,
+      "staerke": "stark",
+      "name": "Stahlbrecher",
+      "konzeptblatt": "planet_10_uebersicht.png"
+    },
+    {
+      "id": "10_boss",
+      "planet": "Schrottwelt",
+      "planet_nr": 10,
+      "staerke": "boss",
+      "name": "Schrottkoloss",
+      "konzeptblatt": "planet_10_uebersicht.png"
+    },
+    {
+      "id": "11_leicht",
+      "planet": "Wolkenstadt",
+      "planet_nr": 11,
+      "staerke": "leicht",
+      "name": "Wolkenflausch",
+      "konzeptblatt": "planet_11_uebersicht.png"
+    },
+    {
+      "id": "11_mittel",
+      "planet": "Wolkenstadt",
+      "planet_nr": 11,
+      "staerke": "mittel",
+      "name": "Federflügler",
+      "konzeptblatt": "planet_11_uebersicht.png"
+    },
+    {
+      "id": "11_stark",
+      "planet": "Wolkenstadt",
+      "planet_nr": 11,
+      "staerke": "stark",
+      "name": "Goldwächter",
+      "konzeptblatt": "planet_11_uebersicht.png"
+    },
+    {
+      "id": "11_boss",
+      "planet": "Wolkenstadt",
+      "planet_nr": 11,
+      "staerke": "boss",
+      "name": "Himmelswächter",
+      "konzeptblatt": "planet_11_uebersicht.png"
+    },
+    {
+      "id": "12_leicht",
+      "planet": "Sporenwelt",
+      "planet_nr": 12,
+      "staerke": "leicht",
+      "name": "Pilzhüpfer",
+      "konzeptblatt": "planet_12_uebersicht.png"
+    },
+    {
+      "id": "12_mittel",
+      "planet": "Sporenwelt",
+      "planet_nr": 12,
+      "staerke": "mittel",
+      "name": "Sporenschwirrer",
+      "konzeptblatt": "planet_12_uebersicht.png"
+    },
+    {
+      "id": "12_stark",
+      "planet": "Sporenwelt",
+      "planet_nr": 12,
+      "staerke": "stark",
+      "name": "Pilzpanzer",
+      "konzeptblatt": "planet_12_uebersicht.png"
+    },
+    {
+      "id": "12_boss",
+      "planet": "Sporenwelt",
+      "planet_nr": 12,
+      "staerke": "boss",
+      "name": "Riesenpilzmutter",
+      "konzeptblatt": "planet_12_uebersicht.png"
+    },
+    {
+      "id": "13_leicht",
+      "planet": "Geistermond",
+      "planet_nr": 13,
+      "staerke": "leicht",
+      "name": "Geisterlein",
+      "konzeptblatt": "planet_13_uebersicht.png"
+    },
+    {
+      "id": "13_mittel",
+      "planet": "Geistermond",
+      "planet_nr": 13,
+      "staerke": "mittel",
+      "name": "Laternenflatterer",
+      "konzeptblatt": "planet_13_uebersicht.png"
+    },
+    {
+      "id": "13_stark",
+      "planet": "Geistermond",
+      "planet_nr": 13,
+      "staerke": "stark",
+      "name": "Steinritter",
+      "konzeptblatt": "planet_13_uebersicht.png"
+    },
+    {
+      "id": "13_boss",
+      "planet": "Geistermond",
+      "planet_nr": 13,
+      "staerke": "boss",
+      "name": "Mondgeist",
+      "konzeptblatt": "planet_13_uebersicht.png"
+    },
+    {
+      "id": "14_leicht",
+      "planet": "Tempelplanet",
+      "planet_nr": 14,
+      "staerke": "leicht",
+      "name": "Skarabäus-Krabbler",
+      "konzeptblatt": "planet_14_uebersicht.png"
+    },
+    {
+      "id": "14_mittel",
+      "planet": "Tempelplanet",
+      "planet_nr": 14,
+      "staerke": "mittel",
+      "name": "Maskenflieger",
+      "konzeptblatt": "planet_14_uebersicht.png"
+    },
+    {
+      "id": "14_stark",
+      "planet": "Tempelplanet",
+      "planet_nr": 14,
+      "staerke": "stark",
+      "name": "Steinwächter",
+      "konzeptblatt": "planet_14_uebersicht.png"
+    },
+    {
+      "id": "14_boss",
+      "planet": "Tempelplanet",
+      "planet_nr": 14,
+      "staerke": "boss",
+      "name": "Tempelkoloss",
+      "konzeptblatt": "planet_14_uebersicht.png"
+    },
+    {
+      "id": "15_leicht",
+      "planet": "Schwarzes Loch",
+      "planet_nr": 15,
+      "staerke": "leicht",
+      "name": "Schattenkugel",
+      "konzeptblatt": "planet_15_uebersicht.png"
+    },
+    {
+      "id": "15_mittel",
+      "planet": "Schwarzes Loch",
+      "planet_nr": 15,
+      "staerke": "mittel",
+      "name": "Leerenflügler",
+      "konzeptblatt": "planet_15_uebersicht.png"
+    },
+    {
+      "id": "15_stark",
+      "planet": "Schwarzes Loch",
+      "planet_nr": 15,
+      "staerke": "stark",
+      "name": "Sternenpanzer",
+      "konzeptblatt": "planet_15_uebersicht.png"
+    },
+    {
+      "id": "15_boss",
+      "planet": "Schwarzes Loch",
+      "planet_nr": 15,
+      "staerke": "boss",
+      "name": "Schlundwächter",
+      "konzeptblatt": "planet_15_uebersicht.png"
+    }
+  ]
+}

@@ -1,0 +1,180 @@
+{
+  "stand": "2026-11-09",
+  "pngs_lesbar": true,
+  "konzeptgruppen": 10,
+  "gegner_gesamt": 40,
+  "einzelmodelle_oder_anatomie_nicht_freigegeben": true,
+  "dateien": [
+    {
+      "datei": "alle_36_monster_aktuell.png",
+      "bytes": 4102201,
+      "sha256": "aa00cee5151c02bb9337362dd25ed2d416c7da4abdfeaba1cc64ad5d3ecc7097",
+      "git_blob_sha": "24dc5e7219410f6fd3919bcec09415933ca2913f",
+      "breite": 3000,
+      "hoehe": 1792,
+      "modus": "RGB"
+    },
+    {
+      "datei": "alle_gegner.png",
+      "bytes": 5988052,
+      "sha256": "d8db7aac22474340aab8b13795fb961ecf6f65c7ff34cfe9282b788534993ad4",
+      "git_blob_sha": "a85ed483b0b65df24ebbd09720916740ad4cfb93",
+      "breite": 2400,
+      "hoehe": 3480,
+      "modus": "RGB"
+    },
+    {
+      "datei": "BILDANWEISUNGEN.json",
+      "bytes": 41020,
+      "sha256": "8a4eb35264a02445d18927912a474810d69589d1c12c1f249e4e8293e7907584",
+      "git_blob_sha": "5d28be197fd574ee9697d6d02267b38946604f3c"
+    },
+    {
+      "datei": "LIESMICH_CLAUDE.md",
+      "bytes": 3694,
+      "sha256": "e7be1fdf30dd3f7c631f0e18479a8fc4599bee41b748803d05341f1a81393dd6",
+      "git_blob_sha": "b973852f723a3deb7465e2f533c67de6ac2e09ed"
+    },
+    {
+      "datei": "MONSTER_KATALOG.json",
+      "bytes": 8614,
+      "sha256": "c26b3101a975feeef552bb21f4453199661f393906dd39cb2b78737e87c7aa34",
+      "git_blob_sha": "47d375aa03ef5b28aacee4b614aea1609f7a132e"
+    },
+    {
+      "datei": "planet_06_uebersicht.png",
+      "bytes": 417610,
+      "sha256": "d869041bcffa430e5110a4a93ad7af65498b9d32bd4550a65bbc95e8aea6b544",
+      "git_blob_sha": "962dfd093e5d80710ecd43eeb736f4c0b9e4e851",
+      "breite": 1774,
+      "hoehe": 1000,
+      "modus": "RGB"
+    },
+    {
+      "datei": "planet_07_uebersicht.png",
+      "bytes": 1109766,
+      "sha256": "6bf0ab358ab6bb89fdd2a28b0ed5d78d56c6f8087134f80b60e9932781f4023f",
+      "git_blob_sha": "59716b8bd1ff91efc2d52d0697c757129ea42800",
+      "breite": 1774,
+      "hoehe": 1000,
+      "modus": "RGB"
+    },
+    {
+      "datei": "planet_08_uebersicht.png",
+      "bytes": 1177385,
+      "sha256": "dfc8695dc54858476e168e352bbd1b756571f9b654c9648ee561a70b3275beaf",
+      "git_blob_sha": "4d7cdf608439a9ba5b53bd7ed8b60a16b90b2895",
+      "breite": 1774,
+      "hoehe": 1000,
+      "modus": "RGB"
+    },
+    {
+      "datei": "planet_09_uebersicht.png",
+      "bytes": 1063554,
+      "sha256": "24a36498f7d5252c65880b2c179dd0be411afce34dbedb3c53e8fc9865077697",
+      "git_blob_sha": "316057ab50a7624915b5621f6d6c34a1b8075688",
+      "breite": 1774,
+      "hoehe": 1000,
+      "modus": "RGB"
+    },
+    {
+      "datei": "planet_10_uebersicht.png",
+      "bytes": 1148099,
+      "sha256": "6cf316bca2a65a850c68f5802f8c059a08e836074238b62ebf2282fa6185985b",
+      "git_blob_sha": "4e420b1e1992ca808994c165a7ad0e1f6ec022ac",
+      "breite": 1774,
+      "hoehe": 1000,
+      "modus": "RGB"
+    },
+    {
+      "datei": "planet_11_uebersicht.png",
+      "bytes": 1209102,
+      "sha256": "12c8695ee09218794f4a65b6f107e2ba36920c572c65f1c48d1c4821b9c3bf9f",
+      "git_blob_sha": "98cf22f5cbceecbf1ce6d677eb479c74273b7d5d",
+      "breite": 1774,
+      "hoehe": 1000,
+      "modus": "RGB"
+    },
+    {
+      "datei": "planet_12_uebersicht.png",
+      "bytes": 1156124,
+      "sha256": "0f8c6cb88c5a97c666309f6a2717140f9fb84b78c6a2425a0b5580cc895569cc",
+      "git_blob_sha": "7036e6d91a03ba04d1a6439358607f3f2d2e0a6a",
+      "breite": 1774,
+      "hoehe": 1000,
+      "modus": "RGB"
+    },
+    {
+      "datei": "planet_13_uebersicht.png",
+      "bytes": 1089502,
+      "sha256": "5ed67322578119df77c298b08af686b6e96e451c43d67d6e7dd4c3a69fbc4017",
+      "git_blob_sha": "ddf65948269612f026f5d34c71f6b737e7b4f23c",
+      "breite": 1774,
+      "hoehe": 1000,
+      "modus": "RGB"
+    },
+    {
+      "datei": "planet_14_uebersicht.png",
+      "bytes": 1178723,
+      "sha256": "ce30672fcdc5fdc345da4e463f56f5d4a6b544ca454f6c54b113931ad0173902",
+      "git_blob_sha": "3649553c5edb5b293bf89bd538ae41383314781c",
+      "breite": 1774,
+      "hoehe": 1000,
+      "modus": "RGB"
+    },
+    {
+      "datei": "planet_15_uebersicht.png",
+      "bytes": 1375658,
+      "sha256": "2c9cd779ef28bb6ba06291002a36ae900286305caf91fcce010d1a220c58ccec",
+      "git_blob_sha": "b5a5a409ecb5f6e02e3b9c3e8d3e3460b757eae9",
+      "breite": 1774,
+      "hoehe": 1000,
+      "modus": "RGB"
+    },
+    {
+      "datei": "pruefseite_01.png",
+      "bytes": 2703940,
+      "sha256": "3dae80c599f87db1dc56c3a0d347ba528e7ae35eb29555922ad247f647d698f3",
+      "git_blob_sha": "b0f747fe2628931556126b8aa6147982f849f5da",
+      "breite": 1774,
+      "hoehe": 3100,
+      "modus": "RGB"
+    },
+    {
+      "datei": "pruefseite_02.png",
+      "bytes": 3427636,
+      "sha256": "ffa3ab3c2646081e4426b92e83d64f45a0224859913fad74100daebaf1d6e0e9",
+      "git_blob_sha": "16f02d49b8608ec86f1549c36eaec5a138c438eb",
+      "breite": 1774,
+      "hoehe": 3100,
+      "modus": "RGB"
+    },
+    {
+      "datei": "pruefseite_03.png",
+      "bytes": 3430732,
+      "sha256": "58d9350a5dcc2d4e4fa5f144c2e06b9a8c2b06ed924eecbd8e3612c0d0c02553",
+      "git_blob_sha": "fb088a96caddddcb127ecd88536f2736726a2c16",
+      "breite": 1774,
+      "hoehe": 3100,
+      "modus": "RGB"
+    },
+    {
+      "datei": "pruefseite_04.png",
+      "bytes": 1382163,
+      "sha256": "803d8c7b0cd060cb428185698c70ab95e2d1ed5de06f083656fdf95df7e307a3",
+      "git_blob_sha": "68403611d759002f19483883cdf09b8f2de612d3",
+      "breite": 1774,
+      "hoehe": 1100,
+      "modus": "RGB"
+    },
+    {
+      "datei": "schwarzes_loch_effekte_freigegeben.png",
+      "bytes": 1882510,
+      "sha256": "92e6e399bc606749291e7225fb437e8b9fd27aab6300abe9214547bffaf767e7",
+      "git_blob_sha": "a5d3e286bf0acf71a8beefa3c6ccb94cbf43c9e0",
+      "breite": 1774,
+      "hoehe": 887,
+      "modus": "RGB"
+    }
+  ]
+}
