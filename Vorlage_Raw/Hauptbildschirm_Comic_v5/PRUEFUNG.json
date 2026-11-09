@@ -1,15 +1,17 @@
 {
-  "bildgroesse": [
+  "stand": "2026-11-09",
+  "revision": "Ringkorrektur v6, Liefername v5 für bestehenden Einbau erhalten",
+  "groesse": [
     852,
     1846
   ],
-  "geanderter_bereich": [
-    487,
-    364,
+  "ausserhalb_bearbeitungsmaske_geaenderte_pixel": 0,
+  "innerhalb_ui_schutzmaske_geaenderte_pixel": 0,
+  "bearbeitungsbereich": [
+    468,
+    363,
     852,
-    802
+    803
   ],
-  "pixel_ausserhalb_planetenmaske_identisch": true,
-  "ui_schutzmaske_pixelgleich": true,
-  "aenderung": "Planet und zugehörige Ringfläche aus eingebauter Bildgenerierung lokal eingesetzt. Hinterer Ring hinter der Kugel, vorderer Ring davor. UI-Silhouetten und Schrift separat aus den Originalpixeln geschützt; restlicher Bildschirm unverändert."
+  "geometrie": "Ring deutlich frontal um die Außenkontur; keine helle Ringlinie durch die Wolkenbänder. Hinterer oberer Ringanteil hinter der Kugel, unterer vor der Außenkante."
 }

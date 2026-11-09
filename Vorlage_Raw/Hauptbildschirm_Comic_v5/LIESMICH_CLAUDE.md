@@ -1,9 +1,9 @@
-# Hauptbildschirm v5 – korrigierter Planetenring
+# Hauptbildschirm – erneute Ringkorrektur
 
-`hauptbildschirm_aktuell_v5.png`: 852 × 1846 Pixel, PNG/RGB. Der hintere obere Ringbogen verschwindet nun hinter der Planetenkugel. Der vordere untere Bogen verläuft vor der Kugel. Farben, Lage und Stil orientieren sich am gelieferten aktuellen Bildschirm.
+Stand 09.11.2026, Revision v6. Der Liefername `hauptbildschirm_aktuell_v5.png` bleibt für den bestehenden Einbau erhalten und ersetzt die vorherige missverständliche Ringfassung.
 
-Die eingebaute Bildgenerierung hat nur den Planeten-Ausschnitt neu gezeichnet. Für die Lieferung wurde ausschließlich der örtlich begrenzte Planeten- und Ringbereich eingesetzt. Die UI-Silhouetten und die Schrift wurden separat aus den Originalpixeln geschützt. Kopfleiste, Boss, Pfad, Angebote links, Spielen-Knopf, Reiterleiste und alle Pixel außerhalb der örtlichen Bearbeitungsmaske sind pixelgleich zum gelieferten Original. Die Knöpfe rechts und ihre Schrift bleiben durch die Schutzmaske original. Innerhalb des Planeten-/Ringbereichs wurden auch Wolkenbänder und Ringglanz neu gezeichnet; dort ist das Bild absichtlich nicht pixelgleich.
+Der Ring wird deutlich frontaler gesehen und liegt außen um die Planetenkugel. Die helle Querlinie durch die Planetenoberfläche ist entfernt. Die Kreisform und die orangebraunen Wolkenbänder sind als geschlossener Körper lesbar; der hintere obere Ringanteil verschwindet hinter der Kugel.
 
-Die Differenzprüfung bestätigt: außerhalb der Bearbeitungsmaske null geänderte Pixel; innerhalb der UI-Schutzmaske null geänderte Pixel. Kein gesamtes Neurendern des Bildschirms. Der Vergleich `vergleich_ring.png` zeigt vorher und nachher nebeneinander. Die Prüf- und Maskendateien liegen zusätzlich im Ordner für die Nachvollziehbarkeit.
+PNG/RGB, 852 × 1846 Pixel. Neue Planetengrafik mit eingebauter Bildgenerierung, danach ausschließlich im örtlichen Planeten-/Ringbereich eingesetzt. Die Masken halten den Boss, die Titelbox, die rechten Knöpfe und Texte sowie den restlichen Bildschirm geschützt. Die Differenzprüfung bestätigt null geänderte Pixel außerhalb der örtlichen Bearbeitungsmaske und null geänderte Pixel in der UI-Schutzmaske. Innerhalb des Planeten-/Ringbereichs wurden Wolkenbänder, Ring und Glanz neu gezeichnet. Keine Spielcodeänderung.
 
-Nur Bilddateien, keine Spielcodeänderungen. Keine weiteren kostenpflichtigen Dienste verwendet.
+`vergleich_ring.png` zeigt die ursprüngliche Vorlage und diese neue Außenringfassung. Die Masken und `PRUEFUNG.json` sind zur Nachvollziehbarkeit enthalten. Booster-Symbole und Gegnerdateien bleiben unverändert.
