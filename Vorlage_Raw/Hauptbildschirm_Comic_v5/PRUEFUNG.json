@@ -1,17 +1,30 @@
 {
   "stand": "2026-11-09",
-  "revision": "Ringkorrektur v7: horizontaler Saturnring, Liefername v5 für bestehenden Einbau erhalten",
+  "revision": "v8: eine separat eingesetzte Planetenkugel",
   "groesse": [
     852,
     1846
   ],
+  "planeten_instanz_anzahl": 1,
+  "hintergrundplatte_ohne_planet_visuell_geprueft": true,
+  "hinterer_ring_von_kugel_verdeckt": true,
+  "ring_horizontal": true,
   "ausserhalb_bearbeitungsmaske_geaenderte_pixel": 0,
   "innerhalb_ui_schutzmaske_geaenderte_pixel": 0,
-  "bearbeitungsbereich": [
-    460,
-    362,
-    852,
-    804
+  "planet_position_px": [
+    398,
+    335
   ],
-  "geometrie": "Flache horizontale Ellipse um den Äquator. Hinterer oberer Ringbogen vollständig von der undurchsichtigen Kugel verdeckt; vorderer unterer Bogen vor der Kugel. Kein vertikaler Halo."
+  "planet_skala_einheitlich": 0.4903078677309008,
+  "kugelzentrum_ziel_px": [
+    774,
+    584
+  ],
+  "kugeldurchmesser_ziel_ca_px": 430,
+  "bearbeitungsbereich": [
+    457,
+    358,
+    852,
+    806
+  ]
 }
