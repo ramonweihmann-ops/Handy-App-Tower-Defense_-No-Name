@@ -155,6 +155,18 @@ func _run() -> bool:
 			if vids != MetaData.VIDEO_DOUBLE_PER_DAY:
 				print("SMOKE FEHLER: Werbevideos nicht auf 5 am Tag begrenzt")
 			save.data["video_used"] = 0
+			# „Neuer Planet entdeckt“: nur vor dem ersten Level eines neuen Planeten, Geschenk nur einmal
+			var pn_ok: bool = save.planet_new(11) and save.planet_new(51) and not save.planet_new(12) and not save.planet_new(1)
+			var ps := PlanetScreen.new(51)
+			main.add_child(ps)
+			var gem0: int = save.gems()
+			var first_gift: bool = save.discover_planet(51)
+			var again: bool = save.discover_planet(51)
+			pn_ok = pn_ok and first_gift and not again and save.gems() - gem0 == MetaData.PLANET_GIFT_GEMS and not save.planet_new(51)
+			print("SMOKE neuer planet: ", pn_ok, " geschenk +", save.gems() - gem0, " fenster ", ps.get_child_count() > 0)
+			if not pn_ok:
+				print("SMOKE FEHLER: Neuer Planet entdeckt stimmt nicht")
+			ps.queue_free()
 		3:
 			# Reiter aus den Mockups liegen nicht in _content, sondern als eigener Bildschirm darüber
 			var page: Control = m._content.get_child(m._content.get_child_count() - 1) if m._content.get_child_count() > 0 else m._mock

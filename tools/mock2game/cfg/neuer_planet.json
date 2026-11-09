@@ -1,0 +1,11 @@
+{"board": "Neuer-Planet-Dschungelmond.dc.html", "out": "out/neuer_planet",
+ "states": [{"name": "main", "eval": "document.querySelectorAll('#dc-root > div > img, #dc-root > div > div[style*=\"inset: 0\"]').forEach(e => e.remove()); const bp = document.querySelectorAll('div[style*=\"top: 66px\"] svg path'); bp[0].setAttribute('fill', '#7a7a7a'); bp[1].setAttribute('fill', '#7a7a7a'); bp[2].setAttribute('fill', '#ffffff'); bp[4].setAttribute('stroke', '#7a7a7a'); document.querySelector('div[style*=\"inset: 10px\"]').style.background = 'radial-gradient(circle, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 68%)'; document.querySelectorAll('div[style*=\"top: 140px\"] svg animate').forEach(e => e.remove()); document.querySelectorAll('div[style*=\"top: 140px\"] svg path, div[style*=\"top: 140px\"] svg circle').forEach(e => { if (e.getAttribute('stroke')) e.setAttribute('stroke', '#ffffff'); if (e.getAttribute('fill')) e.setAttribute('fill', '#ffffff'); e.setAttribute('opacity', '0.8'); }); document.querySelectorAll('.pop, [style*=\"animation\"]').forEach(e => { e.style.animation = 'none'; });"}],
+ "only": ["#dc-root > div > *"],
+ "live": [
+  {"sel": "div[style*=\"repeating-conic-gradient\"]", "id": "rays", "img": true, "pad": 0},
+  {"sel": "div[style*=\"top: 66px\"] > svg", "id": "banner", "img": true, "pad": 3},
+  {"sel": "div[style*=\"inset: 10px\"]", "id": "halo", "img": true, "pad": 0},
+  {"sel": "img[alt=\"Dschungelmond\"]", "id": "planet"},
+  {"sel": "span[style*=\"padding: 1px 7px\"]", "id": "welt"},
+  {"sel": "div[style*=\"top: 654px\"]", "id": "row"}
+ ]}

@@ -27,6 +27,7 @@ var _btn_layer: Control
 var _buttons: Array[MockButton] = []
 var _overrides := {}   # Text-Nummer -> neuer Text
 var _hidden := {}      # Text-Nummer -> true
+var _colors := {}      # Text-Nummer -> andere Farbe (z. B. je Planet)
 var _live := {}        # Live-Kennung -> Rect2 (Mockup-Punkte)
 var _placed := {}      # Live-Kennung -> Control
 var _live_info := {}   # Live-Kennung -> Daten aus dem Export (Bild, Drehung)
@@ -188,6 +189,14 @@ func set_text(key: Variant, value: String) -> void:
 	_redraw_texts()
 
 
+func set_text_color(key: Variant, col: Color) -> void:
+	var i := _find_text(key)
+	if i < 0:
+		return
+	_colors[i] = col
+	_redraw_texts()
+
+
 func hide_text(key: Variant, hide := true) -> void:
 	var i := _find_text(key)
 	if i < 0:
@@ -237,7 +246,7 @@ func draw_text(ci: CanvasItem, t: Dictionary, origin: Vector2) -> void:
 			lines = [{"rect": lines[0]["rect"], "text": " ".join(parts)}]
 	var fs := maxi(1, roundi(float(t["size"]) * s))
 	var font := MockFonts.font(str(t["family"]), int(t["weight"]), roundi(float(t.get("ls", 0.0)) * s))
-	var col := MockFonts.color(str(t["color"]))
+	var col: Color = _colors.get(i, MockFonts.color(str(t["color"])))
 	col.a *= float(t.get("opacity", 1.0))
 	var align := str(t.get("align", "center"))
 	var in_button := int(t["button"]) >= 0

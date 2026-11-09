@@ -55,6 +55,7 @@ func default_data() -> Dictionary:
 		"booster_parts": 0,
 		"video_date": "",
 		"video_used": 0,
+		"planets_seen": [],
 		# Geführter Einstieg (scripts/ui/tutorial.gd): erledigte Schritte; leer = startet von vorn
 		"tut": {},
 		"unlocked": [],
@@ -464,6 +465,26 @@ func add_squad_cards(n: int) -> Dictionary:
 
 
 ## Werbevideo: Siegbelohnung verdoppeln, VIDEO_DOUBLE_PER_DAY-mal am Tag
+## „Neuer Planet entdeckt“: vor dem ersten Level eines neuen Planeten (11, 21 … 141) einmal zeigen
+func planet_new(level: int) -> bool:
+	if level <= 1 or (level - 1) % 10 != 0:
+		return false
+	return not (data.get("planets_seen", []) as Array).has(Battlefields.for_level(level))
+
+
+## Planet als gesehen merken und das Entdecker-Geschenk gutschreiben (nur einmal)
+func discover_planet(level: int) -> bool:
+	var id := Battlefields.for_level(level)
+	if not data.has("planets_seen"):
+		data["planets_seen"] = []
+	if (data["planets_seen"] as Array).has(id):
+		return false
+	data["planets_seen"].append(id)
+	data["gems"] = gems() + MetaData.PLANET_GIFT_GEMS
+	save_game()
+	return true
+
+
 func videos_left() -> int:
 	if str(data.get("video_date", "")) != today():
 		return MetaData.VIDEO_DOUBLE_PER_DAY

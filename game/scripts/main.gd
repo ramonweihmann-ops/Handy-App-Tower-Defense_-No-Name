@@ -582,7 +582,10 @@ func _process(delta: float) -> void:
 		if _menu_shot_t == 40 and parts.size() > 1 and parts[1] == "sieg-doppelt" and _screen is ResultScreen:
 			(_screen as ResultScreen).double_pressed.emit()
 		if _menu_shot_t == 5 and parts.size() > 1:
-			if parts[1] == "sieg" or parts[1] == "sieg-doppelt":
+			if parts[1].begins_with("planet:"):
+				# „Neuer Planet entdeckt“ fürs Bild, z. B. --menushot=bild.png,planet:51
+				show_planet(int(parts[1].get_slice(":", 1)), show_menu)
+			elif parts[1] == "sieg" or parts[1] == "sieg-doppelt":
 				# Siegfenster fürs Bild (wie im Mockup: Level 4, drei Helden); „sieg-doppelt“ tippt „Verdoppeln“
 				level = 4
 				Save.add_hero_cards("dusty", 30)
@@ -735,7 +738,26 @@ func start_mp(station := 0, found: MpMatch = null) -> void:
 
 
 func start_level(n: int, hard_mode := false) -> void:
+	# Erstes Level eines neuen Planeten: vorher einmal „Neuer Planet entdeckt“ (mit Entdecker-Geschenk)
+	if not _autotest and Save.planet_new(n):
+		show_planet(n, func() -> void: _start(n, hard_mode, false))
+		return
 	_start(n, hard_mode, false)
+
+
+## Meldung „Neuer Planet entdeckt“; „Los geht's“ schreibt das Geschenk gut und ruft then auf
+func show_planet(n: int, then: Callable) -> void:
+	state = "planet"
+	get_tree().paused = false
+	hud.visible = false
+	menu.visible = false
+	_column.visible = true
+	var ps := PlanetScreen.new(n)
+	ps.go_pressed.connect(func() -> void:
+		if Save.discover_planet(n):
+			Sfx.play("levelup")
+		then.call())
+	_set_screen(ps)
 
 
 func _start(n: int, hard_mode: bool, multi: bool, found: MpMatch = null) -> void:

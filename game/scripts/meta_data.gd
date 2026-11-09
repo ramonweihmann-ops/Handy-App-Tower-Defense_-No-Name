@@ -90,6 +90,8 @@ const GOLD_CHEST_PARTS := [15, 30]       # Goldtruhe
 const GOLD_CHEST_COST := 150             # Edelsteine
 ## Werbevideo nach einem Sieg: Belohnung verdoppeln, so oft am Tag (mit Prime ohne Video)
 const VIDEO_DOUBLE_PER_DAY := 5
+## Entdecker-Geschenk beim ersten Besuch eines neuen Planeten (Meldung „Neuer Planet entdeckt“)
+const PLANET_GIFT_GEMS := 50
 
 
 # --- Tech-Werft: drei Bereiche, je ein Grundmodul und zwei Äste, die parallel ausbaubar sind ---
