@@ -1,0 +1,1728 @@
+{
+  "werkzeug": "Eingebaute Bildgenerierung",
+  "status": "Gestaltung und technische Korrektur freigegeben; fertige Übergabe vom 09.11.2026",
+  "karten": [
+    {
+      "id": "space_dock",
+      "extra": "Alle seitlichen Ringstationen mit klarer Weltraumlücke zur Brücke weiter nach außen und in den Hintergrund rücken; NICHT winzig machen, ihre saubere radiale Bauweise gut lesbar halten. Die Erde soll größer als in dieser Vorlage, aber wirklich kugelrund sein: kreisförmige Silhouette, keine Ovalverzerrung. Durchmesser ca 420 Pixel, Zentrum etwa (530,95), darf oben abgeschnitten werden. Ozeane, Kontinente, Wolken, Schiffchen erhalten.",
+      "prompt": "Gezielte Bearbeitung der vorhandenen Spielkarte. Schmales Hochkantformat 780:1688, gleiche Komposition und Kamera, KEIN Zoom, KEIN Beschnitt. Brücke einschließlich ihrer geraden inneren Fahrbahnkanten, Perspektive, Breite, Anfangshöhe, Platten und gesamten unteren freien Heldenplattform exakt bewahren. Nur die genannten Hintergrundelemente ändern. Hochwertiger plastischer Space-Comic, derselbe Detailgrad und dieselben Materialien. Keine UI, Figuren, Texte, Markierungen oder Hindernisse. Spawnzone ist mittig am fernen Brückenanfang etwa bei y294 auf 780x1688. Wichtige Portalmitten müssen deutlich darüber liegen, nicht hinter den dort erscheinenden Gegnern.\nAlle seitlichen Ringstationen mit klarer Weltraumlücke zur Brücke weiter nach außen und in den Hintergrund rücken; NICHT winzig machen, ihre saubere radiale Bauweise gut lesbar halten. Die Erde soll größer als in dieser Vorlage, aber wirklich kugelrund sein: kreisförmige Silhouette, keine Ovalverzerrung. Durchmesser ca 420 Pixel, Zentrum etwa (530,95), darf oben abgeschnitten werden. Ozeane, Kontinente, Wolken, Schiffchen erhalten.",
+      "source": "C:/Users/ramon/Documents/ChatGPT/App_TowerDefense/ausgabe/planeten_kulissenkorrektur_v3/karten/space_dock.png"
+    },
+    {
+      "id": "ice_world",
+      "extra": "Abstand zwischen schwebenden Eisinseln und Brückengeländern vergrößern, insbesondere links. Stationen eigenständig für Eiswelt gestalten: kompakte facettierte Forschungsbauten, dreieckige kristallartige Glasdächer, kleine cyanfarbene Antennen, helle frostüberzogene Materialien; keine Ringstationen wie beim Raumdock. Gebäude nur auf seitlichen schwebenden Eisinseln, nicht auf Fahrbahn. Eisplanet und Strudel erhalten.",
+      "prompt": "Gezielte Bearbeitung der vorhandenen Spielkarte. Schmales Hochkantformat 780:1688, gleiche Komposition und Kamera, KEIN Zoom, KEIN Beschnitt. Brücke einschließlich ihrer geraden inneren Fahrbahnkanten, Perspektive, Breite, Anfangshöhe, Platten und gesamten unteren freien Heldenplattform exakt bewahren. Nur die genannten Hintergrundelemente ändern. Hochwertiger plastischer Space-Comic, derselbe Detailgrad und dieselben Materialien. Keine UI, Figuren, Texte, Markierungen oder Hindernisse. Spawnzone ist mittig am fernen Brückenanfang etwa bei y294 auf 780x1688. Wichtige Portalmitten müssen deutlich darüber liegen, nicht hinter den dort erscheinenden Gegnern.\nAbstand zwischen schwebenden Eisinseln und Brückengeländern vergrößern, insbesondere links. Stationen eigenständig für Eiswelt gestalten: kompakte facettierte Forschungsbauten, dreieckige kristallartige Glasdächer, kleine cyanfarbene Antennen, helle frostüberzogene Materialien; keine Ringstationen wie beim Raumdock. Gebäude nur auf seitlichen schwebenden Eisinseln, nicht auf Fahrbahn. Eisplanet und Strudel erhalten.",
+      "source": "C:/Users/ramon/Documents/ChatGPT/App_TowerDefense/ausgabe/planeten_kulissenkorrektur_v3/karten/ice_world.png"
+    },
+    {
+      "id": "nebula_portal",
+      "extra": "Violettes Wurmloch frontal kreisrund und räumlich nach hinten vertieft darstellen, nicht schräg elliptisch. Helle Mitte bei etwa (390,110), deutlich höher als Spawnzone. Äußerer Strudel darf groß sein, aber sein Zentrum nicht tief am Brückenende. Violette Spiralstruktur, Planeten, Kristalle und Ringkulisse erhalten.",
+      "prompt": "Gezielte Bearbeitung der vorhandenen Spielkarte. Schmales Hochkantformat 780:1688, gleiche Komposition und Kamera, KEIN Zoom, KEIN Beschnitt. Brücke einschließlich ihrer geraden inneren Fahrbahnkanten, Perspektive, Breite, Anfangshöhe, Platten und gesamten unteren freien Heldenplattform exakt bewahren. Nur die genannten Hintergrundelemente ändern. Hochwertiger plastischer Space-Comic, derselbe Detailgrad und dieselben Materialien. Keine UI, Figuren, Texte, Markierungen oder Hindernisse. Spawnzone ist mittig am fernen Brückenanfang etwa bei y294 auf 780x1688. Wichtige Portalmitten müssen deutlich darüber liegen, nicht hinter den dort erscheinenden Gegnern.\nViolettes Wurmloch frontal kreisrund und räumlich nach hinten vertieft darstellen, nicht schräg elliptisch. Helle Mitte bei etwa (390,110), deutlich höher als Spawnzone. Äußerer Strudel darf groß sein, aber sein Zentrum nicht tief am Brückenende. Violette Spiralstruktur, Planeten, Kristalle und Ringkulisse erhalten.",
+      "source": "C:/Users/ramon/Documents/ChatGPT/App_TowerDefense/ausgabe/planeten_kulissenkorrektur_v3/karten/nebula_portal.png"
+    },
+    {
+      "id": "scrap_world",
+      "extra": "Kupferorangenes Wurmloch frontal und rund ausrichten, sichtbare Öffnung als Kreis mit räumlicher Tiefe nach hinten, keine diagonal nach unten rechts gekippte Röhre. Zentrum etwa (400,110), klar über der Spawnzone, nicht vom Brückenende verdeckt. Seitliche Schrottinseln und Industriekulisse sichtbar bewahren.",
+      "prompt": "Gezielte Bearbeitung der vorhandenen Spielkarte. Schmales Hochkantformat 780:1688, gleiche Komposition und Kamera, KEIN Zoom, KEIN Beschnitt. Brücke einschließlich ihrer geraden inneren Fahrbahnkanten, Perspektive, Breite, Anfangshöhe, Platten und gesamten unteren freien Heldenplattform exakt bewahren. Nur die genannten Hintergrundelemente ändern. Hochwertiger plastischer Space-Comic, derselbe Detailgrad und dieselben Materialien. Keine UI, Figuren, Texte, Markierungen oder Hindernisse. Spawnzone ist mittig am fernen Brückenanfang etwa bei y294 auf 780x1688. Wichtige Portalmitten müssen deutlich darüber liegen, nicht hinter den dort erscheinenden Gegnern.\nKupferorangenes Wurmloch frontal und rund ausrichten, sichtbare Öffnung als Kreis mit räumlicher Tiefe nach hinten, keine diagonal nach unten rechts gekippte Röhre. Zentrum etwa (400,110), klar über der Spawnzone, nicht vom Brückenende verdeckt. Seitliche Schrottinseln und Industriekulisse sichtbar bewahren.",
+      "source": "C:/Users/ramon/Documents/ChatGPT/App_TowerDefense/ausgabe/planeten_kulissenkorrektur_v3/karten/scrap_world.png"
+    },
+    {
+      "id": "spore_world",
+      "extra": "Türkis-goldenes Wurmloch zur Bildmitte orientieren, frontal und rund mit räumlicher Vertiefung nach hinten statt schräger Ellipse. Helle Mitte etwa (390,115), mit ruhigem Abstand zum Brückenanfang. Pilzinseln, orange und türkis leuchtende Pilze und Naturkulisse bewahren.",
+      "prompt": "Gezielte Bearbeitung der vorhandenen Spielkarte. Schmales Hochkantformat 780:1688, gleiche Komposition und Kamera, KEIN Zoom, KEIN Beschnitt. Brücke einschließlich ihrer geraden inneren Fahrbahnkanten, Perspektive, Breite, Anfangshöhe, Platten und gesamten unteren freien Heldenplattform exakt bewahren. Nur die genannten Hintergrundelemente ändern. Hochwertiger plastischer Space-Comic, derselbe Detailgrad und dieselben Materialien. Keine UI, Figuren, Texte, Markierungen oder Hindernisse. Spawnzone ist mittig am fernen Brückenanfang etwa bei y294 auf 780x1688. Wichtige Portalmitten müssen deutlich darüber liegen, nicht hinter den dort erscheinenden Gegnern.\nTürkis-goldenes Wurmloch zur Bildmitte orientieren, frontal und rund mit räumlicher Vertiefung nach hinten statt schräger Ellipse. Helle Mitte etwa (390,115), mit ruhigem Abstand zum Brückenanfang. Pilzinseln, orange und türkis leuchtende Pilze und Naturkulisse bewahren.",
+      "source": "C:/Users/ramon/Documents/ChatGPT/App_TowerDefense/ausgabe/planeten_kulissenkorrektur_v3/karten/spore_world.png"
+    },
+    {
+      "id": "temple_planet",
+      "extra": "Goldviolettes schwarzes Portal frontal kreisrund machen, Mitte etwa (390,110), nach hinten vertieft; keine schräge Ovalöffnung. Zwischen Lochmitte und Brückenanfang klarer Abstand gegen Überdeckung durch spawnende Gegner. Tempelruinen und Wasserfälle bewahren.",
+      "prompt": "Gezielte Bearbeitung der vorhandenen Spielkarte. Schmales Hochkantformat 780:1688, gleiche Komposition und Kamera, KEIN Zoom, KEIN Beschnitt. Brücke einschließlich ihrer geraden inneren Fahrbahnkanten, Perspektive, Breite, Anfangshöhe, Platten und gesamten unteren freien Heldenplattform exakt bewahren. Nur die genannten Hintergrundelemente ändern. Hochwertiger plastischer Space-Comic, derselbe Detailgrad und dieselben Materialien. Keine UI, Figuren, Texte, Markierungen oder Hindernisse. Spawnzone ist mittig am fernen Brückenanfang etwa bei y294 auf 780x1688. Wichtige Portalmitten müssen deutlich darüber liegen, nicht hinter den dort erscheinenden Gegnern.\nGoldviolettes schwarzes Portal frontal kreisrund machen, Mitte etwa (390,110), nach hinten vertieft; keine schräge Ovalöffnung. Zwischen Lochmitte und Brückenanfang klarer Abstand gegen Überdeckung durch spawnende Gegner. Tempelruinen und Wasserfälle bewahren.",
+      "source": "C:/Users/ramon/Documents/ChatGPT/App_TowerDefense/ausgabe/planeten_kulissenkorrektur_v3/karten/temple_planet.png"
+    },
+    {
+      "id": "black_hole",
+      "extra": "Das schwarze Loch im oberen Himmel mit kreisförmiger schwarzer Silhouette zeigen, keine schräg verzogene Ovalöffnung. Zentrum etwa (400,105), etwas höher, deutlich über der Spawnzone. Leuchtende goldviolette Akkretionsscheibe darf perspektivisch elliptisch sein, aber das schwarze Zentrum bleibt rund, räumlich schlüssige Lichtkrümmung und nach hinten wirkende Tiefe. Schwarzloch etwas kleiner falls nötig für vollständige runde Kontur. Weltraum und Trümmer erhalten.",
+      "prompt": "Gezielte Bearbeitung der vorhandenen Spielkarte. Schmales Hochkantformat 780:1688, gleiche Komposition und Kamera, KEIN Zoom, KEIN Beschnitt. Brücke einschließlich ihrer geraden inneren Fahrbahnkanten, Perspektive, Breite, Anfangshöhe, Platten und gesamten unteren freien Heldenplattform exakt bewahren. Nur die genannten Hintergrundelemente ändern. Hochwertiger plastischer Space-Comic, derselbe Detailgrad und dieselben Materialien. Keine UI, Figuren, Texte, Markierungen oder Hindernisse. Spawnzone ist mittig am fernen Brückenanfang etwa bei y294 auf 780x1688. Wichtige Portalmitten müssen deutlich darüber liegen, nicht hinter den dort erscheinenden Gegnern.\nDas schwarze Loch im oberen Himmel mit kreisförmiger schwarzer Silhouette zeigen, keine schräg verzogene Ovalöffnung. Zentrum etwa (400,105), etwas höher, deutlich über der Spawnzone. Leuchtende goldviolette Akkretionsscheibe darf perspektivisch elliptisch sein, aber das schwarze Zentrum bleibt rund, räumlich schlüssige Lichtkrümmung und nach hinten wirkende Tiefe. Schwarzloch etwas kleiner falls nötig für vollständige runde Kontur. Weltraum und Trümmer erhalten.",
+      "source": "C:/Users/ramon/Documents/ChatGPT/App_TowerDefense/ausgabe/planeten_kulissenkorrektur_v3/karten/black_hole.png"
+    }
+  ],
+  "nebelportal_weniger_brocken": "undefined\n",
+  "sturmriese": "Eingebaute Bildgenerierung. Bearbeitung der bisherigen Sturmriese-Karte.\nWurmloch deutlich höher, Zentrum ungefähr bei 58 % Breite und 9 % Höhe. Freier Abstand zur Spawnzone. Raumstationen beidseits größer als winzige Satelliten, mit perspektivisch plausiblen koaxialen Ringen. Brücke und untere Plattform bewahren. Blau-goldener Space-Comic-Stil; keine Figuren, keine Schrift, keine UI.\n",
+  "technische_korrektur": {
+    "stand": "2026-11-09",
+    "freigabe_technische_korrektur": true,
+    "ziel": [
+      780,
+      1688
+    ],
+    "soll_ecken": [
+      [
+        280,
+        294
+      ],
+      [
+        500,
+        294
+      ],
+      [
+        64,
+        1158
+      ],
+      [
+        716,
+        1158
+      ]
+    ],
+    "ergebnisse": [
+      {
+        "nummer": 1,
+        "id": "space_dock",
+        "welt": "Raumdock",
+        "datei": "space_dock.png",
+        "original_groesse": [
+          977,
+          1609
+        ],
+        "probe_normierung": {
+          "quelle": [
+            977,
+            1609
+          ],
+          "skala": 1.0490988191423245,
+          "beschnitt": [
+            122,
+            0
+          ]
+        },
+        "vorher_ecken_normalisiert": [
+          [
+            282,
+            281
+          ],
+          [
+            496,
+            281
+          ],
+          [
+            72,
+            1155
+          ],
+          [
+            708,
+            1155
+          ]
+        ],
+        "vorher_unten_aus_sichtbaren_seiten_extrapoliert": false,
+        "max_eckenabweichung_vorher_px": 13.6,
+        "verwendete_bruecken_quelle": "aktuelle freigegebene Gestaltung",
+        "technik": "Gezielte stückweise Entzerrung der Fahrbahn; obere Kulisse bis y200 unverändert.",
+        "ziel_ecken_px": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            716,
+            1158
+          ]
+        ],
+        "nachpruefung": "visuell am ausgegebenen Pixelraster erfolgt; kein Godot-Laufzeittest",
+        "fahrbahn_ecken_array": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            716,
+            1158
+          ]
+        ],
+        "fahrbahn_ecken_px": {
+          "oben_links": [
+            280,
+            294
+          ],
+          "oben_rechts": [
+            500,
+            294
+          ],
+          "unten_links": [
+            64,
+            1158
+          ],
+          "unten_rechts": [
+            716,
+            1158
+          ]
+        },
+        "breite": 780,
+        "hoehe": 1688,
+        "modus": "RGB",
+        "messunsicherheit_px": 6,
+        "groesste_gemessene_abweichung_px": 0.0,
+        "innerhalb_freigabetoleranz_inkl_messunsicherheit": true,
+        "feinziel_6px_messtechnisch_bestaetigt": true,
+        "fahrbahn_gerade_und_gleichmaessig_breiter": "visuell bestätigt",
+        "plattformbeginn_abgelesen_ca_y": 1169,
+        "heldenbereich_frei": true,
+        "anzeigenbereich_frei": true,
+        "urspruengliches_design": "originale/space_dock.png"
+      },
+      {
+        "nummer": 2,
+        "id": "ice_world",
+        "welt": "Eiswelt",
+        "datei": "ice_world.png",
+        "original_groesse": [
+          780,
+          1688
+        ],
+        "probe_normierung": {
+          "quelle": [
+            780,
+            1688
+          ],
+          "skala": 1.0,
+          "beschnitt": [
+            0,
+            0
+          ]
+        },
+        "vorher_ecken_normalisiert": [
+          [
+            282,
+            278
+          ],
+          [
+            498,
+            278
+          ],
+          [
+            72,
+            1155
+          ],
+          [
+            708,
+            1155
+          ]
+        ],
+        "vorher_unten_aus_sichtbaren_seiten_extrapoliert": false,
+        "max_eckenabweichung_vorher_px": 16.1,
+        "verwendete_bruecken_quelle": "aktuelle freigegebene Gestaltung",
+        "technik": "Gezielte stückweise Entzerrung der Fahrbahn; obere Kulisse bis y200 unverändert.",
+        "ziel_ecken_px": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            716,
+            1158
+          ]
+        ],
+        "nachpruefung": "visuell am ausgegebenen Pixelraster erfolgt; kein Godot-Laufzeittest",
+        "fahrbahn_ecken_array": [
+          [
+            281,
+            294
+          ],
+          [
+            499,
+            294
+          ],
+          [
+            66,
+            1158
+          ],
+          [
+            714,
+            1158
+          ]
+        ],
+        "fahrbahn_ecken_px": {
+          "oben_links": [
+            281,
+            294
+          ],
+          "oben_rechts": [
+            499,
+            294
+          ],
+          "unten_links": [
+            66,
+            1158
+          ],
+          "unten_rechts": [
+            714,
+            1158
+          ]
+        },
+        "breite": 780,
+        "hoehe": 1688,
+        "modus": "RGB",
+        "messunsicherheit_px": 6,
+        "groesste_gemessene_abweichung_px": 2.0,
+        "innerhalb_freigabetoleranz_inkl_messunsicherheit": true,
+        "feinziel_6px_messtechnisch_bestaetigt": false,
+        "fahrbahn_gerade_und_gleichmaessig_breiter": "visuell bestätigt",
+        "plattformbeginn_abgelesen_ca_y": 1169,
+        "heldenbereich_frei": true,
+        "anzeigenbereich_frei": true,
+        "urspruengliches_design": "originale/ice_world.png"
+      },
+      {
+        "nummer": 3,
+        "id": "desert_outpost",
+        "welt": "Wüstenaußenposten",
+        "datei": "desert_outpost.png",
+        "original_groesse": [
+          780,
+          1688
+        ],
+        "probe_normierung": {
+          "quelle": [
+            780,
+            1688
+          ],
+          "skala": 1.0,
+          "beschnitt": [
+            0,
+            0
+          ]
+        },
+        "vorher_ecken_normalisiert": [
+          [
+            275,
+            279
+          ],
+          [
+            501,
+            279
+          ],
+          [
+            71,
+            1155
+          ],
+          [
+            710,
+            1155
+          ]
+        ],
+        "vorher_unten_aus_sichtbaren_seiten_extrapoliert": false,
+        "max_eckenabweichung_vorher_px": 15.8,
+        "verwendete_bruecken_quelle": "aktuelle freigegebene Gestaltung",
+        "technik": "Gezielte stückweise Entzerrung der Fahrbahn; obere Kulisse bis y200 unverändert.",
+        "ziel_ecken_px": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            716,
+            1158
+          ]
+        ],
+        "nachpruefung": "visuell am ausgegebenen Pixelraster erfolgt; kein Godot-Laufzeittest",
+        "fahrbahn_ecken_array": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            65,
+            1158
+          ],
+          [
+            715,
+            1158
+          ]
+        ],
+        "fahrbahn_ecken_px": {
+          "oben_links": [
+            280,
+            294
+          ],
+          "oben_rechts": [
+            500,
+            294
+          ],
+          "unten_links": [
+            65,
+            1158
+          ],
+          "unten_rechts": [
+            715,
+            1158
+          ]
+        },
+        "breite": 780,
+        "hoehe": 1688,
+        "modus": "RGB",
+        "messunsicherheit_px": 6,
+        "groesste_gemessene_abweichung_px": 1.0,
+        "innerhalb_freigabetoleranz_inkl_messunsicherheit": true,
+        "feinziel_6px_messtechnisch_bestaetigt": false,
+        "fahrbahn_gerade_und_gleichmaessig_breiter": "visuell bestätigt",
+        "plattformbeginn_abgelesen_ca_y": 1169,
+        "heldenbereich_frei": true,
+        "anzeigenbereich_frei": true,
+        "urspruengliches_design": "originale/desert_outpost.png"
+      },
+      {
+        "nummer": 4,
+        "id": "lava_asteroid",
+        "welt": "Lava-Asteroid",
+        "datei": "lava_asteroid.png",
+        "original_groesse": [
+          780,
+          1688
+        ],
+        "probe_normierung": {
+          "quelle": [
+            780,
+            1688
+          ],
+          "skala": 1.0,
+          "beschnitt": [
+            0,
+            0
+          ]
+        },
+        "vorher_ecken_normalisiert": [
+          [
+            279,
+            280
+          ],
+          [
+            499,
+            280
+          ],
+          [
+            70,
+            1155
+          ],
+          [
+            708,
+            1155
+          ]
+        ],
+        "vorher_unten_aus_sichtbaren_seiten_extrapoliert": false,
+        "max_eckenabweichung_vorher_px": 14.0,
+        "verwendete_bruecken_quelle": "aktuelle freigegebene Gestaltung",
+        "technik": "Gezielte stückweise Entzerrung der Fahrbahn; obere Kulisse bis y200 unverändert.",
+        "ziel_ecken_px": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            716,
+            1158
+          ]
+        ],
+        "nachpruefung": "visuell am ausgegebenen Pixelraster erfolgt; kein Godot-Laufzeittest",
+        "fahrbahn_ecken_array": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            66,
+            1158
+          ],
+          [
+            714,
+            1158
+          ]
+        ],
+        "fahrbahn_ecken_px": {
+          "oben_links": [
+            280,
+            294
+          ],
+          "oben_rechts": [
+            500,
+            294
+          ],
+          "unten_links": [
+            66,
+            1158
+          ],
+          "unten_rechts": [
+            714,
+            1158
+          ]
+        },
+        "breite": 780,
+        "hoehe": 1688,
+        "modus": "RGB",
+        "messunsicherheit_px": 6,
+        "groesste_gemessene_abweichung_px": 2.0,
+        "innerhalb_freigabetoleranz_inkl_messunsicherheit": true,
+        "feinziel_6px_messtechnisch_bestaetigt": false,
+        "fahrbahn_gerade_und_gleichmaessig_breiter": "visuell bestätigt",
+        "plattformbeginn_abgelesen_ca_y": 1169,
+        "heldenbereich_frei": true,
+        "anzeigenbereich_frei": true,
+        "urspruengliches_design": "originale/lava_asteroid.png"
+      },
+      {
+        "nummer": 5,
+        "id": "nebula_portal",
+        "welt": "Nebelportal",
+        "datei": "nebula_portal.png",
+        "original_groesse": [
+          853,
+          1844
+        ],
+        "probe_normierung": {
+          "quelle": [
+            853,
+            1844
+          ],
+          "skala": 0.9154013015184381,
+          "beschnitt": [
+            0,
+            0
+          ]
+        },
+        "vorher_ecken_normalisiert": [
+          [
+            285,
+            282
+          ],
+          [
+            495,
+            282
+          ],
+          [
+            80,
+            1155
+          ],
+          [
+            700,
+            1155
+          ]
+        ],
+        "vorher_unten_aus_sichtbaren_seiten_extrapoliert": false,
+        "max_eckenabweichung_vorher_px": 16.3,
+        "verwendete_bruecken_quelle": "aktuelle freigegebene Gestaltung",
+        "technik": "Gezielte stückweise Entzerrung der Fahrbahn; obere Kulisse bis y200 unverändert.",
+        "ziel_ecken_px": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            716,
+            1158
+          ]
+        ],
+        "nachpruefung": "visuell am ausgegebenen Pixelraster erfolgt; kein Godot-Laufzeittest",
+        "fahrbahn_ecken_array": [
+          [
+            281,
+            294
+          ],
+          [
+            499,
+            294
+          ],
+          [
+            68,
+            1158
+          ],
+          [
+            712,
+            1158
+          ]
+        ],
+        "fahrbahn_ecken_px": {
+          "oben_links": [
+            281,
+            294
+          ],
+          "oben_rechts": [
+            499,
+            294
+          ],
+          "unten_links": [
+            68,
+            1158
+          ],
+          "unten_rechts": [
+            712,
+            1158
+          ]
+        },
+        "breite": 780,
+        "hoehe": 1688,
+        "modus": "RGB",
+        "messunsicherheit_px": 6,
+        "groesste_gemessene_abweichung_px": 4.0,
+        "innerhalb_freigabetoleranz_inkl_messunsicherheit": true,
+        "feinziel_6px_messtechnisch_bestaetigt": false,
+        "fahrbahn_gerade_und_gleichmaessig_breiter": "visuell bestätigt",
+        "plattformbeginn_abgelesen_ca_y": 1169,
+        "heldenbereich_frei": true,
+        "anzeigenbereich_frei": true,
+        "urspruengliches_design": "originale/nebula_portal.png"
+      },
+      {
+        "nummer": 6,
+        "id": "jungle_moon",
+        "welt": "Dschungelmond",
+        "datei": "jungle_moon.png",
+        "original_groesse": [
+          780,
+          1688
+        ],
+        "probe_normierung": {
+          "quelle": [
+            780,
+            1688
+          ],
+          "skala": 1.0,
+          "beschnitt": [
+            0,
+            0
+          ]
+        },
+        "vorher_ecken_normalisiert": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            66,
+            1164
+          ],
+          [
+            715,
+            1164
+          ]
+        ],
+        "vorher_unten_aus_sichtbaren_seiten_extrapoliert": false,
+        "max_eckenabweichung_vorher_px": 6.3,
+        "verwendete_bruecken_quelle": "aktuelle freigegebene Gestaltung",
+        "technik": "Gezielte stückweise Entzerrung der Fahrbahn; obere Kulisse bis y200 unverändert.",
+        "ziel_ecken_px": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            716,
+            1158
+          ]
+        ],
+        "nachpruefung": "visuell am ausgegebenen Pixelraster erfolgt; kein Godot-Laufzeittest",
+        "fahrbahn_ecken_array": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            716,
+            1158
+          ]
+        ],
+        "fahrbahn_ecken_px": {
+          "oben_links": [
+            280,
+            294
+          ],
+          "oben_rechts": [
+            500,
+            294
+          ],
+          "unten_links": [
+            64,
+            1158
+          ],
+          "unten_rechts": [
+            716,
+            1158
+          ]
+        },
+        "breite": 780,
+        "hoehe": 1688,
+        "modus": "RGB",
+        "messunsicherheit_px": 6,
+        "groesste_gemessene_abweichung_px": 0.0,
+        "innerhalb_freigabetoleranz_inkl_messunsicherheit": true,
+        "feinziel_6px_messtechnisch_bestaetigt": true,
+        "fahrbahn_gerade_und_gleichmaessig_breiter": "visuell bestätigt",
+        "plattformbeginn_abgelesen_ca_y": 1169,
+        "heldenbereich_frei": true,
+        "anzeigenbereich_frei": true,
+        "urspruengliches_design": "originale/jungle_moon.png"
+      },
+      {
+        "nummer": 7,
+        "id": "ocean_world",
+        "welt": "Ozeanwelt",
+        "datei": "ocean_world_korrigiert.png",
+        "original_groesse": [
+          780,
+          1688
+        ],
+        "probe_normierung": {
+          "quelle": [
+            780,
+            1688
+          ],
+          "skala": 1.0,
+          "beschnitt": [
+            0,
+            0
+          ]
+        },
+        "vorher_ecken_normalisiert": [
+          [
+            278,
+            293
+          ],
+          [
+            501,
+            293
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            715,
+            1158
+          ]
+        ],
+        "vorher_unten_aus_sichtbaren_seiten_extrapoliert": false,
+        "max_eckenabweichung_vorher_px": 2.2,
+        "verwendete_bruecken_quelle": "aktuelle freigegebene Gestaltung",
+        "technik": "Claudes bereits entzerrte Ozeanwelt unverändert übernommen.",
+        "ziel_ecken_px": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            716,
+            1158
+          ]
+        ],
+        "nachpruefung": "visuell am ausgegebenen Pixelraster erfolgt; kein Godot-Laufzeittest",
+        "fahrbahn_ecken_array": [
+          [
+            278,
+            293
+          ],
+          [
+            501,
+            293
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            715,
+            1158
+          ]
+        ],
+        "fahrbahn_ecken_px": {
+          "oben_links": [
+            278,
+            293
+          ],
+          "oben_rechts": [
+            501,
+            293
+          ],
+          "unten_links": [
+            64,
+            1158
+          ],
+          "unten_rechts": [
+            715,
+            1158
+          ]
+        },
+        "breite": 780,
+        "hoehe": 1688,
+        "modus": "RGB",
+        "messunsicherheit_px": 6,
+        "groesste_gemessene_abweichung_px": 2.2,
+        "innerhalb_freigabetoleranz_inkl_messunsicherheit": true,
+        "feinziel_6px_messtechnisch_bestaetigt": false,
+        "fahrbahn_gerade_und_gleichmaessig_breiter": "visuell bestätigt",
+        "plattformbeginn_abgelesen_ca_y": 1169,
+        "heldenbereich_frei": true,
+        "anzeigenbereich_frei": true,
+        "urspruengliches_design": "originale/ocean_world.png"
+      },
+      {
+        "nummer": 8,
+        "id": "crystal_planet",
+        "welt": "Kristallplanet",
+        "datei": "crystal_planet.png",
+        "original_groesse": [
+          780,
+          1688
+        ],
+        "probe_normierung": {
+          "quelle": [
+            780,
+            1688
+          ],
+          "skala": 1.0,
+          "beschnitt": [
+            0,
+            0
+          ]
+        },
+        "vorher_ecken_normalisiert": [
+          [
+            280,
+            279
+          ],
+          [
+            500,
+            279
+          ],
+          [
+            66,
+            1164
+          ],
+          [
+            715,
+            1164
+          ]
+        ],
+        "vorher_unten_aus_sichtbaren_seiten_extrapoliert": false,
+        "max_eckenabweichung_vorher_px": 15.0,
+        "verwendete_bruecken_quelle": "aktuelle freigegebene Gestaltung",
+        "technik": "Gezielte stückweise Entzerrung der Fahrbahn; obere Kulisse bis y200 unverändert.",
+        "ziel_ecken_px": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            716,
+            1158
+          ]
+        ],
+        "nachpruefung": "visuell am ausgegebenen Pixelraster erfolgt; kein Godot-Laufzeittest",
+        "fahrbahn_ecken_array": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            65,
+            1158
+          ],
+          [
+            715,
+            1158
+          ]
+        ],
+        "fahrbahn_ecken_px": {
+          "oben_links": [
+            280,
+            294
+          ],
+          "oben_rechts": [
+            500,
+            294
+          ],
+          "unten_links": [
+            65,
+            1158
+          ],
+          "unten_rechts": [
+            715,
+            1158
+          ]
+        },
+        "breite": 780,
+        "hoehe": 1688,
+        "modus": "RGB",
+        "messunsicherheit_px": 6,
+        "groesste_gemessene_abweichung_px": 1.0,
+        "innerhalb_freigabetoleranz_inkl_messunsicherheit": true,
+        "feinziel_6px_messtechnisch_bestaetigt": false,
+        "fahrbahn_gerade_und_gleichmaessig_breiter": "visuell bestätigt",
+        "plattformbeginn_abgelesen_ca_y": 1169,
+        "heldenbereich_frei": true,
+        "anzeigenbereich_frei": true,
+        "urspruengliches_design": "originale/crystal_planet.png"
+      },
+      {
+        "nummer": 9,
+        "id": "storm_giant",
+        "welt": "Sturmriese",
+        "datei": "storm_giant.png",
+        "original_groesse": [
+          780,
+          1688
+        ],
+        "probe_normierung": {
+          "quelle": [
+            780,
+            1688
+          ],
+          "skala": 1.0,
+          "beschnitt": [
+            0,
+            0
+          ]
+        },
+        "vorher_ecken_normalisiert": [
+          [
+            251,
+            297
+          ],
+          [
+            529,
+            297
+          ],
+          [
+            37,
+            1133
+          ],
+          [
+            743,
+            1133
+          ]
+        ],
+        "vorher_unten_aus_sichtbaren_seiten_extrapoliert": false,
+        "max_eckenabweichung_vorher_px": 36.8,
+        "verwendete_bruecken_quelle": "aktuelle freigegebene Gestaltung",
+        "technik": "Gezielte stückweise Entzerrung der Fahrbahn; obere Kulisse bis y200 unverändert.",
+        "ziel_ecken_px": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            716,
+            1158
+          ]
+        ],
+        "nachpruefung": "visuell am ausgegebenen Pixelraster erfolgt; kein Godot-Laufzeittest",
+        "fahrbahn_ecken_array": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            59,
+            1156
+          ],
+          [
+            721,
+            1156
+          ]
+        ],
+        "fahrbahn_ecken_px": {
+          "oben_links": [
+            280,
+            294
+          ],
+          "oben_rechts": [
+            500,
+            294
+          ],
+          "unten_links": [
+            59,
+            1156
+          ],
+          "unten_rechts": [
+            721,
+            1156
+          ]
+        },
+        "breite": 780,
+        "hoehe": 1688,
+        "modus": "RGB",
+        "messunsicherheit_px": 6,
+        "groesste_gemessene_abweichung_px": 5.4,
+        "innerhalb_freigabetoleranz_inkl_messunsicherheit": true,
+        "feinziel_6px_messtechnisch_bestaetigt": false,
+        "fahrbahn_gerade_und_gleichmaessig_breiter": "visuell bestätigt",
+        "plattformbeginn_abgelesen_ca_y": 1167,
+        "heldenbereich_frei": true,
+        "anzeigenbereich_frei": true,
+        "urspruengliches_design": "originale/storm_giant.png"
+      },
+      {
+        "nummer": 10,
+        "id": "scrap_world",
+        "welt": "Schrottwelt",
+        "datei": "scrap_world.png",
+        "original_groesse": [
+          977,
+          1610
+        ],
+        "probe_normierung": {
+          "quelle": [
+            977,
+            1610
+          ],
+          "skala": 1.0484472049689442,
+          "beschnitt": [
+            122,
+            0
+          ]
+        },
+        "vorher_ecken_normalisiert": [
+          [
+            161,
+            328
+          ],
+          [
+            601,
+            328
+          ],
+          [
+            -84,
+            1138
+          ],
+          [
+            859,
+            1138
+          ]
+        ],
+        "vorher_unten_aus_sichtbaren_seiten_extrapoliert": true,
+        "max_eckenabweichung_vorher_px": 149.3,
+        "verwendete_bruecken_quelle": "vorhandene maßnahe Weltfassung",
+        "technik": "Wegen abgeschnittener Fahrbahnränder: vollständige vorhandene Brücken- und Unterkulisse derselben Welt entzerrt übernommen; neue mittige Portalgestaltung im oberen Himmel erhalten, Übergang am Brückenanfang weich verbunden.",
+        "ziel_ecken_px": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            716,
+            1158
+          ]
+        ],
+        "nachpruefung": "visuell am ausgegebenen Pixelraster erfolgt; kein Godot-Laufzeittest",
+        "fahrbahn_ecken_array": [
+          [
+            279,
+            300
+          ],
+          [
+            501,
+            300
+          ],
+          [
+            55,
+            1164
+          ],
+          [
+            725,
+            1164
+          ]
+        ],
+        "fahrbahn_ecken_px": {
+          "oben_links": [
+            279,
+            300
+          ],
+          "oben_rechts": [
+            501,
+            300
+          ],
+          "unten_links": [
+            55,
+            1164
+          ],
+          "unten_rechts": [
+            725,
+            1164
+          ]
+        },
+        "breite": 780,
+        "hoehe": 1688,
+        "modus": "RGB",
+        "messunsicherheit_px": 6,
+        "groesste_gemessene_abweichung_px": 10.8,
+        "innerhalb_freigabetoleranz_inkl_messunsicherheit": true,
+        "feinziel_6px_messtechnisch_bestaetigt": false,
+        "fahrbahn_gerade_und_gleichmaessig_breiter": "visuell bestätigt",
+        "plattformbeginn_abgelesen_ca_y": 1175,
+        "heldenbereich_frei": true,
+        "anzeigenbereich_frei": true,
+        "urspruengliches_design": "originale/scrap_world.png"
+      },
+      {
+        "nummer": 11,
+        "id": "cloud_city",
+        "welt": "Wolkenstadt",
+        "datei": "cloud_city.png",
+        "original_groesse": [
+          780,
+          1688
+        ],
+        "probe_normierung": {
+          "quelle": [
+            780,
+            1688
+          ],
+          "skala": 1.0,
+          "beschnitt": [
+            0,
+            0
+          ]
+        },
+        "vorher_ecken_normalisiert": [
+          [
+            254,
+            265
+          ],
+          [
+            481,
+            265
+          ],
+          [
+            78,
+            1158
+          ],
+          [
+            690,
+            1158
+          ]
+        ],
+        "vorher_unten_aus_sichtbaren_seiten_extrapoliert": false,
+        "max_eckenabweichung_vorher_px": 38.9,
+        "verwendete_bruecken_quelle": "aktuelle freigegebene Gestaltung",
+        "technik": "Gezielte stückweise Entzerrung der Fahrbahn; obere Kulisse bis y200 unverändert.",
+        "ziel_ecken_px": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            716,
+            1158
+          ]
+        ],
+        "nachpruefung": "visuell am ausgegebenen Pixelraster erfolgt; kein Godot-Laufzeittest",
+        "fahrbahn_ecken_array": [
+          [
+            282,
+            294
+          ],
+          [
+            498,
+            294
+          ],
+          [
+            61,
+            1158
+          ],
+          [
+            719,
+            1158
+          ]
+        ],
+        "fahrbahn_ecken_px": {
+          "oben_links": [
+            282,
+            294
+          ],
+          "oben_rechts": [
+            498,
+            294
+          ],
+          "unten_links": [
+            61,
+            1158
+          ],
+          "unten_rechts": [
+            719,
+            1158
+          ]
+        },
+        "breite": 780,
+        "hoehe": 1688,
+        "modus": "RGB",
+        "messunsicherheit_px": 6,
+        "groesste_gemessene_abweichung_px": 3.0,
+        "innerhalb_freigabetoleranz_inkl_messunsicherheit": true,
+        "feinziel_6px_messtechnisch_bestaetigt": false,
+        "fahrbahn_gerade_und_gleichmaessig_breiter": "visuell bestätigt",
+        "plattformbeginn_abgelesen_ca_y": 1169,
+        "heldenbereich_frei": true,
+        "anzeigenbereich_frei": true,
+        "urspruengliches_design": "originale/cloud_city.png"
+      },
+      {
+        "nummer": 12,
+        "id": "spore_world",
+        "welt": "Sporenwelt",
+        "datei": "spore_world.png",
+        "original_groesse": [
+          977,
+          1610
+        ],
+        "probe_normierung": {
+          "quelle": [
+            977,
+            1610
+          ],
+          "skala": 1.0484472049689442,
+          "beschnitt": [
+            122,
+            0
+          ]
+        },
+        "vorher_ecken_normalisiert": [
+          [
+            257,
+            292
+          ],
+          [
+            516,
+            292
+          ],
+          [
+            -20,
+            1169
+          ],
+          [
+            801,
+            1169
+          ]
+        ],
+        "vorher_unten_aus_sichtbaren_seiten_extrapoliert": true,
+        "max_eckenabweichung_vorher_px": 85.7,
+        "verwendete_bruecken_quelle": "vorhandene maßnahe Weltfassung",
+        "technik": "Wegen abgeschnittener Fahrbahnränder: vollständige vorhandene Brücken- und Unterkulisse derselben Welt entzerrt übernommen; neue mittige Portalgestaltung im oberen Himmel erhalten, Übergang am Brückenanfang weich verbunden.",
+        "ziel_ecken_px": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            716,
+            1158
+          ]
+        ],
+        "nachpruefung": "visuell am ausgegebenen Pixelraster erfolgt; kein Godot-Laufzeittest",
+        "fahrbahn_ecken_array": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            68,
+            1158
+          ],
+          [
+            712,
+            1158
+          ]
+        ],
+        "fahrbahn_ecken_px": {
+          "oben_links": [
+            280,
+            294
+          ],
+          "oben_rechts": [
+            500,
+            294
+          ],
+          "unten_links": [
+            68,
+            1158
+          ],
+          "unten_rechts": [
+            712,
+            1158
+          ]
+        },
+        "breite": 780,
+        "hoehe": 1688,
+        "modus": "RGB",
+        "messunsicherheit_px": 6,
+        "groesste_gemessene_abweichung_px": 4.0,
+        "innerhalb_freigabetoleranz_inkl_messunsicherheit": true,
+        "feinziel_6px_messtechnisch_bestaetigt": false,
+        "fahrbahn_gerade_und_gleichmaessig_breiter": "visuell bestätigt",
+        "plattformbeginn_abgelesen_ca_y": 1169,
+        "heldenbereich_frei": true,
+        "anzeigenbereich_frei": true,
+        "urspruengliches_design": "originale/spore_world.png"
+      },
+      {
+        "nummer": 13,
+        "id": "ghost_moon",
+        "welt": "Geistermond",
+        "datei": "ghost_moon.png",
+        "original_groesse": [
+          780,
+          1688
+        ],
+        "probe_normierung": {
+          "quelle": [
+            780,
+            1688
+          ],
+          "skala": 1.0,
+          "beschnitt": [
+            0,
+            0
+          ]
+        },
+        "vorher_ecken_normalisiert": [
+          [
+            267,
+            285
+          ],
+          [
+            528,
+            285
+          ],
+          [
+            43,
+            1164
+          ],
+          [
+            739,
+            1164
+          ]
+        ],
+        "vorher_unten_aus_sichtbaren_seiten_extrapoliert": false,
+        "max_eckenabweichung_vorher_px": 29.4,
+        "verwendete_bruecken_quelle": "aktuelle freigegebene Gestaltung",
+        "technik": "Gezielte stückweise Entzerrung der Fahrbahn; obere Kulisse bis y200 unverändert.",
+        "ziel_ecken_px": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            716,
+            1158
+          ]
+        ],
+        "nachpruefung": "visuell am ausgegebenen Pixelraster erfolgt; kein Godot-Laufzeittest",
+        "fahrbahn_ecken_array": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            63,
+            1158
+          ],
+          [
+            717,
+            1158
+          ]
+        ],
+        "fahrbahn_ecken_px": {
+          "oben_links": [
+            280,
+            294
+          ],
+          "oben_rechts": [
+            500,
+            294
+          ],
+          "unten_links": [
+            63,
+            1158
+          ],
+          "unten_rechts": [
+            717,
+            1158
+          ]
+        },
+        "breite": 780,
+        "hoehe": 1688,
+        "modus": "RGB",
+        "messunsicherheit_px": 6,
+        "groesste_gemessene_abweichung_px": 1.0,
+        "innerhalb_freigabetoleranz_inkl_messunsicherheit": true,
+        "feinziel_6px_messtechnisch_bestaetigt": false,
+        "fahrbahn_gerade_und_gleichmaessig_breiter": "visuell bestätigt",
+        "plattformbeginn_abgelesen_ca_y": 1169,
+        "heldenbereich_frei": true,
+        "anzeigenbereich_frei": true,
+        "urspruengliches_design": "originale/ghost_moon.png"
+      },
+      {
+        "nummer": 14,
+        "id": "temple_planet",
+        "welt": "Tempelplanet",
+        "datei": "temple_planet.png",
+        "original_groesse": [
+          780,
+          1688
+        ],
+        "probe_normierung": {
+          "quelle": [
+            780,
+            1688
+          ],
+          "skala": 1.0,
+          "beschnitt": [
+            0,
+            0
+          ]
+        },
+        "vorher_ecken_normalisiert": [
+          [
+            251,
+            291
+          ],
+          [
+            528,
+            291
+          ],
+          [
+            -10,
+            1166
+          ],
+          [
+            790,
+            1166
+          ]
+        ],
+        "vorher_unten_aus_sichtbaren_seiten_extrapoliert": true,
+        "max_eckenabweichung_vorher_px": 74.4,
+        "verwendete_bruecken_quelle": "vorhandene maßnahe Weltfassung",
+        "technik": "Wegen abgeschnittener Fahrbahnränder: vollständige vorhandene Brücken- und Unterkulisse derselben Welt entzerrt übernommen; neue mittige Portalgestaltung im oberen Himmel erhalten, Übergang am Brückenanfang weich verbunden.",
+        "ziel_ecken_px": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            716,
+            1158
+          ]
+        ],
+        "nachpruefung": "visuell am ausgegebenen Pixelraster erfolgt; kein Godot-Laufzeittest",
+        "fahrbahn_ecken_array": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            69,
+            1158
+          ],
+          [
+            711,
+            1158
+          ]
+        ],
+        "fahrbahn_ecken_px": {
+          "oben_links": [
+            280,
+            294
+          ],
+          "oben_rechts": [
+            500,
+            294
+          ],
+          "unten_links": [
+            69,
+            1158
+          ],
+          "unten_rechts": [
+            711,
+            1158
+          ]
+        },
+        "breite": 780,
+        "hoehe": 1688,
+        "modus": "RGB",
+        "messunsicherheit_px": 6,
+        "groesste_gemessene_abweichung_px": 5.0,
+        "innerhalb_freigabetoleranz_inkl_messunsicherheit": true,
+        "feinziel_6px_messtechnisch_bestaetigt": false,
+        "fahrbahn_gerade_und_gleichmaessig_breiter": "visuell bestätigt",
+        "plattformbeginn_abgelesen_ca_y": 1169,
+        "heldenbereich_frei": true,
+        "anzeigenbereich_frei": true,
+        "urspruengliches_design": "originale/temple_planet.png"
+      },
+      {
+        "nummer": 15,
+        "id": "black_hole",
+        "welt": "Schwarzes Loch",
+        "datei": "black_hole.png",
+        "original_groesse": [
+          780,
+          1688
+        ],
+        "probe_normierung": {
+          "quelle": [
+            780,
+            1688
+          ],
+          "skala": 1.0,
+          "beschnitt": [
+            0,
+            0
+          ]
+        },
+        "vorher_ecken_normalisiert": [
+          [
+            223,
+            282
+          ],
+          [
+            552,
+            282
+          ],
+          [
+            -30,
+            1132
+          ],
+          [
+            813,
+            1132
+          ]
+        ],
+        "vorher_unten_aus_sichtbaren_seiten_extrapoliert": true,
+        "max_eckenabweichung_vorher_px": 100.4,
+        "verwendete_bruecken_quelle": "vorhandene maßnahe Weltfassung",
+        "technik": "Wegen abgeschnittener Fahrbahnränder: vollständige vorhandene Brücken- und Unterkulisse derselben Welt entzerrt übernommen; neue mittige Portalgestaltung im oberen Himmel erhalten, Übergang am Brückenanfang weich verbunden.",
+        "ziel_ecken_px": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            64,
+            1158
+          ],
+          [
+            716,
+            1158
+          ]
+        ],
+        "nachpruefung": "visuell am ausgegebenen Pixelraster erfolgt; kein Godot-Laufzeittest",
+        "fahrbahn_ecken_array": [
+          [
+            280,
+            294
+          ],
+          [
+            500,
+            294
+          ],
+          [
+            54,
+            1164
+          ],
+          [
+            726,
+            1164
+          ]
+        ],
+        "fahrbahn_ecken_px": {
+          "oben_links": [
+            280,
+            294
+          ],
+          "oben_rechts": [
+            500,
+            294
+          ],
+          "unten_links": [
+            54,
+            1164
+          ],
+          "unten_rechts": [
+            726,
+            1164
+          ]
+        },
+        "breite": 780,
+        "hoehe": 1688,
+        "modus": "RGB",
+        "messunsicherheit_px": 6,
+        "groesste_gemessene_abweichung_px": 11.7,
+        "innerhalb_freigabetoleranz_inkl_messunsicherheit": true,
+        "feinziel_6px_messtechnisch_bestaetigt": false,
+        "fahrbahn_gerade_und_gleichmaessig_breiter": "visuell bestätigt",
+        "plattformbeginn_abgelesen_ca_y": 1175,
+        "heldenbereich_frei": true,
+        "anzeigenbereich_frei": true,
+        "urspruengliches_design": "originale/black_hole.png"
+      }
+    ]
+  }
+}
