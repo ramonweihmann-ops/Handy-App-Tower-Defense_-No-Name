@@ -1,0 +1,83 @@
+{
+  "stand": "2026-11-09",
+  "freigabe": "Nutzer: viel besser; anschließend funktionale Übergabe an Claude beauftragt",
+  "referenz_px": [
+    852,
+    1846
+  ],
+  "mockup_punkte": [
+    390,
+    844
+  ],
+  "aktuelles_spielbild_px": [
+    1170,
+    2532
+  ],
+  "pixel_pro_mockup_punkt": 3,
+  "bestehende_ziele": {
+    "spiel_hintergrund": "game/ui_mock/home/main_bg.webp",
+    "layout": "game/ui_mock/home/layout.json",
+    "ansicht": "game/scripts/ui/mock/mock_view.gd",
+    "hauptbildschirm": "game/scripts/ui/screens/home_screen.gd"
+  },
+  "empfohlen": {
+    "modus": "Hintergrunddatei ersetzen",
+    "quelle": "godot_einbau/main_bg.webp",
+    "ziel": "game/ui_mock/home/main_bg.webp",
+    "layout_aendern": false,
+    "erfordert_planet_extra": false,
+    "beschreibung": "Nur diese Datei austauschen. Alle vorhandenen echten Buttons, Texte, Ereignisse und Live-Ebenen bleiben bestehen."
+  },
+  "alternative": {
+    "modus": "Deckender Pixelersatz als Bildüberlagerung",
+    "quelle": "godot_einbau/ringkorrektur_overlay_1170x2532.png",
+    "elternteil": "derselbe lokale Bereich wie MockView._bg",
+    "position_relativ_bg": [
+      0,
+      0
+    ],
+    "groesse_relativ_bg": [
+      1,
+      1
+    ],
+    "reihenfolge": "unmittelbar nach _bg und vor _live_layer, _text_layer und _btn_layer",
+    "mouse_filter": "Control.MOUSE_FILTER_IGNORE",
+    "stretch_mode": "TextureRect.STRETCH_SCALE",
+    "expand_mode": "TextureRect.EXPAND_IGNORE_SIZE",
+    "beschnitt": "an derselben Bildschirmfläche wie _bg abschneiden",
+    "kombination": "Nicht zusätzlich zum empfohlenen bereits korrigierten Hintergrund verwenden."
+  },
+  "transform": {
+    "s": "min(Ansichtsbreite / 390, Ansichtshöhe / 844)",
+    "off_x": "(Ansichtsbreite - 390*s) / 2",
+    "off_y": "(Ansichtshöhe - 844*s) / 2",
+    "referenz_x_zu_mockup": "x * 390 / 852",
+    "referenz_y_zu_mockup": "y * 844 / 1846",
+    "hinweis": "Bestehendes MockView._layout() weiterverwenden. Keine eigene Fenster-Skalierung für den Planeten daneben einführen."
+  },
+  "einzelobjekt_nur_fuer_neuen_ebenenaufbau": {
+    "datei": "ringplanet_einzeln.png",
+    "position_im_852x1846_entwurf_px": [
+      398,
+      335
+    ],
+    "skalierung_einheitlich": 0.4903078677309008,
+    "rastergroesse_nach_originalskalierung_px": [
+      753,
+      502
+    ],
+    "hinweis": "Nur zusammen mit einer planetenfreien Hintergrundebene und einer echten darüberliegenden UI. Nicht direkt auf das bereits zusammengesetzte Endbild legen."
+  },
+  "pruefung": {
+    "png_und_lossless_webp_pixelgleich": true,
+    "ausserhalb_austauschregion_identisch_zum_aktuellen_spielhintergrund": true,
+    "overlay_und_hintergrundersatz_pixelgleich": true,
+    "overlay_852_rekonstruiert_freigegebenes_bild_pixelgleich": true,
+    "bestehendes_layout_und_spielcode_veraendert": false,
+    "godot_dateitest": {
+      "version": "4.5.1",
+      "ergebnis": "Bestanden: beide Hintergrundformate und beide transparenten Overlays über Image.load gelesen; Abmessungen und Overlay-Alpha geprüft.",
+      "vollstaendiger_spieltest": false
+    }
+  }
+}

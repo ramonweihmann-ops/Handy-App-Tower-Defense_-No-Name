@@ -1,0 +1,140 @@
+{
+  "stand": "2026-11-09",
+  "bezugsdatei_im_spiel": {
+    "pfad": "game/ui_mock/home/main_bg.webp",
+    "git_blob_sha": "640fe8479d6c5fdec9b5fcae35b0d5a77df56b08"
+  },
+  "ergebnisse": {
+    "dateien_lesbar": true,
+    "overlay_rekonstruiert_ersatzbild_pixelgleich": true,
+    "png_und_webp_pixelgleich": true,
+    "ausserhalb_alpha_unveraendert": true,
+    "spielcode_und_layout_nicht_geaendert": true,
+    "freigegebene_entwurfsdatei_unveraendert": true,
+    "godot_dateitest_bestanden": true,
+    "godot_version": "4.5.1",
+    "vollstaendiger_spieltest": "Nicht durchgeführt. Funktionsprüfung nach Übernahme durch Claude erforderlich."
+  },
+  "dateien": [
+    {
+      "datei": "aenderungsmaske.png",
+      "bytes": 5708,
+      "sha256": "415f5bfbad75de844d2351aa9fb1786710dbde7d3bc7e62fac9cc66e6bab3b1f",
+      "git_blob_sha": "22f398adabb154cfe65420beef754768a955f9f3",
+      "breite": 852,
+      "hoehe": 1846,
+      "farbmodus": "L"
+    },
+    {
+      "datei": "BILDANWEISUNG.txt",
+      "bytes": 2972,
+      "sha256": "d62b8ee67ac1276432aef8f541dec6923c9462a313b487c9e0f901d2c5e4fe2e",
+      "git_blob_sha": "3cc90f22be4b38fe8a012140653ea5c0537251c3"
+    },
+    {
+      "datei": "EINBAU.json",
+      "bytes": 3153,
+      "sha256": "5b1e7fa0313404d1b8292858ed204ec58320584ef2b0ac903bde5fc3b8dbdbd5",
+      "git_blob_sha": "9ee9d1f733a45e68e2ded491e6393404e864d1b8"
+    },
+    {
+      "datei": "godot_einbau/main_bg.png",
+      "bytes": 1704604,
+      "sha256": "7790213c348db0aba46418182334ae2375cfaed679f55181506749980be763ae",
+      "git_blob_sha": "37a4d62b91b460b8bcce849f5af5bd0bc5b67103",
+      "breite": 1170,
+      "hoehe": 2532,
+      "farbmodus": "RGB"
+    },
+    {
+      "datei": "godot_einbau/main_bg.webp",
+      "bytes": 1244418,
+      "sha256": "cb3225cd3f7a00af1a92b452fe90fc1b58e4ab75cd8047470209cac21805b9c6",
+      "git_blob_sha": "d0dc409d2c5266b224fe4fb1676768153e5b2a97",
+      "breite": 1170,
+      "hoehe": 2532,
+      "farbmodus": "RGB"
+    },
+    {
+      "datei": "godot_einbau/ringkorrektur_overlay_1170x2532.png",
+      "bytes": 2097468,
+      "sha256": "06d47d27aad9b9fa43ef4478736426a016fbb82192f276835517a764d2609995",
+      "git_blob_sha": "ae83ee75f8b902242b9d07dcf5e1c7498071c4c5",
+      "breite": 1170,
+      "hoehe": 2532,
+      "farbmodus": "RGBA",
+      "alpha_min_max": [
+        0,
+        255
+      ]
+    },
+    {
+      "datei": "godot_einbau/ringkorrektur_overlay_852x1846.png",
+      "bytes": 1224419,
+      "sha256": "9675490d40d438dbe205705be63caebe398528086020c746dab3000b118e8d2b",
+      "git_blob_sha": "9c7e730a58b68eaa69a64c1126340429f027c7db",
+      "breite": 852,
+      "hoehe": 1846,
+      "farbmodus": "RGBA",
+      "alpha_min_max": [
+        0,
+        255
+      ]
+    },
+    {
+      "datei": "hauptbildschirm_aktuell_v5.png",
+      "bytes": 1089367,
+      "sha256": "676e2361e10572df9cd92186050d95aab9cc43d48d68b1ab3e89f5a2c330f7ec",
+      "git_blob_sha": "b5bbff063b1daf5e226a5354697df5ae85c72158",
+      "breite": 852,
+      "hoehe": 1846,
+      "farbmodus": "RGB"
+    },
+    {
+      "datei": "hauptbildschirm_ohne_ringplanet.png",
+      "bytes": 1041392,
+      "sha256": "7a83ca85b1fcb3da0e7b16fa767db1b7a1f893f1b7d9446301bbb7cc96edeecf",
+      "git_blob_sha": "47b7128e77c4eb89e7b0970b38accb7270876c60",
+      "breite": 852,
+      "hoehe": 1846,
+      "farbmodus": "RGB"
+    },
+    {
+      "datei": "LIESMICH_CLAUDE.md",
+      "bytes": 5330,
+      "sha256": "612e83534cc53cbb8cd66a79d65b77d675067919e697bf605d5b2e54b802d619",
+      "git_blob_sha": "31cc2060539805ee835b18ddc2696a4a0d52b107"
+    },
+    {
+      "datei": "ringplanet_einzeln.png",
+      "bytes": 1551430,
+      "sha256": "a537fd186f347c6cb34ed51788054acada68cbc799d0cfe3f323406f51ff0e1c",
+      "git_blob_sha": "c8275968ec2dbfd7063ffb2b84e0c955aadeee48",
+      "breite": 1536,
+      "hoehe": 1024,
+      "farbmodus": "RGBA",
+      "alpha_min_max": [
+        0,
+        254
+      ]
+    },
+    {
+      "datei": "ui_schutzmaske.png",
+      "bytes": 4726,
+      "sha256": "e940b8ef644601d51acce6adc0a420f4abb092925ef0bb931dd90fbb00bc0c19",
+      "git_blob_sha": "f93a2c3f70dddd81a8daa835f9f46d47ff8403e6",
+      "breite": 852,
+      "hoehe": 1846,
+      "farbmodus": "L"
+    },
+    {
+      "datei": "vergleich_ring.png",
+      "bytes": 406438,
+      "sha256": "1e6a716a80d439d3032affa98283b39af0f2a3726e6934a0c30a8741611e9d3b",
+      "git_blob_sha": "839234cd438c7be826fa222d916c34814630ddd7",
+      "breite": 884,
+      "hoehe": 570,
+      "farbmodus": "RGB"
+    }
+  ]
+}
