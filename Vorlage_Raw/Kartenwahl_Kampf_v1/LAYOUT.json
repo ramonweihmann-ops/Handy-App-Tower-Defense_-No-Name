@@ -1,0 +1,91 @@
+{
+  "referenz_punkte": [
+    390,
+    844
+  ],
+  "fenster": [
+    24,
+    101,
+    342,
+    492
+  ],
+  "karte": [
+    38,
+    175,
+    314,
+    102
+  ],
+  "karten_abstand": 10,
+  "karten_anzahl": 3,
+  "innenabstand": 12,
+  "motiv_bereich": [
+    47,
+    188,
+    117,
+    78
+  ],
+  "text_start_x": 183,
+  "trennlinie_x": 172,
+  "portrait_durchmesser": 42,
+  "bestaetigen": [
+    107,
+    542,
+    176,
+    42
+  ],
+  "schrift": {
+    "titel": [
+      "Fredoka",
+      20
+    ],
+    "kategorie": [
+      "Nunito",
+      12,
+      "fett"
+    ],
+    "kartentitel": [
+      "Fredoka",
+      17
+    ],
+    "beschreibung": [
+      "Nunito",
+      12
+    ],
+    "stufe": [
+      "Nunito",
+      11
+    ],
+    "knopf": [
+      "Fredoka",
+      18
+    ]
+  },
+  "farben": {
+    "fenster_oben": "#302344",
+    "fenster_unten": "#211638",
+    "karte": "#28203F",
+    "gold": "#FFD367",
+    "text": "#FFF4D7",
+    "text_neben": "#D6CFE8",
+    "waffe": "#42DDF4",
+    "super": "#FFAB52",
+    "champion": "#DFA0FC",
+    "gruen": "#8FF04D"
+  },
+  "neun_feld_raender": {
+    "fenster": 32,
+    "karte_normal": 20,
+    "karte_gewaehlt": 20,
+    "knopf_normal": 16,
+    "knopf_gedrueckt": 16,
+    "knopf_inaktiv": 16,
+    "badge": 11,
+    "stufe": 10
+  },
+  "interaktion": {
+    "auswahl": "Karte anklicken setzt gewählte ID; Rahmen und Haken zeigen den Zustand. Keine zusätzliche Ausgewählt-Zeile.",
+    "bestaetigung": "Nur NEHMEN bestätigt die gewählte ID; vorhandene Spielregeln unverändert.",
+    "anfang": "Anfangsauswahl wie bisher aus dem Spiel übernehmen; wenn keine Karte gewählt, NEHMEN inaktiv.",
+    "fokus": "Tastatur-/Controller-Fokus als zusätzlicher Rand, keine neue Spielmechanik."
+  }
+}

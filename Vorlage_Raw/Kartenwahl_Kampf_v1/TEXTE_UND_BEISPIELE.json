@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "hinweis": "Beispielwerte aus den bestehenden Karten. Keine neuen Spielwerte. Dynamische Werte immer aus dem Spiel beziehen.",
+  "titel": "Wähle deine Verstärkung",
+  "wellenmeldung": "WELLE {welle} GESCHAFFT!",
+  "bestaetigen": "NEHMEN",
+  "helden": [
+    {
+      "id": "fritzi_waffe",
+      "kategorie": "WAFFE",
+      "held": "Fritzi",
+      "titel": "Breite Flamme",
+      "stufe_von": 0,
+      "stufe_nach": 1,
+      "detail": "+1 Spezialfähigkeit",
+      "motiv": "motive/icon_breite_flamme.png",
+      "portrait": "motive/portrait_fritzi.png"
+    },
+    {
+      "id": "fritzi_super",
+      "kategorie": "SUPER",
+      "held": "Fritzi",
+      "titel": "Feuerwalze",
+      "stufe_von": 0,
+      "stufe_nach": 1,
+      "detail": "",
+      "motiv": "motive/icon_feuerwalze.png",
+      "portrait": "motive/portrait_fritzi.png"
+    },
+    {
+      "id": "dusty_neu",
+      "kategorie": "CHAMPION",
+      "held": "",
+      "titel": "Dusty Jo",
+      "detail": "Revolver",
+      "abzeichen": "NEU IM TEAM",
+      "motiv": "motive/champion_dusty_jo.png"
+    }
+  ],
+  "plasma": [
+    {
+      "id": "verdichter",
+      "kategorie": "PLASMA",
+      "titel": "Plasma-Verdichter",
+      "wert": "×2",
+      "motiv": "motive/icon_plasma_kern.png"
+    },
+    {
+      "id": "feuer_plasma",
+      "kategorie": "PLASMA",
+      "titel": "Feuer-Plasma",
+      "wert": "FEUER",
+      "motiv": "motive/icon_feuerwalze.png"
+    },
+    {
+      "id": "tank",
+      "kategorie": "PLASMA",
+      "titel": "Größerer Tank",
+      "wert": "+30",
+      "motiv": "motive/icon_plasma_tank.png"
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+[
+  {
+    "datei": "motive/champion_dusty_jo.png",
+    "groesse": [
+      512,
+      512
+    ],
+    "modus": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "motiv_box": [
+      57,
+      40,
+      454,
+      472
+    ]
+  },
+  {
+    "datei": "motive/icon_breite_flamme.png",
+    "groesse": [
+      512,
+      512
+    ],
+    "modus": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "motiv_box": [
+      57,
+      59,
+      446,
+      467
+    ]
+  },
+  {
+    "datei": "motive/icon_feuerwalze.png",
+    "groesse": [
+      512,
+      512
+    ],
+    "modus": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "motiv_box": [
+      48,
+      43,
+      462,
+      457
+    ]
+  },
+  {
+    "datei": "motive/icon_plasma_kern.png",
+    "groesse": [
+      512,
+      512
+    ],
+    "modus": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "motiv_box": [
+      52,
+      40,
+      460,
+      472
+    ]
+  },
+  {
+    "datei": "motive/icon_plasma_tank.png",
+    "groesse": [
+      512,
+      512
+    ],
+    "modus": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "motiv_box": [
+      40,
+      71,
+      472,
+      441
+    ]
+  },
+  {
+    "datei": "motive/portrait_fritzi.png",
+    "groesse": [
+      512,
+      512
+    ],
+    "modus": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "motiv_box": [
+      43,
+      42,
+      446,
+      465
+    ]
+  }
+]

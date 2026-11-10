@@ -1,0 +1,32 @@
+[
+  {
+    "datei": "motive/icon_breite_flamme.png",
+    "quelle": "exec-8c1a6791-13d9-48e0-986c-00b2afb424a7.png",
+    "bearbeitung": "Alpharand beschnitten, proportional in 512 × 512 mit mindestens 40 Pixel Rand eingepasst. Keine Neuzeichnung durch Zuschnitt."
+  },
+  {
+    "datei": "motive/icon_feuerwalze.png",
+    "quelle": "exec-4d3ab12c-e1fc-419a-9b3d-e552a968dce5.png",
+    "bearbeitung": "Alpharand beschnitten, proportional in 512 × 512 mit mindestens 40 Pixel Rand eingepasst. Keine Neuzeichnung durch Zuschnitt."
+  },
+  {
+    "datei": "motive/portrait_fritzi.png",
+    "quelle": "exec-6a8a782a-fbbb-4712-b850-c4b20ff23d3d.png",
+    "bearbeitung": "Alpharand beschnitten, proportional in 512 × 512 mit mindestens 40 Pixel Rand eingepasst. Keine Neuzeichnung durch Zuschnitt."
+  },
+  {
+    "datei": "motive/champion_dusty_jo.png",
+    "quelle": "dusty_jo.png",
+    "bearbeitung": "Alpharand beschnitten, proportional in 512 × 512 mit mindestens 40 Pixel Rand eingepasst. Keine Neuzeichnung durch Zuschnitt."
+  },
+  {
+    "datei": "motive/icon_plasma_tank.png",
+    "quelle": "icon_plasma_tank.png",
+    "bearbeitung": "Alpharand beschnitten, proportional in 512 × 512 mit mindestens 40 Pixel Rand eingepasst. Keine Neuzeichnung durch Zuschnitt."
+  },
+  {
+    "datei": "motive/icon_plasma_kern.png",
+    "quelle": "icon_energiekern.png",
+    "bearbeitung": "Alpharand beschnitten, proportional in 512 × 512 mit mindestens 40 Pixel Rand eingepasst. Keine Neuzeichnung durch Zuschnitt."
+  }
+]
