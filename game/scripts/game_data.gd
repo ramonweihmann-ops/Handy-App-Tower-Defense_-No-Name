@@ -183,6 +183,21 @@ const ENEMIES := {
 		"hp": 3400.0, "speed": 0.4, "xp": 0, "dps": 120.0, "size": 2.2, "armor": 0.15,
 		"minion": "krabbler",
 	},
+	# Dschungelmond (Level 51–60): eigene Comic-Gegner mit eigenen Farben und Namen (own_look: keine Färbung,
+	# keine Vorsilbe der Welt). Werte wie die Gegner gleicher Stärke aus Welt 1, damit die Abstimmung gleich bleibt.
+	"rankling": {
+		"name": "Rankling", "plural": "Ranklinge", "tier": "leicht", "own_look": true,
+		"hp": 28.0, "speed": 2.3, "xp": 1, "dps": 8.0, "size": 0.55, "armor": 0.0,
+	},
+	"bluetenschnapper": {
+		"name": "Blütenschnapper", "plural": "Blütenschnapper", "tier": "mittel", "own_look": true,
+		"hp": 95.0, "speed": 1.45, "xp": 3, "dps": 18.0, "size": 0.8, "armor": 0.0,
+	},
+	"urwaldriese": {
+		"name": "Urwaldriese", "plural": "Urwaldriesen", "tier": "boss", "own_look": true,
+		"hp": 2000.0, "speed": 0.45, "xp": 0, "dps": 90.0, "size": 2.0, "armor": 0.1,
+		"minion": "rankling",
+	},
 }
 
 ## Welten hinter dem Wurmloch: je 5 Level, Gegner nach Stärke (leicht, mittel, stark, Boss).
@@ -220,9 +235,11 @@ const WORLDS := [
 	# --- Level 51–150 (Schritt 2): je Planet zwei Welten, vorerst mit eingefärbten Gegnern ---
 	# Planet Dschungelmond (Level 51–60)
 	{"name": "Rankendickicht", "kinds": ["schleimling", "tentakler", "panzerkaefer", "schleimmutter"],
+		"kinds_neu": ["rankling", "bluetenschnapper", "panzerkaefer", "urwaldriese"],
 		"prefix": "Ranken-", "tint": Color(0.70, 1.20, 0.60),
 		"c1": Color(0.22, 0.93, 0.07), "c2": Color(0.62, 0.28, 0.92), "rim": Color(0.44, 0.96, 0.34)},
 	{"name": "Blütenwipfel", "kinds": ["krabbler", "zombie", "brecher", "koloss"],
+		"kinds_neu": ["rankling", "bluetenschnapper", "brecher", "urwaldriese"],
 		"prefix": "Blüten-", "tint": Color(1.25, 0.80, 1.00),
 		"c1": Color(0.93, 0.07, 0.45), "c2": Color(0.28, 0.92, 0.44), "rim": Color(0.96, 0.34, 0.61)},
 	# Planet Ozeanwelt (Level 61–70)
@@ -378,15 +395,26 @@ static func is_boss_level(level: int) -> bool:
 
 
 ## Färbung der Gegner dieser Welt (Weiß = Originalfarben).
-static func world_tint(level: int) -> Color:
+static func world_tint(level: int, kind := "") -> Color:
+	if kind != "" and bool(ENEMIES.get(kind, {}).get("own_look", false)):
+		return Color(1, 1, 1)
 	return WORLDS[world_of(level)].get("tint", Color(1, 1, 1))
+
+
+## Gegnerarten der Welt dieses Levels (leicht, mittel, stark, Boss). Mit dem Prüf-Schalter --neue-monster
+## die neuen, noch nicht freigegebenen Gegner („kinds_neu“).
+static func world_kinds(level: int) -> Array:
+	var w: Dictionary = WORLDS[world_of(level)]
+	if Models.test_new and w.has("kinds_neu"):
+		return w["kinds_neu"]
+	return w["kinds"]
 
 
 ## Name eines Gegners in der Welt dieses Levels (mit Vorsilbe der Welt).
 static func enemy_name(kind: String, level: int, plural := false) -> String:
 	var d: Dictionary = ENEMIES[kind]
 	var n: String = d["plural"] if plural else d["name"]
-	var prefix: String = WORLDS[world_of(level)].get("prefix", "")
+	var prefix: String = "" if bool(d.get("own_look", false)) else WORLDS[world_of(level)].get("prefix", "")
 	return prefix + n if prefix == "" else prefix + n.substr(0, 1).to_upper() + n.substr(1)
 
 
@@ -412,7 +440,7 @@ static func level_hp(level: int) -> float:
 ## Ab Level 51: gleicht aus, dass manche Gegnerarten von Haus aus mehr Leben haben (z. B. Krabbler,
 ## Zombie, Brecher gegenüber Schleimling, Tentakler, Panzerkäfer), damit keine Welt aus der Reihe fällt.
 static func world_hp_norm(level: int) -> float:
-	var k: Array = WORLDS[world_of(level)]["kinds"]
+	var k: Array = world_kinds(level)
 	var hp := 0.5 * float(ENEMIES[k[0]]["hp"]) + 0.35 * float(ENEMIES[k[1]]["hp"]) + 0.15 * float(ENEMIES[k[2]]["hp"])
 	var ref := 0.5 * 28.0 + 0.35 * 95.0 + 0.15 * 320.0
 	return ref / hp
@@ -446,7 +474,7 @@ static func boss_hp(level: int) -> float:
 ## Stellt die Gegner einer Welle zusammen (Art nach Welt, Menge nach Level in der Welt).
 static func wave_spawns(level: int, wave: int) -> Array[String]:
 	var list: Array[String] = []
-	var kinds: Array = WORLDS[world_of(level)]["kinds"]
+	var kinds: Array = world_kinds(level)
 	var lw := (level - 1) % LEVELS_PER_WORLD + 1
 	var extra := mini(world_of(level), 2)
 	var total := waves_in_level(level)

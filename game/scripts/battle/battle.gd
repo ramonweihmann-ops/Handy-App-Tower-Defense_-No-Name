@@ -358,7 +358,7 @@ func next_wave_text() -> String:
 			order.append(kind)
 		counts[kind] = int(counts.get(kind, 0)) + 1
 	var parts: Array[String] = []
-	var kinds: Array = GameData.WORLDS[GameData.world_of(level)]["kinds"].duplicate()
+	var kinds: Array = GameData.world_kinds(level).duplicate()
 	kinds.reverse()
 	for kind in kinds:
 		if counts.has(kind):
@@ -374,7 +374,7 @@ func spawn_enemy(kind: String, pos := Vector3.INF) -> Enemy:
 	if pos == Vector3.INF:
 		pos = Vector3(randf_range(-3.6, 3.6), 0, spawn_z() + randf_range(-1.0, 1.0))
 	e.position = pos
-	e.tint = GameData.world_tint(level)
+	e.tint = GameData.world_tint(level, kind)
 	e.dps_scale = GameData.dps_mult(level)
 	var hp := (MpData.hp_mult(level, maxi(wave, 1)) if mode == "mp" else GameData.hp_mult(level, maxi(wave, 1))) * hp_scale
 	if GameData.ENEMIES[kind]["tier"] == "boss":

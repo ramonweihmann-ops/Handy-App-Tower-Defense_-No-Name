@@ -177,7 +177,7 @@ static func _interp(table: Dictionary, level: int) -> float:
 
 ## Nächster Gegner: mit jeder Welle mehr mittlere und starke Gegner.
 static func pick_kind(level: int, wave: int, roll: float) -> String:
-	var kinds: Array = GameData.WORLDS[GameData.world_of(level)]["kinds"]
+	var kinds: Array = GameData.world_kinds(level)
 	var heavy := 0.0 if wave < 2 else 0.03 + 0.02 * wave
 	var mid := 0.15 + 0.035 * wave
 	if roll < heavy:
@@ -188,7 +188,7 @@ static func pick_kind(level: int, wave: int, roll: float) -> String:
 
 
 static func boss_kind(level: int) -> String:
-	return GameData.WORLDS[GameData.world_of(level)]["kinds"][3]
+	return GameData.world_kinds(level)[3]
 
 
 ## Nummer der laufenden Saison und Sekunden bis zu ihrem Ende

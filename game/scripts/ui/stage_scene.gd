@@ -96,7 +96,7 @@ func _build_view() -> void:
 	# Blick leicht über die Figuren, damit sie im unteren Drittel auf dem Boden stehen
 	cam.look_at(Vector3(0, 2.2, 0), Vector3.UP)
 	# Aufstellung: leichte Gegner vorne, stärkere dahinter, der Boss in der Mitte
-	var kinds: Array = GameData.WORLDS[GameData.world_of(level)]["kinds"]
+	var kinds: Array = GameData.world_kinds(level)
 	var in_world := (level - 1) % GameData.LEVELS_PER_WORLD
 	var spots := [[kinds[0], Vector3(-1.9, 0, 1.2)], [kinds[0], Vector3(1.9, 0, 1.2)]]
 	if in_world >= 1:
@@ -111,7 +111,7 @@ func _build_view() -> void:
 		var en := Enemy.new()
 		en.process_mode = Node.PROCESS_MODE_DISABLED
 		en.position = s[1]
-		en.tint = GameData.world_tint(level)
+		en.tint = GameData.world_tint(level, String(s[0]))
 		vp.add_child(en)
 		en.setup(String(s[0]), null, 1.0)
 		en.rotation.y = randf_range(-0.25, 0.25)
