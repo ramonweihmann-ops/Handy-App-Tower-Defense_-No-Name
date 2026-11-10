@@ -199,6 +199,21 @@ const ENEMIES := {
 		"hp": 2000.0, "speed": 0.45, "xp": 0, "dps": 90.0, "size": 2.0, "armor": 0.1,
 		"minion": "rankling",
 	},
+	# Ozeanwelt (Level 61–70, gebaut 10.11.2026, noch nicht freigegeben: nur mit --neue-monster über
+	# „kinds_neu“). Der mittlere Gegner (Quallenflieger) fehlt noch; bis dahin eingefärbter Tentakler.
+	"blubberfisch": {
+		"name": "Blubberfisch", "plural": "Blubberfische", "tier": "leicht", "own_look": true,
+		"hp": 28.0, "speed": 2.3, "xp": 1, "dps": 8.0, "size": 0.55, "armor": 0.0,
+	},
+	"krabbenpanzer": {
+		"name": "Krabbenpanzer", "plural": "Krabbenpanzer", "tier": "stark", "own_look": true,
+		"hp": 320.0, "speed": 0.85, "xp": 8, "dps": 40.0, "size": 1.0, "armor": 0.35,
+	},
+	"tiefseekrake": {
+		"name": "Tiefseekrake", "plural": "Tiefseekraken", "tier": "boss", "own_look": true,
+		"hp": 2000.0, "speed": 0.45, "xp": 0, "dps": 90.0, "size": 2.0, "armor": 0.1,
+		"minion": "blubberfisch",
+	},
 }
 
 ## Welten hinter dem Wurmloch: je 5 Level, Gegner nach Stärke (leicht, mittel, stark, Boss).
@@ -243,9 +258,11 @@ const WORLDS := [
 		"c1": Color(0.93, 0.07, 0.45), "c2": Color(0.28, 0.92, 0.44), "rim": Color(0.96, 0.34, 0.61)},
 	# Planet Ozeanwelt (Level 61–70)
 	{"name": "Korallenriff", "kinds": ["schleimling", "tentakler", "panzerkaefer", "schleimmutter"],
+		"kinds_neu": ["blubberfisch", "tentakler", "krabbenpanzer", "tiefseekrake"],
 		"prefix": "Riff-", "tint": Color(0.60, 1.15, 1.25),
 		"c1": Color(0.07, 0.79, 0.93), "c2": Color(0.92, 0.28, 0.37), "rim": Color(0.34, 0.87, 0.96)},
 	{"name": "Tiefseegraben", "kinds": ["krabbler", "tentakler", "brecher", "koloss"],
+		"kinds_neu": ["blubberfisch", "tentakler", "brecher", "tiefseekrake"],
 		"prefix": "Tiefsee-", "tint": Color(0.50, 0.75, 1.30),
 		"c1": Color(0.07, 0.34, 0.93), "c2": Color(0.92, 0.53, 0.28), "rim": Color(0.34, 0.53, 0.96)},
 	# Planet Kristallplanet (Level 71–80)
