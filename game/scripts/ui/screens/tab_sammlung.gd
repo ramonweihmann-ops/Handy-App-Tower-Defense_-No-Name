@@ -27,7 +27,7 @@ const LOCK_CARD := Vector2(119.4, 221.0)
 const LOCK_GAP := 12.0
 const LEFT := 10.9
 ## Sichtbarer Bereich über der Reiterleiste; darin scrollt die Liste
-const VIEW_H := 772.0
+const VIEW_H := 758.0   # endet über dem Kampf-Knopf der einheitlichen Reiterleiste
 const BOTTOM_PAD := 24.0
 ## Farbe des Bildfelds je Held (Baukasten: violett, gold, cyan, rosa)
 const BG := {
@@ -123,7 +123,7 @@ func bind() -> void:
 	_sort()
 	# Die Kauf-Knöpfe des Mockups sitzen fest; die Karten zeichnen ihre Knöpfe selbst
 	for b in buttons():
-		b.visible = int(b.info["rect"][1]) > 700
+		b.visible = int(b.info["rect"][1]) > 700 and not TAB_OF.has(str(b.info.get("href", "")))
 	_cards.clear()
 	var y := BANNER_TOP + BANNER_OK.y + 24.0
 	for k in _open.size():

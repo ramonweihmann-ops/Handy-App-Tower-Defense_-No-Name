@@ -62,6 +62,29 @@ func _run() -> bool:
 			m.sub_tab["upgrades"] = "talente"
 			m.show_tab("upgrades")
 			print("SMOKE alle Reiter gebaut")
+			# einheitliche Reiterleiste: auf jedem Reiter dieselbe Leiste, Antippen wechselt den Reiter
+			var nav_ok := true
+			for t in ["shop", "sammlung", "upgrades", "basis"]:
+				m.show_tab(t)
+				var ms := m._mock as MockScreen
+				if ms == null or ms._nav_bar == null:
+					nav_ok = false
+					print("SMOKE FEHLER: Reiter ohne einheitliche Leiste: ", t)
+					continue
+				for b in ms.buttons():
+					if MockScreen.TAB_OF.has(str(b.info.get("href", ""))) and b.visible and float((b.info["rect"] as Array)[1]) > 700.0:
+						nav_ok = false
+						print("SMOKE FEHLER: alte Reiterleiste sichtbar auf ", t)
+			m.show_tab("shop")
+			var nb: Control = (m._mock as MockScreen)._nav_bar
+			var ev := InputEventMouseButton.new()
+			ev.button_index = MOUSE_BUTTON_LEFT
+			ev.pressed = true
+			ev.position = (Vector2(115, 810) - Vector2(0, MockScreen.NAV_TOP)) * (m._mock as MockScreen).s
+			nb._gui_input(ev)
+			print("SMOKE reiterleiste einheitlich: ", nav_ok, " antippen Helden -> ", m.current_tab)
+			if m.current_tab != "sammlung":
+				print("SMOKE FEHLER: Reiterleiste wechselt nicht")
 			_check_close_buttons(m)
 			# Basislager: Lager-Blase einsammeln und „Alle Lager einsammeln“
 			m.show_tab("basis")
