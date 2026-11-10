@@ -1,0 +1,11 @@
+{
+  "version": "Godot 4.5.1",
+  "svg_dateien": 17,
+  "svg_laden_und_rendern": "erfolgreich",
+  "transparent_png": 6,
+  "png_masse": [
+    512,
+    512
+  ],
+  "hinweis": "Nur Grafikbausteine und XML geprüft, kein Einbau in den laufenden Kampf. Freigegebener Entwurf unverändert kopiert."
+}

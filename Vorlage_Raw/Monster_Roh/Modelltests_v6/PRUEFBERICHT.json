@@ -1,0 +1,201 @@
+{
+  "datum": "2026-11-10",
+  "credits_start": 1315,
+  "credits_ende": 1255,
+  "credits_verbraucht": 60,
+  "versuche_gesamt": 4,
+  "rigging_credits": 0,
+  "bewegungen_credits": 0,
+  "einstellungen": {
+    "modell": "Meshy T2.5",
+    "topologie": "Smart Topology",
+    "ziel_polygone": 10000,
+    "texturen": true,
+    "texturmodell": "Meshy N1",
+    "texturaufloesung": 2048,
+    "posekorrektur": false,
+    "lizenz_einstellung": "Privat",
+    "zusatztext": null,
+    "bilder_pro_erzeugung": 1,
+    "rigging": false
+  },
+  "modelle": [
+    {
+      "id": "blubberfisch",
+      "versuche": 1,
+      "credits": 15,
+      "pruefung": {
+        "bestanden": true,
+        "arme": 0,
+        "beine": 0,
+        "fangarme": 0,
+        "scheren": 0,
+        "bemerkung": "Runder geschlossener Körper, zwei seitliche Flossen, Rücken- und Schwanzflosse verbunden. Keine abgerissene Flosse in den vier Ansichten erkennbar."
+      },
+      "glb_daten": {
+        "datei": "blubberfisch_statisch_roh.glb",
+        "bytes": 3684872,
+        "sha256": "7f520c0122bad8d3e3d41663c4e2ea569db1f2b849f8f2fcf3766ef38fc4b907",
+        "git_blob_sha": "03ece2e28fe127a94b33c1ef3441ff24e987a158",
+        "glTF_version": 2,
+        "dreiecke": 10459,
+        "materialien": 1,
+        "texturen": [
+          {
+            "name": null,
+            "eingebettet": true,
+            "breite": 2048,
+            "hoehe": 2048
+          }
+        ],
+        "skelette": 0,
+        "knochen": [],
+        "animationen": [],
+        "knoten": [
+          "geometry_0"
+        ]
+      },
+      "glb_geliefert": true,
+      "pruefansichten": [
+        "vorn",
+        "seite",
+        "oben",
+        "unten"
+      ],
+      "animationen": []
+    },
+    {
+      "id": "quallenflieger",
+      "versuche": 1,
+      "credits": 15,
+      "pruefung": {
+        "bestanden": false,
+        "arme": 0,
+        "beine": 0,
+        "fangarme": 8,
+        "soll_fangarme": 4,
+        "scheren": 0,
+        "bemerkung": "Vorn wirken nur vier Fangarme sichtbar, die Unteransicht zeigt acht. Wegen falscher Anzahl abgelehnt. Kein zweiter Versuch und kein GLB im Lieferpaket."
+      },
+      "glb_daten": {
+        "datei": "quallenflieger_statisch_roh.glb",
+        "bytes": 3747360,
+        "sha256": "1db60c982106a17e748ff7c7a08f6870095aaaa5dadf9d357f0cc912bdb244a4",
+        "git_blob_sha": "29608092acc9ae4c67305be9442e2e7a4bc484a5",
+        "glTF_version": 2,
+        "dreiecke": 10407,
+        "materialien": 1,
+        "texturen": [
+          {
+            "name": null,
+            "eingebettet": true,
+            "breite": 2048,
+            "hoehe": 2048
+          }
+        ],
+        "skelette": 0,
+        "knochen": [],
+        "animationen": [],
+        "knoten": [
+          "geometry_0"
+        ]
+      },
+      "glb_geliefert": false,
+      "pruefansichten": [
+        "vorn",
+        "seite",
+        "oben",
+        "unten"
+      ],
+      "animationen": []
+    },
+    {
+      "id": "krabbenpanzer",
+      "versuche": 1,
+      "credits": 15,
+      "pruefung": {
+        "bestanden": true,
+        "arme": 2,
+        "beine": 6,
+        "fangarme": 0,
+        "scheren": 2,
+        "bemerkung": "Genau drei Laufbeine je Seite plus zwei eigene Scherenarme. Oben und unten gezählt. Geringe Nähe zwischen hinteren Laufbeinen und Scheren in der Projektion, als getrennte Gliedmaßen erkennbar."
+      },
+      "glb_daten": {
+        "datei": "krabbenpanzer_statisch_roh.glb",
+        "bytes": 3982836,
+        "sha256": "9776ffaade8a31095f341a31064d2add8689b830db918076dff7131ce5439b83",
+        "git_blob_sha": "9e55498750f270ce5ca9a15126e9b12d95ca5a24",
+        "glTF_version": 2,
+        "dreiecke": 10405,
+        "materialien": 1,
+        "texturen": [
+          {
+            "name": null,
+            "eingebettet": true,
+            "breite": 2048,
+            "hoehe": 2048
+          }
+        ],
+        "skelette": 0,
+        "knochen": [],
+        "animationen": [],
+        "knoten": [
+          "geometry_0"
+        ]
+      },
+      "glb_geliefert": true,
+      "pruefansichten": [
+        "vorn",
+        "seite",
+        "oben",
+        "unten"
+      ],
+      "animationen": []
+    },
+    {
+      "id": "tiefseekrake",
+      "versuche": 1,
+      "credits": 15,
+      "pruefung": {
+        "bestanden": true,
+        "arme": 0,
+        "beine": 0,
+        "fangarme": 8,
+        "scheren": 0,
+        "bemerkung": "Acht einzeln erkennbare Fangarme mit Lücken bis zum gemeinsamen Körperansatz; keine zusätzliche Armspitze erkennbar. Arme fächerförmig nach vorn und relativ flach angeordnet, siehe Seitenansicht. Kleine dunkle Dreiecksmarkierungen auf oberer Kopftextur, von Claude bei Bedarf bereinigen."
+      },
+      "glb_daten": {
+        "datei": "tiefseekrake_statisch_roh.glb",
+        "bytes": 3639356,
+        "sha256": "bdcc02e527f218ae5f3c9fd6df2d66438762728a46775008845fe7ebfde8f177",
+        "git_blob_sha": "4d179a726f43af5c260f1d6086f732a3bb53ddae",
+        "glTF_version": 2,
+        "dreiecke": 9850,
+        "materialien": 1,
+        "texturen": [
+          {
+            "name": null,
+            "eingebettet": true,
+            "breite": 2048,
+            "hoehe": 2048
+          }
+        ],
+        "skelette": 0,
+        "knochen": [],
+        "animationen": [],
+        "knoten": [
+          "geometry_0"
+        ]
+      },
+      "glb_geliefert": true,
+      "pruefansichten": [
+        "vorn",
+        "seite",
+        "oben",
+        "unten"
+      ],
+      "animationen": []
+    }
+  ]
+}
