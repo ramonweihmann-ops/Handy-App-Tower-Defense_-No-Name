@@ -1,0 +1,86 @@
+{
+  "status": "Teillieferung Planet 07, drei von vier Vorlagen",
+  "dateien": [
+    {
+      "datei": "07_leicht.png",
+      "name": "Blubberfisch",
+      "quelle": "exec-5ab9d4bc-0ce0-4369-be24-d5f0321b0f34.png",
+      "koerperbau": "Fisch",
+      "arme": 0,
+      "beine": 0,
+      "fluegel": 0,
+      "fangarme": 0,
+      "besonderheit": "Zwei Seitenflossen und drei Rückenflossenplatten; kein humanoider Körper.",
+      "abmessungen": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA",
+      "motivgrenzen": [
+        105,
+        104,
+        918,
+        920
+      ],
+      "pruefung": "Visuell gezählt; Hintergrund transparent, keine Effekte, vollständige Figur."
+    },
+    {
+      "datei": "07_mittel.png",
+      "name": "Quallenflieger",
+      "quelle": "exec-4afddac9-9d99-4568-98d8-e56c6f59d723.png",
+      "koerperbau": "Glockenkörper mit Fangarmen",
+      "arme": 0,
+      "beine": 0,
+      "fluegel": 0,
+      "fangarme": 4,
+      "besonderheit": "Vier kurze dicke Fangarme mit sichtbaren Zwischenräumen.",
+      "abmessungen": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA",
+      "motivgrenzen": [
+        106,
+        105,
+        913,
+        920
+      ],
+      "pruefung": "Visuell gezählt; Hintergrund transparent, keine Effekte, vollständige Figur."
+    },
+    {
+      "datei": "07_boss.png",
+      "name": "Tiefseekrake",
+      "quelle": "exec-b58a087f-2c31-4dad-9624-d44f6bd1d668.png",
+      "koerperbau": "Krake",
+      "arme": 0,
+      "beine": 0,
+      "fluegel": 0,
+      "fangarme": 8,
+      "besonderheit": "Acht Fangarme, vier je Seite; länglicher Kopf und orange Panzerhöcker.",
+      "abmessungen": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA",
+      "motivgrenzen": [
+        107,
+        104,
+        916,
+        920
+      ],
+      "pruefung": "Visuell gezählt; Hintergrund transparent, keine Effekte, vollständige Figur."
+    }
+  ],
+  "fehlend": {
+    "datei": "07_stark.png",
+    "name": "Krabbenpanzer",
+    "status": "FEHLT – Bildgenerierung hat zwei Ausgaben automatisch abgelehnt. Keine Ersatzdatei geliefert.",
+    "soll": {
+      "arme_scheren": 2,
+      "beine": 6,
+      "fluegel": 0,
+      "fangarme": 0
+    }
+  },
+  "restliche_planeten": "08–15 erst nach Rückmeldung; nicht erzeugt"
+}

@@ -1,0 +1,26 @@
+{
+  "werkzeug": "Eingebaute Bildgenerierung",
+  "referenz": "Vorlage_Raw/Gegner_51_150_v1/Freigabe_v3_2026_11_09/planet_07_uebersicht.png",
+  "vorlagen": [
+    {
+      "id": "07_leicht",
+      "prompt": "Erstelle eine einzige freigestellte Modellvorlage des BLUBBERFISCHS ganz links im Referenzbild. Referenzbild dient verbindlich für Identität, Farben, Form und Comic-Detailgrad; keine anderen Figuren übernehmen. Aquamarinblauer gepanzerter ovaler Fischkörper, violette kantige Augenbrauen, cremefarbener gepanzerter Unterkiefer/Bauch, drei orange Rückenflossenplatten und genau zwei orange Seitenflossen (eine links, eine rechts). Gleicher ernster fokussierter Blick, nicht knuffiger machen. Frontal orthografisch symmetrisch, ganzer Körper, keine Arme und keine Beine. Einfache kompakte Formen, keine dünnen Anhänge. Einzelne Figur mittig in quadratischem 1024×1024 Bild, etwa 10 Prozent freier Rand rundum. Echte Transparenz. Kein Schatten, keine Bodenplatte, kein Text, keine zweite Ansicht, keine Aura, kein Außenleuchten, keine Partikel, kein Hintergrund. Originaldesign präzise erhalten; nur aus Übersicht zur sauberen Einzelvorlage übertragen.",
+      "status": "erzeugt"
+    },
+    {
+      "id": "07_mittel",
+      "prompt": "Erstelle nur den QUALLENFLIEGER (zweite Figur von links) aus dem Referenzblatt als saubere einzelne Modellvorlage. Identität exakt beibehalten: flache kantig gewölbte aquamarinfarbene Glocke, violette breite Unterkante und kantige violette Brauen, orange Stirnplatte und zwei orange Seitenplatten, fokussierte Augen und kleiner ernster Mund. Genau VIER kurze dicke violette Fangarme, nebeneinander einzeln klar sichtbar, mit durchgehenden transparenten Zwischenräumen; keine weiteren Arme, Beine oder Flügel. Gerade von vorn orthografisch, gesamte Figur, symmetrisch; gleiche Comic-Schattierung und Formen wie Referenz, nicht süßer oder rundlicher machen. Einzelne Figur mittig, quadratisch 1024×1024, rundum etwa zehn Prozent Rand, echte Transparenz. Kein Text, keine Bodenplatte, kein Schatten, kein Außenleuchten, keine Aura, keine Partikel und keine anderen Figuren oder zweite Ansicht.",
+      "status": "erzeugt"
+    },
+    {
+      "id": "07_stark",
+      "prompt": "Einzelvorlage der dritten Figur aus dem Referenzbild: Krabbenpanzer. Gleiche Aquamarin-, Violett-, Orange- und Cremefarben, gleiches Gesicht und derselbe breite flache Panzer. Comic-Spielgrafik mit einfachen kantigen Formen und weicher Schattierung. Leicht erhöhte Ansicht von vorn, damit die Anatomie sichtbar ist: sechs Laufbeine, drei auf jeder Seite, mit jeweils eigenem cremefarbenen Fuß; zusätzlich zwei große Scherenarme oberhalb der Beine. Alle Anhänge voneinander getrennt, insgesamt sechs Beine und zwei Scheren. Eine Figur in der Bildmitte mit zehn Prozent Rand, quadratisch 1024×1024, transparenter Hintergrund. Ohne Schrift, Bodenplatte, Schatten und Effekte. Keine weiteren Figuren. Das bestehende Design unverändert als Einzelvorlage ausarbeiten.",
+      "status": "Keine Ausgabe; automatische Ablehnung, zwei Versuche"
+    },
+    {
+      "id": "07_boss",
+      "prompt": "Erstelle eine einzelne freigestellte Modellvorlage der TIEFSEEKRAKE, der vierten Figur rechts im Referenzbild. Identität präzise erhalten: hoher länglicher violetter Kopf, aquamarinfarbene kantige Augenbrauen und Seitenpanzerplatten, drei orange Panzerhöcker auf dem Kopf, entschlossener ernster Gesichtsausdruck, cremefarbene Saugnäpfe. Genau ACHT kurze dicke violette Fangarme, vier links und vier rechts, seitlich und nach unten aufgefächert, jeder Arm vom Körperansatz bis zur eigenen Spitze eindeutig einzeln sichtbar mit transparenten Zwischenräumen. Kein Fangarm kreuzt einen anderen. Keine Beine, Flügel oder menschlichen Arme. Gerade von vorn orthografisch, gleiche einfachen facettierten Comicformen und weiche Schattierung wie Referenz, nicht knuffiger machen. Einzelfigur mittig, 1024×1024 quadratisch, zehn Prozent Rand, echter transparenter Hintergrund. Keine Schrift, Bodenplatte, Schatten, Aura, Außenleuchten oder Partikel, keine zweite Ansicht.",
+      "status": "erzeugt"
+    }
+  ]
+}
