@@ -1,0 +1,21 @@
+{
+  "id": "rankling",
+  "import_erfolgreich": true,
+  "netze": 1,
+  "dreiecke": 9492,
+  "grenzen_blender_xyz": [
+    [
+      -0.4782710075378418,
+      0.4787600040435791
+    ],
+    [
+      -0.4343259930610657,
+      0.4362789988517761
+    ],
+    [
+      -0.45727500319480896,
+      0.4553219974040985
+    ]
+  ],
+  "hinweis": "Ansichten aus unverändertem Rohmodell; Anatomie wird visuell geprüft. Kein Godot-Test."
+}

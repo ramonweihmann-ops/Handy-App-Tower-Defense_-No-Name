@@ -1,0 +1,21 @@
+{
+  "id": "bluetenschnapper",
+  "import_erfolgreich": true,
+  "netze": 1,
+  "dreiecke": 10381,
+  "grenzen_blender_xyz": [
+    [
+      -0.4782710075378418,
+      0.4787600040435791
+    ],
+    [
+      -0.2131350040435791,
+      0.2131350040435791
+    ],
+    [
+      -0.28588899970054626,
+      0.28491199016571045
+    ]
+  ],
+  "hinweis": "Ansichten aus unverändertem Rohmodell; Anatomie wird visuell geprüft. Kein Godot-Test."
+}

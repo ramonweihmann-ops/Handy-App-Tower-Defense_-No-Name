@@ -1,0 +1,245 @@
+{
+  "stand": "2026-11-10",
+  "gelieferte_figuren": 3,
+  "gelieferte_glbs": 4,
+  "borkenkaefer_ausgeschlossen": true,
+  "dateien": [
+    {
+      "datei": "BEFUNDE_UND_KOSTEN.json",
+      "bytes": 1756,
+      "sha256": "638ff80e46c0d04f1f3f95794c6c5677c673c0d2f374116e2e66694dbada7db5",
+      "git_blob_sha": "a5ff44cf9dc275037ce9cdc672c80ce8fbfa6ab2"
+    },
+    {
+      "datei": "bluetenschnapper_IMPORTPRUEFUNG.json",
+      "bytes": 448,
+      "sha256": "8b33a74af7f45198908390ea8bb3756c387877636eed0dddbf07729d53b3874b",
+      "git_blob_sha": "199adeada969e8cfce25c4414d236427e909977e"
+    },
+    {
+      "datei": "bluetenschnapper_statisch_roh.glb",
+      "bytes": 2789348,
+      "sha256": "90eab5c24b5f51f24235565aa96c6b1cbab5d3f3f28f5292b2d46af265062392",
+      "git_blob_sha": "b701072eb070612bf726f25150b13aac8d77c3b4"
+    },
+    {
+      "datei": "bluetenschnapper_vorlage.png",
+      "bytes": 388137,
+      "sha256": "c8e850b0a22c57cc04bee257a71e3e3b53006ca3cda580d9991ac0e4e8b05958",
+      "git_blob_sha": "e5129b2fe79a50db5da45c56b81bf672fd61fda9",
+      "groesse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "bluetenschnapper_vorschau_oben.png",
+      "bytes": 438115,
+      "sha256": "b7349f6f7a5a86bcc342a8d441f44cd1f69f449a1542bee3f46ae1d0033b3217",
+      "git_blob_sha": "ce802422f568009c012b82cf53f043c99d965dca",
+      "groesse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "bluetenschnapper_vorschau_seite.png",
+      "bytes": 419059,
+      "sha256": "fd6e712946168a0a8be1c58049529e835ba296be03872c6850b89cb5a28a9829",
+      "git_blob_sha": "76c63e84a37f8e59352d6fb0679537868614e402",
+      "groesse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "bluetenschnapper_vorschau_vorn.png",
+      "bytes": 519565,
+      "sha256": "db0b082d2a3fef17599c43f116797c2e40860167817f075d3df6387f2e06ba6d",
+      "git_blob_sha": "7ef2408032a758f5fec24735ec6a09c5a8a7e675",
+      "groesse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "BORKENKAEFER_FEHLVERSUCH.md",
+      "bytes": 827,
+      "sha256": "cbbbd345cd80ca1557e50dc80edc103610e98d7bd2bf91aba3030c8ed6cd4a0a",
+      "git_blob_sha": "ed517ee9da67c33c22e22477ecce802dbe0e6451"
+    },
+    {
+      "datei": "GLB_PRUEFUNG.json",
+      "bytes": 6401,
+      "sha256": "52f1f4020df8ee9d6e625f530601b684092cca445d044620731f42a2cc97be35",
+      "git_blob_sha": "8fdf2de8d0cc3aa61b2b5656492f234fbead134d"
+    },
+    {
+      "datei": "LIESMICH_CLAUDE.md",
+      "bytes": 5337,
+      "sha256": "ac92b674ccdec0dbe7f97391473602633592c3e98ed967afff540fbea3fb77ae",
+      "git_blob_sha": "5e37625a5a566b39330afc9201714fb029e6340b"
+    },
+    {
+      "datei": "meshy_abschlussnachweis.png",
+      "bytes": 35958,
+      "sha256": "059439665d9a78d34e70450bd24e462e399442030f143591314d912982d464f5",
+      "git_blob_sha": "99943245a16b6513dcb6b16ef7334ad95ffbc02b",
+      "groesse": [
+        535,
+        672
+      ],
+      "modus": "RGB"
+    },
+    {
+      "datei": "MODELLUEBERSICHT.png",
+      "bytes": 883718,
+      "sha256": "4753e8da366c389b033d190c657d72140e773cffb10327d25e1c0a8d6a996b9c",
+      "git_blob_sha": "04e97fc822218b25c0c237b18d0513ac563d569b",
+      "groesse": [
+        1536,
+        1740
+      ],
+      "modus": "RGB"
+    },
+    {
+      "datei": "rankling_IMPORTPRUEFUNG.json",
+      "bytes": 438,
+      "sha256": "f6492f7e9ef290d55ffb13006217ace6b87d72b40828ba5f43e381aed41cef86",
+      "git_blob_sha": "7e2f19755890c045442e44a7cb3617ad3c14b711"
+    },
+    {
+      "datei": "rankling_statisch_roh.glb",
+      "bytes": 3431880,
+      "sha256": "b608fff252457f1117be84be71f1e0ea3c433f409d50d576b9a2ec7ddc3cc25f",
+      "git_blob_sha": "aeea5a1414fafaaa744036f63345f0bc7b59464f"
+    },
+    {
+      "datei": "rankling_vorlage.png",
+      "bytes": 707018,
+      "sha256": "632ce5ea9edb0feeb3e397aac0bbd07f242071206e8c1a3c67e2b1bd4f15d264",
+      "git_blob_sha": "32988a03d2789146168d560b1538b637e9937043",
+      "groesse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "rankling_vorschau_oben.png",
+      "bytes": 779436,
+      "sha256": "b9b5b87659b5bc5cecae8825ff41b1c497494deaa4128514bdf2d440633adf69",
+      "git_blob_sha": "3a162740f32266a706af9b3d085b5e1d2e85b1c8",
+      "groesse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "rankling_vorschau_seite.png",
+      "bytes": 737411,
+      "sha256": "796ff20a248dfd141fbb0e974c05ac2e555df68cbf390c6f9343c4b20cb5b02e",
+      "git_blob_sha": "9fe6f148bc84ed6e7e7fea0680749fe8bb957f3e",
+      "groesse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "rankling_vorschau_vorn.png",
+      "bytes": 801018,
+      "sha256": "c6ff559ce192d06d00299ed9d4fdd7176793b0eb61aaed72cd9165a99f16297c",
+      "git_blob_sha": "f6f98056c042eb43d5a7ef3382b77bd5b2c8216f",
+      "groesse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "RIG_IMPORT_UND_BEWEGUNGSPRUEFUNG.json",
+      "bytes": 6106,
+      "sha256": "e47a0bf5e04c06600a8023ba574abd2c616ef478d719b06b0a1210d9a6299b48",
+      "git_blob_sha": "5711ccbcb27517535bbae6d68c28d7dbafbd5f4f"
+    },
+    {
+      "datei": "urwaldriese_bewegungspruefung.png",
+      "bytes": 676669,
+      "sha256": "444e806bd3fa42910cdd0acad308761d5dd456295aabf8cd0823f1a40f0f2db4",
+      "git_blob_sha": "d2285d2c89320444a0c6b0f4d0f6becfe64650fc",
+      "groesse": [
+        2048,
+        1130
+      ],
+      "modus": "RGB"
+    },
+    {
+      "datei": "urwaldriese_IMPORTPRUEFUNG.json",
+      "bytes": 445,
+      "sha256": "a10c56c82ceca6ad41e2993b2eea197e549f34979c3ae14635fbe506fe4f682d",
+      "git_blob_sha": "69187efb48ca57631db299710e509ff5d2b5b062"
+    },
+    {
+      "datei": "urwaldriese_rig_roh.glb",
+      "bytes": 4216660,
+      "sha256": "9a6fdc8a776c30b194ef64305b389610dca3da259cdc9237a82a74baa5ee7bba",
+      "git_blob_sha": "1d98f261b9da60e9055960e007a2a7ea95bfb2e8"
+    },
+    {
+      "datei": "urwaldriese_statisch_roh.glb",
+      "bytes": 3622308,
+      "sha256": "f3cb3e09e90e85e10db64fd1addb33397fce3d0b1160f2c363a369dde4dedbe8",
+      "git_blob_sha": "410e590e880d9159f2e1ed02c2920b862d3177ee"
+    },
+    {
+      "datei": "urwaldriese_vorlage.png",
+      "bytes": 614853,
+      "sha256": "16451a7a91968162ea11b2cc49ee5fe77c20ee7cc20a53ce807018c9adc93ed5",
+      "git_blob_sha": "93da21072b56346fd3a7cf43fb26cea0230883b8",
+      "groesse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "urwaldriese_vorschau_oben.png",
+      "bytes": 501715,
+      "sha256": "88207b74470daa4427783f020609883a87a35bfcdbf78f92da660d0a8cc5867e",
+      "git_blob_sha": "8d0156f4ca45b7acb9da899fb70f73c49f8e0611",
+      "groesse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "urwaldriese_vorschau_seite.png",
+      "bytes": 608840,
+      "sha256": "b43ca5489bca215d79b439e217bfef2b70a51b9796ca0fba929a7dd2b84b80c6",
+      "git_blob_sha": "2891077148cb4c2f6dc106e2402e93c560b8545f",
+      "groesse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    },
+    {
+      "datei": "urwaldriese_vorschau_vorn.png",
+      "bytes": 804166,
+      "sha256": "d66d11beac11fdadb98d10c55a8dfbf1c38fb0774f16192fa53dd705182fbad8",
+      "git_blob_sha": "aa053269b19a8c5483d780c84e90ae95f1cb65fa",
+      "groesse": [
+        1024,
+        1024
+      ],
+      "modus": "RGBA"
+    }
+  ]
+}

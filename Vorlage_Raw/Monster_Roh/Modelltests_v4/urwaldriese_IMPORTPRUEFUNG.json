@@ -1,0 +1,21 @@
+{
+  "id": "urwaldriese",
+  "import_erfolgreich": true,
+  "netze": 1,
+  "dreiecke": 10290,
+  "grenzen_blender_xyz": [
+    [
+      -0.4782710075378418,
+      0.4787600040435791
+    ],
+    [
+      -0.24291999638080597,
+      0.24584999680519104
+    ],
+    [
+      -0.44506800174713135,
+      0.44555699825286865
+    ]
+  ],
+  "hinweis": "Ansichten aus unverändertem Rohmodell; Anatomie wird visuell geprüft. Kein Godot-Test."
+}

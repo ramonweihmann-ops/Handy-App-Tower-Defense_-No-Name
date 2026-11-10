@@ -1,0 +1,69 @@
+{
+  "stand": "2026-11-10",
+  "erzeugungen": 4,
+  "credits_verbraucht": 60,
+  "kostenverlauf": {
+    "ausgang_nach_tagesgutschrift_09_11": 1290,
+    "nach_rankling": 1275,
+    "nach_bluetenschnapper": 1260,
+    "nach_borkenkaefer": 1245,
+    "nach_urwaldriese": 1230,
+    "tagesgutschrift_10_11": 100,
+    "endstand": 1330,
+    "rigging_und_vorgabeclips_zusatzcredits": 0
+  },
+  "einstellungen": {
+    "modell": "Meshy T2.5",
+    "topologie": "Smart Topology",
+    "ziel_polygone": 10000,
+    "texturen_an": true,
+    "texturmodell": "Meshy N1",
+    "texturaufloesung": "2K",
+    "posekorrektur": false,
+    "privat": true,
+    "eingabebilder_je_modell": 1,
+    "zusatztext": false
+  },
+  "ergebnisse": [
+    {
+      "id": "rankling",
+      "status": "statisch bestanden",
+      "arme": 0,
+      "beine": 0,
+      "fluegel": 0,
+      "versuche": 1
+    },
+    {
+      "id": "bluetenschnapper",
+      "status": "statisch bestanden",
+      "arme": 0,
+      "beine": 0,
+      "fluegel": 2,
+      "versuche": 1
+    },
+    {
+      "id": "borkenkaefer",
+      "status": "Fehlversuch, vom Upload ausgeschlossen",
+      "erwartete_beine": 6,
+      "gezaehlte_beine": 8,
+      "versuche": 1,
+      "weitere_erzeugung": false,
+      "dreiecke": 9980,
+      "lokaler_sha256_zur_identifikation": "978bea4277be8a00311e922fd66255e192021e7a271525f8f0e72c2125bd4995"
+    },
+    {
+      "id": "urwaldriese",
+      "status": "statisch und Rig importiert, Bewegungsstichproben bestanden; Nacharbeit erforderlich",
+      "arme": 2,
+      "beine": 2,
+      "haende_frei": true,
+      "versuche": 1,
+      "knochen": 58,
+      "clips": [
+        "Attack",
+        "Running",
+        "Walking"
+      ]
+    }
+  ]
+}
