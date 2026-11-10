@@ -1,0 +1,25 @@
+[
+  {
+    "datei": "borkenkaefer_statisch_roh.glb",
+    "bytes": 3265284,
+    "sha256": "634c9c928c7799a98999a8832443576dc198f02b42c3c313b507dc7d8cf8eed5",
+    "git_blob_sha": "818e8c7c21a3b8c8d9584ac8efe695428bf68185",
+    "glTF_version": 2,
+    "dreiecke": 10055,
+    "materialien": 1,
+    "texturen": [
+      {
+        "name": null,
+        "eingebettet": true,
+        "breite": 2048,
+        "hoehe": 2048
+      }
+    ],
+    "skelette": 0,
+    "knochen": [],
+    "animationen": [],
+    "knoten": [
+      "geometry_0"
+    ]
+  }
+]
