@@ -70,6 +70,7 @@ var _boost_override: Array[String] = []
 var _menu_shot := ""
 var _squad := ""
 var _pick_shot := ""
+var _card_shot := ""
 var _tut_shot := false   # --tut: Tutorial auch in Prüfbildern zeigen
 var _world_holder: Control
 var _world_container: SubViewportContainer
@@ -300,6 +301,9 @@ func _parse_args() -> void:
 				_boost_override.append(b)
 		elif arg.begins_with("--profile="):
 			_profile = arg.get_slice("=", 1)
+		elif arg.begins_with("--cardshot="):
+			# Prüfbild der Kartenwahl beim Aufleveln: --cardshot=bild.png,plasma|mix (mit --autotest --level=N)
+			_card_shot = arg.get_slice("=", 1)
 		elif arg.begins_with("--pickshot="):
 			_pick_shot = arg.get_slice("=", 1)
 		elif arg.begins_with("--squad="):
@@ -634,6 +638,8 @@ func _process(delta: float) -> void:
 			get_viewport().get_texture().get_image().save_png(parts[0])
 			print("BILD gespeichert: ", parts[0])
 			get_tree().quit()
+	if _card_shot != "" and state == "battle" and battle.elapsed > 6.0:
+		_show_card_shot()
 	if _shot_path != "" and state == "battle" and battle.elapsed > 8.0:
 		get_viewport().get_texture().get_image().save_png(_shot_path)
 		print("BILD gespeichert: ", _shot_path)
@@ -893,6 +899,36 @@ func _on_enemy_killed(e: Enemy, gained: int) -> void:
 		levelups += 1
 		xp_needed = GameData.xp_needed(levelups)
 	hud.set_xp(xp, xp_needed)
+
+
+## Kartenwahl mit festen Karten für Prüfbilder (--cardshot), „plasma“: nur Plasma-Karten,
+## „mix“: Waffen-Karte eines Helden, Superfähigkeit und ein neuer Champion
+func _show_card_shot() -> void:
+	var parts := _card_shot.split(",")
+	_card_shot = ""
+	var want := parts[1] if parts.size() > 1 else "plasma"
+	var cards: Array = []
+	if want == "plasma":
+		for c in _machine_cards():
+			if str(c["key"]) in ["gate:fire", "gate:x2", "machine:tank"]:
+				cards.append(c)
+	else:
+		var h: Hero = battle.heroes[0]
+		for c in _hero_cards(h):
+			if str(c["key"]).ends_with(":special") or str(c["key"]).ends_with(":ult"):
+				cards.append(c)
+		for id in GameData.HERO_IDS:
+			if not battle.has_hero(id):
+				cards.append(_card_add_hero(id))
+				break
+	state = "cards"
+	get_tree().paused = true
+	var pick := CardPick.new(cards, 3)
+	_set_screen(pick)
+	get_tree().create_timer(1.2, true).timeout.connect(func() -> void:
+		get_viewport().get_texture().get_image().save_png(parts[0])
+		print("BILD gespeichert: ", parts[0])
+		get_tree().quit())
 
 
 func _open_card_pick() -> void:
