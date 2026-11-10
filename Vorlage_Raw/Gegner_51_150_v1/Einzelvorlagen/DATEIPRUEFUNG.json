@@ -1,20 +1,29 @@
 {
-  "status": "Teillieferung Planet 07, drei von vier Vorlagen",
+  "anzahl_vorhanden": 34,
+  "anzahl_geplant": 36,
+  "meshy_credits_verbraucht": 0,
+  "hinweis": "Gezählte Teile beziehen sich auf Bildvorlagen, nicht auf erzeugte 3D-Modelle.",
   "dateien": [
     {
-      "datei": "07_leicht.png",
+      "id": "07_leicht",
+      "planet": "Ozeanwelt",
+      "planet_nr": 7,
+      "staerke": "leicht",
       "name": "Blubberfisch",
-      "quelle": "exec-5ab9d4bc-0ce0-4369-be24-d5f0321b0f34.png",
-      "koerperbau": "Fisch",
-      "arme": 0,
-      "beine": 0,
-      "fluegel": 0,
-      "fangarme": 0,
-      "besonderheit": "Zwei Seitenflossen und drei Rückenflossenplatten; kein humanoider Körper.",
-      "abmessungen": [
-        1024,
-        1024
-      ],
+      "konzeptblatt": "planet_07_uebersicht.png",
+      "datei": "07_leicht.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Klumpen / kompakter Schwebekörper",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 0,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "Zwei Seitenflossen und drei feste Rückenflossenplatten.",
+      "nutzerfreigabe": "Einzelvorlage freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
       "modus": "RGBA",
       "motivgrenzen": [
         105,
@@ -22,22 +31,29 @@
         918,
         920
       ],
-      "pruefung": "Visuell gezählt; Hintergrund transparent, keine Effekte, vollständige Figur."
+      "quelle": "Unveränderte freigegebene Ozeanvorlage",
+      "git_blob_sha": "812aca8aa12c1751a35c72928b9bed751aac2349"
     },
     {
-      "datei": "07_mittel.png",
+      "id": "07_mittel",
+      "planet": "Ozeanwelt",
+      "planet_nr": 7,
+      "staerke": "mittel",
       "name": "Quallenflieger",
-      "quelle": "exec-4afddac9-9d99-4568-98d8-e56c6f59d723.png",
-      "koerperbau": "Glockenkörper mit Fangarmen",
-      "arme": 0,
-      "beine": 0,
-      "fluegel": 0,
-      "fangarme": 4,
-      "besonderheit": "Vier kurze dicke Fangarme mit sichtbaren Zwischenräumen.",
-      "abmessungen": [
-        1024,
-        1024
-      ],
+      "konzeptblatt": "planet_07_uebersicht.png",
+      "datei": "07_mittel.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Fangarmkörper",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 0,
+        "fluegel": 0,
+        "fangarme": 4
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Einzelvorlage freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
       "modus": "RGBA",
       "motivgrenzen": [
         106,
@@ -45,22 +61,59 @@
         913,
         920
       ],
-      "pruefung": "Visuell gezählt; Hintergrund transparent, keine Effekte, vollständige Figur."
+      "quelle": "Unveränderte freigegebene Ozeanvorlage",
+      "git_blob_sha": "8119bcc6dc29e52610d5fb4dab04ee78bc4246a1"
     },
     {
-      "datei": "07_boss.png",
-      "name": "Tiefseekrake",
-      "quelle": "exec-b58a087f-2c31-4dad-9624-d44f6bd1d668.png",
-      "koerperbau": "Krake",
-      "arme": 0,
-      "beine": 0,
-      "fluegel": 0,
-      "fangarme": 8,
-      "besonderheit": "Acht Fangarme, vier je Seite; länglicher Kopf und orange Panzerhöcker.",
-      "abmessungen": [
-        1024,
-        1024
+      "id": "07_stark",
+      "planet": "Ozeanwelt",
+      "planet_nr": 7,
+      "staerke": "stark",
+      "name": "Krabbenpanzer",
+      "konzeptblatt": "planet_07_uebersicht.png",
+      "datei": "07_stark.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Krabbeltier",
+      "gezaehlt": {
+        "arme": 2,
+        "beine": 6,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "Arme bezeichnet hier zwei Scherenarme, zusätzlich sechs Laufbeine.",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        105,
+        920,
+        919
       ],
+      "quelle": "exec-72ea75d7-246f-4521-a11c-38b0544f99a8.png",
+      "git_blob_sha": "d973fe70ee55b7d4cddbf8339d2b308e9bae84e6"
+    },
+    {
+      "id": "07_boss",
+      "planet": "Ozeanwelt",
+      "planet_nr": 7,
+      "staerke": "boss",
+      "name": "Tiefseekrake",
+      "konzeptblatt": "planet_07_uebersicht.png",
+      "datei": "07_boss.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Fangarmkörper",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 0,
+        "fluegel": 0,
+        "fangarme": 8
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Einzelvorlage freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
       "modus": "RGBA",
       "motivgrenzen": [
         107,
@@ -68,19 +121,932 @@
         916,
         920
       ],
-      "pruefung": "Visuell gezählt; Hintergrund transparent, keine Effekte, vollständige Figur."
+      "quelle": "Unveränderte freigegebene Ozeanvorlage",
+      "git_blob_sha": "6fcc562a4ff4c8f7b830375a4c9ec0843a1e89e5"
+    },
+    {
+      "id": "08_leicht",
+      "planet": "Kristallplanet",
+      "planet_nr": 8,
+      "staerke": "leicht",
+      "name": "Kristallwichtel",
+      "konzeptblatt": "planet_08_uebersicht.png",
+      "datei": "08_leicht.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Zweibeiner",
+      "gezaehlt": {
+        "arme": 2,
+        "beine": 2,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        113,
+        104,
+        910,
+        920
+      ],
+      "quelle": "exec-76154584-8e24-4953-bca4-6b0b2cad75f9.png",
+      "git_blob_sha": "505d5b1a8b40fa410178ca5f4acb6d9f6c550142"
+    },
+    {
+      "id": "08_mittel",
+      "planet": "Kristallplanet",
+      "planet_nr": 8,
+      "staerke": "mittel",
+      "name": "Glitzerfledermaus",
+      "konzeptblatt": "planet_08_uebersicht.png",
+      "datei": "08_mittel.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Flieger",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 2,
+        "fluegel": 2,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        127,
+        920,
+        896
+      ],
+      "quelle": "exec-3226f35f-d0e4-419f-8af2-deb2e88d67e5.png",
+      "git_blob_sha": "2cf8d5a5be1238d3a27657fe32845c9d733b3900"
+    },
+    {
+      "id": "08_stark",
+      "planet": "Kristallplanet",
+      "planet_nr": 8,
+      "staerke": "stark",
+      "name": "Quarzkäfer",
+      "konzeptblatt": "planet_08_uebersicht.png",
+      "datei": "08_stark.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Krabbeltier",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 6,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "Erhöhte Draufsicht zur eindeutigen Darstellung aller sechs Beine.",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        107,
+        920,
+        916
+      ],
+      "quelle": "exec-fed609bd-b5bd-42db-9f8e-c9085f8ef8c7.png",
+      "git_blob_sha": "69947d0c4067f08bb9ba534fa8cd15fd05565d46"
+    },
+    {
+      "id": "08_boss",
+      "planet": "Kristallplanet",
+      "planet_nr": 8,
+      "staerke": "boss",
+      "name": "Kristallgolem",
+      "konzeptblatt": "planet_08_uebersicht.png",
+      "datei": "08_boss.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Zweibeiner",
+      "gezaehlt": {
+        "arme": 2,
+        "beine": 2,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        142,
+        104,
+        882,
+        920
+      ],
+      "quelle": "exec-c6f7dd7b-abd1-48b8-acad-dd73aa3402be.png",
+      "git_blob_sha": "f22cddf4792642c7c7825a31891280913c7dec91"
+    },
+    {
+      "id": "09_leicht",
+      "planet": "Sturmriese",
+      "planet_nr": 9,
+      "staerke": "leicht",
+      "name": "Funkenball",
+      "konzeptblatt": "planet_09_uebersicht.png",
+      "datei": "09_leicht.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Klumpen / kompakter Schwebekörper",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 0,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        114,
+        104,
+        910,
+        920
+      ],
+      "quelle": "exec-4e93a28b-fc6f-40fc-b2ce-9e11b75b0ffd.png",
+      "git_blob_sha": "89d4d89e2b347908fb35848c08fedb42612b25fd"
+    },
+    {
+      "id": "09_mittel",
+      "planet": "Sturmriese",
+      "planet_nr": 9,
+      "staerke": "mittel",
+      "name": "Donnervogel",
+      "konzeptblatt": "planet_09_uebersicht.png",
+      "datei": "09_mittel.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Flieger",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 2,
+        "fluegel": 2,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        167,
+        920,
+        857
+      ],
+      "quelle": "exec-5d99b758-732b-4360-9249-207a820e4e54.png",
+      "git_blob_sha": "90ad66129144af1e188a0d649c2d768f4e341335"
+    },
+    {
+      "id": "09_stark",
+      "planet": "Sturmriese",
+      "planet_nr": 9,
+      "staerke": "stark",
+      "name": "Blitzpanzer",
+      "konzeptblatt": "planet_09_uebersicht.png",
+      "datei": "09_stark.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Krabbeltier",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 6,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "Erhöhte Draufsicht; goldene Blitzplatten sind fest am Panzer.",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        105,
+        919,
+        918
+      ],
+      "quelle": "exec-0851c3e9-eb41-49d2-929b-b8de09e87b3d.png",
+      "git_blob_sha": "7a4571bab150a3e7a0cb44528ed67f8783a9495c"
+    },
+    {
+      "id": "09_boss",
+      "planet": "Sturmriese",
+      "planet_nr": 9,
+      "staerke": "boss",
+      "name": "Sturmwolke",
+      "konzeptblatt": "planet_09_uebersicht.png",
+      "datei": "09_boss.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Schwebender Körper mit Armen",
+      "gezaehlt": {
+        "arme": 2,
+        "beine": 0,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "Zwei Wolkenarme, kompakte Wolkenbasis, keine Beine.",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        118,
+        104,
+        905,
+        920
+      ],
+      "quelle": "exec-0c8dd36e-ea0c-4c17-afd1-b0677903e515.png",
+      "git_blob_sha": "39b38259aecd564bf8c0c8ab57b0e87192a587ac"
+    },
+    {
+      "id": "10_leicht",
+      "planet": "Schrottwelt",
+      "planet_nr": 10,
+      "staerke": "leicht",
+      "name": "Schraubenkrabbler",
+      "konzeptblatt": "planet_10_uebersicht.png",
+      "datei": "10_leicht.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Krabbeltier",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 6,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "Sechs mechanische Beine; erhöhte Ansicht zur Zählung.",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        104,
+        920,
+        919
+      ],
+      "quelle": "exec-1aafc8a9-968c-40e6-8749-d1e751f309b9.png",
+      "git_blob_sha": "18a6ae9452ddf4ebd58e7abbe93acc8997b3950e"
+    },
+    {
+      "id": "10_mittel",
+      "planet": "Schrottwelt",
+      "planet_nr": 10,
+      "staerke": "mittel",
+      "name": "Propellerdrohne",
+      "konzeptblatt": "planet_10_uebersicht.png",
+      "datei": "10_mittel.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Klumpen / kompakter Schwebekörper",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 0,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "Zwei feste Rotorscheiben in Gehäuseringen, keine dünnen Rotorblätter.",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        122,
+        104,
+        901,
+        920
+      ],
+      "quelle": "exec-4e558bee-f0d8-41d2-9451-be9909af45d3.png",
+      "git_blob_sha": "86581f0e9a97bb34bd88ce90d13a17afcfa1b243"
+    },
+    {
+      "id": "10_stark",
+      "planet": "Schrottwelt",
+      "planet_nr": 10,
+      "staerke": "stark",
+      "name": "Stahlbrecher",
+      "konzeptblatt": "planet_10_uebersicht.png",
+      "datei": "10_stark.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Zweibeiner",
+      "gezaehlt": {
+        "arme": 2,
+        "beine": 2,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        105,
+        913,
+        918
+      ],
+      "quelle": "exec-aae90232-0233-45a8-8d84-e029813be151.png",
+      "git_blob_sha": "4712599a819ba4392ec8da52763e7cea9e471fa9"
+    },
+    {
+      "id": "10_boss",
+      "planet": "Schrottwelt",
+      "planet_nr": 10,
+      "staerke": "boss",
+      "name": "Schrottkoloss",
+      "konzeptblatt": "planet_10_uebersicht.png",
+      "datei": "10_boss.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Zweibeiner",
+      "gezaehlt": {
+        "arme": 2,
+        "beine": 2,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        118,
+        920,
+        906
+      ],
+      "quelle": "exec-11aa9038-0ae8-4e59-bd64-6fe3daace1da.png",
+      "git_blob_sha": "1ab508a8f57086bd4be226d510da5cbfe64c2cbf"
+    },
+    {
+      "id": "11_leicht",
+      "planet": "Wolkenstadt",
+      "planet_nr": 11,
+      "staerke": "leicht",
+      "name": "Wolkenflausch",
+      "konzeptblatt": "planet_11_uebersicht.png",
+      "datei": "11_leicht.png",
+      "status": "FEHLT",
+      "grund": "Automatische Bildprüfung hat beide Ausgaben abgelehnt. Keine Einzelvorlage geliefert.",
+      "gezaehlt": null
+    },
+    {
+      "id": "11_mittel",
+      "planet": "Wolkenstadt",
+      "planet_nr": 11,
+      "staerke": "mittel",
+      "name": "Federflügler",
+      "konzeptblatt": "planet_11_uebersicht.png",
+      "datei": "11_mittel.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Flieger",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 2,
+        "fluegel": 2,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        107,
+        919,
+        916
+      ],
+      "quelle": "exec-c6b50e65-963c-4e40-a11b-59709888c09f.png",
+      "git_blob_sha": "56f83b19bbcfb1c453076316077a10071e9bdc3d"
+    },
+    {
+      "id": "11_stark",
+      "planet": "Wolkenstadt",
+      "planet_nr": 11,
+      "staerke": "stark",
+      "name": "Goldwächter",
+      "konzeptblatt": "planet_11_uebersicht.png",
+      "datei": "11_stark.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Zweibeiner",
+      "gezaehlt": {
+        "arme": 2,
+        "beine": 2,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        105,
+        104,
+        914,
+        920
+      ],
+      "quelle": "exec-f46e1f10-70b4-4299-a58e-73bfd62c875f.png",
+      "git_blob_sha": "1f474f48d6960582f9bd255b7ee3f57c7448455f"
+    },
+    {
+      "id": "11_boss",
+      "planet": "Wolkenstadt",
+      "planet_nr": 11,
+      "staerke": "boss",
+      "name": "Himmelswächter",
+      "konzeptblatt": "planet_11_uebersicht.png",
+      "datei": "11_boss.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Zweibeiner mit Flügeln",
+      "gezaehlt": {
+        "arme": 2,
+        "beine": 2,
+        "fluegel": 2,
+        "fangarme": 0
+      },
+      "hinweis": "Zwei menschliche Arme plus zwei große Flügel und zwei Beine.",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        104,
+        919,
+        920
+      ],
+      "quelle": "exec-6b8d6216-b334-4aaf-9e27-3ab415a7a118.png",
+      "git_blob_sha": "635a2c4ebf8f5dad39d7e188a0c8b2766ffe72f8"
+    },
+    {
+      "id": "12_leicht",
+      "planet": "Sporenwelt",
+      "planet_nr": 12,
+      "staerke": "leicht",
+      "name": "Pilzhüpfer",
+      "konzeptblatt": "planet_12_uebersicht.png",
+      "datei": "12_leicht.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Zweibeiniger Pilzkörper",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 2,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "Zwei Beine, keine Arme; asymmetrischer fester Pilzhut bleibt erhalten.",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        111,
+        920,
+        912
+      ],
+      "quelle": "exec-f687e2be-5a3d-40a3-8f49-b9a0722e68be.png",
+      "git_blob_sha": "c76ac3cb75279d6a02739c9c2fc56ac85aa6212f"
+    },
+    {
+      "id": "12_mittel",
+      "planet": "Sporenwelt",
+      "planet_nr": 12,
+      "staerke": "mittel",
+      "name": "Sporenschwirrer",
+      "konzeptblatt": "planet_12_uebersicht.png",
+      "datei": "12_mittel.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Flieger",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 0,
+        "fluegel": 2,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        131,
+        920,
+        893
+      ],
+      "quelle": "exec-3a4d3872-5a77-42ce-8725-6bcbd6e387d0.png",
+      "git_blob_sha": "1c34b6a82040174d6c887d0e8137cca50078e23a"
+    },
+    {
+      "id": "12_stark",
+      "planet": "Sporenwelt",
+      "planet_nr": 12,
+      "staerke": "stark",
+      "name": "Pilzpanzer",
+      "konzeptblatt": "planet_12_uebersicht.png",
+      "datei": "12_stark.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Krabbeltier",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 6,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "Sechs Beine in erhöhter Draufsicht, Pilzhüte fest am Panzer.",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        124,
+        920,
+        900
+      ],
+      "quelle": "exec-677c0df3-16f8-46d3-8f4b-450cd214c940.png",
+      "git_blob_sha": "bf6644096da8335a687f9c814c359c725ef6e1b8"
+    },
+    {
+      "id": "12_boss",
+      "planet": "Sporenwelt",
+      "planet_nr": 12,
+      "staerke": "boss",
+      "name": "Riesenpilzmutter",
+      "konzeptblatt": "planet_12_uebersicht.png",
+      "datei": "12_boss.png",
+      "status": "FEHLT",
+      "grund": "Automatische Bildprüfung hat beide Ausgaben abgelehnt. Keine Einzelvorlage geliefert.",
+      "gezaehlt": null
+    },
+    {
+      "id": "13_leicht",
+      "planet": "Geistermond",
+      "planet_nr": 13,
+      "staerke": "leicht",
+      "name": "Geisterlein",
+      "konzeptblatt": "planet_13_uebersicht.png",
+      "datei": "13_leicht.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Klumpen / kompakter Schwebekörper",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 0,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "Ein kompakter Körperschwanz statt Beinen, zwei feste Ohren.",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        123,
+        920,
+        900
+      ],
+      "quelle": "exec-6516b975-1506-4bd6-a66b-ae5cdeddeed5.png",
+      "git_blob_sha": "f3c69becc920d3f2f5a2fc3fb79892454c569b25"
+    },
+    {
+      "id": "13_mittel",
+      "planet": "Geistermond",
+      "planet_nr": 13,
+      "staerke": "mittel",
+      "name": "Laternenflatterer",
+      "konzeptblatt": "planet_13_uebersicht.png",
+      "datei": "13_mittel.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Flieger",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 0,
+        "fluegel": 2,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        122,
+        920,
+        901
+      ],
+      "quelle": "exec-8090ee53-8395-4057-8135-92d358340777.png",
+      "git_blob_sha": "14e084bcb8195b38e04e2046449706d6931256d1"
+    },
+    {
+      "id": "13_stark",
+      "planet": "Geistermond",
+      "planet_nr": 13,
+      "staerke": "stark",
+      "name": "Steinritter",
+      "konzeptblatt": "planet_13_uebersicht.png",
+      "datei": "13_stark.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Zweibeiner",
+      "gezaehlt": {
+        "arme": 2,
+        "beine": 2,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        122,
+        920,
+        903
+      ],
+      "quelle": "exec-a6f0ee46-883e-4a06-8b51-b1b1a60d5705.png",
+      "git_blob_sha": "c1f0df95c85dd52a64fbc31e12f409d1717a8029"
+    },
+    {
+      "id": "13_boss",
+      "planet": "Geistermond",
+      "planet_nr": 13,
+      "staerke": "boss",
+      "name": "Mondgeist",
+      "konzeptblatt": "planet_13_uebersicht.png",
+      "datei": "13_boss.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Schwebender Körper mit Armen",
+      "gezaehlt": {
+        "arme": 2,
+        "beine": 0,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "Zwei Arme, keine Beine; Mondsichel fest am Helm, keine schwebenden Teile.",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        109,
+        104,
+        915,
+        920
+      ],
+      "quelle": "exec-972c4958-d05e-4da4-96c7-4a17f704178e.png",
+      "git_blob_sha": "108710295077dc5bab1e146c1b0a2006d9a63717"
+    },
+    {
+      "id": "14_leicht",
+      "planet": "Tempelplanet",
+      "planet_nr": 14,
+      "staerke": "leicht",
+      "name": "Skarabäus-Krabbler",
+      "konzeptblatt": "planet_14_uebersicht.png",
+      "datei": "14_leicht.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Krabbeltier",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 6,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        108,
+        104,
+        915,
+        920
+      ],
+      "quelle": "exec-ab260376-f2e6-4237-b2b3-d6502e056496.png",
+      "git_blob_sha": "224670df236af5b294d6cf27efea092c8623e8f8"
+    },
+    {
+      "id": "14_mittel",
+      "planet": "Tempelplanet",
+      "planet_nr": 14,
+      "staerke": "mittel",
+      "name": "Maskenflieger",
+      "konzeptblatt": "planet_14_uebersicht.png",
+      "datei": "14_mittel.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Flieger",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 0,
+        "fluegel": 2,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        119,
+        920,
+        905
+      ],
+      "quelle": "exec-e98ab257-24de-4540-97de-50071da979ad.png",
+      "git_blob_sha": "a0121ec1ad11d718de53072446f50422dc656c69"
+    },
+    {
+      "id": "14_stark",
+      "planet": "Tempelplanet",
+      "planet_nr": 14,
+      "staerke": "stark",
+      "name": "Steinwächter",
+      "konzeptblatt": "planet_14_uebersicht.png",
+      "datei": "14_stark.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Zweibeiner",
+      "gezaehlt": {
+        "arme": 2,
+        "beine": 2,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        105,
+        920,
+        919
+      ],
+      "quelle": "exec-14429d3b-3e27-4331-b3d4-6a2eb596129d.png",
+      "git_blob_sha": "ab3f3b1c7ac63563855dd279dec5f3a68f5c9576"
+    },
+    {
+      "id": "14_boss",
+      "planet": "Tempelplanet",
+      "planet_nr": 14,
+      "staerke": "boss",
+      "name": "Tempelkoloss",
+      "konzeptblatt": "planet_14_uebersicht.png",
+      "datei": "14_boss.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Zweibeiner",
+      "gezaehlt": {
+        "arme": 2,
+        "beine": 2,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        117,
+        104,
+        907,
+        920
+      ],
+      "quelle": "exec-b3dc2ceb-6524-4173-9674-f094dea284ee.png",
+      "git_blob_sha": "932ef1a31ef49b2e0d982836d7d96b1cef270724"
+    },
+    {
+      "id": "15_leicht",
+      "planet": "Schwarzes Loch",
+      "planet_nr": 15,
+      "staerke": "leicht",
+      "name": "Schattenkugel",
+      "konzeptblatt": "planet_15_uebersicht.png",
+      "datei": "15_leicht.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Klumpen / kompakter Schwebekörper",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 0,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        126,
+        122,
+        920,
+        901
+      ],
+      "quelle": "exec-10ed2526-2adf-4f53-830d-24298180143e.png",
+      "git_blob_sha": "b2e4d767d077609f471ff9dbf9ded1f973947c8b"
+    },
+    {
+      "id": "15_mittel",
+      "planet": "Schwarzes Loch",
+      "planet_nr": 15,
+      "staerke": "mittel",
+      "name": "Leerenflügler",
+      "konzeptblatt": "planet_15_uebersicht.png",
+      "datei": "15_mittel.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Flieger",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 0,
+        "fluegel": 2,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        107,
+        917,
+        916
+      ],
+      "quelle": "exec-a6a19104-a8b9-4da2-b60d-46db14c792c2.png",
+      "git_blob_sha": "b668abaf2f79c5e9aee8d6af3fa13ca6cf818478"
+    },
+    {
+      "id": "15_stark",
+      "planet": "Schwarzes Loch",
+      "planet_nr": 15,
+      "staerke": "stark",
+      "name": "Sternenpanzer",
+      "konzeptblatt": "planet_15_uebersicht.png",
+      "datei": "15_stark.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Krabbeltier",
+      "gezaehlt": {
+        "arme": 0,
+        "beine": 6,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        107,
+        920,
+        918
+      ],
+      "quelle": "exec-04cb3565-d1e2-4d40-b7c1-3208f15c9898.png",
+      "git_blob_sha": "756e66de03634c35b9a68ec37244e8aa385a25ca"
+    },
+    {
+      "id": "15_boss",
+      "planet": "Schwarzes Loch",
+      "planet_nr": 15,
+      "staerke": "boss",
+      "name": "Schlundwächter",
+      "konzeptblatt": "planet_15_uebersicht.png",
+      "datei": "15_boss.png",
+      "status": "Vorlage vorhanden, visuell geprüft",
+      "koerperbau": "Zweibeiner",
+      "gezaehlt": {
+        "arme": 2,
+        "beine": 2,
+        "fluegel": 0,
+        "fangarme": 0
+      },
+      "hinweis": "Brustkern geschlossen; schwebender Ring und sämtliche freien Effekte entfernt.",
+      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        108,
+        104,
+        915,
+        920
+      ],
+      "quelle": "exec-5a44ac4c-715e-49ed-aead-baf2bbe3cb0d.png",
+      "git_blob_sha": "5843949b4e3107498c44d881c5bd27a8c9fe9f10"
     }
-  ],
-  "fehlend": {
-    "datei": "07_stark.png",
-    "name": "Krabbenpanzer",
-    "status": "FEHLT – Bildgenerierung hat zwei Ausgaben automatisch abgelehnt. Keine Ersatzdatei geliefert.",
-    "soll": {
-      "arme_scheren": 2,
-      "beine": 6,
-      "fluegel": 0,
-      "fangarme": 0
-    }
-  },
-  "restliche_planeten": "08–15 erst nach Rückmeldung; nicht erzeugt"
+  ]
 }
