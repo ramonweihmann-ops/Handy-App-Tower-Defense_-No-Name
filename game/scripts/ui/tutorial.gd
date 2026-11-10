@@ -220,7 +220,7 @@ func _resolve(delta: float) -> Dictionary:
 				return _battle_step(t, delta)
 		"cards":
 			if wins == 0 and not bool(t.get("card", false)):
-				return {"key": "card", "n": 2, "pose": "zeigen", "y": 600.0, "mode": "none",
+				return {"key": "card", "n": 2, "pose": "zeigen", "y": 646.0, "mode": "none",
 					"title": "Wähle eine Karte für dein Team.", "body": "Nimm einen Helden oder eine Verbesserung."}
 		"result":
 			return _result_step(wins)

@@ -908,7 +908,21 @@ func _show_card_shot() -> void:
 	_card_shot = ""
 	var want := parts[1] if parts.size() > 1 else "plasma"
 	var cards: Array = []
-	if want == "plasma":
+	if want.contains("+"):
+		# feste Auswahl über Schlüssel, z. B. gate:ice+plasma:mag+station:repair (Held: :damage für Held 1)
+		var pool: Array = _machine_cards() + [_card_repair()]
+		for h in battle.heroes:
+			pool.append_array(_hero_cards(h))
+		for id in GameData.HERO_IDS:
+			if not battle.has_hero(id):
+				pool.append(_card_add_hero(id))
+		for k in want.split("+"):
+			for c in pool:
+				var ck := str(c["key"])
+				if ck == k or (k.begins_with(":") and ck.ends_with(k) and ck.begins_with(battle.heroes[0].id)):
+					cards.append(c)
+					break
+	elif want == "plasma":
 		for c in _machine_cards():
 			if str(c["key"]) in ["gate:fire", "gate:x2", "machine:tank"]:
 				cards.append(c)

@@ -80,6 +80,27 @@ func _run() -> bool:
 			main._open_card_pick()
 		6:
 			_expect("card")
+			# Kartenwahl (Entwurf B): jede mögliche Karte hat Kategorie, Titel, Wirkung; Antippen wählt aus
+			var pick: CardPick = main._screen as CardPick
+			_check(pick != null and pick.cards.size() >= 2, "kartenwahl-offen")
+			if pick:
+				var pool: Array = main._machine_cards() + [main._card_repair()]
+				for h in main.battle.heroes:
+					pool.append_array(main._hero_cards(h))
+				for id in GameData.HERO_IDS:
+					pool.append(main._card_add_hero(id))
+				var bad: Array = []
+				for c in pool:
+					var f: Dictionary = pick.face(c)
+					if not CardPick.CATS.has(f.get("cat", "")) or str(f["title"]) == "" or str(f["short"]) == "" or str(f["text"]) == "":
+						bad.append(c["key"])
+				_check(bad.is_empty(), "karten-gesichter %d %s" % [pool.size(), bad])
+				var tap := InputEventMouseButton.new()
+				tap.button_index = MOUSE_BUTTON_LEFT
+				tap.pressed = true
+				tap.position = pick.off + pick.slot_rect(0).get_center() * pick.s
+				pick._gui_input(tap)
+				_check(pick._sel == 0, "karte-antippen-waehlt")
 			main._on_card_picked(main._roll_cards(3)[0])
 		7:
 			_check(bool(Save.data["tut"].get("card", false)), "karte-gewählt")
