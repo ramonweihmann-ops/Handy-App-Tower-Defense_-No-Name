@@ -231,18 +231,19 @@
         "fangarme": 0
       },
       "hinweis": "",
-      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "nutzerfreigabe": "Nutzerauftrag: Stilkorrekturen umsetzen und alles so für Claude bereitstellen.",
       "breite": 1024,
       "hoehe": 1024,
       "modus": "RGBA",
       "motivgrenzen": [
-        142,
+        122,
         104,
-        882,
+        901,
         920
       ],
-      "quelle": "exec-c6f7dd7b-abd1-48b8-acad-dd73aa3402be.png",
-      "git_blob_sha": "f22cddf4792642c7c7825a31891280913c7dec91"
+      "quelle": "exec-fbd2996c-492c-443e-8494-3879fe244349.png",
+      "git_blob_sha": "3e4e2f95599ed6cdb39e2ef34177e88dabfd33da",
+      "fassung": "Stilfeinschliff_v2, aktuelle Hauptvorlage; bisherige Fassung separat archiviert."
     },
     {
       "id": "09_leicht",
@@ -573,18 +574,19 @@
         "fangarme": 0
       },
       "hinweis": "Zwei menschliche Arme plus zwei große Flügel und zwei Beine.",
-      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "nutzerfreigabe": "Nutzerauftrag: Stilkorrekturen umsetzen und alles so für Claude bereitstellen.",
       "breite": 1024,
       "hoehe": 1024,
       "modus": "RGBA",
       "motivgrenzen": [
         104,
-        104,
-        919,
-        920
+        137,
+        920,
+        887
       ],
-      "quelle": "exec-6b8d6216-b334-4aaf-9e27-3ab415a7a118.png",
-      "git_blob_sha": "635a2c4ebf8f5dad39d7e188a0c8b2766ffe72f8"
+      "quelle": "exec-79f0d9be-db93-47a5-90a2-43b6c8d7dae9.png",
+      "git_blob_sha": "c8371914338e2cae86d1d7d64c987c55cf54e16c",
+      "fassung": "Stilfeinschliff_v2, aktuelle Hauptvorlage; bisherige Fassung separat archiviert."
     },
     {
       "id": "12_leicht",
@@ -1035,18 +1037,19 @@
         "fangarme": 0
       },
       "hinweis": "Brustkern geschlossen; schwebender Ring und sämtliche freien Effekte entfernt.",
-      "nutzerfreigabe": "Nach bestätigtem Design erstellt; neue Einzelvorlage noch nicht separat freigegeben",
+      "nutzerfreigabe": "Nutzerauftrag: Stilkorrekturen umsetzen und alles so für Claude bereitstellen.",
       "breite": 1024,
       "hoehe": 1024,
       "modus": "RGBA",
       "motivgrenzen": [
-        108,
+        125,
         104,
-        915,
+        898,
         920
       ],
-      "quelle": "exec-5a44ac4c-715e-49ed-aead-baf2bbe3cb0d.png",
-      "git_blob_sha": "5843949b4e3107498c44d881c5bd27a8c9fe9f10"
+      "quelle": "exec-2e817f07-174f-49e4-a97a-949fe868a2d2.png",
+      "git_blob_sha": "30eb6b1703c043cea4809c333b646f72c47d1e61",
+      "fassung": "Stilfeinschliff_v2, aktuelle Hauptvorlage; bisherige Fassung separat archiviert."
     }
   ]
 }

@@ -1,5 +1,7 @@
 # Stilprüfung: bisherige und neue Monster
 
+**Aktualisierung 10.11.2026:** Die unten begründeten gezielten Anpassungen sind auf Nutzerauftrag umgesetzt. Aktuell gelten die neuen Dateien `11_boss.png`, `08_boss.png` und `15_boss.png` im Hauptordner. Der Schlundwächter ist nur minimal angepasst. Frühere Fassungen liegen unter `Stilfeinschliff_v2/bisher/`. Die folgende Bewertung dokumentiert den Ausgangspunkt; der dort beschriebene Proportionsausreißer Himmelswächter ist inzwischen korrigiert.
+
 Die folgende Einschätzung beantwortet die Sorge des Nutzers vor einem zu starken Stilwechsel. Sie ist eine gestalterische Empfehlung, keine zusätzliche Designfreigabe und kein Auftrag für neue kostenpflichtige Modelle.
 
 ## Ergebnis

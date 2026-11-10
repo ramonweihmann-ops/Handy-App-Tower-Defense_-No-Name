@@ -201,5 +201,35 @@
   "fehlend": [
     "11_leicht.png",
     "12_boss.png"
+  ],
+  "aktueller_stilfeinschliff": {
+    "werkzeug": "Eingebaute Bildgenerierung",
+    "datum": "2026-11-10",
+    "formatierung": "Proportionale Einpassung auf maximal 816 Pixel Motivgröße innerhalb 1024 × 1024 RGBA; generierte Transparenz erhalten.",
+    "auftraege": [
+      {
+        "id": "11_boss",
+        "prompt": "Bearbeite genau diese einzelne Himmelswächter-Figur. Ziel: erkennbar derselbe weiß-hellblau-goldene Comic-Wächter mit denselben zwei Flügeln und derselben Rüstung, aber etwas kompakter und weniger erwachsen-realistisch proportioniert. Kopf mit Helm und Gesicht etwa 15 Prozent größer relativ zum Körper. Beine und Rumpf etwas kürzer, Hände und Stiefel etwas kräftiger. Nur eine moderate Annäherung an freundliche Comic-Proportionen, kein Baby und keine übertriebene Chibi-Figur. Große Augen und entschlossener Blick bleiben. Die zwei ausgebreiteten Flügel bleiben genau in ihrer Formensprache und Farbaufteilung erhalten, ihre goldenen und weißen Spitzen ganz leicht stumpfer. Breite saubere Panzerflächen, alle Kontaktkanten und Rüstungsecken sanft abrunden; keine neuen Details, Ornamente oder Materialien. Gold, Hellblau und Weiß unverändert. Frontal, offene A-Pose mit genau zwei Armen, zwei Beinen und zwei Flügeln, klare Lücken zwischen Armen und Rumpf und zwischen Beinen, Hände mit abgesetztem Daumen. Einzelne vollständige Figur, quadratisch, echte Transparenz, rundum zehn Prozent freier Rand. Kein Text, kein Schatten, keine Bodenplatte, keine Aura, keine andere Figur oder zweite Ansicht.",
+        "referenz": "Vorlage_Raw/Gegner_51_150_v1/Einzelvorlagen/11_boss.png",
+        "ausgabe": "11_boss.png"
+      },
+      {
+        "id": "08_boss",
+        "prompt": "Sehr behutsamer Stilfeinschliff genau dieses Kristallgolems. Gleiche Figur, exakt gleiche violett-türkise und weißliche Farbaufteilung, gleiches Gesicht, identische Kristallkrone, Schulterplatten und Brustform. Bewahre seine markante facettierte Kristall-Silhouette und die großen Kristalle. Nur Panzerkontaktkanten, Hände, Gelenkübergänge und Fußkanten etwas sanfter abrunden, Schattierung eine kleine Spur weicher. Kopf minimal deutlicher lesbar, aber keine grundlegende Proportionsänderung. Keine zusätzlichen Facetten, Splitter oder Texturen, nicht zu einer kugeligen Figur machen. Offene frontale A-Pose, zwei Arme und zwei Beine, deutliche Zwischenräume, Hände mit getrenntem Daumen. Einzelne vollständige Figur auf echtem transparentem Hintergrund, quadratisch mit zehn Prozent Rand, kein Text, kein Boden, kein Schatten oder Effekt.",
+        "referenz": "Vorlage_Raw/Gegner_51_150_v1/Einzelvorlagen/08_boss.png",
+        "ausgabe": "08_boss.png"
+      },
+      {
+        "id": "15_boss",
+        "prompt": "MINIMALE Bearbeitung genau dieses Schlundwächters. Der Nutzer liebt dieses Design: Erhalte seine starke markante Silhouette, Proportionen, violette Panzerplatten, goldene Akzente, cyanfarbenen Körperfugen, Gesicht und kreisförmigen Brustkern praktisch unverändert. Keine Vereinfachung des Rüstungsdesigns und keine knuffige oder niedliche Neugestaltung. Nur an Händen, Ellenbogen, Knien und den äußersten Panzerkanten winzige weiche Fasen statt messerscharfer Übergänge, Schattierung minimal weicher. Veränderung soll erst beim direkten Vergleich auffallen. Große Schulterform, spitze Helmform und ernsthafter Endboss-Charakter ausdrücklich erhalten. Genau zwei Arme und zwei Beine in der gleichen offenen frontalen A-Pose, getrennte Hände und Füße. Kein zusätzlicher Leuchtrand, keine Aura, keine schwebenden Ringe oder Effekte. Eine vollständige Figur mittig, quadratisch, zehn Prozent Rand, echter transparenter Hintergrund, kein Text, Schatten oder Boden.",
+        "referenz": "Vorlage_Raw/Gegner_51_150_v1/Einzelvorlagen/15_boss.png",
+        "ausgabe": "15_boss.png"
+      }
+    ]
+  },
+  "aktuelle_fassungen": [
+    "08_boss.png",
+    "11_boss.png",
+    "15_boss.png"
   ]
 }

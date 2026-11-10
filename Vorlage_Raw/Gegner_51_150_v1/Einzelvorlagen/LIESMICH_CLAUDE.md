@@ -11,7 +11,14 @@ Die automatische Prüfung der eingebauten Bildgenerierung hat bei beiden Motiven
 
 ## Freigabe und Umfang
 
-Die drei Ozeanvorlagen `07_leicht`, `07_mittel`, `07_boss` sind vom Nutzer freigegeben und bytegleich übernommen. Der Krabbenpanzer `07_stark` ist ergänzt und zeigt sechs Laufbeine plus zwei Scherenarme. 30 weitere neue Einzelvorlagen für Planet 08–15 liegen vor; die beiden oben genannten fehlen noch. Die bestätigten Monsterdesigns dienen als Referenz; die neuen Einzelvorlagen selbst sind noch nicht separat vom Nutzer abgenommen.
+Die drei Ozeanvorlagen `07_leicht`, `07_mittel`, `07_boss` sind vom Nutzer freigegeben und bytegleich übernommen. Der Krabbenpanzer `07_stark` ist ergänzt und zeigt sechs Laufbeine plus zwei Scherenarme. 30 weitere neue Einzelvorlagen für Planet 08–15 liegen vor; die beiden oben genannten fehlen noch. Die bestätigten Monsterdesigns dienen als Referenz. Der Nutzer hat die gezielten drei Stilkorrekturen umgesetzt und für Claude bereitgestellt haben wollen; andere Vorlagen wurden durch diesen Feinschliff nicht verändert.
+
+
+## Aktueller Stand: Stilfeinschliff übernommen
+
+Auf Nutzerauftrag vom 10.11.2026 sind **08_boss.png, 11_boss.png und 15_boss.png direkt in diesem Ordner die neuen aktuellen Fassungen**. Für die spätere Modellproduktion diese Dateien verwenden. Der Himmelswächter ist kompakter und weicher, der Kristallgolem hat weichere Übergänge. Der Schlundwächter wurde ausdrücklich nur minimal verändert und behält seinen Endboss-Charakter.
+
+Die vorherigen drei PNGs sind bytegleich unter `Stilfeinschliff_v2/bisher/` archiviert. `Stilfeinschliff_v2/vergleich_vorher_nachher.png` und dessen Liesmich dokumentieren die Änderung. Es gibt weiterhin 34 vorhandene Einzelvorlagen und zwei offene Motive, keine zusätzlichen GLBs. Die drei bereits freigegebenen Ozeanvorlagen bleiben bytegleich.
 
 ## Bildformat
 
@@ -69,7 +76,3 @@ Arme enthält beim Krabbenpanzer die zwei Scherenarme; Fangarme werden separat g
 `kontrolle.png` zeigt alle 36 geplanten Positionen mit Zählwerten; die zwei Lücken sind klar markiert. `kontrolle_01.png` bis `kontrolle_03.png` teilen die Übersicht in gut lesbare Seiten. `DATEIPRUEFUNG.json` enthält Abmessungen, Alpha-Motivgrenzen, Prüfsummen und anatomische Hinweise. Die Prompts stehen in `BILDANWEISUNGEN.json`.
 
 Dies sind Bildvorlagen, keine GLB-Dateien. Keine Meshy-Erzeugung, kein Rigging und keine Animationen beauftragt oder ausgeführt, **0 Meshy-Credits verbraucht**. Vor einer späteren Erzeugung muss der Nutzer die Kosten freigeben. Nach der Erzeugung erneut Vorder-, Seiten-, Ober- und Unteransicht prüfen: Eine korrekte Bildvorlage garantiert keine korrekte Modellanatomie. Die nicht sichtbare Rückseite ist durch diese Einzelansichten nicht definiert.
-
-## Ergänzende Stilprüfung
-
-Die nachträgliche Sorge des Nutzers zum Übergang wurde geprüft. STILPRUEFUNG.md enthält die Einschätzung und selektive Empfehlungen; stilvergleich.png zeigt frühere und neue Figuren sowie kleine Ansichten. Keine bestätigten Designs wurden dafür pauschal neu gestaltet.

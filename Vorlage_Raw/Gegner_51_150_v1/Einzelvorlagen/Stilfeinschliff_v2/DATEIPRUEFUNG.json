@@ -1,0 +1,66 @@
+{
+  "datum": "2026-11-10",
+  "status": "Auf Nutzerauftrag als aktuelle Vorlagen für Claude bereitgestellt; bisherige Fassungen separat erhalten.",
+  "dateien": [
+    {
+      "datei": "11_boss.png",
+      "name": "Himmelswächter",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        104,
+        137,
+        920,
+        887
+      ],
+      "arme": 2,
+      "beine": 2,
+      "fluegel": 2,
+      "fangarme": 0,
+      "anatomie": "Visuell geprüft: vollständige getrennte Gliedmaßen; keine zusätzlichen Körperteile.",
+      "quelle": "exec-79f0d9be-db93-47a5-90a2-43b6c8d7dae9.png",
+      "git_blob_sha": "c8371914338e2cae86d1d7d64c987c55cf54e16c"
+    },
+    {
+      "datei": "08_boss.png",
+      "name": "Kristallgolem",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        122,
+        104,
+        901,
+        920
+      ],
+      "arme": 2,
+      "beine": 2,
+      "fluegel": 0,
+      "fangarme": 0,
+      "anatomie": "Visuell geprüft: vollständige getrennte Gliedmaßen; keine zusätzlichen Körperteile.",
+      "quelle": "exec-fbd2996c-492c-443e-8494-3879fe244349.png",
+      "git_blob_sha": "3e4e2f95599ed6cdb39e2ef34177e88dabfd33da"
+    },
+    {
+      "datei": "15_boss.png",
+      "name": "Schlundwächter",
+      "breite": 1024,
+      "hoehe": 1024,
+      "modus": "RGBA",
+      "motivgrenzen": [
+        125,
+        104,
+        898,
+        920
+      ],
+      "arme": 2,
+      "beine": 2,
+      "fluegel": 0,
+      "fangarme": 0,
+      "anatomie": "Visuell geprüft: vollständige getrennte Gliedmaßen; keine zusätzlichen Körperteile.",
+      "quelle": "exec-2e817f07-174f-49e4-a97a-949fe868a2d2.png",
+      "git_blob_sha": "30eb6b1703c043cea4809c333b646f72c47d1e61"
+    }
+  ]
+}
