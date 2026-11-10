@@ -62,3 +62,10 @@ Schaden) ändern sich nicht; nur Aussehen und Bewegung.
 
 Zombie-Prüfbild → Tentakler-Prüfbild → Entscheidung Panzerkäfer (neue Erzeugung ja/nein) → Gegner-Übersicht
 als Mockup → Rest. Kein Modell geht ohne dein OK ins Spiel.
+
+**Stand 10.11.2026:** Dschungelmond (Level 51–60) hat eigene Gegner: Rankling (leicht, `build_schleim.py`),
+Blütenschnapper (mittel, neues `build_flieger.py`), Urwaldriese (Boss, `build_zweibeiner.py`), Rohmodelle
+`Vorlage_Raw/Monster_Roh/Modelltests_v4`, freigegeben und aktiv. Neue Gegnerarten mit eigenem Aussehen tragen
+`own_look` (keine Färbung, keine Vorsilbe der Welt). Borkenkäfer (stark): zweiter Meshy-Versuch mit Draufsicht
+beauftragt (`BORKENKAEFER_NEU_FUER_CHATGPT.md`, etwa 15 Credits, freigegeben); bis dahin eingefärbter Panzerkäfer
+bzw. Brecher. Nahaufnahmen eines Modells in Bewegung: `game/tests/model_frames.gd`.

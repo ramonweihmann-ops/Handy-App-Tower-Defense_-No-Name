@@ -183,8 +183,9 @@ const ENEMIES := {
 		"hp": 3400.0, "speed": 0.4, "xp": 0, "dps": 120.0, "size": 2.2, "armor": 0.15,
 		"minion": "krabbler",
 	},
-	# Dschungelmond (Level 51–60): eigene Comic-Gegner mit eigenen Farben und Namen (own_look: keine Färbung,
-	# keine Vorsilbe der Welt). Werte wie die Gegner gleicher Stärke aus Welt 1, damit die Abstimmung gleich bleibt.
+	# Dschungelmond (Level 51–60, freigegeben 10.11.2026): eigene Comic-Gegner mit eigenen Farben und Namen
+	# (own_look: keine Färbung, keine Vorsilbe der Welt). Der starke Gegner (Borkenkäfer) folgt; bis dahin
+	# eingefärbter Panzerkäfer bzw. Brecher. Werte wie die Gegner gleicher Stärke aus Welt 1, damit die Abstimmung gleich bleibt.
 	"rankling": {
 		"name": "Rankling", "plural": "Ranklinge", "tier": "leicht", "own_look": true,
 		"hp": 28.0, "speed": 2.3, "xp": 1, "dps": 8.0, "size": 0.55, "armor": 0.0,
@@ -234,12 +235,10 @@ const WORLDS := [
 		"c1": Color(1.0, 0.2, 0.6), "c2": Color(0.3, 0.9, 1.0), "rim": Color(1.0, 0.4, 0.9)},
 	# --- Level 51–150 (Schritt 2): je Planet zwei Welten, vorerst mit eingefärbten Gegnern ---
 	# Planet Dschungelmond (Level 51–60)
-	{"name": "Rankendickicht", "kinds": ["schleimling", "tentakler", "panzerkaefer", "schleimmutter"],
-		"kinds_neu": ["rankling", "bluetenschnapper", "panzerkaefer", "urwaldriese"],
+	{"name": "Rankendickicht", "kinds": ["rankling", "bluetenschnapper", "panzerkaefer", "urwaldriese"],
 		"prefix": "Ranken-", "tint": Color(0.70, 1.20, 0.60),
 		"c1": Color(0.22, 0.93, 0.07), "c2": Color(0.62, 0.28, 0.92), "rim": Color(0.44, 0.96, 0.34)},
-	{"name": "Blütenwipfel", "kinds": ["krabbler", "zombie", "brecher", "koloss"],
-		"kinds_neu": ["rankling", "bluetenschnapper", "brecher", "urwaldriese"],
+	{"name": "Blütenwipfel", "kinds": ["rankling", "bluetenschnapper", "brecher", "urwaldriese"],
 		"prefix": "Blüten-", "tint": Color(1.25, 0.80, 1.00),
 		"c1": Color(0.93, 0.07, 0.45), "c2": Color(0.28, 0.92, 0.44), "rim": Color(0.96, 0.34, 0.61)},
 	# Planet Ozeanwelt (Level 61–70)
@@ -319,8 +318,8 @@ const LEVEL_NAMES := [
 	["Dichter Nebel", "Stimmen im Dunst", "Nebeltentakel", "Unsichtbare Brecher", "Mutter des Nebels"],
 	["Lichtloses Tor", "Schattenläufer", "Flüsternde Horde", "Brecher der Dunkelheit", "Der Schattenkoloss"],
 	["Am Ereignishorizont", "Verzerrte Zeit", "Sturm der Tentakel", "Letzte Verteidigung", "Das Herz des Wurmlochs"],
-	["Grünes Dickicht", "Lianenpfad", "Wuchernde Tentakel", "Panzer im Laub", "Die Rankenmutter"],
-	["Über den Wipfeln", "Duftende Falle", "Blütenzombies", "Brecher im Geäst", "Der Blütenkoloss"],
+	["Grünes Dickicht", "Lianenpfad", "Schnappende Blüten", "Panzer im Laub", "Der Urwaldriese"],
+	["Über den Wipfeln", "Duftende Falle", "Blütenschwarm", "Brecher im Geäst", "Der Riese erwacht"],
 	["Brandung", "Korallengärten", "Tentakel im Riff", "Muschelpanzer", "Die Riffmutter"],
 	["Abtauchen", "Leuchtende Tiefe", "Druckwelle", "Brecher der Tiefe", "Der Tiefseekoloss"],
 	["Rosa Funkeln", "Kristallregen", "Gläserne Horde", "Facettenpanzer", "Die Kristallmutter"],

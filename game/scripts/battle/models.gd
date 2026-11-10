@@ -41,12 +41,7 @@ const ENEMIES := {
 	"brecher": {"file": "enemies_v2/brecher", "height": 2.0, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.59},
 	# Comic-Zombie-Koloss (Boss, tools/monsters/build_zweibeiner.py), freigegeben 04.11.2026
 	"koloss": {"file": "enemies_v2/koloss", "height": 3.0, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.58},
-}
-
-## Neue Comic-Gegner zur Prüfung, gebaut, aber noch nicht freigegeben. Aktiv nur mit dem Test-Schalter
-## --neue-monster (Prüfbilder: tests/monster_show.gd); nach der Freigabe wandern die Einträge nach ENEMIES.
-const ENEMIES_NEU := {
-	# Dschungelmond (Level 51–60), Rohmodelle Vorlage_Raw/Monster_Roh/Modelltests_v4
+	# Dschungelmond (Level 51–60), Rohmodelle Vorlage_Raw/Monster_Roh/Modelltests_v4, freigegeben 10.11.2026
 	# Rankling: tools/monsters/build_schleim.py (Hüpfen wie der Schleimling)
 	"rankling": {"file": "enemies_v2/rankling", "height": 0.85, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.62},
 	# Blütenschnapper: tools/monsters/build_flieger.py (Flügelschlag, Biss), schwebt wie der Tentakler
@@ -54,6 +49,10 @@ const ENEMIES_NEU := {
 	# Urwaldriese (Boss): tools/monsters/build_zweibeiner.py mit Meshys Skelett, wie der Zombie-Koloss
 	"urwaldriese": {"file": "enemies_v2/urwaldriese", "height": 3.0, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.58},
 }
+
+## Neue Comic-Gegner zur Prüfung, gebaut, aber noch nicht freigegeben. Aktiv nur mit dem Test-Schalter
+## --neue-monster (Prüfbilder: tests/monster_show.gd); nach der Freigabe wandern die Einträge nach ENEMIES.
+const ENEMIES_NEU := {}
 static var test_new := false
 
 
