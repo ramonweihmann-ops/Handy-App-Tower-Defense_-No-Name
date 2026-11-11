@@ -48,12 +48,7 @@ const ENEMIES := {
 	"bluetenschnapper": {"file": "enemies_v2/bluetenschnapper", "height": 0.95, "walk": "Fly", "attack": "Attack", "lift": 0.45, "v2": true},
 	# Urwaldriese (Boss): tools/monsters/build_zweibeiner.py mit Meshys Skelett, wie der Zombie-Koloss
 	"urwaldriese": {"file": "enemies_v2/urwaldriese", "height": 3.0, "walk": "Walk", "attack": "Attack", "v2": true, "stride": 0.58},
-}
-
-## Neue Comic-Gegner zur Prüfung, gebaut, aber noch nicht freigegeben. Aktiv nur mit dem Test-Schalter
-## --neue-monster (Prüfbilder: tests/monster_show.gd); nach der Freigabe wandern die Einträge nach ENEMIES.
-const ENEMIES_NEU := {
-	# Ozeanwelt (Level 61–70), Rohmodelle Vorlage_Raw/Monster_Roh/Modelltests_v6
+	# Ozeanwelt (Level 61–70), Rohmodelle Vorlage_Raw/Monster_Roh/Modelltests_v6, freigegeben 11.11.2026
 	# Blubberfisch: tools/monsters/build_flieger.py (Seitenflossen schlagen), schwebt wie der Blütenschnapper
 	"blubberfisch": {"file": "enemies_v2/blubberfisch", "height": 0.85, "walk": "Fly", "attack": "Attack", "lift": 0.4, "v2": true},
 	# Krabbenpanzer: tools/monsters/build_krabbe.py (sechs Beine, zwei Scheren), flach und breit wie der Panzerkäfer
@@ -61,6 +56,10 @@ const ENEMIES_NEU := {
 	# Tiefseekrake (Boss): tools/monsters/build_krake.py (acht Fangarme wogen), schwebt
 	"tiefseekrake": {"file": "enemies_v2/tiefseekrake", "height": 2.6, "walk": "Fly", "attack": "Attack", "lift": 0.35, "v2": true},
 }
+
+## Neue Comic-Gegner zur Prüfung, gebaut, aber noch nicht freigegeben. Aktiv nur mit dem Test-Schalter
+## --neue-monster (Prüfbilder: tests/monster_show.gd); nach der Freigabe wandern die Einträge nach ENEMIES.
+const ENEMIES_NEU := {}
 static var test_new := false
 
 
