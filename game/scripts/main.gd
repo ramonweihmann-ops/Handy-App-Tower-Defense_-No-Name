@@ -910,6 +910,11 @@ func _show_card_shot() -> void:
 	var cards: Array = []
 	if want.contains("+"):
 		# feste Auswahl über Schlüssel, z. B. gate:ice+plasma:mag+station:repair (Held: :damage für Held 1)
+		for k in want.split("+"):
+			# Heldenkarte eines Helden, der nicht im Kampf ist: Held dazuholen
+			var hid := k.get_slice(":", 0)
+			if GameData.HEROES.has(hid) and not battle.has_hero(hid) and battle.heroes.size() < Battle.MAX_HEROES:
+				battle.add_hero(hid)
 		var pool: Array = _machine_cards() + [_card_repair()]
 		for h in battle.heroes:
 			pool.append_array(_hero_cards(h))
@@ -939,6 +944,8 @@ func _show_card_shot() -> void:
 	get_tree().paused = true
 	var pick := CardPick.new(cards, 3)
 	_set_screen(pick)
+	if parts.size() > 2:
+		pick.select(int(parts[2]))   # dritte Angabe: gewählte Karte
 	get_tree().create_timer(1.2, true).timeout.connect(func() -> void:
 		get_viewport().get_texture().get_image().save_png(parts[0])
 		print("BILD gespeichert: ", parts[0])
@@ -1075,7 +1082,7 @@ func _hero_cards(h: Hero) -> Array:
 		"cryo": ["Frostsplitter", "Der Frost-Strahl springt auf 1 Gegner mehr über", 3],
 		"shotgun": ["Mehr Schrot", "+1 Kugel pro Schuss", 3],
 		"sniper": ["Durchschlag", "Die Kugel durchschlägt 1 Gegner mehr", 3],
-		"flamer": ["Breitere Flamme", "Flammenbereich +20 %", 3],
+		"flamer": ["Breitere Flamme", "Fritzis Flammenwerfer trifft einen breiteren Bereich: Flammenbereich +20 %.", 3],
 		"beam": ["Längerer Atem", "Der Atem durchschlägt 1 Gegner mehr", 3],
 		"drone": ["Feinmechanik", "Repariert 50 % mehr Mauer je Schuss", 3],
 		"cannon": ["Mehr Wucht", "Stößt 25 % weiter zurück", 3],

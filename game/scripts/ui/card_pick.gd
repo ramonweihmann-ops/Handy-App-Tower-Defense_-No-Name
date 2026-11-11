@@ -117,6 +117,7 @@ func face(c: Dictionary) -> Dictionary:
 			var d: Dictionary = GameData.HEROES[id]
 			f["cat"] = "champion"
 			f["new"] = true
+			f["champ"] = id
 			f["image"] = "res://ui/heroes2d/%s.png" % id
 			var extra := "Verstärkung: +30 % Schaden, Team +6 %. " if GameData.HERO_TYPE.get(id, "start") == "verstaerkung" else ""
 			f["text"] = "%s mit %s: %s %s+10 Munition." % [d["role"], d["weapon"], d["blurb"], extra]
@@ -244,23 +245,27 @@ func _draw_panel(c: Dictionary) -> void:
 	_label_with_symbol(cat[0], cat[2], pill.get_center(), 11, 0.04, INK, false)
 	if hero_name != "":
 		_text_left(_font("Nunito", 800, 12), hero_name, pill.end.x + 6, o.y + 14 + 0.5, 12, TEXT)
-	# Titel (bei Heldenkarten einzeilig, darunter Stufen und Champion-Zeile)
+	elif f["new"]:
+		# Champion-Karte: Name des neuen Champions groß neben der Plakette
+		var champ_name := String(GameData.HEROES[f["champ"]]["name"])
+		_text_left(_font("Nunito", 800, 15), champ_name, pill.end.x + 6, o.y + 14 - 1.0, 15, TEXT)
+	# Titel einzeilig (wird bei langen Namen kleiner), darunter Stufen und bei Heldenkarten die Champion-Zeile
 	var tw := inner_w - 128 - 10
-	var tf := _font("Fredoka", 700, 21)
 	var size_pt := 21.0
-	if hero_name != "" or f["new"]:
-		while size_pt > 15 and _font("Fredoka", 700, size_pt).get_string_size(str(f["title"]), HORIZONTAL_ALIGNMENT_LEFT, -1, _fs(size_pt)).x > tw * s:
-			size_pt -= 0.5
-		_text_left(_font("Fredoka", 700, size_pt), str(f["title"]), x, o.y + 36 + (21.0 - size_pt) * 0.5, size_pt, TEXT, 1.1)
-	else:
-		_wrap_left(tf, str(f["title"]), x, o.y + 36, tw, 21, 1.1, TEXT, 2)
-	var row_y := o.y + (64.0 if hero_name != "" or f["new"] else 86.0)
+	while size_pt > 15 and _font("Fredoka", 700, size_pt).get_string_size(str(f["title"]), HORIZONTAL_ALIGNMENT_LEFT, -1, _fs(size_pt)).x > tw * s:
+		size_pt -= 0.5
+	_text_left(_font("Fredoka", 700, size_pt), str(f["title"]), x, o.y + 36 + (21.0 - size_pt) * 0.5, size_pt, TEXT, 1.1)
+	var row_y := o.y + 64.0
 	if f["new"]:
-		var nf := _font("Nunito", 800, 10)
-		var nw := nf.get_string_size("NEU IM TEAM", HORIZONTAL_ALIGNMENT_LEFT, -1, _fs(10)).x / s + 16
-		var nr := Rect2(x, row_y, nw, 17)
-		_round_border(nr, 8, 1.5, GREEN)
-		_text_center(nf, "NEU IM TEAM", nr.get_center().x, row_y + 1.5, 10, GREEN)
+		# „NEU IM TEAM“ und die Stufe, mit der der Champion dazukommt
+		var nf := _font("Nunito", 800, 11)
+		var nx := x
+		for chip in [["NEU IM TEAM", GREEN], ["Stufe %d" % Save.hero_level(f["champ"]), GOLD]]:
+			var nw := nf.get_string_size(chip[0], HORIZONTAL_ALIGNMENT_LEFT, -1, _fs(11)).x / s + 16
+			var nr := Rect2(nx, row_y, nw, 18)
+			_round_border(nr, 8, 1.5, chip[1])
+			_text_center(nf, chip[0], nr.get_center().x, row_y + 1.5, 11, chip[1])
+			nx += nw + 6
 	else:
 		var dw := _dots(f, Vector2(x, row_y + 7.5), false)
 		var sf := _font("Nunito", 800, 11)
@@ -385,12 +390,6 @@ func _lines(font: Font, txt: String, width: float, size_pt: float) -> Array:
 	if line != "":
 		out.append(line)
 	return out
-
-
-func _wrap_left(font: Font, txt: String, x: float, top: float, width: float, size_pt: float, lh: float, col: Color, max_lines: int) -> void:
-	var lines := _lines(font, txt, width, size_pt)
-	for i in mini(lines.size(), max_lines):
-		_text_left(font, lines[i], x, top + i * size_pt * lh, size_pt, col, lh)
 
 
 func _ellipsis(font: Font, txt: String, width: float) -> String:
