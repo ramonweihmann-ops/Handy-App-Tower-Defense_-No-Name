@@ -6,4 +6,6 @@ Die Dateinamen entsprechen der Zuordnung aus `KARTENMOTIVE_FUER_CHATGPT.md`. Fü
 
 Die Raketensalve zeigt fünf schlanke Raketen in Violett, Goldorange und Cyan. Der Gewittersturm hat kantigere Wolkenformen bei gleicher Farbpalette. Die Dampfwalze hat eine einzelne Dampfwolke. Das goldene Nachlademotiv verwendet dasselbe gerade Magazin mit den sichtbaren Patronen wie `held_mag.png`. Das Magazin wurde proportional verkleinert und mit dem kräftigeren goldenen Ladepfeil kombiniert. Ein sichtbarer Spalt trennt beide Motive.
 
+Das Plasma-Nachlademotiv `plasma_reload.png` verwendet ebenfalls das gerade Magazin aus `held_mag.png`. Zwei dünne türkise Pfeile markieren den Plasma-Effekt und lassen Platz um das Magazin.
+
 Die räumliche Wirkung ist Teil der PNG-Illustration. Die 31 Motive wurden mit der eingebauten Bildgenerierung aus den Beschreibungen der Auftragsdatei und den bisherigen Kartenmotiven als Stilreferenzen erstellt.
