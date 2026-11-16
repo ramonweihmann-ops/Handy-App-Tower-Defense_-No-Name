@@ -1,6 +1,9 @@
 Bildanweisungen für die 23 Kartenmotive
 Eigene Bildgenerierung im bestehenden Konto. Die Stilreferenzen stammen aus Vorlage_Raw/Kartenmotive_v2/.
 
+Farbverfeinerung für held_damage.png
+Behutsame Farb- und Materialverfeinerung des ersten Bildes, genau dieses freigestellte Kartenicon Mehr Schaden. Die zweite Referenz ist nur Vorbild für die charakteristische Farbigkeit und das weiche plastische Finish der Spiel-Icons. Silhouette, Perspektive, Anordnung und Größenverhältnis von Aufwärtspfeil, diagonalem Geschoss, Aufprallstern und kurzer Spur exakt erhalten. Ziel ist genau die Mitte zwischen matt und grell: ungefähr 15 Prozent lebendiger und plastischer als das erste Bild. Der blaue Pfeil erhält eine klar frische türkise Lichtkante und einen weichen Verlauf von Cyanblau zu Azur. Auf der violetten Geschossspitze eine schmale lavendelfarbene Lichtkante, darunter sattes Violett. Die Goldhülse mit einem schmalen weichen honiggoldenen Glanzstreifen. Der Stern bekommt etwas wärmeres Mandarinenorange an den Kanten, bleibt leicht dunkler als die Goldhülse und ohne leuchtendgelbes Zentrum. Dünne farbige dunkellila Konturen und subtile Glanzlichter links oben wie im Spiel. Keine weißen Glanzflecken, keine Funken, keine Aura, keine zusätzlichen Bewegungslinien. Echte Transparenz, ein einzelnes quadratisches Icon, 8 Prozent Freiraum, lesbar bei 56 Pixeln, keine Schrift und kein Rahmen.
+
 Überarbeitungen der drei Motive
 
 held_damage.png
