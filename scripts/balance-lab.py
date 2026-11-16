@@ -21,6 +21,9 @@ def target(level, profile):
     boss = level % BOSS_EVERY == 0
     if level <= 20:
         return {"anfaenger": (0.70, 1.0), "durchschnitt": (0.85, 1.0), "zahlend": (0.95, 1.0)}[profile]
+    if level <= 30:
+        # Level 21–30 entspannt, auch ohne Käufe fast immer ein Sieg (Entscheidung 16.11.2026)
+        return {"anfaenger": (0.85, 1.0), "durchschnitt": (0.88, 1.0), "zahlend": (0.95, 1.0)}[profile]
     if boss:
         return {"anfaenger": None, "durchschnitt": (0.35, 0.55), "zahlend": (0.70, 1.0)}[profile]
     return {"anfaenger": None, "durchschnitt": (0.55, 0.75), "zahlend": (0.85, 1.0)}[profile]

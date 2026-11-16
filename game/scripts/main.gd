@@ -276,6 +276,8 @@ func _parse_args() -> void:
 			level = clampi(int(arg.get_slice("=", 1)), 1, GameData.LEVEL_COUNT)
 		elif arg.begins_with("--seed="):
 			seed(int(arg.get_slice("=", 1)))
+		elif arg.begins_with("--hpeasy="):
+			GameData.HP_GROWTH_EASY = float(arg.get_slice("=", 1))   # Labor: Lebenszuwachs Level 21–30
 		elif arg.begins_with("--hpg="):
 			GameData.HP_GROWTH = float(arg.get_slice("=", 1))
 		elif arg.begins_with("--dpsg="):

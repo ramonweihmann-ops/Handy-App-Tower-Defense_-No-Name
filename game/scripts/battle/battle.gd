@@ -378,7 +378,7 @@ func spawn_enemy(kind: String, pos := Vector3.INF) -> Enemy:
 		pos = Vector3(randf_range(-3.6, 3.6), 0, spawn_z() + randf_range(-1.0, 1.0))
 	e.position = pos
 	e.tint = GameData.world_tint(level, kind)
-	e.dps_scale = GameData.dps_mult(level)
+	e.dps_scale = GameData.dps_mult(level, mode != "mp")
 	var hp := (MpData.hp_mult(level, maxi(wave, 1)) if mode == "mp" else GameData.hp_mult(level, maxi(wave, 1))) * hp_scale
 	if mode != "mp":
 		hp *= CardRules.team_easing(level, wave, heroes.size())

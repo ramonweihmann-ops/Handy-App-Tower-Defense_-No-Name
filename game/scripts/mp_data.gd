@@ -132,7 +132,7 @@ static func alive_target(wave: int) -> int:
 ## Lebensfaktor der Gegner in Welle w
 static func hp_mult(level: int, wave: int) -> float:
 	# ohne die Sonderabstimmung der Boss-Level im Abenteuer (GameData.BOSS_TUNE)
-	var base := GameData.level_hp(level) / float(GameData.BOSS_TUNE.get(level, 1.0))
+	var base := GameData.level_hp(level, false) / float(GameData.BOSS_TUNE.get(level, 1.0))
 	return base * hp_tune(level) * pow(HP_WAVE, wave - 1)
 
 
