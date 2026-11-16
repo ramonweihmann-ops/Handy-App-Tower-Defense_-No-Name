@@ -665,6 +665,11 @@ func _process(delta: float) -> void:
 					menu.open_board(parts[2].get_slice(":", 1))
 					if parts[2].get_slice_count(":") > 2:
 						menu.open_test_map()
+				elif parts.size() > 2 and parts[2].begins_with("aufleveln:"):
+					# „Held aufleveln“ fürs Bild, z. B. --menushot=bild.png,sammlung,aufleveln:volta
+					menu.show_tab(parts[1])
+					HeroBoard.start_hero = parts[2].get_slice(":", 1)
+					menu.open_board("Artboard-seqx-c6i2.dc.html")
 				elif parts.size() > 2 and parts[2].begins_with("held:"):
 					menu.show_tab(parts[1])
 					HeroLockBoard.hero = parts[2].get_slice(":", 1)

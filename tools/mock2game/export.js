@@ -175,10 +175,10 @@ async function shootLive(p, data, pre) {
       continue;
     }
     await p.addStyleTag({ content: 'html,body{background:transparent!important} .m2g-t{color:transparent!important;text-shadow:none!important} .m2g-svgt{fill:transparent!important;stroke:transparent!important} [data-m2g-live]{visibility:hidden!important} #dc-root{visibility:hidden!important} [data-m2g-ov]{visibility:visible!important} [data-m2g-btn]{visibility:hidden!important}' });
-    const box = await p.evaluate(() => { let a = null; document.querySelectorAll('[data-m2g-ov], [data-m2g-ov] *').forEach(e => { const q = e.getBoundingClientRect(); if (q.width < 0.5 || q.height < 0.5) return; const cs = getComputedStyle(e);
+    const box = await p.evaluate((BH) => { let a = null; document.querySelectorAll('[data-m2g-ov], [data-m2g-ov] *').forEach(e => { const q = e.getBoundingClientRect(); if (q.width < 0.5 || q.height < 0.5) return; const cs = getComputedStyle(e);
       const shadow = parseFloat((cs.boxShadow.match(/(\d+)px\)?\s*$/) || [0, 0])[1]) || 0; const g = Math.min(40, 6 + (cs.boxShadow !== 'none' ? 24 : 0));
       const r = [q.left - g, q.top - g, q.right + g, q.bottom + g]; a = a ? [Math.min(a[0], r[0]), Math.min(a[1], r[1]), Math.max(a[2], r[2]), Math.max(a[3], r[3])] : r; });
-      if (!a) return [0, 0, 1, 1]; a = [Math.max(0, a[0]), Math.max(0, a[1]), Math.min(390, a[2]), Math.min(BH, a[3])]; return [a[0], a[1], a[2] - a[0], a[3] - a[1]]; });
+      if (!a) return [0, 0, 1, 1]; a = [Math.max(0, a[0]), Math.max(0, a[1]), Math.min(390, a[2]), Math.min(BH, a[3])]; return [a[0], a[1], a[2] - a[0], a[3] - a[1]]; }, BH);
     const pre = path.join(cfg.out, 'ov_' + ov.name);
     await p.screenshot({ path: pre + '_bg.png', clip: { x: box[0], y: box[1], width: box[2], height: box[3] }, omitBackground: true });
     data.rect = box;
