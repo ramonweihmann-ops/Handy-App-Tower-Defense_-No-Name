@@ -327,7 +327,7 @@ Nur die eingebaute Bildgenerierung im bestehenden Konto verwenden, keine weitere
 
 ## Prompt 4b: Fähigkeiten der Champions und fehlende Kartenlogos (23 Motive)
 
-**Kosten:** keine · **Abschicken:** nachdem du die acht neuen Fähigkeiten für Fünkchen, Pip, Rollo und Nova (Teil B) bestätigt hast
+**Kosten:** keine · **Abschicken:** jederzeit (Fähigkeiten bestätigt am 16.11.2026)
 
 ~~~~text
 Bitte für mein Handyspiel (Tower Defense, Comic-Stil) 23 Motive erzeugen: Fähigkeiten der Champions und vier

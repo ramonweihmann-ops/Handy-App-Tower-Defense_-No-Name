@@ -3,9 +3,15 @@
 **Kosten: keine** (eingebaute Bildgenerierung). Wunsch des Nutzers vom 16.11.2026: alle Fähigkeitsbilder auf
 „Held aufleveln“ und alle Kartenlogos im neuen Stil der Kartenmotive.
 
-**Vor dem Abschicken bestätigen:** Für Fünkchen, Pip, Rollo und Nova gibt es bisher keine zwei Fähigkeiten
-(nur Spezial- und Superfähigkeit). Die acht Fähigkeiten in Teil B sind Claudes Vorschlag. Passen sie, kann der
-Auftrag so raus; sonst Namen und Wirkung vorher ändern.
+**Bestätigt am 16.11.2026:** Die acht neuen Fähigkeiten für Fünkchen, Pip, Rollo und Nova (Teil B) passen, der
+Auftrag kann raus. Wirkung im Spiel (beim Einbau umzusetzen):
+
+| Champion | Fähigkeit 1 | Fähigkeit 2 |
+|---|---|---|
+| Fünkchen | Sternenstaub: getroffene Gegner nehmen kurz mehr Schaden | Kometenschweif: jeder 5. Atemzug trifft auch die Nachbarreihen |
+| Pip | Notreparatur: unter 30 % Schild repariert Pip doppelt so schnell | Ersatzteile: besiegte Gegner lassen manchmal Schildstücke fallen |
+| Rollo | Panzerplatte: das Schild nimmt 10 % weniger Schaden | Doppelwumms: jeder 4. Schuss stößt zweimal zurück |
+| Nova | Mini-Loch: getroffene Gegner werden kurz zusammengezogen | Zeitdehnung: Gegner im Feld sind 20 % langsamer |
 
 ---
 
