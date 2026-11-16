@@ -1,6 +1,6 @@
 # Ranglisten, Ligen und Überleben: Auftrag für ChatGPT (Stand 16.11.2026)
 
-**Reihenfolge:** Auftrag 1 von 4 (Übersicht in `Vorlage_Raw/AUFTRAEGE_REIHENFOLGE.md`).
+**Reihenfolge:** Auftrag 1 von 5 (Übersicht in `Vorlage_Raw/AUFTRAEGE_REIHENFOLGE.md`).
 **Kosten: keine.** Nur die eingebaute Bildgenerierung im bestehenden Konto, keine weiteren Dienste.
 
 ## Für uns: Ligen-Vorschlag (vor dem Abschicken vom Nutzer bestätigen)

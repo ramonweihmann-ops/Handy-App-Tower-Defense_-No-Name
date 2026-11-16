@@ -1,6 +1,6 @@
 # Planeten 08–15: 3D-Modelle der 32 Gegner – Auftrag für ChatGPT (Stand 16.11.2026)
 
-**Reihenfolge:** Auftrag 4 von 4 (Übersicht in `Vorlage_Raw/AUFTRAEGE_REIHENFOLGE.md`).
+**Reihenfolge:** Auftrag 5 von 5 (Übersicht in `Vorlage_Raw/AUFTRAEGE_REIHENFOLGE.md`).
 
 **Kosten: je Gegner eine Erzeugung zu etwa 15 Meshy-Credits, je Planet etwa 60 Credits, alle acht Planeten
 zusammen etwa 480 Credits (bezahltes Konto).** Wie bei Dschungel und Ozean: **Planet für Planet**, jeder Planet

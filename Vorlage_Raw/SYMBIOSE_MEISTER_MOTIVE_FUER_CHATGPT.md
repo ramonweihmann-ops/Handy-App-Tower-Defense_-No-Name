@@ -1,6 +1,6 @@
 # Kartenmotive für Symbiosen und Meisterfähigkeit – Auftrag für ChatGPT (Stand 16.11.2026)
 
-**Reihenfolge:** Auftrag 3 von 4 (Übersicht in `Vorlage_Raw/AUFTRAEGE_REIHENFOLGE.md`).
+**Reihenfolge:** Auftrag 4 von 5 (Übersicht in `Vorlage_Raw/AUFTRAEGE_REIHENFOLGE.md`).
 **Kosten: keine** (eingebaute Bildgenerierung im Konto).
 
 **Erst abschicken, wenn der Nutzer die Mockups „Karten-Meister“ und „Karten-Symbiose“ freigegeben hat** und die
