@@ -15,6 +15,32 @@ const HEROES := {
 	"lynx": {"file": "heroes/Soldier_Female", "gun": "guns/Sniper"},
 	"fritzi": {"file": "heroes/Worker_Female", "gun": ""},
 }
+## Neue Comic-Modelle zur Prüfung (Meshy H2, gebaut mit tools/heroes/build_hero_v2.py): nur mit eingeschalteten
+## Entwickler-Werkzeugen sichtbar, bis der Nutzer sie freigibt; danach wandern die Einträge nach HEROES.
+const HEROES_NEU := {
+	"pip": {"file": "heroes_v2/pip", "gun": "", "v2": true},
+	"nova": {"file": "heroes_v2/nova", "gun": "", "v2": true},
+	# size: Höhe im Verhältnis zu den Menschen (Rollo ist breit und gedrungen)
+	"fuenkchen": {"file": "heroes_v2/fuenkchen", "gun": "", "v2": true, "size": 0.95},
+	"rollo": {"file": "heroes_v2/rollo", "gun": "", "v2": true, "size": 0.72},
+}
+static var test_new_heroes := false
+
+
+## Entwickler-Werkzeuge an? (Spielstand über den Szenenbaum, damit Tests ohne Spielstand laufen)
+static func _developer() -> bool:
+	var tree := Engine.get_main_loop() as SceneTree
+	var save: Node = tree.root.get_node_or_null("Save") if tree else null
+	return save != null and bool(save.get("developer"))
+
+
+## Modell-Eintrag eines Helden (mit Entwickler-Werkzeugen auch die neuen, noch nicht freigegebenen)
+static func hero_info(id: String) -> Dictionary:
+	if (test_new_heroes or _developer()) and HEROES_NEU.has(id):
+		return HEROES_NEU[id]
+	return HEROES.get(id, {})
+
+
 ## Länge der Waffe in Körper-Einheiten (der Held ist etwa 1,5 hoch).
 const GUN_LENGTH := {"guns/Revolver": 0.42, "guns/AK": 0.78, "guns/RocketLauncher": 0.95,
 	"guns/Shotgun": 0.8, "guns/Sniper": 1.05}
@@ -86,11 +112,11 @@ static func _scene(file: String) -> PackedScene:
 
 ## Neues Comic-Modell (eigene Waffe, Animationen Idle/Shoot/Victory)
 static func is_v2(id: String) -> bool:
-	return bool(HEROES.get(id, {}).get("v2", false)) and has_hero(id)
+	return bool(hero_info(id).get("v2", false)) and has_hero(id)
 
 
 static func has_hero(id: String) -> bool:
-	return HEROES.has(id) and _scene(HEROES[id]["file"]) != null
+	return not hero_info(id).is_empty() and _scene(hero_info(id)["file"]) != null
 
 
 static func has_enemy(kind: String) -> bool:

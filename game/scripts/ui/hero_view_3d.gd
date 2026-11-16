@@ -176,7 +176,7 @@ func set_hero(id: String) -> void:
 	if ResourceLoader.exists("res://ui/heroes2d/%s.png" % id) and not Models.is_v2(id):
 		_show_design(id)
 		return
-	var info: Dictionary = Models.HEROES.get(id, {})
+	var info: Dictionary = Models.hero_info(id)
 	var scene := Models._scene(str(info.get("file", "")))
 	if scene == null:
 		return
@@ -250,7 +250,7 @@ func _show_design(id: String) -> void:
 
 
 func _attach_gun(id: String) -> void:
-	var file: String = str(Models.HEROES.get(id, {}).get("gun", ""))
+	var file: String = str(Models.hero_info(id).get("gun", ""))
 	if file == "":
 		file = MENU_GUNS.get(id, "")
 	if file == "" or _skel == null:

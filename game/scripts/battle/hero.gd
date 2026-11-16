@@ -897,7 +897,7 @@ var _anim: AnimationPlayer
 
 
 func _build_model() -> void:
-	_model = Models.make(String(Models.HEROES[id]["file"]), MODEL_HEIGHT)
+	_model = Models.make(String(Models.hero_info(id)["file"]), MODEL_HEIGHT * float(Models.hero_info(id).get("size", 1.0)))
 	_body.add_child(_model)
 	_model.position.y = 0.0
 	Models.recolor(_model, "Skin", data["skin"])
@@ -961,7 +961,7 @@ func _fit_weapon_to_model() -> void:
 			if c != _muzzle and c is Node3D:
 				(c as Node3D).visible = false
 		return
-	var gun_file: String = Models.HEROES[id]["gun"]
+	var gun_file: String = Models.hero_info(id)["gun"]
 	if gun_file != "":
 		var gun := Models.make_gun(gun_file)
 		if gun:

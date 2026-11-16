@@ -275,6 +275,8 @@ func _parse_args() -> void:
 			CardRules.SOLO_HP = float(arg.get_slice("=", 1))   # Labor: Gegnerleben mit einem Champion
 		elif arg.begins_with("--duo-hp="):
 			CardRules.DUO_HP = float(arg.get_slice("=", 1))   # Labor: Gegnerleben mit zwei Champions
+		elif arg == "--neue-helden":
+			Models.test_new_heroes = true   # noch nicht freigegebene Heldenmodelle zeigen (Prüfbilder)
 		elif arg == "--neue-monster":
 			Models.test_new = true   # noch nicht freigegebene Gegnermodelle zeigen (Prüfbilder)
 		elif arg == "--mp":
