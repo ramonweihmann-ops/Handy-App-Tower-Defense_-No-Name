@@ -57,8 +57,22 @@ Level 3–50, je Level und Profil 5 Läufe, Siegquote beim ersten Versuch (durch
   kommen vor (z. B. Dusty Jo mit Meister-Spezialfähigkeit), Symbiosen in den Probeläufen nie: Dafür müssen genau
   das passende Paar im Team sein und beide ihre Spezialfähigkeit haben.
 
+### Ausgleich (Entscheidung 16.11.2026: Gegner leichter, solange man allein kämpft; Symbiose reicht mit einer Spezialfähigkeit)
+
+| Fassung | L20 | L25 | L30 | L40 | L50 |
+|---|---|---|---|---|---|
+| Wellen 1–5 allein −20 % | 100 / 100 | 80 / 100 | 20 / 100 | 80 / 60 | 60 / 60 |
+| Wellen 1–5 allein −30 % | 100 / 100 | 80 / 100 | 0 / 60 | 80 / 100 | 60 / 100 |
+| **bis Welle 8: allein −45 %, zu zweit −20 %** (eingestellt) | 100 / 100 | 100 / 100 | 40 / 80 | 60 / 100 | 80 / 80 |
+
+(Siegquote durchschnitt / zahlend, je 5 Läufe.) Verloren wurde vorher in Welle 4–6: allein, oder direkt nachdem der
+zweite Champion nach Welle 5 dazukam. Mit dem eingestellten Ausgleich liegt das neue System etwa auf dem Stand des
+bisherigen. Level 30 bleibt für Durchschnittsspieler schwer, aber das ist auch bisher so (Zielkurve ab Level 21:
+Bosse 35–55 %, `scripts/balance-lab.py`). Der Wunsch „bis Level 30 entspannt“ betrifft deshalb die Grundkurve
+(Sprung ab Level 21, `docs/KONZEPT.md` 9.1), nicht nur das Kartensystem.
+
 ## Offen
 
-- Ausgleich für „Held ab Welle 5“ ab Level 25 (Vorschlag an den Nutzer) und Symbiosen häufiger machen
+- Grundkurve: „bis Level 30 entspannt“ (Vorschlag an den Nutzer)
 - Mockup der neuen Karten (Meisterfähigkeit, Symbiose, belegte Plätze), danach Einbau ins Spiel und ins Tutorial
   (dort wählt man bisher nach Welle 1 einen Helden)
