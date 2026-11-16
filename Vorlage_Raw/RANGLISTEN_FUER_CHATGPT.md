@@ -3,7 +3,7 @@
 **Reihenfolge:** Auftrag 1 von 5 (Übersicht in `Vorlage_Raw/AUFTRAEGE_REIHENFOLGE.md`).
 **Kosten: keine.** Nur die eingebaute Bildgenerierung im bestehenden Konto, keine weiteren Dienste.
 
-## Für uns: Ligen-Vorschlag (vor dem Abschicken vom Nutzer bestätigen)
+## Für uns: Ligen-Vorschlag (vom Nutzer am 16.11.2026 bestätigt)
 
 Die sechs Ligen im Spiel bleiben, mit gleichen Farben und gleichen Pokalgrenzen (`game/scripts/mp_data.gd`). Neu sind
 drei Stufen je Liga und eine siebte Liga ganz oben. So gibt es öfter einen kleinen Aufstieg, und die besten Spieler
