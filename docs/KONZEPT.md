@@ -281,7 +281,11 @@ eine Zielkurve.
 
 - **Level 1–10:** Gegnerleben steigt gleichmäßig (+20 % je Level), Gegnerschaden gleich.
 - **Level 11–20:** Leben +5,5 % je Level, Schaden wächst mit dem Schild der Station mit (+3,5 % Druck).
-- **Ab Level 21 (Phase 2):** einmaliger Sprung (Leben ×4,7, Schaden ×1,6), danach Leben +2,5 % je
+- **Level 21–30 (seit 16.11.2026, Wunsch: „bis Level 30 entspannt, auch ohne Käufe fast 90 %“):** Leben wächst von
+  Level 20 aus um 10 % je Level und nur um 2 % je Welle, Schaden wie in Level 11–20, Boss in Level 30 Leben ×0,65.
+  Labor: Durchschnitt und zahlend 100 %, Anfänger 80–100 %. Der Sprung von Phase 2 kommt erst mit Level 31; der
+  Mehrspieler rechnet weiter mit der bisherigen Kurve (`GameData.level_hp(level, false)`).
+- **Ab Level 31 (Phase 2, vorher ab Level 21):** einmaliger Sprung (Leben ×4,7, Schaden ×1,6), danach Leben +2,5 % je
   Level – im Gleichschritt mit einem Spieler, der regelmäßig aufwertet. Bosse ab Level 21: Leben ×1,22.
 - **Heldentypen:** Start-Helden (Dusty, Iska, Brocken, Kalle, Fritzi) tragen den Kampfbeginn;
   Verstärkungs-Helden (Volta, Margot, Lynx) sind als erster Held schwächer, im Kampf dazugerufen aber
