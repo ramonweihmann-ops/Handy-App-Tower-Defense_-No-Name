@@ -38,8 +38,27 @@ einzelne Teile mit `--karten-neu=held5,plaetze,meister,symbiose`.
 
 Dusty Jo hat noch keine Symbiose.
 
+## Ergebnis Balance-Labor (16.11.2026)
+
+Level 3–50, je Level und Profil 5 Läufe, Siegquote beim ersten Versuch (durchschnitt / zahlend):
+
+| Level | bisher | neu komplett | neu ohne „ab Welle 5“ |
+|---|---|---|---|
+| 3–15 | 100 / 100 | 100 / 100 | 100 / 100 |
+| 20 | 100 / 100 | 100 / 100 (anfaenger 80) | 100 / 100 |
+| 25 | 100 / 100 | 60 / 80 | 100 / 100 |
+| 30 | 100 / 80 | 40 / 40 | 100 / 80 |
+| 40 | 80 / 80 | 40 / 80 | 80 / 100 |
+| 50 | 100 / 100 | 60 / 60 | 100 / 100 |
+
+- **„Held ab Welle 5“ macht ab Level 25 deutlich schwerer**: Mit einem Champion allein bricht das Schild oft in
+  Welle 6 ein, kurz nachdem der zweite dazukam. Zahlende Spieler fallen bei Level 30 und 50 unter die Zielkurve.
+- **Plätze, Meisterfähigkeit und Symbiosen ändern die Siegquote kaum** (fast gleich wie bisher). Meisterfähigkeiten
+  kommen vor (z. B. Dusty Jo mit Meister-Spezialfähigkeit), Symbiosen in den Probeläufen nie: Dafür müssen genau
+  das passende Paar im Team sein und beide ihre Spezialfähigkeit haben.
+
 ## Offen
 
-- Ergebnis Balance-Labor (Siegquoten bisher / neu / neu ohne „ab Welle 5“) und daraus nötige Anpassungen
+- Ausgleich für „Held ab Welle 5“ ab Level 25 (Vorschlag an den Nutzer) und Symbiosen häufiger machen
 - Mockup der neuen Karten (Meisterfähigkeit, Symbiose, belegte Plätze), danach Einbau ins Spiel und ins Tutorial
   (dort wählt man bisher nach Welle 1 einen Helden)
