@@ -43,11 +43,7 @@ const OK_RECT := Rect2(95, 579, 200, 50)
 const KARTEN_DIR := "res://ui/karten/"
 const IMAGES := {
 	"gate:plus3": "res://ui/karten/gate_x2.webp",
-	"gate:fire": "res://ui/karten/flamer_ult.webp",
-	"plasma:core": "res://ui/upgrades_v2/icon_core.webp",
 	"station:repair": "res://ui/upgrades_v2/symbol_schild.webp",
-	"damage": "res://ui/upgrades_v2/tech_damage.webp",
-	"crit": "res://ui/upgrades_v2/tech_crit.webp",
 }
 ## Kurztitel auf den Kärtchen (der volle Titel steht im Detailfeld)
 const SHORT := {
