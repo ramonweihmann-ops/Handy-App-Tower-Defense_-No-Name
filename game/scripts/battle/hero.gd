@@ -18,6 +18,7 @@ var reload_total := 1.0
 var waiting_for_ammo := false
 
 var _shot_cd := 0.3
+var _shot_n := 0
 var _t := 0.0
 var _recoil := 0.0
 var _body: Node3D
@@ -243,6 +244,20 @@ func ammo_cost() -> int:
 	return int(ceil(float(data["cost"]) * (1.0 + 0.5 * mods["mag"])))
 
 
+## Meisterfähigkeit (CardRules „meister“): Waffenfähigkeit auf Stufe 3
+func meister(mod: String) -> bool:
+	return CardRules.has("meister") and int(mods[mod]) >= CardRules.MEISTER_LEVEL
+
+
+## Stufe der Spezialfähigkeit, als Meisterfähigkeit zwei Stufen mehr
+func sp() -> int:
+	return int(mods["special"]) + (2 if meister("special") else 0)
+
+
+func sym(id_: String) -> bool:
+	return battle != null and battle.symbioses.has(id_)
+
+
 func crit_chance() -> float:
 	var extra: float = battle.bonus_crit if battle else 0.0
 	return 0.05 + 0.1 * mods["crit"] + extra
@@ -322,14 +337,24 @@ func _try_reload() -> void:
 	reloading = true
 	reload_total = reload_time()
 	reload_left = reload_total
+	# Meisterfähigkeit „Blitzladen“
+	if meister("reload") and randf() < 0.3:
+		reload_left = 0.05
 	_pipe_glow = 1.0
 
 
 func _fire(target: Enemy) -> void:
 	# Während einer Daueraktion (Superfähigkeit) wird keine Munition verbraucht
-	var ammo_type: String = "normal" if ult_active() or magazine.is_empty() else magazine.pop_front()
+	var ammo_type := "normal"
+	if not ult_active() and not magazine.is_empty():
+		# Meisterfähigkeit „Sparmagazin“: manchmal bleibt der Schuss im Magazin
+		ammo_type = magazine.front() if meister("mag") and randf() < 0.25 else magazine.pop_front()
+	_shot_n += 1
 	var crit := randf() < crit_chance()
-	var dmg := damage() * (2.0 if crit else 1.0)
+	var dmg := damage() * ((3.0 if meister("crit") else 2.0) if crit else 1.0)
+	# Meisterfähigkeit „Wuchttreffer“: jeder 4. Schuss dreifach
+	if meister("damage") and _shot_n % 4 == 0:
+		dmg *= 3.0
 	var from := _muzzle.global_position
 	Sfx.play(SHOT_SOUND.get(family(), "shot"))
 	var style := str(FX_STYLE.get(family(), ""))
@@ -339,35 +364,46 @@ func _fire(target: Enemy) -> void:
 		"revolver":
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, 0, 30.0, 1.0)
 			if magazine.is_empty() or ult_active():
-				var extra := 2 + 2 * int(mods["special"])
+				var extra := 2 + 2 * sp()
 				for other in battle.spread_targets(extra, target):
 					battle.fire_bullet(from, other, dmg * 0.8, false, ammo_type, 0, 28.0, 0.9)
 		"mg":
 			if ult_active():
-				battle.fire_bullet(from, target, dmg, crit, "normal", int(mods["special"]) + 1, 42.0, 1.1)
+				battle.fire_bullet(from, target, dmg, crit, "normal", sp() + 1 + (1 if sym("durchschlagsalve") else 0), 42.0, 1.1)
 			else:
-				battle.fire_bullet(from, target, dmg, crit, ammo_type, int(mods["special"]), 34.0, 0.75)
+				battle.fire_bullet(from, target, dmg, crit, ammo_type, sp() + (1 if sym("durchschlagsalve") else 0), 34.0, 0.75)
 		"rocket":
-			var radius: float = float(data["splash"]) * (1.0 + 0.25 * int(mods["special"]))
+			var radius: float = float(data["splash"]) * (1.0 + 0.25 * sp())
 			battle.fire_rocket(from, target, dmg, crit, ammo_type, radius)
+			if sym("schwerkraftbombe"):
+				var eid3 := target.get_instance_id()
+				get_tree().create_timer(from.distance_to(target.aim_point()) / 11.0, false).timeout.connect(func() -> void:
+					var e := instance_from_id(eid3) as Enemy
+					if battle and e and e.alive:
+						battle.gravity_well(e.global_position, radius * 1.2, 0.0, false, "normal", 0.5, 0.35, 1.0))
 		"tesla":
-			battle.fire_chain(from, target, dmg, crit, ammo_type, int(data["chain"]) + int(mods["special"]))
+			var t_ammo := "ice" if sym("frostblitz") and ammo_type == "normal" else ammo_type
+			battle.fire_chain(from, target, dmg, crit, t_ammo, int(data["chain"]) + sp(), Color(0, 0, 0, 0), 1.3 if sym("kettenexplosion") else 0.0)
 		"cryo":
 			# Frost-Strahl: immer Eismunition, springt mit der Spezialkarte auf Nachbarn über
-			battle.fire_chain(from, target, dmg, crit, "ice", int(mods["special"]), Color(0.55, 0.95, 1.0))
+			battle.fire_chain(from, target, dmg, crit, "ice", sp(), Color(0.55, 0.95, 1.0))
 		"shotgun":
-			var pellets := int(data["pellets"]) + int(mods["special"])
+			var pellets := int(data["pellets"]) + sp()
+			if sym("brandschrot") and ammo_type == "normal":
+				ammo_type = "fire"
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, 0, 32.0, 0.7)
 			for other in battle.spread_targets(pellets - 1, target):
 				battle.fire_bullet(from, other, dmg, false, ammo_type, 0, 30.0, 0.7)
 		"sniper":
-			battle.fire_bullet(from, target, dmg, crit, ammo_type, int(data["pierce"]) + int(mods["special"]), 60.0, 1.3)
+			battle.fire_bullet(from, target, dmg, crit, ammo_type, int(data["pierce"]) + sp() + (1 if sym("durchschlagsalve") else 0), 60.0, 1.3)
 		"flamer":
-			var cone: float = float(data["cone"]) * (1.0 + 0.2 * int(mods["special"])) * (2.2 if ult_active() else 1.0)
+			var cone: float = float(data["cone"]) * (1.0 + 0.2 * sp()) * (2.2 if ult_active() else 1.0)
 			battle.flame(from, target, dmg, crit, ammo_type, cone)
 		"beam":
 			# Sternenatem: durchschlägt die ganze Reihe; mit der Superfähigkeit drei Reihen
-			var pierce := int(data["pierce"]) + int(mods["special"])
+			var pierce := int(data["pierce"]) + sp()
+			if sym("sternenfeuer") and ammo_type == "normal":
+				ammo_type = "fire"
 			if FxSprite.has("fuenkchen_geschoss"):
 				var far := from + (target.aim_point() - from).normalized() * maxf(8.0, from.distance_to(target.aim_point()) + 4.0)
 				FxSprite.beam(battle, "fuenkchen_geschoss", from, far, 0.25, 0.6, 0.7)
@@ -377,7 +413,7 @@ func _fire(target: Enemy) -> void:
 					battle.fire_bullet(from, other, dmg, false, ammo_type, pierce, 60.0, 1.3)
 		"drone":
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, 0, 34.0, 0.8)
-			battle.repair_fence(float(data["repair"]) * (1.0 + 0.5 * int(mods["special"])), 0.0)
+			battle.repair_fence(float(data["repair"]) * (1.0 + 0.5 * sp()), 0.0)
 			_repair_n += 1
 			if _repair_n % 4 == 0:
 				battle.fence_heal_fx("pip_reparatur", [global_position.x])
@@ -387,7 +423,9 @@ func _fire(target: Enemy) -> void:
 		"cannon":
 			# Wuchtgeschoss: stößt den getroffenen Gegner zurück (beim Auftreffen)
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, 0, 30.0, 1.4)
-			var push: float = float(data["push"]) * (1.0 + 0.25 * int(mods["special"])) * battle.z_scale
+			var push: float = float(data["push"]) * (1.0 + 0.25 * sp()) * battle.z_scale
+			if sym("reparaturwucht"):
+				battle.repair_fence(float(GameData.HEROES["pip"]["repair"]) * 0.6, 0.0)
 			var eid := target.get_instance_id()
 			var travel := from.distance_to(target.aim_point()) / 30.0
 			get_tree().create_timer(travel, false).timeout.connect(func() -> void:
@@ -396,7 +434,7 @@ func _fire(target: Enemy) -> void:
 					e.knockback(push))
 		"gravity":
 			# Schwerkraftfeld am Ziel: zieht die Gegner dort zusammen und bremst sie
-			var r: float = float(data["radius"]) * (1.0 + 0.2 * int(mods["special"]))
+			var r: float = float(data["radius"]) * (1.0 + 0.2 * sp())
 			battle.fire_bullet(from, target, 0.0, false, ammo_type, 0, 32.0, 1.0)
 			var eid2 := target.get_instance_id()
 			var travel2 := from.distance_to(target.aim_point()) / 32.0
@@ -404,6 +442,10 @@ func _fire(target: Enemy) -> void:
 				var e := instance_from_id(eid2) as Enemy
 				if battle and e and e.alive:
 					battle.gravity_well(e.global_position, r, dmg, crit, ammo_type, 0.5, 0.35, 1.2))
+	# Meisterfähigkeit „Doppelschuss“: jeder 3. Schuss trifft zusätzlich einen zweiten Gegner
+	if meister("rate") and _shot_n % 3 == 0 and not ult_active():
+		for other in battle.spread_targets(1, target):
+			battle.fire_bullet(from, other, maxf(dmg, damage()) * 0.8, false, ammo_type, 0, 34.0, 0.8)
 	battle.shot_style = ""
 	_recoil = 1.0
 	_flash_t = 0.0 if FxSprite.has(style + "_muendung") else 0.06

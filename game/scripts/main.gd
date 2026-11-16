@@ -259,6 +259,9 @@ func _parse_args() -> void:
 			Battle.fx_test = "bilder"
 		elif arg == "--fx-bisher":
 			Battle.fx_test = "bisher"
+		elif arg == "--karten-neu" or arg.begins_with("--karten-neu="):
+			# Neues Kartensystem im Balance-Labor (CardRules), optional nur einzelne Teile
+			CardRules.enable(arg.get_slice("=", 1) if arg.contains("=") else "")
 		elif arg == "--neue-monster":
 			Models.test_new = true   # noch nicht freigegebene Gegnermodelle zeigen (Prüfbilder)
 		elif arg == "--mp":
@@ -985,12 +988,16 @@ func _auto_choose(cards: Array) -> Dictionary:
 			score = 7.0 if starving else 3.5
 		elif c["kind"] == "station":
 			score = 9.0 if battle.fence_hp < battle.fence_max * 0.5 else 1.0
+		elif c["kind"] == "symbiosis":
+			score = 8.0
 		elif key.ends_with(":ult"):
 			score = 6.5 if int(c["stars"]) == 0 else 4.0
 		elif key.ends_with(":damage") or key.ends_with(":special"):
 			score = 5.0
 		elif key.ends_with(":rate"):
 			score = 4.0
+		if CardRules.has("meister") and c["kind"] == "hero" and not key.ends_with(":ult") and int(c["stars"]) == CardRules.MEISTER_LEVEL - 1:
+			score += 1.5   # Meisterfähigkeit fertig machen
 		score += randf()
 		if score > best_score:
 			best_score = score
@@ -1014,7 +1021,8 @@ func _on_card_picked(card: Dictionary) -> void:
 
 func _roll_cards(n: int) -> Array:
 	var pool: Array = []
-	if battle.heroes.size() < Battle.MAX_HEROES:
+	var heroes_ok := not CardRules.has("held5") or _card_wave >= CardRules.HERO_FROM_WAVE
+	if battle.heroes.size() < Battle.MAX_HEROES and heroes_ok:
 		for id in Save.squad():
 			if not battle.has_hero(id):
 				pool.append(_card_add_hero(id))
@@ -1022,6 +1030,8 @@ func _roll_cards(n: int) -> Array:
 		pool.append_array(_hero_cards(h))
 	pool.append_array(_machine_cards())
 	pool.append(_card_repair())
+	if CardRules.has("symbiose"):
+		pool.append_array(_symbiosis_cards())
 	pool = pool.filter(func(c: Dictionary) -> bool: return int(c["stars"]) < int(c["max"]) and bool(c.get("available", true)))
 	var picked: Array = []
 	var has_add := false
@@ -1094,6 +1104,18 @@ func _hero_cards(h: Hero) -> Array:
 	var ult_desc := "SUPERFÄHIGKEIT: %s\nTippe danach auf %s, um sie auszulösen." % [ult[1], String(d["name"]).split(" ")[0]]
 	if h.ult_level() > 0:
 		ult_desc = "%s stärker, länger und schneller wieder bereit." % ult[0]
+	if CardRules.has("meister"):
+		# Waffenfähigkeiten höchstens Stufe 3, die dritte Stufe macht sie zur Meisterfähigkeit
+		for s in stats:
+			s[3] = CardRules.MEISTER_LEVEL
+			if int(h.mods[s[0]]) == CardRules.MEISTER_LEVEL - 1:
+				var m: Array = CardRules.MEISTER[s[0]]
+				s[2] = "%s\nMeisterfähigkeit: %s" % [s[2], m[1]]
+	if CardRules.has("plaetze"):
+		# höchstens 3 verschiedene Waffenfähigkeiten je Champion
+		var taken: Array = CardRules.WEAPON_MODS.filter(func(m: String) -> bool: return int(h.mods[m]) > 0)
+		if taken.size() >= CardRules.SLOTS:
+			stats = stats.filter(func(s: Array) -> bool: return s[0] in taken)
 	stats.append(["ult", ult[0], ult_desc, Hero.ULT_MAX])
 	for s in stats:
 		var mod: String = s[0]
@@ -1111,6 +1133,27 @@ func _apply_hero_mod(h: Hero, mod: String) -> void:
 	h.mods[mod] = int(h.mods[mod]) + 1
 	if mod == "ult" and h.mods[mod] == 1:
 		hud.show_banner("Tippe auf %s: %s!" % [String(h.data["name"]).split(" ")[0], Hero.ULTS[h.family()][0]])
+
+
+## Symbiose-Karten: zwei Champions im Team, beide mit ihrer Spezialfähigkeit (CardRules.SYMBIOSES)
+func _symbiosis_cards() -> Array:
+	var list: Array = []
+	var fam := {}
+	for h in battle.heroes:
+		fam[h.family()] = h
+	for id in CardRules.SYMBIOSES:
+		var s: Dictionary = CardRules.SYMBIOSES[id]
+		if not (fam.has(s["a"]) and fam.has(s["b"])):
+			continue
+		if int(fam[s["a"]].mods["special"]) < 1 or int(fam[s["b"]].mods["special"]) < 1:
+			continue
+		list.append({
+			"key": "sym:" + id, "kind": "symbiosis", "target": "Symbiose", "color": Color("7cf2c2"),
+			"title": s["title"], "desc": s["desc"], "stars": 1 if battle.symbioses.has(id) else 0, "max": 1,
+			"emblem": "∞", "weight": 3.0, "heroes": [fam[s["a"]].id, fam[s["b"]].id],
+			"apply": func() -> void: battle.symbioses[id] = true,
+		})
+	return list
 
 
 func _machine_cards() -> Array:

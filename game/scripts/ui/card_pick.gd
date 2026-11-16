@@ -18,6 +18,7 @@ const CATS := {
 	"super": ["SUPER", Color("ffab52"), "star"],
 	"champion": ["CHAMPION", Color("dfa0fc"), "crown"],
 	"schild": ["SCHILD", Color("8ff04d"), "shield"],
+	"symbiose": ["SYMBIOSE", Color("7cf2c2"), "spark"],
 }
 const GOLD := Color("ffd367")
 const GREEN := Color("8ff04d")
@@ -135,6 +136,8 @@ func face(c: Dictionary) -> Dictionary:
 				f["text"] = "%s Danach %s antippen." % [ult[1], first] if f["stars"] == 0 else "%s wird stärker, länger und schneller wieder bereit." % ult[0]
 		"station":
 			f["cat"] = "schild"
+		"symbiosis":
+			f["cat"] = "symbiose"
 		_:
 			f["cat"] = "plasma"
 			f["short"] = SHORT.get(key, f["title"])

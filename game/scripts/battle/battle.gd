@@ -39,6 +39,8 @@ var ammo: AmmoStore
 var overdrive_left := 0.0
 ## Karte „+2 Schuss“: zusätzliche Schüsse im Magazin für alle Helden
 var team_mag := 0
+## Symbiosen, die in diesem Kampf gewählt wurden (CardRules.SYMBIOSES)
+var symbioses := {}
 var camera: Camera3D
 var enemies: Array[Enemy] = []
 var heroes: Array[Hero] = []
@@ -201,6 +203,7 @@ func setup(level_: int, ammo_: AmmoStore) -> void:
 	_mp_boss_done = false
 	overdrive_left = 0.0
 	team_mag = 0
+	symbioses = {}
 	elapsed = 0.0
 	hero_wait_time = 0.0
 	hero_time = 0.0
@@ -587,10 +590,11 @@ func fire_rocket(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type
 	p.launch(self, "rocket", from, target, dmg, crit, ammo_type, 11.0, 1.0)
 
 
-func fire_chain(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type: String, jumps: int, color := Color(0, 0, 0, 0)) -> void:
+func fire_chain(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type: String, jumps: int, color := Color(0, 0, 0, 0), boom := 0.0) -> void:
 	var hit: Array[Enemy] = [target]
 	var points: Array[Vector3] = [from, target.aim_point()]
 	var current := target
+	var boom_at: Array[Vector3] = [target.global_position]
 	apply_hit(target, dmg, crit, ammo_type)
 	var d := dmg
 	for i in jumps:
@@ -600,8 +604,13 @@ func fire_chain(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type:
 			break
 		hit.append(nxt)
 		points.append(nxt.aim_point())
+		boom_at.append(nxt.global_position)
 		apply_hit(nxt, d, false, ammo_type)
 		current = nxt
+	# Symbiose „Explosiver Kettenblitz“: jeder getroffene Gegner explodiert
+	if boom > 0.0:
+		for p in boom_at:
+			explode(p, boom, dmg * 0.45, false, ammo_type)
 	var col := Color(0.8, 0.5, 1.0)
 	if ammo_type == "fire":
 		col = Color(1.0, 0.5, 0.2)
