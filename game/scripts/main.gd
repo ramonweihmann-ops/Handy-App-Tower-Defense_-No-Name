@@ -278,6 +278,8 @@ func _parse_args() -> void:
 			seed(int(arg.get_slice("=", 1)))
 		elif arg.begins_with("--hpeasy="):
 			GameData.HP_GROWTH_EASY = float(arg.get_slice("=", 1))   # Labor: Lebenszuwachs Level 21–30
+		elif arg.begins_with("--wavegrow="):
+			GameData.WAVE_GROWTH_EASY = float(arg.get_slice("=", 1))   # Labor: Zuwachs je Welle Level 21–30
 		elif arg.begins_with("--boss30="):
 			GameData.BOSS_TUNE_EASY[30] = float(arg.get_slice("=", 1))   # Labor: Boss-Level 30
 		elif arg.begins_with("--hpg="):

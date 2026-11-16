@@ -371,9 +371,11 @@ static var DPS_GROWTH := 1.035
 ## das Leben wächst von Level 20 aus um HP_GROWTH_EASY je Level, der Schaden wie in Level 11–20.
 ## Der Sprung von Phase 2 kommt erst mit Level 31 (EASY_TO + 1); Level 31+ bleiben unverändert.
 const EASY_TO := 30
-static var HP_GROWTH_EASY := 1.12
+static var HP_GROWTH_EASY := 1.10
 ## Boss-Level in diesem Bereich (mehr und gemischtere Wellen): Faktor auf das Leben (Labor 16.11.2026)
 static var BOSS_TUNE_EASY := {30: 0.65}
+## Zuwachs des Gegnerlebens je Welle in Level 21–30 (sonst 4 %): lange Level bleiben auch für Anfänger schaffbar
+static var WAVE_GROWTH_EASY := 0.02
 ## Ab Level 21 (Spiel-Phase 2) ein spürbarer Sprung, danach wächst es im Gleichschritt mit
 ## einem Spieler, der regelmäßig aufwertet (abgestimmt mit dem Balance-Labor, docs/BALANCE.md).
 const PHASE2_FROM := 21
@@ -488,7 +490,8 @@ static func dps_mult(level: int, easy := true) -> float:
 
 
 static func hp_mult(level: int, wave: int) -> float:
-	return level_hp(level) * (1.0 + 0.04 * (wave - 1))
+	var per_wave := WAVE_GROWTH_EASY if level >= PHASE2_FROM and level <= EASY_TO else 0.04
+	return level_hp(level) * (1.0 + per_wave * (wave - 1))
 
 
 ## Zusätzlicher Lebensfaktor für den Boss dieses Levels.
