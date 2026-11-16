@@ -12,8 +12,9 @@ Bitte nacheinander abschicken, jeweils erst den nächsten, wenn der vorige gelie
 | 4b | Fähigkeiten der Champions (19) und fehlende Kartenlogos (4) im neuen Stil | `TALENTE_LOGOS_FUER_CHATGPT.md` | keine | bestätigt am 16.11.2026, kann raus |
 | 5 | 3D-Modelle der Gegner für die Planeten 08–15 (Level 71–150), Planet für Planet | `Monster_Roh/PLANETEN_08_15_MESHY_FUER_CHATGPT.md` | je Planet etwa 60 Meshy-Credits, zusammen etwa 480 | eigene Freigabe je Planet |
 
-| H1 | Champion-Vorlagen (vorn, links, hinten) für elf Champions | `HELDEN_VORLAGEN_MESHY_FUER_CHATGPT.md` Teil A | keine | – |
-| H2 | Meshy-Modelle Fünkchen, Pip, Rollo, Nova | dieselbe Datei, Teil B | etwa 120 Credits, **freigegeben 16.11.2026** | nach H1 |
+| H1 | Champion-Vorlagen (vorn, links, hinten) für elf Champions | `HELDEN_VORLAGEN_MESHY_FUER_CHATGPT.md` Teil A | keine | **geliefert und geprüft 16.11.2026** |
+| H2 | Meshy-Modelle Fünkchen, Pip, Rollo, Nova | dieselbe Datei, Teil B | etwa 120 Credits, **freigegeben 16.11.2026** | abgeschickt 16.11.2026 |
+| H3 | Meshy-Modelle Iska, Brocken, Volta, Kalle, Margot, Lynx, Fritzi | `CHATGPT_PROMPTS.md`, Prompt H3 | etwa 210 Credits, **freigegeben 16.11.2026** | nach H2 |
 
 ## Gemerkt für später (noch kein Auftrag)
 

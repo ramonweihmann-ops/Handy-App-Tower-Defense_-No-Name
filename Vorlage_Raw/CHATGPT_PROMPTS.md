@@ -549,3 +549,47 @@ ABLAGE in Vorlage_Raw/Helden_Roh/<id>_comic_v1/ je Champion:
 - <id>_vorschau_vorn.png, _seite.png, _oben.png, _hinten.png
 - Ergänzung in LIESMICH_CLAUDE.md: verbrauchte Credits, Einstellungen, Dreiecke, gezählte Gliedmaßen, Rigging-Ergebnis
 ~~~~
+
+## Prompt H3: Meshy-Modelle Iska, Brocken, Volta, Kalle, Margot, Lynx, Fritzi
+
+**Kosten:** etwa 210 Meshy-Credits, freigegeben am 16.11.2026 · **Abschicken:** nachdem H2 geliefert ist
+
+~~~~text
+Bitte aus den Vorlagen bei Meshy 3D-Modelle für die sieben übrigen Champions erzeugen, genau wie bei Dusty Jo
+(Vorlage_Raw/Helden_Roh/dusty_jo_comic_v1/LIESMICH_CLAUDE.md) und H2. Repository Handy-App-Tower-Defense_-No-Name,
+Branch claude/amazing-hypatia-yl59v4.
+
+KOSTENRAHMEN: vom Nutzer freigegeben, höchstens 7 Erzeugungen zu je etwa 30 Credits (zusammen etwa 210 Credits).
+Je Champion ein Versuch; wenn er misslingt, melden statt neu erzeugen. Wenn Rigging oder Bewegungen extra kosten,
+vorher melden und nicht ungefragt buchen. Adobe/Mixamo nicht verwenden.
+
+DIE SIEBEN CHAMPIONS (Vorlagen in Vorlage_Raw/Helden_Roh/<id>_comic_v1/, alle Menschen in A-Pose, leere Hände)
+- iska: dunkelblaue Jacke mit türkisen Streifen, langer brauner Pferdeschwanz (hinten gut sichtbar)
+- brocken: gelbe Mütze, weißes Shirt, braune Latzhose mit Gurten, große Handschuhe, kräftige Statur
+- volta: weißer Laborkittel, blonder Haarknoten, türkise Kopfhörer, türkise Hose
+- kalle: dunkle Haare, Hosenträger, olivgrüne Hose, Armband
+- margot: Piratenhut (Dreispitz) mit rotem Band, blauer Mantel mit Goldrand, blonde Haare
+- lynx: rote Haare mit Pferdeschwanz, grüner Schal, olivgrüner Anzug mit Gurten
+- fritzi: orange Mütze, braune Weste mit Werkzeuggurt, blaue Hose
+Für alle: humanoides Auto-Rigging versuchen; scheitert es, das Intelligente Rig (Beta) wie bei Dusty Jo.
+Waffen und gehaltene Geräte NICHT mit erzeugen, die baut Claude als eigene Modelle.
+
+ERZEUGUNG
+- Meshy 7.1 Bild zu 3D mit Multi-View aus den drei Ansichten (vorn, links, hinten), Standardauflösung,
+  Texturen 2K, privat
+- danach die kostenlose 10K-Reduktion speichern (Voraussetzung für das Rigging)
+
+VOR DEM HOCHLADEN PRÜFEN
+- jedes Modell von vorn, von der Seite, von oben und **von hinten** rendern
+- Gliedmaßen zählen: zwei Arme, zwei Beine, Kopf; Hände frei und nicht mit dem Körper verschmolzen
+- Rückseite muss zur Vorlage passen: Pferdeschwänze (Iska, Lynx), Haarknoten (Volta), Hut und Mantel (Margot),
+  Latzhose-Gurte (Brocken), Weste (Fritzi) nicht verschmolzen oder fehlend
+- Hüte und Mützen sitzen fest auf dem Kopf, keine Löcher oder schwebenden Teile
+
+ABLAGE in Vorlage_Raw/Helden_Roh/<id>_comic_v1/ je Champion:
+- <id>_original_statisch.glb (unverändert), <id>_reduziert_statisch.glb (10K)
+- <id>_rig_roh.glb (Ergebnis des Riggings)
+- <id>_vorschau_vorn.png, _seite.png, _oben.png, _hinten.png
+- Ergänzung in LIESMICH_CLAUDE.md: verbrauchte Credits, Einstellungen, Dreiecke, gezählte Gliedmaßen, Rigging-Ergebnis
+Dazu Vorlage_Raw/Helden_Roh/UEBERSICHT_MODELLE_H3.png mit den Hinten-Vorschauen aller sieben nebeneinander.
+~~~~
