@@ -621,7 +621,9 @@ func fire_chain(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type:
 	if color.a > 0.0:
 		col = color
 	var beam := shot_style + "_geschoss"
-	if shot_style != "" and FxSprite.has(beam):
+	if FxSprite.enabled and Fx3D.has(shot_style):
+		Fx3D.lightning(self, points, col if color.a > 0.0 or ammo_type != "normal" else Color(0.45, 0.8, 1.0))
+	elif shot_style != "" and FxSprite.has(beam):
 		for i in points.size() - 1:
 			FxSprite.beam(self, beam, points[i], points[i + 1], 0.2)
 			FxSprite.play(self, shot_style + "_einschlag", points[i + 1], {"speed": 1.6})
@@ -639,7 +641,9 @@ func flame(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type: Stri
 			apply_hit(e, dmg, crit, ammo_type)
 			e.apply_burn(dmg * 0.6 * (1.0 + burn_bonus), 2.5)
 	_flame_tick += 1
-	if FxSprite.has("fritzi_geschoss"):
+	if FxSprite.enabled and Fx3D.has(shot_style):
+		Fx3D.flame_burst(self, from, target.aim_point(), radius)
+	elif FxSprite.has("fritzi_geschoss"):
 		# Brandflinte: je Schuss zwei Feuerkugeln mit Flammenschweif, gestreut über den Kegel; jede zweite
 		# setzt beim Aufschlag ein kleines Feuer (reine Optik, der Schaden ist schon verrechnet)
 		var to := target.aim_point()

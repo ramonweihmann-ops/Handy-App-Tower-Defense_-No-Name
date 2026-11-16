@@ -473,6 +473,11 @@ func _muzzle_fx(style: String, from: Vector3, target: Enemy) -> void:
 	if not FxSprite.has(name):
 		return
 	var d := target.aim_point() - from
+	if FxSprite.enabled and Fx3D.has(style):
+		# neue räumliche Schüsse: Brocken Rückstoß-Rauch, Volta und Fritzi zeichnen ihren Effekt selbst
+		if style == "brocken":
+			Fx3D.rocket_launch(battle, from, d)
+		return
 	if style == "brocken":
 		d = -d
 	FxSprite.play(battle, name, from, {"dir": d, "speed": 2.4, "scale": 0.8})

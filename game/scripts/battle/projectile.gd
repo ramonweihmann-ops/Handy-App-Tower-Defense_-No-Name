@@ -25,6 +25,9 @@ const BEAM_STYLES := ["fuenkchen"]
 ## Diese Helden bekommen statt der (zu feinen) Bildfolge eine kräftige Leuchtspur, die mit dem Tempo länger wird
 const TRACER_STYLES := ["iska"]
 var _sprite: FxSprite
+## Rauchfahne der 3D-Rakete (Fx3D), wird beim Einschlag stehen gelassen
+var _smoke: CPUParticles3D
+var _t := 0.0
 var _tracer: Node3D
 var _tracer_len := 1.0
 
@@ -51,6 +54,10 @@ func launch(battle_: Battle, kind_: String, from: Vector3, target_: Enemy, dmg_:
 	var col: Color = AMMO_COLORS.get(ammo_type, AMMO_COLORS["normal"])
 	if style in TRACER_STYLES and FxSprite.enabled:
 		_make_tracer(col)
+		return
+	if kind == "rocket" and FxSprite.enabled and Fx3D.has(style):
+		_arc = clampf(_length * 0.12, 0.6, 2.5)
+		_smoke = Fx3D.build_rocket(self)
 		return
 	if style != "" and FxSprite.has(style + "_geschoss"):
 		if not style in BEAM_STYLES:
@@ -95,6 +102,9 @@ func launch(battle_: Battle, kind_: String, from: Vector3, target_: Enemy, dmg_:
 
 
 func _process(delta: float) -> void:
+	_t += delta
+	if _smoke:
+		Fx3D.rocket_tick(self, _t)
 	if is_instance_valid(target) and target.alive:
 		_last_target = target.aim_point()
 	_s += speed * delta / _length
@@ -140,6 +150,9 @@ func _make_tracer(col: Color) -> void:
 
 
 func _impact() -> void:
+	if _smoke:
+		Fx3D.release_smoke(_smoke, battle)
+		_smoke = null
 	if kind != "rocket" and style != "" and style != "nova":
 		FxSprite.play(battle, style + "_einschlag", _last_target, {"speed": 1.5})
 	if kind == "rocket":

@@ -246,6 +246,11 @@ func _parse_args() -> void:
 			ms.set("kinds", spec.get_slice(":", 0).split(","))
 			ms.set("out_dir", spec.get_slice(":", 1))
 			add_child.call_deferred(ms)
+		elif arg.begins_with("--shot-show="):
+			var ss: Node = load("res://tests/shot_show.gd").new()
+			ss.set("main", self)
+			ss.set("out_dir", arg.get_slice("=", 1))
+			add_child.call_deferred(ss)
 		elif arg.begins_with("--fx-show="):
 			var fs: Node = load("res://tests/fx_show.gd").new()
 			var spec := arg.get_slice("=", 1)
