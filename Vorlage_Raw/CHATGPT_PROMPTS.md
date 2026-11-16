@@ -32,8 +32,8 @@ Flügel, mehr Glanz, größere Krone. Man muss die Rangfolge auf einen Blick erk
 | `liga_bronze.png` | Bronze | Kupfer-Orange (#e8964a / #a8561a) | einfaches, rundliches Schild mit einem Stern in der Mitte |
 | `liga_silber.png` | Silber | Silber (#e6eaee / #8d949c) | Schild mit Stern, links und rechts kleine Flügelansätze |
 | `liga_gold.png` | Gold | Gold (#ffe27a / #c8901a) | Schild mit Stern, zwei Flügel, kleine Krone oben |
-| `liga_kristall.png` | Kristall | Violett (#b48cff / #5a3fd8) | Schild aus Kristall mit Kristallzacken als Flügeln und Krone, leichtes Funkeln |
-| `liga_sternen.png` | Sternen | Himmelblau (#8fe8ff / #2a8ad8) | Schild mit Kranz aus kleinen Sternen, große Flügel, Krone |
+| `liga_diamant.png` | Diamant | Eisblau (#8fe8ff / #2a8ad8) | Schild mit großem geschliffenem Diamanten in der Mitte, Flügel, Krone, Funkeln |
+| `liga_kristall.png` | Kristall | Violett (#b48cff / #5a3fd8) | Schild aus Kristall mit großen Kristallzacken als Flügeln, Krone mit Edelstein, starkes Funkeln (prächtiger als Diamant) |
 | `liga_galaxie.png` | Galaxie | Pink-Magenta (#ff9fe0 / #c2508f) | Schild mit Spiralgalaxie in der Mitte, große prächtige Flügel, Krone mit Edelstein |
 | `liga_legende.png` | Legende | Gold mit Regenbogenschimmer | das prächtigste: Krone über einem Planeten mit Ring, goldene Flügel, Strahlenkranz |
 
@@ -54,7 +54,7 @@ komplett durchsichtig** (ein Kreis mit etwa 62 % des Bilddurchmessers), damit da
 
 | Datei | Motiv |
 |---|---|
-| `rahmen_bronze.png` … `rahmen_galaxie.png` (6 Dateien) | Ring in der Farbe der Liga, mit dem Schmuck des Liga-Abzeichens (Stern, Flügel, Krone) |
+| `rahmen_bronze.png`, `rahmen_silber.png`, `rahmen_gold.png`, `rahmen_diamant.png`, `rahmen_kristall.png`, `rahmen_galaxie.png` (6 Dateien) | Ring in der Farbe der Liga, mit dem Schmuck des Liga-Abzeichens (Stern, Flügel, Krone) |
 | `rahmen_legende.png` | Ring wie das Legende-Abzeichen, mit Strahlenkranz |
 | `rahmen_platz1.png` | goldener Ring mit großer Krone oben und Lorbeerkranz, für den Besten der Weltrangliste |
 | `rahmen_top10.png` | silber-goldener Ring mit kleiner Krone, für die Top 10 |
@@ -69,8 +69,8 @@ komplett durchsichtig** (ein Kreis mit etwa 62 % des Bilddurchmessers), damit da
 | `medaille_3min.png` | runde Medaille mit Stoppuhr-Motiv, Bronze | 512 × 512 |
 | `medaille_6min.png` | dieselbe in Silber | 512 × 512 |
 | `medaille_9min.png` | dieselbe in Gold | 512 × 512 |
-| `medaille_12min.png` | dieselbe in Kristall-Violett | 512 × 512 |
-| `medaille_15min.png` | dieselbe in Sternen-Blau | 512 × 512 |
+| `medaille_12min.png` | dieselbe in Diamant-Eisblau | 512 × 512 |
+| `medaille_15min.png` | dieselbe in Kristall-Violett | 512 × 512 |
 | `medaille_20min.png` | dieselbe in Galaxie-Pink mit Flammenkranz, die prächtigste | 512 × 512 |
 
 Die Medaillen sind wie die Liga-Abzeichen eine Familie: gleiche Form, von Stufe zu Stufe prächtiger.
@@ -98,6 +98,30 @@ Branch `claude/amazing-hypatia-yl59v4`:
 4. `BILDANWEISUNG.txt`: die verwendeten Bildprompts
 
 Nur die eingebaute Bildgenerierung im bestehenden Konto verwenden, keine weiteren kostenpflichtigen Dienste.
+~~~~
+
+## Prompt 1b: Nachtrag zu Prompt 1 (Liganamen geändert)
+
+**Abschicken:** sofort hinterher, weil ChatGPT schon an Prompt 1 arbeitet
+
+~~~~text
+Nachtrag zum Auftrag „Ranglisten, Ligen …“ – bitte vor dem Abschluss noch berücksichtigen:
+
+Die Ligen heißen jetzt (von unten nach oben): Bronze, Silber, Gold, Diamant, Kristall, Galaxie, Legende.
+Die Sternen-Liga entfällt. Dadurch ändern sich vier Bilder:
+
+1. liga_sternen.png entfällt. Neu: liga_diamant.png (4. Liga) – Eisblau (#8fe8ff / #2a8ad8), Schild mit großem
+   geschliffenem Diamanten in der Mitte, Flügel, Krone, Funkeln.
+2. liga_kristall.png ist jetzt die 5. Liga, also eine Stufe über Diamant: Violett (#b48cff / #5a3fd8), Schild aus
+   Kristall mit großen Kristallzacken als Flügeln, Krone mit Edelstein, starkes Funkeln. Muss sichtbar prächtiger
+   sein als Diamant und etwas schlichter als Galaxie.
+3. rahmen_sternen.png entfällt. Neu: rahmen_diamant.png (eisblau, mit Diamant-Schmuck). rahmen_kristall.png im Stil
+   des neuen Kristall-Abzeichens.
+4. Medaillen: medaille_12min.png in Diamant-Eisblau, medaille_15min.png in Kristall-Violett.
+
+Die Rangfolge muss auf einen Blick erkennbar bleiben: Bronze < Silber < Gold < Diamant < Kristall < Galaxie < Legende.
+Alles andere bleibt wie im Auftrag. Die Übersicht und LIESMICH_CLAUDE.md bitte entsprechend anpassen.
+Der aktualisierte Auftrag liegt auf GitHub unter Vorlage_Raw/RANGLISTEN_FUER_CHATGPT.md.
 ~~~~
 
 ## Prompt 2: Brücken der Planeten 06–15 neu gestalten

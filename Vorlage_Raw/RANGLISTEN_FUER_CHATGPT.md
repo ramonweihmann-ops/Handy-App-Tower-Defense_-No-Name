@@ -3,7 +3,7 @@
 **Reihenfolge:** Auftrag 1 von 5 (Übersicht in `Vorlage_Raw/AUFTRAEGE_REIHENFOLGE.md`).
 **Kosten: keine.** Nur die eingebaute Bildgenerierung im bestehenden Konto, keine weiteren Dienste.
 
-## Für uns: Ligen-Vorschlag (vom Nutzer am 16.11.2026 bestätigt)
+## Für uns: Ligen-Vorschlag (vom Nutzer am 16.11.2026 bestätigt; Namen danach geändert: Diamant 4., Kristall 5., Sternen entfällt)
 
 Die sechs Ligen im Spiel bleiben, mit gleichen Farben und gleichen Pokalgrenzen (`game/scripts/mp_data.gd`). Neu sind
 drei Stufen je Liga und eine siebte Liga ganz oben. So gibt es öfter einen kleinen Aufstieg, und die besten Spieler
@@ -14,8 +14,8 @@ haben eine eigene Bühne.
 | Bronze | III · II · I | 0 / 130 / 260 | Kupfer-Orange | einfaches Schild mit einem Stern |
 | Silber | III · II · I | 400 / 600 / 800 | Silber | Schild mit Flügelansatz |
 | Gold | III · II · I | 1.000 / 1.270 / 1.540 | Gold | Schild mit zwei Flügeln und Krone |
-| Kristall | III · II · I | 1.800 / 2.130 / 2.460 | Violett | Kristallschild mit Kristallzacken |
-| Sternen | III · II · I | 2.800 / 3.200 / 3.600 | Himmelblau | Schild mit Sternenkranz |
+| Diamant | III · II · I | 1.800 / 2.130 / 2.460 | Eisblau | Schild mit geschliffenem Diamanten, Flügel, Krone |
+| Kristall | III · II · I | 2.800 / 3.200 / 3.600 | Violett | Kristallschild mit Kristallzacken als großen Flügeln, Krone mit Edelstein |
 | Galaxie | III · II · I | 4.000 / 4.500 / 5.000 | Pink-Magenta | Schild mit Spiralgalaxie und großen Flügeln |
 | **Legende** (neu) | keine, dafür Platz in der Weltrangliste | 5.500 | Gold-Regenbogen | Krone über einem Planeten mit Ring, prächtigste Form |
 
@@ -57,8 +57,8 @@ Flügel, mehr Glanz, größere Krone. Man muss die Rangfolge auf einen Blick erk
 | `liga_bronze.png` | Bronze | Kupfer-Orange (#e8964a / #a8561a) | einfaches, rundliches Schild mit einem Stern in der Mitte |
 | `liga_silber.png` | Silber | Silber (#e6eaee / #8d949c) | Schild mit Stern, links und rechts kleine Flügelansätze |
 | `liga_gold.png` | Gold | Gold (#ffe27a / #c8901a) | Schild mit Stern, zwei Flügel, kleine Krone oben |
-| `liga_kristall.png` | Kristall | Violett (#b48cff / #5a3fd8) | Schild aus Kristall mit Kristallzacken als Flügeln und Krone, leichtes Funkeln |
-| `liga_sternen.png` | Sternen | Himmelblau (#8fe8ff / #2a8ad8) | Schild mit Kranz aus kleinen Sternen, große Flügel, Krone |
+| `liga_diamant.png` | Diamant | Eisblau (#8fe8ff / #2a8ad8) | Schild mit großem geschliffenem Diamanten in der Mitte, Flügel, Krone, Funkeln |
+| `liga_kristall.png` | Kristall | Violett (#b48cff / #5a3fd8) | Schild aus Kristall mit großen Kristallzacken als Flügeln, Krone mit Edelstein, starkes Funkeln (prächtiger als Diamant) |
 | `liga_galaxie.png` | Galaxie | Pink-Magenta (#ff9fe0 / #c2508f) | Schild mit Spiralgalaxie in der Mitte, große prächtige Flügel, Krone mit Edelstein |
 | `liga_legende.png` | Legende | Gold mit Regenbogenschimmer | das prächtigste: Krone über einem Planeten mit Ring, goldene Flügel, Strahlenkranz |
 
@@ -79,7 +79,7 @@ komplett durchsichtig** (ein Kreis mit etwa 62 % des Bilddurchmessers), damit da
 
 | Datei | Motiv |
 |---|---|
-| `rahmen_bronze.png` … `rahmen_galaxie.png` (6 Dateien) | Ring in der Farbe der Liga, mit dem Schmuck des Liga-Abzeichens (Stern, Flügel, Krone) |
+| `rahmen_bronze.png`, `rahmen_silber.png`, `rahmen_gold.png`, `rahmen_diamant.png`, `rahmen_kristall.png`, `rahmen_galaxie.png` (6 Dateien) | Ring in der Farbe der Liga, mit dem Schmuck des Liga-Abzeichens (Stern, Flügel, Krone) |
 | `rahmen_legende.png` | Ring wie das Legende-Abzeichen, mit Strahlenkranz |
 | `rahmen_platz1.png` | goldener Ring mit großer Krone oben und Lorbeerkranz, für den Besten der Weltrangliste |
 | `rahmen_top10.png` | silber-goldener Ring mit kleiner Krone, für die Top 10 |
@@ -94,8 +94,8 @@ komplett durchsichtig** (ein Kreis mit etwa 62 % des Bilddurchmessers), damit da
 | `medaille_3min.png` | runde Medaille mit Stoppuhr-Motiv, Bronze | 512 × 512 |
 | `medaille_6min.png` | dieselbe in Silber | 512 × 512 |
 | `medaille_9min.png` | dieselbe in Gold | 512 × 512 |
-| `medaille_12min.png` | dieselbe in Kristall-Violett | 512 × 512 |
-| `medaille_15min.png` | dieselbe in Sternen-Blau | 512 × 512 |
+| `medaille_12min.png` | dieselbe in Diamant-Eisblau | 512 × 512 |
+| `medaille_15min.png` | dieselbe in Kristall-Violett | 512 × 512 |
 | `medaille_20min.png` | dieselbe in Galaxie-Pink mit Flammenkranz, die prächtigste | 512 × 512 |
 
 Die Medaillen sind wie die Liga-Abzeichen eine Familie: gleiche Form, von Stufe zu Stufe prächtiger.

@@ -24,34 +24,33 @@ Ziel: vier Kommandanten mit ähnlicher Stärke, kurze Wartezeit, keine unfairen 
 | Wartezeit | Pokale höchstens entfernt | Kampfkraft höchstens entfernt |
 |---|---|---|
 | 0–5 s | ±100 | ±10 % |
-| 5–12 s | ±250 | ±15 % |
-| 12–20 s | ±500 | ±20 % |
-| ab 20 s | freie Plätze füllen Computergegner mit passender Stärke (wie im Pilot) | |
+| 5–10 s | ±250 | ±15 % |
+| 10–15 s | ±500 | ±20 % |
+| ab 15 s | freie Plätze füllen Computergegner mit passender Stärke | |
 
-- Höchstens etwa 20–25 Sekunden Wartezeit. Die Suche zeigt die gefundenen Kommandanten nacheinander (wie jetzt).
+- **Höchstens 15 Sekunden Wartezeit** (Entscheidung 16.11.2026). Die Suche zeigt die gefundenen Kommandanten
+  nacheinander (wie jetzt).
 - Nicht zweimal hintereinander dieselben Gegner.
-- In Legende und den oberen Galaxie-Stufen wird länger gewartet (bis 40 s), weil dort echte Gegner wichtiger sind.
-- **❓ Computergegner kennzeichnen?** Ehrlicher ist ein kleines Zeichen (z. B. „KI“) am Namen. Ohne Kennzeichnung
-  wirkt es voller, kann aber bei Entdeckung Vertrauen kosten. Empfehlung: kennzeichnen, sobald es genug echte
-  Spieler gibt; im Pilot wie jetzt.
+- **Computergegner** bekommen einen zufälligen Namen aus den Wortlisten und ein zufälliges Spielerbild mit passendem
+  Rahmen. **Keine Kennzeichnung als Computergegner** (Entscheidung 16.11.2026).
 
 **Fairness im Kampf:** Alle vier spielen dieselben Wellen mit demselben Startwert (gleiche Gegner zur gleichen
 Zeit). Gegnerleben richtet sich nach der Kampfkraft der Gruppe, nicht nach der des Einzelnen.
 
-## 2. Ligen und Stufen (bestätigt 16.11.2026)
+## 2. Ligen und Stufen (bestätigt 16.11.2026, Namen geändert: Diamant als 4., Kristall als 5. Liga)
 
 | Liga | Stufen (III · II · I) ab Pokalen | Farbe |
 |---|---|---|
 | Bronze | 0 · 130 · 260 | Kupfer |
 | Silber | 400 · 600 · 800 | Silber |
 | Gold | 1.000 · 1.270 · 1.540 | Gold |
-| Kristall | 1.800 · 2.130 · 2.460 | Violett |
-| Sternen | 2.800 · 3.200 · 3.600 | Himmelblau |
+| Diamant | 1.800 · 2.130 · 2.460 | Eisblau |
+| Kristall | 2.800 · 3.200 · 3.600 | Violett |
 | Galaxie | 4.000 · 4.500 · 5.000 | Pink |
 | **Legende** | ab 5.500, keine Stufen, dafür Platz in der Weltrangliste | Gold-Regenbogen |
 
-- **❓ Namen:** Der Nutzer schrieb „Bronze, Silber, Gold, Diamant …“. Bisher heißt die vierte Liga **Kristall**
-  (passend zum Weltraum, die Bilder sind so beauftragt). Umbenennen in Diamant? Dann den Bildauftrag anpassen.
+- **Namen (Entscheidung 16.11.2026):** Bronze, Silber, Gold, **Diamant**, **Kristall**, Galaxie, Legende. Die
+  bisherige Sternen-Liga entfällt, damit es bei sieben Ligen bleibt.
 - Pokale je Platz wie im Pilot (`MpData.TROPHIES`), in Legende +25 / +5 / −10 / −25.
 - **Aufstieg** in eine neue Stufe oder Liga wird gefeiert (Abzeichen fliegt ein). **Abstieg** nur innerhalb einer
   Liga; aus einer Liga fällt man erst, wenn man 50 Pokale unter ihre Grenze rutscht (Schutz gegen Hin und Her).
@@ -118,8 +117,7 @@ haben auch Neulinge eine Chance auf Platz 1 ihrer Gruppe. Belohnung am Wochenend
 
 **Kosten:** 1 Energie wie ein Abenteuer-Level (❓ oder 3 Versuche am Tag frei?).
 
-**❓ Geld:** Überlebenspunkte kaufbar? Empfehlung: nein, damit die Rangliste glaubwürdig bleibt; kaufbar nur
-„Zweiter Atem“-Ladungen oder ein Pass mit mehr Punkten je Minute (+25 %).
+**Geld (Entscheidung 16.11.2026):** Überlebenspunkte sind **nicht kaufbar**, damit die Rangliste glaubwürdig bleibt.
 
 ## 5. Server und Kosten
 
@@ -153,8 +151,10 @@ etwa 10–15 W, also rund 3–4 € im Monat.
 - Betrieb: Linux (z. B. Ubuntu Server) oder Windows mit Docker; Server-Programm und Datenbank als Container.
 - Erreichbarkeit über Cloudflare Tunnel (kostenlos, kein offener Port, feste Adresse trotz wechselnder IP).
 - Sicherung: Datenbank nachts verschlüsselt auf einen externen Speicher kopieren.
-- ❓ Upload-Geschwindigkeit des Anschlusses? Für 1.000 Spieler gleichzeitig reichen etwa 2 Mbit/s.
-- ❓ Läuft auf dem Mini-PC schon etwas anderes (z. B. das Webportal)? Dann bekommt das Spiel einen eigenen Container.
+- Anschluss: **49 Mbit/s Upload**, 744 Mbit/s Download. Bei etwa 1 kbit/s je Spieler im Kampf reicht das
+  rechnerisch für über 20.000 Spieler gleichzeitig; praktisch ist bis zu einigen Tausend gut machbar.
+- Auf dem Mini-PC läuft bisher nur ein Worker, belegt sind 10 von 24 GB Arbeitsspeicher. Das Spiel bekommt einen
+  eigenen Container daneben; Server und Datenbank brauchen anfangs unter 1 GB.
 
 **Rechtliches (vor dem Start mit echten Spielern):** Spielernamen und Ergebnisse sind personenbezogene Daten →
 Datenschutzerklärung ergänzen, Löschung auf Wunsch. Für Kinder: keine freien Texte, kein Chat (siehe oben).
