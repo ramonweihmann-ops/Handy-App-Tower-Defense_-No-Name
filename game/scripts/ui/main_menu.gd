@@ -7,6 +7,8 @@ signal play_requested(level: int, hard: bool)
 ## Multiplayer: Gegner sind gefunden, der Kampf soll beginnen
 signal mp_requested(found: MpMatch)
 signal quality_changed
+## Testkarte starten (nur Entwickler): {"level", "wave", "heroes", "god"}
+signal test_requested(cfg: Dictionary)
 
 const MAX_ASPECT := 0.62
 const TABS := [
@@ -35,6 +37,9 @@ var _nav: Dictionary = {}
 var _nav_icons: Dictionary = {}
 var _pill_icons: Dictionary = {}
 var _modal: Control
+## Testkarte: zuletzt gewählte Einstellungen; Tipp-Zähler für den versteckten Entwickler-Schalter
+var _test_cfg := {}
+var _dev_taps := 0
 var _toast: Label
 var _toast_t := 0.0
 var _tick := 0.0
@@ -525,6 +530,84 @@ func open_energy() -> void:
 
 func open_settings() -> void:
 	_open_settings()
+
+
+## Testkarte (nur Entwickler): Level, Welle und bis zu drei Champions wählen; die Welle kommt immer wieder.
+func open_test_map() -> void:
+	if _test_cfg.is_empty():
+		_test_cfg = {"level": Save.max_level(), "wave": 1, "heroes": [Save.squad()[0]], "god": false}
+	var cfg := _test_cfg
+	cfg["level"] = clampi(int(cfg["level"]), 1, GameData.LEVEL_COUNT)
+	var waves := GameData.waves_in_level(int(cfg["level"]))
+	cfg["wave"] = clampi(int(cfg["wave"]), 1, waves)
+	var v := _modal_box("Testkarte")
+	v.add_child(_wrap_left("Nur für Entwickler: Die gewählte Welle kommt immer wieder. Keine Energie, keine Belohnung, kein Fortschritt.", 19, UiKit.C_MUTED))
+	var lvl := int(cfg["level"])
+	v.add_child(_test_stepper("Level %d · %s" % [lvl, GameData.level_name(lvl)], "level", [-10, -1, 1, 10], 1, GameData.LEVEL_COUNT))
+	v.add_child(_test_stepper("Welle %d von %d" % [int(cfg["wave"]), waves], "wave", [-1, 1], 1, waves))
+	var chosen: Array = cfg["heroes"]
+	v.add_child(UiKit.label("Champions (%d/%d)" % [chosen.size(), Battle.MAX_HEROES], 22, UiKit.C_GOLD))
+	var grid := GridContainer.new()
+	grid.columns = 3
+	grid.add_theme_constant_override("h_separation", 8)
+	grid.add_theme_constant_override("v_separation", 8)
+	for id in GameData.HERO_IDS:
+		var hid: String = id
+		var on := chosen.has(hid)
+		var nm := String(GameData.HEROES[hid]["name"])
+		var b := UiKit.button(("✓ " if on else "") + nm, func() -> void:
+			if chosen.has(hid):
+				chosen.erase(hid)
+			elif chosen.size() < Battle.MAX_HEROES:
+				chosen.append(hid)
+			else:
+				toast("Höchstens %d Champions gleichzeitig." % Battle.MAX_HEROES)
+				return
+			open_test_map(), 176)
+		if not on:
+			UiKit.secondary(b)
+		b.add_theme_font_size_override("font_size", 19)
+		grid.add_child(b)
+	v.add_child(grid)
+	var god := bool(cfg["god"])
+	v.add_child(UiKit.secondary(UiKit.button("Station unverwundbar: %s" % ("an" if god else "aus"), func() -> void:
+		cfg["god"] = not god
+		open_test_map(), 420)))
+	var start := UiKit.button("Testkarte starten", func() -> void:
+		if chosen.is_empty():
+			toast("Bitte mindestens einen Champion wählen.")
+			return
+		_close_modal()
+		for b in _boards.duplicate():
+			close_board(b)
+		test_requested.emit(cfg.duplicate(true)), 420)
+	v.add_child(start)
+	v.add_child(UiKit.secondary(UiKit.button("Schließen", _close_modal, 240)))
+
+
+## Zeile mit Text und Knöpfen (−10, −1, +1, +10) für die Testkarte
+func _test_stepper(text: String, key: String, steps: Array, lo: int, hi: int) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 8)
+	for st in steps:
+		var step: int = st
+		if step > 0:
+			continue
+		row.add_child(UiKit.secondary(UiKit.button(str(step), func() -> void:
+			_test_cfg[key] = clampi(int(_test_cfg[key]) + step, lo, hi)
+			open_test_map(), 64)))
+	var l := UiKit.label(text, 21)
+	l.custom_minimum_size = Vector2(250, 0)
+	row.add_child(l)
+	for st in steps:
+		var step: int = st
+		if step < 0:
+			continue
+		row.add_child(UiKit.secondary(UiKit.button("+%d" % step, func() -> void:
+			_test_cfg[key] = clampi(int(_test_cfg[key]) + step, lo, hi)
+			open_test_map(), 64)))
+	return row
 
 
 # --- Bausteine -------------------------------------------------------------------
@@ -1506,7 +1589,18 @@ func _open_settings() -> void:
 	var ver := "Version %s" % (updater.current_name if updater else "?")
 	if updater and updater.current_stamp != "":
 		ver += " · Stand %s" % updater.current_stamp
-	v.add_child(UiKit.label(ver, 20, UiKit.C_MUTED))
+	var ver_label := UiKit.label(ver + ("  ·  Entwickler" if Save.developer else ""), 20, UiKit.C_MUTED)
+	# Versteckt: siebenmal auf die Versionsnummer tippen schaltet die Entwickler-Werkzeuge ein oder aus
+	ver_label.mouse_filter = Control.MOUSE_FILTER_STOP
+	ver_label.gui_input.connect(func(ev: InputEvent) -> void:
+		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+			_dev_taps += 1
+			if _dev_taps >= 7:
+				_dev_taps = 0
+				Save.set_developer(not Save.developer)
+				toast("Entwickler-Werkzeuge: %s" % ("an – Testkarte unter Spielmodi" if Save.developer else "aus"))
+				_open_settings())
+	v.add_child(ver_label)
 	var high: bool = Save.data.get("quality", "hoch") == "hoch"
 	v.add_child(UiKit.secondary(UiKit.button("Grafik: %s" % ("Hoch (Leuchten, Schatten)" if high else "Sparsam"), func() -> void:
 		Save.data["quality"] = "sparsam" if high else "hoch"

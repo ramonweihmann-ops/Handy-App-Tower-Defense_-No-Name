@@ -78,6 +78,8 @@ var _world_container: SubViewportContainer
 var _field_bg: TextureRect
 var _field_fill: TextureRect
 var _menu_shot_t := 0
+## Testkarte (nur Entwickler, Spielmodi): {"level", "wave", "heroes", "god"}; leer = normaler Kampf
+var test_run := {}
 var _side_bg: ColorRect   # Rand neben dem Spielfeld; im Menü verdeckt
 
 
@@ -104,6 +106,8 @@ func _ready() -> void:
 		_tut_stage()
 	elif _autotest and mp:
 		start_mp(level)
+	elif _autotest and not test_run.is_empty():
+		start_test(test_run)
 	elif _autotest:
 		start_level(level)
 	elif _menu_shot != "":
@@ -324,6 +328,10 @@ func _parse_args() -> void:
 			_card_shot = arg.get_slice("=", 1)
 		elif arg.begins_with("--pickshot="):
 			_pick_shot = arg.get_slice("=", 1)
+		elif arg.begins_with("--testkarte="):
+			# Testkarte im automatischen Test: --testkarte=level,welle,held1+held2[,unverwundbar]
+			var tk := arg.get_slice("=", 1).split(",")
+			test_run = {"level": int(tk[0]), "wave": int(tk[1]), "heroes": Array(tk[2].split("+")), "god": tk.size() > 3}
 		elif arg.begins_with("--squad="):
 			# nur mit --profile: feste Heldenauswahl für Prüfbilder, z. B. --squad=iska,fritzi
 			_squad = arg.get_slice("=", 1)
@@ -411,6 +419,7 @@ func _build_layout() -> void:
 	menu.visible = false
 	_overlay.add_child(menu)
 	menu.play_requested.connect(start_level)
+	menu.test_requested.connect(start_test)
 	menu.mp_requested.connect(func(m: MpMatch) -> void: start_mp(0, m))
 	menu.quality_changed.connect(battle.apply_quality)
 
@@ -421,7 +430,7 @@ func _build_layout() -> void:
 	battle.wave_started.connect(func(w: int, total: int) -> void:
 		hud.set_wave(level, w, total)
 		hud.set_next_wave(battle.next_wave_text())
-		if w > 1:
+		if w > 1 and test_run.is_empty():
 			Save.track("waves")
 			# Nach jeder geschafften Welle eine Karte wählen (Mockup „Karte nach der Welle“)
 			pending_levelups += 1
@@ -432,13 +441,18 @@ func _build_layout() -> void:
 				battle.repair_fence(heal, 0.0)
 	)
 	plasma.manual_pulled.connect(func() -> void:
-		Save.track("pulls")
+		if test_run.is_empty():
+			Save.track("pulls")
 		battle.overdrive(OVERDRIVE_TIME)
 		hud.show_banner("Energiekern!")
 		Sfx.play("whoosh", 0.05))
 	battle.fence_changed.connect(hud.set_fence)
 	battle.damage_dealt.connect(hud.add_floater)
 	battle.level_won.connect(_on_level_won)
+	battle.test_round.connect(func(r: int) -> void:
+		hud.show_banner("Welle %d · Durchgang %d" % [battle.wave, r])
+		if _autotest:
+			print("TESTKARTE Durchgang %d, Welle %d, Zeit %.0f s, Station %.0f/%.0f" % [r, battle.wave, battle.elapsed, battle.fence_hp, battle.fence_max]))
 	battle.level_lost.connect(_on_level_lost)
 	hud.pause_pressed.connect(_on_pause)
 	hud.booster_pressed.connect(_use_booster)
@@ -644,6 +658,13 @@ func _process(delta: float) -> void:
 						Save.base()[bid2] = {"level": 2, "stock": 3.0, "time": Time.get_unix_time_from_system()}
 					menu.show_tab(parts[1])
 					menu.open_building(bid2)
+				elif parts.size() > 2 and parts[2].begins_with("board:"):
+					# beliebiges Fenster fürs Bild, z. B. --menushot=bild.png,kampf,board:Spielmodi.dc.html[:test]
+					Save.developer = true
+					menu.show_tab(parts[1])
+					menu.open_board(parts[2].get_slice(":", 1))
+					if parts[2].get_slice_count(":") > 2:
+						menu.open_test_map()
 				elif parts.size() > 2 and parts[2].begins_with("held:"):
 					menu.show_tab(parts[1])
 					HeroLockBoard.hero = parts[2].get_slice(":", 1)
@@ -766,7 +787,14 @@ func start_mp(station := 0, found: MpMatch = null) -> void:
 	_start(lvl, false, true, found)
 
 
+## Testkarte (nur Entwickler): gewählte Champions, eine Welle endlos, ohne Energie, Belohnung und Fortschritt
+func start_test(cfg: Dictionary) -> void:
+	test_run = cfg.duplicate()
+	_start(int(cfg["level"]), false, false)
+
+
 func start_level(n: int, hard_mode := false) -> void:
+	test_run = {}
 	# Erstes Level eines neuen Planeten: vorher einmal „Neuer Planet entdeckt“ (mit Entdecker-Geschenk)
 	if not _autotest and Save.planet_new(n):
 		show_planet(n, func() -> void: _start(n, hard_mode, false))
@@ -790,7 +818,9 @@ func show_planet(n: int, then: Callable) -> void:
 
 
 func _start(n: int, hard_mode: bool, multi: bool, found: MpMatch = null) -> void:
-	if not _autotest and not Save.use_energy(MetaData.ENERGY_COST):
+	if multi:
+		test_run = {}
+	if test_run.is_empty() and not _autotest and not Save.use_energy(MetaData.ENERGY_COST):
 		show_menu()
 		return
 	mp = multi
@@ -817,6 +847,9 @@ func _start(n: int, hard_mode: bool, multi: bool, found: MpMatch = null) -> void
 		battle.setup_mp(n, ammo, _mp_seed)
 	else:
 		battle.setup(n, ammo)
+	if not test_run.is_empty():
+		battle.test_wave = clampi(int(test_run["wave"]), 1, battle.total_waves)
+		battle.test_god = bool(test_run.get("god", false))
 	_set_field(Battlefields.for_mode("mp", n) if mp else Battlefields.for_level(n))
 	battle.hp_scale = 1.5 if hard else 1.0
 	battle.bonus_crit = float(bonus["crit"])
@@ -847,11 +880,25 @@ func _start(n: int, hard_mode: bool, multi: bool, found: MpMatch = null) -> void
 		_booster_cd.append(MetaData.booster_cd(id, Save.booster_level(id)) * 0.5)
 	hud.reset(level, battle.total_waves)
 	hud.set_mp(mp)
-	hud.show_banner("Multiplayer · Station %d" % level if mp else "%d · %s" % [level, GameData.level_name(level)])
+	if not test_run.is_empty():
+		hud.show_banner("Testkarte · Level %d · Welle %d" % [level, battle.test_wave])
+	else:
+		hud.show_banner("Multiplayer · Station %d" % level if mp else "%d · %s" % [level, GameData.level_name(level)])
 	hud.set_boosters(_boosters)
 	hud.set_next_wave(battle.next_wave_text())
 	hud.set_xp(0, xp_needed)
 	hud.set_fence(battle.fence_hp, battle.fence_max)
+	if not test_run.is_empty():
+		# Testkarte: gewählte Champions sofort auf die Station, keine Heldenauswahl
+		_set_screen(null)
+		var first := true
+		for id in test_run["heroes"]:
+			battle.add_hero(str(id), not first)
+			first = false
+		state = "battle"
+		battle.start()
+		plasma.active = true
+		return
 	var options: Array = Save.squad()
 	options.shuffle()
 	if options.size() > 3:
@@ -904,10 +951,11 @@ func _on_hero_picked(id: String) -> void:
 # --- Erfahrung und Karten ---------------------------------------------------
 
 func _on_enemy_killed(e: Enemy, gained: int) -> void:
-	Save.track("kills")
 	plasma.on_kill(e.is_boss())
-	if e.is_boss():
-		Save.track("boss")
+	if test_run.is_empty():
+		Save.track("kills")
+		if e.is_boss():
+			Save.track("boss")
 	_xp_carry += gained * (1.0 + float(bonus.get("xp", 0.0)))
 	var whole := int(floor(_xp_carry))
 	_xp_carry -= whole
@@ -1375,6 +1423,12 @@ func _on_pause() -> void:
 			battle.running = false
 			plasma.active = false
 			_finish_mp(true))))
+	elif not test_run.is_empty():
+		v.add_child(UiKit.secondary(UiKit.button("Testkarte neu starten", func() -> void: start_test(test_run))))
+		v.add_child(UiKit.secondary(UiKit.button("Andere Auswahl", func() -> void:
+			show_menu()
+			menu.open_board("Spielmodi.dc.html")
+			menu.open_test_map())))
 	else:
 		v.add_child(UiKit.secondary(UiKit.button("Level neu starten", func() -> void: start_level(level, hard))))
 		v.add_child(UiKit.secondary(UiKit.button("Zum Menü", show_menu)))
@@ -1402,6 +1456,13 @@ func _on_level_won() -> void:
 
 func _on_level_lost() -> void:
 	plasma.active = false
+	if not test_run.is_empty():
+		# Testkarte: keine Belohnung, kein Fortschritt; gleich wieder zur Auswahl
+		show_menu()
+		menu.open_board("Spielmodi.dc.html")
+		menu.open_test_map()
+		menu.toast("Die Station ist gefallen (Testkarte).")
+		return
 	if mp:
 		_finish_mp(true)
 		return

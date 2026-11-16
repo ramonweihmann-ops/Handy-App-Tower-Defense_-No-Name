@@ -8,6 +8,8 @@ signal fence_changed(hp: float, max_hp: float)
 signal damage_dealt(pos: Vector3, amount: float, crit: bool)
 signal level_won
 signal level_lost
+## Testkarte: die gewählte Welle beginnt von vorn (Durchgang 2, 3, …)
+signal test_round(round: int)
 
 const FENCE_Z := 0.0
 const SPAWN_Z := -27.0
@@ -47,6 +49,10 @@ var heroes: Array[Hero] = []
 var fence_hp := 1000.0
 var fence_max := 1000.0
 var running := false
+## Testkarte (nur Entwickler): diese Welle wiederholt sich endlos; test_god = Station nimmt keinen Schaden
+var test_wave := 0
+var test_god := false
+var test_rounds := 0
 var wave := 0
 var total_waves := 0
 var kills := 0
@@ -184,6 +190,9 @@ func apply_quality() -> void:
 
 func setup(level_: int, ammo_: AmmoStore) -> void:
 	clear()
+	test_wave = 0
+	test_god = false
+	test_rounds = 0
 	# Kampfeffekte: Bildfolgen (Standard) oder die bisherigen einfachen Effekte
 	FxSprite.enabled = fx_style() == "bilder"
 	FxSprite.preload_all()
@@ -244,6 +253,9 @@ func start() -> void:
 	if mode == "mp":
 		_spawn_timer = 0.6
 		return
+	if test_wave > 0:
+		# Testkarte: gleich mit der gewählten Welle beginnen (Leben der Gegner wie in dieser Welle)
+		wave = clampi(test_wave, 1, total_waves) - 1
 	_next_wave()
 
 
@@ -312,6 +324,15 @@ func _update_spawning(delta: float) -> void:
 			_spawn_timer = randf_range(0.45, 0.95) * (1.8 if tier == "stark" else 1.0)
 		return
 	_wave_timer += delta
+	if test_wave > 0:
+		# Testkarte: dieselbe Welle immer wieder, kein Sieg und keine Kartenwahl
+		if enemies.size() <= 2 or _wave_timer > 10.0:
+			test_rounds += 1
+			_spawn_queue.assign(_plan[wave - 1])
+			_spawn_timer = 0.6
+			_wave_timer = 0.0
+			test_round.emit(test_rounds + 1)
+		return
 	if wave < total_waves:
 		if enemies.size() <= 2 or _wave_timer > 10.0:
 			_next_wave()
@@ -352,6 +373,8 @@ func _next_wave() -> void:
 func next_wave_text() -> String:
 	if mode == "mp":
 		return "Boss in Welle %d" % MpData.BOSS_WAVE if wave < MpData.BOSS_WAVE else "Halte bis zum Schluss durch!"
+	if test_wave > 0:
+		return "Testkarte: Welle %d kommt immer wieder" % wave
 	if wave >= total_waves:
 		return "Letzte Welle – halte durch!"
 	var counts := {}
@@ -434,6 +457,9 @@ func on_enemy_died(e: Enemy) -> void:
 
 func damage_fence(amount: float) -> void:
 	if not running or shield_guard > 0.0:
+		return
+	if test_god:
+		_fence_flash = minf(1.0, _fence_flash + amount * 0.02)
 		return
 	fence_hp -= amount
 	_fence_flash = minf(1.0, _fence_flash + amount * 0.02)
