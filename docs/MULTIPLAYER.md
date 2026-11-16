@@ -2,7 +2,7 @@
 
 Stand: Pilot (November 2026). Im Pilot sind die drei anderen Kommandanten **Computergegner**, die wie
 echte Spieler auftreten (Name, Held, Pokale). Das kostet nichts und braucht keinen Server. Zum Release
-sollen echte Spieler gegeneinander antreten, mit Emotes, ohne Chat (braucht einen Server, verursacht
+sollen echte Spieler gegeneinander antreten, ohne Chat und ohne Emotes (Entscheidung 16.11.2026) (braucht einen Server, verursacht
 laufende Kosten; vorher abstimmen).
 
 ## Ablauf

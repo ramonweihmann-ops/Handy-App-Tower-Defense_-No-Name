@@ -72,8 +72,19 @@ Zeit). Gegnerleben richtet sich nach der Kampfkraft der Gruppe, nicht nach der d
 - Eigener Platz immer unten fest sichtbar (wie im Mockup „Rangliste“).
 - **Spielerrahmen:** je Liga ein Rahmen um das Spielerbild, dazu Platz 1 / Top 10 / Top 100. Sie zeigen den Erfolg
   in allen Listen und im Kampf.
-- **Namen:** Das Spiel ist für Kinder ab 6. Deshalb keine frei eintippbaren Namen, sondern **zusammengesetzte
-  Namen aus Wortlisten** (z. B. „Flinker Komet 27“). Kein Chat, nur feste Emotes. ❓ Einverstanden?
+- **Kontoname (Entscheidung 16.11.2026):** Jeder wählt im Profil einen eigenen Namen. Er muss für Kinder ab 6
+  geeignet sein und wird **auf dem Server geprüft**, nicht nur im Spiel:
+  - 3–16 Zeichen, Buchstaben (auch Umlaute), Ziffern, Leerzeichen, Bindestrich; keine Sonderzeichen-Ketten
+  - Sperrliste (Schimpfwörter, Beleidigungen, Gewalt, Drogen, Erwachsenes, extremistische Begriffe; deutsch und
+    englisch, auch mit Ziffern statt Buchstaben wie „4“ für „a“)
+  - keine persönlichen Daten: keine Telefonnummern, E-Mail-Adressen, Internetadressen, Ortsangaben mit Hausnummer
+  - keine Namen, die wie das Spiel oder ein Mitarbeiter wirken („Admin“, „Support“, „Moderator“ …)
+  - abgelehnte Namen mit freundlichem Hinweis („Dieser Name geht leider nicht. Probier einen anderen!“)
+  - Wer noch keinen Namen gewählt hat, bekommt einen zufälligen aus Wortlisten (z. B. „Flinker Komet 27“).
+  - Namen ändern: der erste Wechsel frei, danach höchstens einmal in 30 Tagen.
+  - Melden: Andere Spieler können einen Namen in der Rangliste melden; nach mehreren Meldungen wird er bis zur
+    Prüfung durch einen zufälligen Namen ersetzt.
+- **Kein Chat und keine Emotes** (Entscheidung 16.11.2026).
 
 ## 4. Überleben (endloses Level)
 
@@ -97,7 +108,7 @@ Kurz vor jeder Stufe eine Ansage („In 10 Sekunden: Stufe 4!“). Zeitmedaillen
 **Wege, sich zu verbessern** (damit man immer weiterkommen kann und die Rangliste spannend bleibt):
 1. **Im Lauf:** Kartenwahl nach jeder Minute (wie nach jeder Welle), Champions kommen dazu (ab der 3. Minute,
    passend zu „Held ab Welle 5“), Meisterfähigkeiten und Symbiosen zählen hier besonders.
-2. **Überlebenspunkte (neu, nur für diesen Modus):** Jede überlebte Minute, jeder Boss und jede Medaille bringt
+2. **Sternensplitter (neu, nur für diesen Modus, Name vom Nutzer gewählt 16.11.2026):** Jede überlebte Minute, jeder Boss und jede Medaille bringt
    Punkte. Sie werden in der **Überlebens-Werkstatt** ausgegeben und wirken **nur im Modus Überleben**:
 
    | Verbesserung | Stufen | Wirkung je Stufe |
@@ -109,15 +120,16 @@ Kurz vor jeder Stufe eine Ansage („In 10 Sekunden: Stufe 4!“). Zeitmedaillen
    | Startkarte | 3 | 1 / 2 / 3 Karten schon zu Beginn |
    | Bossjäger | 5 | +6 % Schaden gegen Bosse |
 
-   Preise steigen je Stufe. ❓ Name: „Überlebenspunkte“ oder etwas Bildhaftes (z. B. „Sternsplitter“)?
+   Preise steigen je Stufe.
 3. **Allgemein:** Heldenstufen und Upgrades aus dem Abenteuer zählen mit.
 
 **Fairness der Rangliste:** Die Wochenliste vergleicht nur Spieler mit ähnlicher Kampfkraft (Gruppen zu 50). So
 haben auch Neulinge eine Chance auf Platz 1 ihrer Gruppe. Belohnung am Wochenende nach Platz in der Gruppe.
 
-**Kosten:** 1 Energie wie ein Abenteuer-Level (❓ oder 3 Versuche am Tag frei?).
+**Kosten (Entscheidung 16.11.2026):** **2 Läufe am Tag frei.** Danach kostet ein Lauf Energie wie ein Kampf im
+Abenteuer (5 Energie); Energie lädt wie immer nach oder wird gekauft.
 
-**Geld (Entscheidung 16.11.2026):** Überlebenspunkte sind **nicht kaufbar**, damit die Rangliste glaubwürdig bleibt.
+**Geld (Entscheidung 16.11.2026):** Sternensplitter sind **nicht kaufbar**, damit die Rangliste glaubwürdig bleibt.
 
 ## 5. Server und Kosten
 
