@@ -88,3 +88,15 @@ er in jedem zweiten Kampf. Die Profile liegen klar getrennt: Aufwerten lohnt sic
 | Zahlend | 64 % | 17 % | 13 % | 6 % | 1,60 |
 
 Rangregel: in 12.105 Fällen „zuerst gefallen und am wenigsten besiegt“ immer Letzter, keine verletzten Paare.
+
+## Nächste Überarbeitung (Wunsch des Nutzers, 16.11.2026)
+
+Mehrspieler und Ranglisten begeistern die Spieler am meisten („Wer ist der Beste?“), hier wird das Geld
+ausgegeben. Deshalb wird das ganze Konzept als Nächstes überarbeitet, erst als Mockup und Konzept, dann gebaut:
+
+- **Mehrspieler und Ranglisten** ansprechend und sauber machen, vor allem die Gegnersuche: faire Gegner nach
+  Stärke, kurze Wartezeit, keine unfairen Paarungen
+- **Überleben (endloses Level) mit eigener Rangliste:** Gezeigt wird, wer am längsten durchhält. Zu festen Zeitpunkten
+  (3 min, 6 min …) zieht die Schwierigkeit an. Es muss immer Wege geben, sich zu verbessern und weiterzukommen, damit
+  die Rangliste spannend bleibt.
+- Leitlinie Balancing: Bis Level 30 spielen die Spieler ganz entspannt (erst binden), danach darf es anziehen.
