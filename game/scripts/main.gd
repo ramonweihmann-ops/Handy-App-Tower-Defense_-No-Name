@@ -262,6 +262,8 @@ func _parse_args() -> void:
 		elif arg == "--karten-neu" or arg.begins_with("--karten-neu="):
 			# Neues Kartensystem im Balance-Labor (CardRules), optional nur einzelne Teile
 			CardRules.enable(arg.get_slice("=", 1) if arg.contains("=") else "")
+		elif arg.begins_with("--solo-hp="):
+			CardRules.SOLO_HP = float(arg.get_slice("=", 1))   # Labor: Gegnerleben Welle 1–5 allein
 		elif arg == "--neue-monster":
 			Models.test_new = true   # noch nicht freigegebene Gegnermodelle zeigen (Prüfbilder)
 		elif arg == "--mp":
@@ -1145,12 +1147,13 @@ func _symbiosis_cards() -> Array:
 		var s: Dictionary = CardRules.SYMBIOSES[id]
 		if not (fam.has(s["a"]) and fam.has(s["b"])):
 			continue
-		if int(fam[s["a"]].mods["special"]) < 1 or int(fam[s["b"]].mods["special"]) < 1:
+		# es reicht, wenn einer der beiden seine Spezialfähigkeit hat (Entscheidung 16.11.2026)
+		if int(fam[s["a"]].mods["special"]) < 1 and int(fam[s["b"]].mods["special"]) < 1:
 			continue
 		list.append({
 			"key": "sym:" + id, "kind": "symbiosis", "target": "Symbiose", "color": Color("7cf2c2"),
 			"title": s["title"], "desc": s["desc"], "stars": 1 if battle.symbioses.has(id) else 0, "max": 1,
-			"emblem": "∞", "weight": 3.0, "heroes": [fam[s["a"]].id, fam[s["b"]].id],
+			"emblem": "∞", "weight": 6.0, "heroes": [fam[s["a"]].id, fam[s["b"]].id],
 			"apply": func() -> void: battle.symbioses[id] = true,
 		})
 	return list
