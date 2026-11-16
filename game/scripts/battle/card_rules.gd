@@ -12,9 +12,12 @@ const HERO_FROM_WAVE := 5
 const WEAPON_MODS := ["damage", "rate", "reload", "mag", "crit", "special"]
 const SLOTS := 3
 const MEISTER_LEVEL := 3
-## Ausgleich für held5: ab diesem Level haben die Gegner in den Wellen 1–5 weniger Leben, solange man allein kämpft
+## Ausgleich für held5: ab diesem Level haben die Gegner weniger Leben, solange das Team noch nicht voll ist
+## (bis höchstens Welle EASE_TO_WAVE): mit einem Champion SOLO_HP, mit zwei DUO_HP
 const SOLO_FROM_LEVEL := 21
-static var SOLO_HP := 0.8
+const EASE_TO_WAVE := 8
+static var SOLO_HP := 0.55
+static var DUO_HP := 0.8
 
 static var on := {}
 
@@ -29,8 +32,11 @@ static func enable(spec: String) -> void:
 		on[str(p)] = true
 
 
-static func solo_easing(level: int, wave: int, hero_count: int) -> bool:
-	return has("held5") and level >= SOLO_FROM_LEVEL and wave <= HERO_FROM_WAVE and hero_count <= 1
+## Faktor für das Gegnerleben (1.0 = kein Ausgleich)
+static func team_easing(level: int, wave: int, hero_count: int) -> float:
+	if not has("held5") or level < SOLO_FROM_LEVEL or wave > EASE_TO_WAVE:
+		return 1.0
+	return SOLO_HP if hero_count <= 1 else (DUO_HP if hero_count == 2 else 1.0)
 
 
 ## Zusatz der Meisterfähigkeit je Waffenfähigkeit (Spezialfähigkeit: wirkt wie zwei Stufen mehr)

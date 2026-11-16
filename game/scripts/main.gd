@@ -263,7 +263,9 @@ func _parse_args() -> void:
 			# Neues Kartensystem im Balance-Labor (CardRules), optional nur einzelne Teile
 			CardRules.enable(arg.get_slice("=", 1) if arg.contains("=") else "")
 		elif arg.begins_with("--solo-hp="):
-			CardRules.SOLO_HP = float(arg.get_slice("=", 1))   # Labor: Gegnerleben Welle 1–5 allein
+			CardRules.SOLO_HP = float(arg.get_slice("=", 1))   # Labor: Gegnerleben mit einem Champion
+		elif arg.begins_with("--duo-hp="):
+			CardRules.DUO_HP = float(arg.get_slice("=", 1))   # Labor: Gegnerleben mit zwei Champions
 		elif arg == "--neue-monster":
 			Models.test_new = true   # noch nicht freigegebene Gegnermodelle zeigen (Prüfbilder)
 		elif arg == "--mp":

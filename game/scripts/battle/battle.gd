@@ -380,8 +380,8 @@ func spawn_enemy(kind: String, pos := Vector3.INF) -> Enemy:
 	e.tint = GameData.world_tint(level, kind)
 	e.dps_scale = GameData.dps_mult(level)
 	var hp := (MpData.hp_mult(level, maxi(wave, 1)) if mode == "mp" else GameData.hp_mult(level, maxi(wave, 1))) * hp_scale
-	if mode != "mp" and CardRules.solo_easing(level, wave, heroes.size()):
-		hp *= CardRules.SOLO_HP
+	if mode != "mp":
+		hp *= CardRules.team_easing(level, wave, heroes.size())
 	if GameData.ENEMIES[kind]["tier"] == "boss":
 		hp *= GameData.boss_hp(level) * (MpData.BOSS_HP * MpData.boss_tune(level) if mode == "mp" else 1.0)
 	e.setup(kind, self, hp)
