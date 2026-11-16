@@ -4,7 +4,7 @@ Bitte nacheinander abschicken, jeweils erst den nächsten, wenn der vorige gelie
 
 | Nr. | Auftrag | Datei | Kosten | Voraussetzung |
 |---|---|---|---|---|
-| 1 | Ranglisten, Ligen, Spielerrahmen, Überleben, Gegnersuche (31 Bilder) | `RANGLISTEN_FUER_CHATGPT.md` | keine | Ligen bestätigt am 16.11.2026, kann raus |
+| 1 | Ranglisten, Ligen, Spielerrahmen, Überleben, Gegnersuche (31 Bilder) | `RANGLISTEN_FUER_CHATGPT.md` | keine | **geliefert und geprüft 16.11.2026** (`Ranglisten_v1`), in den Wettbewerb-Mockups eingesetzt |
 | 1c | Arenen neu: Bahn flach auf dem Arenaboden, Tribünen ringsum, Tunnel für die Gegner | `ARENEN_V2_FUER_CHATGPT.md` | keine | – |
 | 2 | Brücken der Planeten 06–15 neu gestalten (bisher überall dieselbe schlichte Brücke) | `BRUECKEN_06_15_FUER_CHATGPT.md` | keine | – |
 | 3 | Quallenflieger: fehlerhaftes Modell mit acht Armen nachreichen | `Monster_Roh/QUALLE_FEHLMODELL_FUER_CHATGPT.md` | keine | – (vom Nutzer am 11.11.2026 freigegeben) |
