@@ -372,6 +372,8 @@ static var DPS_GROWTH := 1.035
 ## Der Sprung von Phase 2 kommt erst mit Level 31 (EASY_TO + 1); Level 31+ bleiben unverändert.
 const EASY_TO := 30
 static var HP_GROWTH_EASY := 1.12
+## Boss-Level in diesem Bereich (mehr und gemischtere Wellen): Faktor auf das Leben (Labor 16.11.2026)
+static var BOSS_TUNE_EASY := {30: 0.65}
 ## Ab Level 21 (Spiel-Phase 2) ein spürbarer Sprung, danach wächst es im Gleichschritt mit
 ## einem Spieler, der regelmäßig aufwertet (abgestimmt mit dem Balance-Labor, docs/BALANCE.md).
 const PHASE2_FROM := 21
@@ -449,7 +451,8 @@ static func level_hp(level: int, easy := true) -> float:
 	if level < PHASE2_FROM:
 		return 2.8 * pow(HP_GROWTH, level - 10)
 	if easy and level <= EASY_TO:
-		return 2.8 * pow(HP_GROWTH, PHASE2_FROM - 11) * pow(HP_GROWTH_EASY, level - PHASE2_FROM + 1)
+		return 2.8 * pow(HP_GROWTH, PHASE2_FROM - 11) * pow(HP_GROWTH_EASY, level - PHASE2_FROM + 1) \
+			* float(BOSS_TUNE_EASY.get(level, 1.0))
 	var late := pow(HP_GROWTH_LATE, mini(level, PHASE3_FROM - 1) - PHASE2_FROM)
 	if level >= PHASE3_FROM:
 		late *= HP_STEP3 * pow(HP_GROWTH_P3, level - PHASE3_FROM + 1) * world_hp_norm(level)
