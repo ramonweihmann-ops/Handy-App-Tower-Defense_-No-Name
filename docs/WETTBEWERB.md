@@ -145,9 +145,16 @@ ein kleiner Rechner gut.
 sichern. Wenn es mehr als einige hundert Spieler gleichzeitig werden oder Ausfälle stören, auf einen gemieteten
 Server umziehen (der Server-Code bleibt gleich, Docker).
 
-**❓ Mini-PC:** Die Analyse aus dem anderen Chat liegt hier nicht vor (vermutlich im Webportal-Repository; der
-Zugriff darauf wurde in dieser Sitzung nicht gewährt). Bitte Modell, Prozessor, Arbeitsspeicher, Betriebssystem und
-den Upload des Internetanschlusses nennen oder den Lesezugriff auf das Webportal freigeben.
+**Mini-PC des Nutzers: ACEMAGIC F5A** (Produktseite acemagic.de/products/f5a-270-minipc; laut Testberichten
+AMD Ryzen AI 9 mit 12 Kernen / 24 Threads, zwei 2,5-Gbit-LAN-Anschlüsse, PCIe-4.0-SSD). Für unseren Server ist das
+weit mehr als genug: Rechenleistung und Speicher reichen für Zehntausende Spieler gleichzeitig. Der Engpass ist
+nicht der Rechner, sondern der **Upload des Heimanschlusses** und seine Verfügbarkeit. Stromverbrauch im Leerlauf
+etwa 10–15 W, also rund 3–4 € im Monat.
+- Betrieb: Linux (z. B. Ubuntu Server) oder Windows mit Docker; Server-Programm und Datenbank als Container.
+- Erreichbarkeit über Cloudflare Tunnel (kostenlos, kein offener Port, feste Adresse trotz wechselnder IP).
+- Sicherung: Datenbank nachts verschlüsselt auf einen externen Speicher kopieren.
+- ❓ Upload-Geschwindigkeit des Anschlusses? Für 1.000 Spieler gleichzeitig reichen etwa 2 Mbit/s.
+- ❓ Läuft auf dem Mini-PC schon etwas anderes (z. B. das Webportal)? Dann bekommt das Spiel einen eigenen Container.
 
 **Rechtliches (vor dem Start mit echten Spielern):** Spielernamen und Ergebnisse sind personenbezogene Daten →
 Datenschutzerklärung ergänzen, Löschung auf Wunsch. Für Kinder: keine freien Texte, kein Chat (siehe oben).
