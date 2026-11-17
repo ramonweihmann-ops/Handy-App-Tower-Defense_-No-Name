@@ -24,6 +24,8 @@ for a in list(bpy.data.actions):   # Meshy-Clips (Walking, Running) braucht das 
 body = [o for o in scene.objects if o.type == 'MESH'][0]
 body.name = hero.capitalize()
 FPS = 30
+import os
+DEBUG_TWIST = bool(os.environ.get("DREHUNG"))
 scene.render.fps = FPS
 
 
@@ -556,8 +558,14 @@ def build_armed():
         u = (up - b * up.dot(b)).normalized()
         return b, u, b.cross(u)
 
-    def orient(hd, f, d):
-        """Drehung der Hand: Finger nach f, Handfläche nach d (beides Weltrichtungen)."""
+    roll = {"Right": 0.0, "Left": 0.0}
+    last_twist = [0.0]
+
+    def orient(hd, f, d, side="Right"):
+        """Drehung der Hand: Finger nach f, Handfläche nach d (beides Weltrichtungen), dazu die je Champion gesuchte
+        Drehung um die Fingerachse (roll), die das Handgelenk am wenigsten verdreht."""
+        if roll[side]:
+            d = Matrix.Rotation(math.radians(roll[side]), 3, f.normalized()) @ d
         fl = hd["f"]
         pl = (hd["p"] - fl * hd["p"].dot(fl)).normalized()
         L = Matrix((fl, pl, fl.cross(pl))).transposed()
@@ -567,15 +575,46 @@ def build_armed():
         return W @ L.transposed()
 
     def place(side, hd, center, f, d, pole):
-        """Handmitte (Faust) genau an center, Hand gedreht nach f/d, Arm per IK."""
-        M = orient(hd, f, d)
+        """Handmitte (Faust) genau an center, Hand gedreht nach f/d, Arm per IK. Der Ellbogen darf um die Achse
+        Schulter-Ziel ausweichen: genommen wird die Richtung mit der kleinsten Verdrehung am Handgelenk."""
+        M = orient(hd, f, d, side)
         up, lo = "mixamorig:%sArm" % side, "mixamorig:%sForeArm" % side
-        for _ in range(2):   # Handgelenk so legen, dass die Faustmitte am Ziel sitzt
-            ik(arm, up, lo, center - M @ hd["c"], pole)
         pb = arm.pose.bones["mixamorig:%sHand" % side]
-        head = pb.matrix.translation.copy()
-        pb.matrix = Matrix.Translation(head) @ M.to_4x4()
+        fpb = arm.pose.bones[lo]
+        saved = {n: (arm.pose.bones[n].rotation_quaternion.copy(), arm.pose.bones[n].location.copy()) for n in (up, lo, pb.name)}
+
+        def solve(pl):
+            for n, (r, l) in saved.items():
+                arm.pose.bones[n].rotation_quaternion = r
+                arm.pose.bones[n].location = l
+            update()
+            for _ in range(2):   # Handgelenk so legen, dass die Faustmitte am Ziel sitzt
+                ik(arm, up, lo, center - M @ hd["c"], pl)
+            pb.matrix = Matrix.Translation(pb.matrix.translation) @ M.to_4x4()
+            update()
+            qh = pb.matrix_basis.to_quaternion()   # Drehung gegenüber der Ruhestellung: die zählt für die Haut
+            a = 2.0 * math.atan2(qh.y, qh.w)
+            return (a + math.pi) % (2 * math.pi) - math.pi
+
+        axis = (center - bone_head(arm, up)).normalized()
+        best = None
+        for deg in (-75, -50, -25, 0, 25, 50, 75):
+            pl = Matrix.Rotation(math.radians(deg), 3, axis) @ Vector(pole)
+            a = solve(pl)
+            cost = abs(a) + 0.004 * abs(deg)   # bei gleicher Verdrehung lieber nah an der gewünschten Richtung
+            if best is None or cost < best[0]:
+                best = (cost, pl)
+        ang = solve(best[1])
+        last_twist[0] = ang
+        if DEBUG_TWIST and side == "Right":
+            print("DREHUNG", round(math.degrees(ang), 1))
+        # Rest der Verdrehung zur Hälfte auf den Unterarm, sonst verdreht sich die Haut wie ein Bonbonpapier
+        Mf = fpb.matrix.to_3x3().normalized()
+        fpb.matrix = Matrix.Translation(fpb.matrix.translation) @ (Mf @ Matrix.Rotation(ang * 0.5, 3, 'Y')).to_4x4()
         update()
+        pb.matrix = Matrix.Translation(pb.matrix.translation) @ M.to_4x4()
+        update()
+        head = pb.matrix.translation.copy()
         finger_curl(arm, side, hd, 0.5 if side == "Right" else 0.3)   # stärker zerknittern Meshys verschmolzene Finger
         return (head + M @ hd["c"] - center).length   # wie weit die Faust das Ziel verfehlt (Arm zu kurz)
 
@@ -675,6 +714,21 @@ def build_armed():
             b = Vector((0.85, -0.42, -0.05 if hero == "lynx" else 0.15))
             c = sh_r + Vector((0.04, -0.26, -0.32 + 0.008 * w))
             grip(c, b, pole_r=(-0.6, 0.5, -0.7))
+
+    # Handdrehung um den Griff je Champion suchen: kleinste Verdrehung am rechten Handgelenk in Schuss und Heldenpose
+    best_roll = None
+    for r in range(-90, 91, 15):
+        roll["Right"] = float(r)
+        aim(0.0)
+        t1 = abs(last_twist[0])
+        menu_pose(0.0)
+        t2 = abs(last_twist[0]) if kind != "across" else abs(last_twist[0])
+        cost = t1 + t2 + 0.002 * abs(r)
+        if best_roll is None or cost < best_roll[0]:
+            best_roll = (cost, r, t1, t2)
+    roll["Right"] = float(best_roll[1])
+    print("HANDDREHUNG", best_roll[1], "Grad, Rest-Verdrehung Schuss", round(math.degrees(best_roll[2])), "Pose", round(math.degrees(best_roll[3])))
+    reset_pose(arm)
 
     make_actions(arm, [
         ("Idle", [(i * 15, (lambda t=i / 4.0: idle(t))) for i in range(5)]),
