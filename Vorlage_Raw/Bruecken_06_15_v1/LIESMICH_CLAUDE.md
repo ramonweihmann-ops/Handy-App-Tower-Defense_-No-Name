@@ -1,18 +1,26 @@
-# Brücken 06–15 · Zwei Muster zur Spielprüfung
+# Brücken 06–15
 
-Diese erste Lieferung enthält den Kristallplaneten und die Wolkenstadt. Die übrigen acht Brücken folgen nach der Rückmeldung aus dem Spiel.
+Die zehn Schlachtfelder liegen als PNG in RGB mit 780 × 1688 Pixeln vor. Für die Ozeanwelt wurde die bereits korrigierte Vorlage verwendet. Die ersten Muster für Kristallplanet und Wolkenstadt sind Teil dieses Satzes.
 
-- Kristallplanet (`crystal_planet.png`) · Dunkles Kristallglas mit großflächigen Facetten und kleinen rosa Kristallen an den seitlichen Schienen.
-- Wolkenstadt (`cloud_city.png`) · Blaugraue Schieferplatten mit versetzten Fugen, weiße Marmorbalustraden, goldene Kugeln und himmelblaue Einbauleuchten.
-- [Vorher und nachher](uebersicht.png) · Die Ausschnitte zeigen die Brücken in derselben Skalierung.
+[Vorher-Nachher-Übersicht](uebersicht.png) · Brückenausschnitte im gleichen Maßstab.
 
 ## Maßprüfung
 
-Beide Schlachtfelder sind PNGs mit 780 × 1688 Pixeln in RGB. Die Koordinaten beziehen sich auf die inneren Fahrbahnkanten, Ursprung links oben. Abgelesen im vergrößerten Ausgabebild. Die sichtbare Übergangskante kann durch Schattierung um wenige Pixel variieren.
+Die vier Punkte sind an der inneren Fahrbahnkante im vergrößerten Ausgabebild abgelesen. Der Ursprung liegt links oben. Schattierung und Fugenbreite begrenzen die optische Messgenauigkeit auf wenige Pixel.
 
-| Datei | Oben links | Oben rechts | Unten links | Unten rechts | Größte sichtbare Abweichung vom Soll |
-| --- | --- | --- | --- | --- | --- |
-| `crystal_planet.png` | (280, 294) | (500, 294) | (64, 1158) | (716, 1158) | etwa 2 px |
-| `cloud_city.png` | (280, 294) | (500, 294) | (64, 1158) | (716, 1158) | etwa 2 px |
+| Planet | Gestaltung | Oben links | Oben rechts | Unten links | Unten rechts | Abweichung vom Soll |
+| --- | --- | --- | --- | --- | --- | --- |
+| [06 · Dschungelmond](jungle_moon.png) | Bronzeplatten, Ranken, smaragdgrüne Lampen | (282, 294) | (499, 294) | (65, 1159) | (716, 1159) | ca. 2 px |
+| [07 · Ozeanwelt](ocean_world.png) | Schiffsdeck, Bullaugen, Rettungsringe und seitliche Stützen | (280, 294) | (500, 294) | (64, 1158) | (716, 1158) | ca. 0 px |
+| [08 · Kristallplanet](crystal_planet.png) | Dunkle Kristallfacetten und rosa Randkristalle | (280, 294) | (500, 294) | (63, 1158) | (717, 1158) | ca. 1 px |
+| [09 · Sturmriese](storm_giant.png) | Stahlgerüst, Warnstreifen, gelbe Lichter und Blitzableiter | (280, 294) | (500, 294) | (65, 1158) | (715, 1158) | ca. 1 px |
+| [10 · Schrottwelt](scrap_world.png) | Genietete Platten, Kupferflicken, Rohre und Käfiglampen | (280, 294) | (501, 294) | (64, 1158) | (716, 1158) | ca. 1 px |
+| [11 · Wolkenstadt](cloud_city.png) | Versetzte Schieferplatten, Marmorbalustraden und goldene Kugeln | (280, 294) | (500, 294) | (64, 1158) | (716, 1158) | ca. 0 px |
+| [12 · Sporenwelt](spore_world.png) | Dunkles Holzdeck, gebogene Pilzstiele und leuchtende Pilzkappen | (280, 294) | (499, 294) | (65, 1159) | (715, 1159) | ca. 2 px |
+| [13 · Geistermond](ghost_moon.png) | Alte Steinplatten, Metallbeschläge und türkise Laternen | (280, 294) | (499, 294) | (64, 1158) | (716, 1158) | ca. 1 px |
+| [14 · Tempelplanet](temple_planet.png) | Sandstein, Goldintarsien und Feuerschalen | (283, 294) | (505, 294) | (63, 1158) | (716, 1158) | ca. 5 px |
+| [15 · Schwarzes Loch](black_hole.png) | Schwarze Panzerplatten und kompakte violette Energiepfosten | (277, 294) | (502, 294) | (65, 1159) | (716, 1159) | ca. 3 px |
 
-Die Brücken stammen aus der eingebauten Bildbearbeitung mit den vorhandenen Schlachtfeldern als direkte Vorlage. Die neuen Brückenbereiche wurden auf das vorhandene Trapez eingepasst. Außerhalb dieser Bereiche stammen die Pixel aus den Originaldateien. An den Außenseiten der Geländer liegt ein schmaler Übergang zur Kulisse. Die komplette Plattform ab y = 1169 und die obere Kulisse bis y = 261 sind in beiden Dateien pixelgleich mit der Vorlage. Das Spiel ist der nächste Prüfschritt.
+Die Bildbearbeitung hat jeweils das vorhandene Schlachtfeld als Vorlage verwendet. Die neuen Brücken sind passgenau in die Originaldateien montiert. Direkt an den Außenseiten der Geländer kann ein schmaler Übergang zur Kulisse liegen. Ein Pixelvergleich bestätigt die unveränderte Plattform ab y = 1169 und die unveränderte obere Kulisse bis einschließlich y = 239 für alle zehn Dateien.
+
+Die Maße wurden an den PNGs geprüft. Die Prüfung im Spiel steht für diese Lieferung noch aus.
