@@ -1,0 +1,24 @@
+{
+  "held": "volta",
+  "modell": "../Helden_Posen_v1/volta/volta.glb",
+  "abschussanimation": {
+    "aktion": "Shoot",
+    "dauer_s": 0.4,
+    "loop": false,
+    "rueckstoss_spitze_s": 0.067
+  },
+  "muendungsknoten": "Muzzle",
+  "effekte": {
+    "muendung": "volta_muendung/volta_muendung.json",
+    "blitzbogen": "volta_blitzbogen/volta_blitzbogen.json",
+    "einschlag": "volta_einschlag/volta_einschlag.json"
+  },
+  "kampfvorschau": {
+    "start_muendung_und_erster_bogen_s": 0.0,
+    "versatz_zweiter_bogen_s": 0.083,
+    "alpha_zweiter_bogen": 0.68,
+    "alpha_zweiter_einschlag": 0.72,
+    "groesse_zweiter_einschlag_relativ": 0.82
+  },
+  "hinweis": "Die Zeiten und Alphawerte im Block kampfvorschau betreffen die Darstellung. Treffer, Ziele und Schadenszeitpunkte kommen aus dem bestehenden Kampfsystem."
+}
