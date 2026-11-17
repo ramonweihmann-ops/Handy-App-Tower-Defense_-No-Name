@@ -1,5 +1,6 @@
 """Baut aus den Meshy-Rohmodellen (Vorlage_Raw/Helden_Roh/<id>_comic_v1) die fertigen Spiel-GLBs für
-Pip, Nova (humanoides Meshy-Rig mit Mixamo-Namen), Fünkchen und Rollo (ohne Rig: Skelett entsteht hier).
+Pip, Nova (humanoides Meshy-Rig mit Mixamo-Namen), Fünkchen und Rollo (ohne Rig: Skelett entsteht hier) und die
+sieben Menschen aus H3 (Iska, Brocken, Volta, Kalle, Margot, Lynx, Fritzi) mit eigener Waffe an der rechten Hand.
 Aufruf: python3 build_hero_v2.py <id> <eingabe.glb> <ausgabe.glb>   (benötigt: pip install bpy)
 
 Gemeinsam mit Dusty Jo (build_dusty_jo.py):
@@ -282,6 +283,250 @@ def build_humanoid():
     return arm
 
 
+
+# --- Menschen mit Waffe (H3): Iska, Brocken, Volta, Kalle, Margot, Lynx, Fritzi ---------------------
+# Meshys zweite Rig-Vorlage heißt Hips/Spine02/Spine01/Spine/LeftArm …, Brockens Intelligentes Rig nur
+# Bone_###. Alles wird auf die Mixamo-Namen gebracht, die das Spiel und dieses Skript erwarten.
+STD = ["Hips", "Neck", "Head", "LeftShoulder", "LeftArm", "LeftForeArm", "LeftHand", "RightShoulder",
+       "RightArm", "RightForeArm", "RightHand", "LeftUpLeg", "LeftLeg", "LeftFoot", "RightUpLeg", "RightLeg", "RightFoot"]
+MESHY2 = {"Spine02": "mixamorig:Spine", "Spine01": "mixamorig:Spine1", "Spine": "mixamorig:Spine2", "neck": "mixamorig:Neck"}
+# Brocken: Seiten aus der Lage bestimmt (Figur schaut nach -Y, rechts = -X)
+BROCKEN = {"Bone_001": "mixamorig:Hips", "Bone_014": "mixamorig:Spine2", "Bone_017": "mixamorig:Head",
+           "Bone_020": "mixamorig:RightArm", "Bone_019": "mixamorig:RightForeArm", "Bone_018": "mixamorig:RightHand",
+           "Bone_023": "mixamorig:LeftArm", "Bone_022": "mixamorig:LeftForeArm", "Bone_021": "mixamorig:LeftHand",
+           "Bone_009": "mixamorig:RightFoot", "Bone_004": "mixamorig:LeftFoot"}
+
+
+def normalize_bones(arm):
+    names = [b.name for b in arm.data.bones]
+    if "mixamorig:Hips" in names:
+        return
+    ren = dict(BROCKEN) if "Bone_001" in names and "Hips" not in names else dict(MESHY2)
+    for n in names:
+        if n in STD and n not in ren:
+            ren[n] = "mixamorig:" + n
+    for old, new in ren.items():
+        if old in names:
+            arm.data.bones[old].name = new   # Gruppen der Hautgewichte werden mit umbenannt
+
+
+def mat(name, col, metal=0.0, rough=0.6, emit=0.0):
+    m = bpy.data.materials.new(name)
+    m.use_nodes = True
+    b = m.node_tree.nodes["Principled BSDF"]
+    b.inputs["Base Color"].default_value = (*col, 1.0)
+    b.inputs["Metallic"].default_value = metal
+    b.inputs["Roughness"].default_value = rough
+    if emit:
+        b.inputs["Emission Color"].default_value = (*col, 1.0)
+        b.inputs["Emission Strength"].default_value = emit
+    return m
+
+
+R90 = 0.5 * math.pi
+# Waffen im Waffenraum: +Y = Lauf nach vorn, +Z = oben, Ursprung = Griff in der rechten Hand.
+# Teile: (Form, Maße, Lage, Drehung, Farbe). cyl: (Radius, Länge) entlang Y; box: (Breite, Länge, Höhe).
+# hold: rifle (zweihändig vor der Brust), shoulder (auf der Schulter), pistol (einhändig ausgestreckt)
+DARK, METAL, WOOD = (0.16, 0.17, 0.2), (0.45, 0.47, 0.52), (0.42, 0.24, 0.11)
+WEAPONS = {
+    "iska": {"hold": "rifle", "fore": 0.30, "tip": 0.62, "parts": [
+        ("box", (0.07, 0.5, 0.11), (0, 0.12, 0.04), DARK), ("cyl", (0.024, 0.3), (0, 0.5, 0.06), METAL),
+        ("box", (0.08, 0.2, 0.085), (0, 0.3, 0.05), (0.15, 0.75, 0.8)), ("box", (0.05, 0.08, 0.17), (0, 0.13, -0.09), DARK, (-0.35, 0, 0)),
+        ("box", (0.06, 0.26, 0.1), (0, -0.2, 0.01), (0.3, 0.32, 0.38)), ("box", (0.045, 0.06, 0.12), (0, 0.0, -0.06), DARK, (-0.3, 0, 0))]},
+    "brocken": {"hold": "shoulder", "fore": 0.32, "tip": 0.66, "parts": [
+        ("cyl", (0.095, 0.95), (0, 0.18, 0.13), (0.85, 0.16, 0.12)), ("cyl", (0.11, 0.07), (0, 0.63, 0.13), DARK),
+        ("cyl", (0.11, 0.07), (0, -0.27, 0.13), DARK), ("box", (0.05, 0.07, 0.14), (0, 0.0, 0.0), DARK),
+        ("box", (0.05, 0.07, 0.12), (0, 0.32, 0.02), DARK), ("box", (0.04, 0.14, 0.06), (0, 0.12, 0.25), (0.95, 0.75, 0.15))]},
+    "volta": {"hold": "pistol", "tip": 0.33, "parts": [
+        ("box", (0.065, 0.22, 0.09), (0, 0.08, 0.05), (0.92, 0.93, 0.95)), ("cyl", (0.038, 0.16), (0, 0.22, 0.07), (0.2, 0.85, 0.9)),
+        ("cyl", (0.05, 0.025), (0, 0.17, 0.07), METAL), ("cyl", (0.05, 0.025), (0, 0.25, 0.07), METAL),
+        ("cyl", (0.02, 0.05), (0, 0.31, 0.07), (0.6, 1.0, 1.0)), ("box", (0.045, 0.06, 0.13), (0, -0.01, -0.04), DARK, (-0.35, 0, 0))]},
+    "kalle": {"hold": "pistol", "tip": 0.37, "parts": [
+        ("box", (0.075, 0.25, 0.1), (0, 0.09, 0.05), (0.55, 0.82, 0.95)), ("cyl", (0.04, 0.16), (0, 0.28, 0.06), (0.92, 0.96, 1.0)),
+        ("cyl", (0.03, 0.03), (0, 0.36, 0.06), (0.3, 0.9, 1.0)), ("cyl", (0.035, 0.12), (0, 0.03, 0.14), (0.3, 0.9, 1.0), (0, 0, 0)),
+        ("box", (0.05, 0.065, 0.13), (0, -0.01, -0.04), DARK, (-0.35, 0, 0))]},
+    "margot": {"hold": "rifle", "fore": 0.28, "tip": 0.66, "parts": [
+        ("cyl", (0.028, 0.6), (0.03, 0.36, 0.07), METAL), ("cyl", (0.028, 0.6), (-0.03, 0.36, 0.07), METAL),
+        ("box", (0.09, 0.22, 0.07), (0, 0.27, 0.03), WOOD), ("box", (0.065, 0.36, 0.11), (0, -0.12, 0.0), WOOD),
+        ("cyl", (0.045, 0.03), (0, 0.12, 0.07), (0.85, 0.65, 0.25)), ("box", (0.045, 0.06, 0.12), (0, 0.0, -0.06), WOOD, (-0.3, 0, 0))]},
+    "lynx": {"hold": "rifle", "fore": 0.32, "tip": 0.84, "parts": [
+        ("cyl", (0.022, 0.55), (0, 0.55, 0.06), DARK), ("box", (0.06, 0.42, 0.1), (0, 0.06, 0.04), (0.33, 0.4, 0.22)),
+        ("cyl", (0.036, 0.3), (0, 0.08, 0.15), DARK), ("cyl", (0.042, 0.03), (0, 0.24, 0.15), (0.25, 0.75, 0.9)),
+        ("box", (0.06, 0.28, 0.11), (0, -0.26, 0.01), WOOD), ("box", (0.045, 0.06, 0.12), (0, 0.0, -0.06), DARK, (-0.3, 0, 0))]},
+    "fritzi": {"hold": "rifle", "fore": 0.28, "tip": 0.6, "parts": [
+        ("box", (0.08, 0.4, 0.11), (0, 0.1, 0.05), (0.38, 0.27, 0.16)), ("cyl", (0.04, 0.24), (0, 0.42, 0.07), METAL),
+        ("cyl", (0.055, 0.04), (0, 0.55, 0.07), (1.0, 0.45, 0.1)), ("cyl", (0.06, 0.24), (0, 0.16, -0.07), (0.9, 0.25, 0.12)),
+        ("box", (0.06, 0.2, 0.1), (0, -0.18, 0.02), (0.38, 0.27, 0.16)), ("box", (0.045, 0.06, 0.12), (0, 0.0, -0.06), DARK, (-0.3, 0, 0))]},
+}
+
+
+def build_weapon(spec):
+    objs = []
+    for part in spec["parts"]:
+        kind, size, loc, col = part[:4]
+        rot = part[4] if len(part) > 4 else None
+        if kind == "cyl":
+            bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=size[0], depth=size[1], location=loc,
+                                                rotation=rot if rot is not None else (R90, 0, 0))
+        else:
+            bpy.ops.mesh.primitive_cube_add(size=1.0, location=loc, rotation=rot or (0, 0, 0))
+            bpy.context.object.scale = size
+        o = bpy.context.object
+        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)   # Maße fest, bevor zusammengefügt wird
+        o.data.materials.append(mat("W_%d" % len(objs), col, 0.3 if col == METAL else 0.0))
+        objs.append(o)
+    bpy.ops.object.select_all(action='DESELECT')
+    for o in objs:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = objs[0]
+    bpy.ops.object.join()
+    w = bpy.context.object
+    w.name = "Weapon"
+    w.scale = (wscale(spec),) * 3   # im Spielmaßstab von hinten gut erkennbar (wie Dustys Revolver)
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+    return w
+
+
+def wscale(spec):
+    return {"rifle": 1.4, "shoulder": 1.15, "pistol": 1.6}[spec["hold"]]
+
+
+def bone_head(arm, name):
+    return arm.matrix_world @ arm.pose.bones[name].head
+
+
+def bone_tail(arm, name):
+    return arm.matrix_world @ arm.pose.bones[name].tail
+
+
+def ik(arm, upper, lower, target, pole):
+    """Zwei Knochen so drehen, dass das Ende des unteren den Zielpunkt erreicht (Ellbogen Richtung pole)."""
+    S = bone_head(arm, upper)
+    a, b = arm.data.bones[upper].length, arm.data.bones[lower].length
+    d = target - S
+    dist = max(0.05, min(d.length, (a + b) * 0.995))
+    n = d.normalized()
+    cos_a = max(-1.0, min(1.0, (a * a + dist * dist - b * b) / (2 * a * dist)))
+    p = Vector(pole) - n * Vector(pole).dot(n)
+    p.normalize()
+    elbow = S + n * a * cos_a + p * a * math.sqrt(1 - cos_a * cos_a)
+    point_bones(arm, {upper: elbow - S}, [upper])
+    point_bones(arm, {lower: target - bone_head(arm, lower)}, [lower])
+
+
+def fix_volta_pocket():
+    """Türkise Seitentasche hinten rechts am Kittel (fehlt im Meshy-Export, steht in der Vorlage)."""
+    x0, x1, z0, z1 = -0.27, -0.17, 0.58, 0.72
+    col = (0.12, 0.72, 0.76, 1.0)
+    def rec(p, c):
+        if not (x0 < p.x < x1 and z0 < p.z < z1):
+            return None
+        edge = min(p.x - x0, x1 - p.x, p.z - z0, z1 - p.z)
+        k = 0.78 if edge < 0.01 else 1.0
+        return (col[0] * k, col[1] * k, col[2] * k, 1.0)
+    paint(lambda p, n: n.y > 0.3 and x0 - 0.05 < p.x < x1 + 0.05 and z0 - 0.05 < p.z < z1 + 0.05, rec)
+
+
+def build_armed():
+    arm = [o for o in scene.objects if o.type == 'ARMATURE'][0]
+    arm.name = "Armature"
+    normalize_bones(arm)
+    scale_rigged(arm)
+    if hero == "volta":
+        fix_volta_pocket()
+    spec = WEAPONS[hero]
+    hold = spec["hold"]
+    reset_pose(arm)
+    sh_r = bone_head(arm, "mixamorig:RightArm")
+    sh_l = bone_head(arm, "mixamorig:LeftArm")
+    reach = arm.data.bones["mixamorig:RightArm"].length + arm.data.bones["mixamorig:RightForeArm"].length
+    fwd = Vector((0, -1, 0))
+    if hold == "pistol":
+        grip = sh_r + Vector((0.1, -0.85 * reach, -0.06))
+    elif hold == "shoulder":
+        grip = sh_r + Vector((0.12, -0.45 * reach, -0.05))
+    else:
+        grip = sh_r + Vector((0.14, -0.6 * reach, -0.14))
+    print("GRIFF", tuple(round(c, 3) for c in grip), "Reichweite", round(reach, 3))
+    POLE_R, POLE_L = (-0.6, 0.3, -1.0), (0.6, 0.3, -1.0)
+
+    def arms(g, left, hand_dir=fwd):
+        ik(arm, "mixamorig:RightArm", "mixamorig:RightForeArm", g, POLE_R)
+        point_bones(arm, {"mixamorig:RightHand": hand_dir}, ["mixamorig:RightHand"])
+        if left is None:
+            point_bones(arm, {"mixamorig:LeftArm": Vector((0.35, -0.1, -1.0)), "mixamorig:LeftForeArm": Vector((0.2, -0.35, -1.0))},
+                        ["mixamorig:LeftArm", "mixamorig:LeftForeArm"])
+        else:
+            ik(arm, "mixamorig:LeftArm", "mixamorig:LeftForeArm", left, POLE_L)
+            point_bones(arm, {"mixamorig:LeftHand": fwd}, ["mixamorig:LeftHand"])
+
+    def body(spine=0.0, hips_up=0.0):
+        reset_pose(arm)
+        if "mixamorig:Spine2" in arm.pose.bones:
+            rot_world(arm, "mixamorig:Spine2", (1, 0, 0), spine)
+        move_world(arm, "mixamorig:Hips", (0, 0, hips_up))
+        update()
+
+    def fore(g):
+        return None if hold == "pistol" else g + Vector((-0.02, -spec["fore"] * wscale(spec), 0.0))
+
+    def aim(r=0.0, spine=0.0):
+        body(spine)
+        g = grip + Vector((0, 0.06 * r, 0.025 * r))
+        arms(g, fore(g), Vector((0, -1, 0.3 * r)))
+
+    def idle(t):
+        w = math.sin(t * 2 * math.pi)
+        body(1.5 * w, 0.008 * math.sin(t * 4 * math.pi))
+        g = grip + Vector((0.02, 0.1, -0.18 + 0.01 * w))
+        arms(g, fore(g) + Vector((0, 0.05, -0.04)) if hold != "pistol" else None, Vector((0, -1, -0.55)))
+
+    def victory(t):
+        w = math.sin(t * 2 * math.pi)
+        body(-3, 0.06 * abs(w))
+        g = sh_r + Vector((-0.1, -0.1, 0.55 + 0.04 * w))
+        ik(arm, "mixamorig:RightArm", "mixamorig:RightForeArm", g, (-1.0, 0.2, 0.0))
+        point_bones(arm, {"mixamorig:RightHand": Vector((0, -0.3, 1.0))}, ["mixamorig:RightHand"])
+        point_bones(arm, {"mixamorig:LeftArm": Vector((0.5, -0.1, 0.9 + 0.1 * w)), "mixamorig:LeftForeArm": Vector((0.35, -0.1, 1.0))},
+                    ["mixamorig:LeftArm", "mixamorig:LeftForeArm"])
+
+    make_actions(arm, [
+        ("Idle", [(i * 15, (lambda t=i / 4.0: idle(t))) for i in range(5)]),
+        ("Shoot", [(0, lambda: aim(0.0)), (2, lambda: aim(1.0, -4)), (6, lambda: aim(0.35, -1)), (12, lambda: aim(0.0))]),
+        ("Victory", [(i * 12, (lambda t=i / 4.0: victory(t))) for i in range(5)]),
+    ])
+
+    # Waffe: starr an der rechten Hand, in der Zielhaltung so gelegt, dass der Griff in der Hand sitzt
+    weapon = build_weapon(spec)
+    socket = bpy.data.objects.new("WeaponSocket", None)
+    scene.collection.objects.link(socket)
+    socket.parent = arm
+    socket.parent_type = 'BONE'
+    socket.parent_bone = "mixamorig:RightHand"
+    socket.matrix_parent_inverse = Matrix.Identity(4)
+    weapon.parent = socket
+    weapon.matrix_parent_inverse = Matrix.Identity(4)
+    weapon.location = (0, 0, 0)
+    muzzle = bpy.data.objects.new("Muzzle", None)
+    scene.collection.objects.link(muzzle)
+    muzzle.parent = weapon
+    muzzle.location = Vector((0, spec["tip"], 0.07 if hold != "shoulder" else 0.13)) * wscale(spec)
+    aim(0.0)
+    hand = (bone_head(arm, "mixamorig:RightHand") + bone_tail(arm, "mixamorig:RightHand")) * 0.5
+    up = Vector((0, 0, 1))
+    rot = Matrix((fwd.cross(up), fwd, up)).transposed()
+    want = Matrix.Translation(hand) @ rot.to_4x4()
+    pb = arm.pose.bones["mixamorig:RightHand"]
+    tail = arm.matrix_world @ pb.matrix @ Matrix.Translation((0, pb.bone.length, 0))
+    socket.matrix_basis = tail.inverted() @ want
+    update()
+    lh = bone_tail(arm, "mixamorig:LeftHand")
+    print("HAND", tuple(round(c, 3) for c in hand), "LINKS", tuple(round(c, 3) for c in lh),
+          "MUENDUNG", tuple(round(c, 3) for c in muzzle.matrix_world.translation))
+    reset_pose(arm)
+    return arm
+
+
 # --- Eigenes Skelett: Fünkchen und Rollo ----------------------------------------------------------
 def ground_static(turn=0.0):
     """Statische Figur: Füße auf z = 0, Mitte auf x = y = 0, Höhe 2,0. turn: Drehung um die Hochachse,
@@ -459,7 +704,7 @@ def build_tank():
     return arm
 
 
-arm = {"pip": build_humanoid, "nova": build_humanoid, "fuenkchen": build_dragon, "rollo": build_tank}[hero]()
+arm = {"pip": build_humanoid, "nova": build_humanoid, "fuenkchen": build_dragon, "rollo": build_tank}.get(hero, build_armed)()
 tris = sum(len(p.vertices) - 2 for o in scene.objects if o.type == 'MESH' for p in o.data.polygons)
 print("DREIECKE", tris, "TEXTUREN", [tuple(i.size) for i in bpy.data.images], "AKTIONEN", [a.name for a in bpy.data.actions])
 bpy.ops.export_scene.gltf(filepath=out, export_format='GLB', export_animations=True, export_animation_mode='ACTIONS',

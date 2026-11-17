@@ -15,7 +15,7 @@ const HEROES := {
 	"lynx": {"file": "heroes/Soldier_Female", "gun": "guns/Sniper"},
 	"fritzi": {"file": "heroes/Worker_Female", "gun": ""},
 }
-## Neue Comic-Modelle zur Prüfung (Meshy H2, gebaut mit tools/heroes/build_hero_v2.py): nur mit eingeschalteten
+## Neue Comic-Modelle zur Prüfung (Meshy H2 und H3, gebaut mit tools/heroes/build_hero_v2.py): nur mit eingeschalteten
 ## Entwickler-Werkzeugen sichtbar, bis der Nutzer sie freigibt; danach wandern die Einträge nach HEROES.
 const HEROES_NEU := {
 	"pip": {"file": "heroes_v2/pip", "gun": "", "v2": true},
@@ -23,6 +23,14 @@ const HEROES_NEU := {
 	# size: Höhe im Verhältnis zu den Menschen (Rollo ist breit und gedrungen)
 	"fuenkchen": {"file": "heroes_v2/fuenkchen", "gun": "", "v2": true, "size": 0.95},
 	"rollo": {"file": "heroes_v2/rollo", "gun": "", "v2": true, "size": 0.72},
+	# H3: die sieben Menschen mit eigener Waffe an der rechten Hand (WeaponSocket → Weapon → Muzzle)
+	"iska": {"file": "heroes_v2/iska", "gun": "", "v2": true},
+	"brocken": {"file": "heroes_v2/brocken", "gun": "", "v2": true},
+	"volta": {"file": "heroes_v2/volta", "gun": "", "v2": true},
+	"kalle": {"file": "heroes_v2/kalle", "gun": "", "v2": true},
+	"margot": {"file": "heroes_v2/margot", "gun": "", "v2": true},
+	"lynx": {"file": "heroes_v2/lynx", "gun": "", "v2": true},
+	"fritzi": {"file": "heroes_v2/fritzi", "gun": "", "v2": true},
 }
 static var test_new_heroes := false
 
