@@ -593,3 +593,47 @@ ABLAGE in Vorlage_Raw/Helden_Roh/<id>_comic_v1/ je Champion:
 - Ergänzung in LIESMICH_CLAUDE.md: verbrauchte Credits, Einstellungen, Dreiecke, gezählte Gliedmaßen, Rigging-Ergebnis
 Dazu Vorlage_Raw/Helden_Roh/UEBERSICHT_MODELLE_H3.png mit den Hinten-Vorschauen aller sieben nebeneinander.
 ~~~~
+
+## Prompt W1: Vorlagen für acht Champion-Waffen (drei Ansichten)
+
+**Kosten:** keine Kosten · **Abschicken:** sofort · danach W2 (Meshy, etwa 240 Credits, eigene Freigabe)
+
+~~~~text
+Bitte für mein Handyspiel (Tower Defense, Comic-Stil, Godot) Vorlagen für acht Waffen der Champions erstellen.
+Aus den Vorlagen entstehen danach bei Meshy 3D-Modelle, die die Figuren in der rechten Hand halten.
+Repository Handy-App-Tower-Defense_-No-Name, Branch claude/amazing-hypatia-yl59v4.
+
+REFERENZEN (bitte laden)
+- Heldenbilder mit der jeweiligen Waffe: game/ui/heroes2d/<id>.png
+- Stil und Farben der Figuren: Vorlage_Raw/Helden_Roh/UEBERSICHT_VORLAGEN.png
+Die Waffe soll genau so aussehen wie im Heldenbild, nur sauber und vollständig.
+
+DIE ACHT WAFFEN
+- dusty: klassischer Western-Revolver, Metalllauf, Holzgriff, Trommel
+- iska: kompaktes Sturmgewehr, dunkles Metall, türkiser Handschutz, gebogenes Magazin
+- brocken: großer roter Raketenwerfer zum Schultern, dunkle Ringe vorn und hinten, Griff und Vordergriff unten
+- volta: Blitzpistole, weißes Gehäuse, türkise Spule mit Metallringen, leuchtende Spitze
+- kalle: Eisblaster, hellblaues Gehäuse, weiße Mündung, kleiner Kältetank oben
+- margot: doppelläufige Piratenflinte, Holzschaft, Messingband
+- lynx: Scharfschützengewehr, olivgrün und dunkel, langes Zielfernrohr mit türkiser Linse, Holzschaft
+- fritzi: Flammenwerfer, braunes Gehäuse, Metalldüse mit orangem Ring, roter Brennstofftank unter dem Lauf
+
+ANSICHTEN je Waffe (für Meshy Multi-View)
+- <id>_waffe_seite.png: genau von der Seite, Lauf zeigt nach RECHTS, Griff unten gut sichtbar
+- <id>_waffe_oben.png: genau von oben, Lauf zeigt nach RECHTS
+- <id>_waffe_vorn.png: genau von vorn in die Mündung
+- alle drei Ansichten in gleichem Maßstab, orthografisch, keine Perspektive
+
+FORMAT
+- je 1254 × 1254 Pixel, PNG mit durchsichtigem Hintergrund, eine Waffe, etwa 10 % Rand
+- keine Hände, keine Figur, kein Halter, keine Bodenplatte, kein Schatten, keine Schrift, keine Logos
+- Comic-Stil wie die Figuren: klare Formen, kräftige Farben, weiche Schattierung, leicht übertriebene Proportionen
+  (dickere Läufe, größere Griffe), damit die Waffe im Spiel auch klein gut erkennbar ist
+- Griff deutlich ausgeformt, so dass eine einfache Comic-Hand ihn umfassen kann
+
+BITTE LIEFERN in Vorlage_Raw/Waffen_Roh/<id>_waffe_v1/: die drei Bilder und eine kurze LIESMICH_CLAUDE.md
+(Waffe, Länge im Verhältnis zur Figur aus dem Heldenbild, wo genau Griff und Mündung liegen).
+Dazu Vorlage_Raw/Waffen_Roh/UEBERSICHT_WAFFEN.png mit allen 24 Bildern.
+
+Nur die eingebaute Bildgenerierung im bestehenden Konto verwenden, keine weiteren kostenpflichtigen Dienste.
+~~~~
