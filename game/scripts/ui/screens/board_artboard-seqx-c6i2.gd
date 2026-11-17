@@ -57,8 +57,10 @@ var _view3d: HeroView3D
 ## ui/portraits/<id>.webp, schon auf das Motiv zugeschnitten. Unterkante auf der Standlinie (Podest).
 const PORTRAIT_BOX := Vector2(262, 300)   # Breite: breite Motive (Rollo, Kalle) bleiben zwischen den Fähigkeitskarten
 ## Höhe relativ zur Box und Abstand über der Standlinie (aus PORTRAET_LAYOUT.json): Lynx kniet, Fritzi springt
+## Dritter Wert (wo nötig): Versatz nach rechts in Mockup-Punkten. Kalle hält die Waffe weit links: etwas kleiner
+## und nach rechts, damit sie nicht unter der linken Fähigkeitskarte liegt.
 const PORTRAIT_FIT := {"lynx": [0.836, 0.0], "fritzi": [0.933, 0.1], "fuenkchen": [0.98, 0.0], "pip": [0.94, 0.0],
-	"rollo": [0.84, 0.0], "nova": [1.0, 0.0]}
+	"rollo": [0.84, 0.0], "nova": [1.0, 0.0], "kalle": [0.86, 0.0, 26.0]}
 var _portrait: TextureRect
 var _portrait_id := ""
 var _feet := 0.0
@@ -142,7 +144,8 @@ func _show_portrait(id: String) -> void:
 	if w > PORTRAIT_BOX.x:
 		h *= PORTRAIT_BOX.x / w
 		w = PORTRAIT_BOX.x
-	var r := Rect2(W * 0.5 - w * 0.5, _feet - PORTRAIT_BOX.y * float(fit[1]) - h, w, h)
+	var dx := float(fit[2]) if fit.size() > 2 else 0.0
+	var r := Rect2(W * 0.5 - w * 0.5 + dx, _feet - PORTRAIT_BOX.y * float(fit[1]) - h, w, h)
 	_live[_portrait_id] = r
 	_portrait.position = to_screen(r.position)
 	_portrait.size = r.size * s
