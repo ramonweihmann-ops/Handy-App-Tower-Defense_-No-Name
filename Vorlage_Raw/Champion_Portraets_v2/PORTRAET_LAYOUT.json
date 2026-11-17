@@ -1,0 +1,70 @@
+{
+  "fuenkchen": {
+    "datei": "ohne_hintergrund/fuenkchen.png",
+    "name": "Fünkchen",
+    "bildgroesse_px": [
+      1122,
+      1402
+    ],
+    "motivbereich_px": [
+      104,
+      172,
+      912,
+      1058
+    ],
+    "maximale_motivhoehe_relativ_zur_anzeigehoehe": 0.98,
+    "abstand_zur_standlinie_relativ_zur_anzeigehoehe": 0,
+    "datei_mit_hintergrund": "mit_hintergrund/fuenkchen.png"
+  },
+  "pip": {
+    "datei": "ohne_hintergrund/pip.png",
+    "name": "Pip",
+    "bildgroesse_px": [
+      1122,
+      1402
+    ],
+    "motivbereich_px": [
+      106,
+      169,
+      910,
+      1063
+    ],
+    "maximale_motivhoehe_relativ_zur_anzeigehoehe": 0.94,
+    "abstand_zur_standlinie_relativ_zur_anzeigehoehe": 0,
+    "datei_mit_hintergrund": "mit_hintergrund/pip.png"
+  },
+  "rollo": {
+    "datei": "ohne_hintergrund/rollo.png",
+    "name": "Rollo",
+    "bildgroesse_px": [
+      1122,
+      1402
+    ],
+    "motivbereich_px": [
+      106,
+      312,
+      910,
+      778
+    ],
+    "maximale_motivhoehe_relativ_zur_anzeigehoehe": 0.84,
+    "abstand_zur_standlinie_relativ_zur_anzeigehoehe": 0,
+    "datei_mit_hintergrund": "mit_hintergrund/rollo.png"
+  },
+  "nova": {
+    "datei": "ohne_hintergrund/nova.png",
+    "name": "Nova",
+    "bildgroesse_px": [
+      1122,
+      1402
+    ],
+    "motivbereich_px": [
+      219,
+      131,
+      684,
+      1140
+    ],
+    "maximale_motivhoehe_relativ_zur_anzeigehoehe": 1.0,
+    "abstand_zur_standlinie_relativ_zur_anzeigehoehe": 0,
+    "datei_mit_hintergrund": "mit_hintergrund/nova.png"
+  }
+}
