@@ -53,6 +53,8 @@ var running := false
 var test_wave := 0
 var test_god := false
 var test_rounds := 0
+## Zähler für Pips „Ersatzteile“
+var _parts_n := 0
 var wave := 0
 var total_waves := 0
 var kills := 0
@@ -193,6 +195,7 @@ func setup(level_: int, ammo_: AmmoStore) -> void:
 	test_wave = 0
 	test_god = false
 	test_rounds = 0
+	_parts_n = 0
 	# Kampfeffekte: Bildfolgen (Standard) oder die bisherigen einfachen Effekte
 	FxSprite.enabled = fx_style() == "bilder"
 	FxSprite.preload_all()
@@ -268,6 +271,9 @@ func add_hero(id: String, joined := false) -> Hero:
 	if h.reinforced:
 		team_aura += GameData.TEAM_AURA
 	h.setup(id, self)
+	if Hero.test_skills > 0:
+		h.mods["skill1"] = Hero.test_skills
+		h.mods["skill2"] = Hero.test_skills
 	heroes.append(h)
 	_layout_heroes(true)
 	Fx.flash(self, h.global_position + Vector3(0, 0.8, 0), Color(0.3, 0.9, 1.0), 1.4, 0.35)
@@ -452,6 +458,16 @@ func on_enemy_died(e: Enemy) -> void:
 		if not FxSprite.has(splat):
 			Fx.flash(self, e.aim_point(), col, 6.0, 0.5)
 		add_shake(0.8)
+	# Ersatzteile (Pip): jeder n-te besiegte Gegner lässt ein Schildstück fallen
+	for h in heroes:
+		if is_instance_valid(h) and h.family() == "drone" and h.skill(2) > 0:
+			_parts_n += 1
+			if _parts_n % int(Hero.skill_value("drone", 2, h.skill(2))) == 0:
+				repair_fence(0.02, 0.0)
+				if Hero.test_skills > 0:
+					print("FAEHIGKEIT Ersatzteile")
+				fence_heal_fx("pip_reparatur", [e.position.x])
+			break
 	enemy_killed.emit(e, e.xp)
 
 
@@ -461,6 +477,13 @@ func damage_fence(amount: float) -> void:
 	if test_god:
 		_fence_flash = minf(1.0, _fence_flash + amount * 0.02)
 		return
+	# Panzerplatte (Rollo): die Mauer nimmt weniger Schaden
+	var plate := 0
+	for h in heroes:
+		if is_instance_valid(h) and h.family() == "cannon":
+			plate = maxi(plate, h.skill(1))
+	if plate > 0:
+		amount *= 1.0 - float(Hero.skill_value("cannon", 1, plate)) / 100.0
 	fence_hp -= amount
 	_fence_flash = minf(1.0, _fence_flash + amount * 0.02)
 	if fence_hp <= 0.0:

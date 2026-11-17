@@ -31,6 +31,10 @@ const ULT_TEXT := {
 	"volta": ["Ein gewaltiger Blitz trifft ", "alle", " Gegner auf dem Feld gleichzeitig.", "Mit dem 3. Stern schlägt der Blitz zweimal ein"],
 	"margot": ["Drei mächtige Schrotsalven treffen ", "alle", " Gegner vorne auf der Bahn.", "Mit dem 3. Stern feuert Margot vier Salven"],
 	"lynx": ["Durchschlagende Volltreffer auf die ", "3", " stärksten Gegner.", "Mit dem 3. Stern trifft Lynx 5 Ziele"],
+	"fuenkchen": ["Jeder Atemzug trifft ", "drei", " Reihen auf einmal.", "Mit dem 3. Stern hält der Schweif 2 Sekunden länger"],
+	"pip": ["Repariert die Mauer und stellt einen ", "Turm", " auf, der mitschießt.", "Mit dem 3. Stern bleibt der Turm doppelt so lange"],
+	"rollo": ["Schleudert ", "alle", " Gegner vor der Mauer weit zurück.", "Mit dem 3. Stern rollt die Walze zweimal"],
+	"nova": ["Zieht ", "alle", " Gegner zu einem Punkt und bremst sie stark.", "Mit dem 3. Stern hält das Loch 2 Sekunden länger"],
 }
 ## Zwei Kampfkarten je Held: Name, Text vor, hervorgehoben, nach (aus dem Mockup)
 const CARDS := {
@@ -42,6 +46,11 @@ const CARDS := {
 	"volta": [["Kettenblitz", "Jeder Blitz springt auf ", "3", " weitere Gegner."], ["Überspannung", "Gegen Bosse ", "+40 %", " Blitzschaden."]],
 	"margot": [["Enterhaken", "Zieht den vordersten Gegner ", "2 Felder", " zurück."], ["Schrotregen", "Die Breitseite trifft zusätzlich ", "alle", " Gegner am Rand."]],
 	"lynx": [["Durchschuss", "Jeder Schuss durchschlägt bis zu ", "2", " Gegner."], ["Zielfernrohr", "Gegen Bosse ", "+25 %", " kritische Treffer."]],
+	# Fünkchen, Pip, Rollo, Nova: im Kampf umgesetzt (Hero.SKILLS), Werte der Stufe 1
+	"fuenkchen": [["Sternenstaub", "Getroffene Gegner nehmen 3 Sekunden lang ", "+15 %", " Schaden."], ["Kometenschweif", "Jeder ", "5.", " Atemzug trifft auch die Nachbarreihen."]],
+	"pip": [["Notreparatur", "Unter 30 % Schild repariert Pip ", "doppelt", " so schnell."], ["Ersatzteile", "Jeder ", "8.", " besiegte Gegner lässt ein Schildstück fallen."]],
+	"rollo": [["Panzerplatte", "Die Mauer nimmt ", "10 %", " weniger Schaden."], ["Doppelwumms", "Jeder ", "4.", " Schuss stößt zweimal zurück."]],
+	"nova": [["Mini-Loch", "Getroffene Gegner werden kurz ", "zusammengezogen", "."], ["Zeitdehnung", "Gegner im Schwerkraftfeld sind ", "20 %", " langsamer."]],
 }
 const TEXT_SHADOW := "rgb(29, 107, 42) 0px 2px 0px"
 ## Fähigkeiten-Fenster und Symbolfeld darüber (Mockup-Punkte)

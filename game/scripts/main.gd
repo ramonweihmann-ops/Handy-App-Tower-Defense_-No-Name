@@ -275,6 +275,8 @@ func _parse_args() -> void:
 			CardRules.SOLO_HP = float(arg.get_slice("=", 1))   # Labor: Gegnerleben mit einem Champion
 		elif arg.begins_with("--duo-hp="):
 			CardRules.DUO_HP = float(arg.get_slice("=", 1))   # Labor: Gegnerleben mit zwei Champions
+		elif arg.begins_with("--faehigkeiten="):
+			Hero.test_skills = int(arg.get_slice("=", 1))   # alle Kampfkarten der Champions auf diese Stufe (Test)
 		elif arg == "--neue-monster":
 			Models.test_new = true   # noch nicht freigegebene Gegnermodelle zeigen (Prüfbilder)
 		elif arg == "--mp":
@@ -1183,6 +1185,12 @@ func _hero_cards(h: Hero) -> Array:
 		var taken: Array = CardRules.WEAPON_MODS.filter(func(m: String) -> bool: return int(h.mods[m]) > 0)
 		if taken.size() >= CardRules.SLOTS:
 			stats = stats.filter(func(s: Array) -> bool: return s[0] in taken)
+	# Kampfkarten des Champions (wie auf „Held aufleveln“), je bis 3 Sterne; Text zeigt den Wert der nächsten Stufe
+	if Hero.SKILLS.has(h.family()):
+		for n in [1, 2]:
+			var sk: Array = Hero.SKILLS[h.family()][n - 1]
+			var next := mini(h.skill(n) + 1, 3)
+			stats.append(["skill%d" % n, sk[0], String(sk[1]) % Hero.skill_value(h.family(), n, next), 3])
 	stats.append(["ult", ult[0], ult_desc, Hero.ULT_MAX])
 	for s in stats:
 		var mod: String = s[0]

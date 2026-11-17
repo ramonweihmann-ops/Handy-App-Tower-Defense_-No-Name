@@ -9,7 +9,42 @@ var battle: Battle
 ## Stufen der Verbesserungen aus der Kartenauswahl.
 ## Als Verstärkung dazugerufen (Bonus-Schaden, siehe GameData.HERO_TYPE).
 var reinforced := false
-var mods := {"damage": 0, "rate": 0, "reload": 0, "mag": 0, "crit": 0, "special": 0, "ult": 0}
+var mods := {"damage": 0, "rate": 0, "reload": 0, "mag": 0, "crit": 0, "special": 0, "ult": 0, "skill1": 0, "skill2": 0}
+## Kampfkarten der Champions (Fähigkeiten wie auf „Held aufleveln“), je bis 3 Sterne. Bisher für Fünkchen, Pip, Rollo
+## und Nova umgesetzt: [Name, Text je Stufe]. Die Wirkung steht an der Stelle des Schusses bzw. in battle.gd.
+const SKILLS := {
+	"beam": [["Sternenstaub", "Getroffene Gegner nehmen 3 Sekunden lang +%d %% Schaden."],
+		["Kometenschweif", "Jeder %d. Atemzug trifft auch die Nachbarreihen."]],
+	"drone": [["Notreparatur", "Unter 30 %% Schild repariert Pip %s so schnell."],
+		["Ersatzteile", "Jeder %d. besiegte Gegner lässt ein Schildstück fallen (+2 %% Schild)."]],
+	"cannon": [["Panzerplatte", "Die Mauer nimmt %d %% weniger Schaden."],
+		["Doppelwumms", "Jeder %d. Schuss stößt zweimal zurück."]],
+	"gravity": [["Mini-Loch", "Getroffene Gegner werden stärker zusammengezogen (+%d %%)."],
+		["Zeitdehnung", "Gegner im Schwerkraftfeld sind %d %% langsamer."]],
+}
+
+
+## Nur für Tests (--faehigkeiten=N): alle Kampfkarten der Champions gleich auf Stufe N
+static var test_skills := 0
+
+
+func skill(n: int) -> int:
+	return int(mods.get("skill%d" % n, 0))
+
+
+## Wert der Fähigkeit auf Stufe lvl (1–3), wie er auf der Karte steht
+static func skill_value(fam: String, n: int, lvl: int):
+	lvl = clampi(lvl, 1, 3)
+	match [fam, n]:
+		["beam", 1]: return 10 + 5 * lvl          # +15/20/25 % Schaden (Stufe 1 laut Seite: +15 %)
+		["beam", 2]: return 6 - lvl               # jeder 5./4./3. Atemzug
+		["drone", 1]: return ["doppelt", "zweieinhalbmal", "dreimal"][lvl - 1]
+		["drone", 2]: return 9 - lvl              # jeder 8./7./6. besiegte Gegner
+		["cannon", 1]: return 5 + 5 * lvl         # 10/15/20 % weniger Schaden
+		["cannon", 2]: return 5 - lvl             # jeder 4./3./2. Schuss
+		["gravity", 1]: return 25 * lvl           # Sog +25/50/75 %
+		["gravity", 2]: return 15 + 5 * lvl       # 20/25/30 % langsamer
+	return 0
 
 var magazine: Array[String] = []
 var reloading := false
@@ -408,12 +443,18 @@ func _fire(target: Enemy) -> void:
 				var far := from + (target.aim_point() - from).normalized() * maxf(8.0, from.distance_to(target.aim_point()) + 4.0)
 				FxSprite.beam(battle, "fuenkchen_geschoss", from, far, 0.25, 0.6, 0.7)
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, pierce, 60.0, 1.3)
-			if ult_active():
+			if skill(1) > 0:
+				target.mark_vulnerable(float(skill_value("beam", 1, skill(1))) / 100.0, 3.0)
+			var comet := skill(2) > 0 and _shot_n % int(skill_value("beam", 2, skill(2))) == 0
+			if ult_active() or comet:
 				for other in battle.spread_targets(2, target):
 					battle.fire_bullet(from, other, dmg, false, ammo_type, pierce, 60.0, 1.3)
 		"drone":
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, 0, 34.0, 0.8)
-			battle.repair_fence(float(data["repair"]) * (1.0 + 0.5 * sp()), 0.0)
+			var fix := float(data["repair"]) * (1.0 + 0.5 * sp())
+			if skill(1) > 0 and battle.fence_hp < battle.fence_max * 0.3:
+				fix *= 1.5 + 0.5 * skill(1)   # Notreparatur: doppelt / zweieinhalbmal / dreimal
+			battle.repair_fence(fix, 0.0)
 			_repair_n += 1
 			if _repair_n % 4 == 0:
 				battle.fence_heal_fx("pip_reparatur", [global_position.x])
@@ -428,20 +469,28 @@ func _fire(target: Enemy) -> void:
 				battle.repair_fence(float(GameData.HEROES["pip"]["repair"]) * 0.6, 0.0)
 			var eid := target.get_instance_id()
 			var travel := from.distance_to(target.aim_point()) / 30.0
+			var twice := skill(2) > 0 and _shot_n % int(skill_value("cannon", 2, skill(2))) == 0
 			get_tree().create_timer(travel, false).timeout.connect(func() -> void:
 				var e := instance_from_id(eid) as Enemy
 				if e and e.alive:
-					e.knockback(push))
+					e.knockback(push)
+					if twice:
+						e.knockback(push)   # Doppelwumms
+						if battle:
+							Fx.flash(battle, e.aim_point(), Color(1.0, 0.65, 0.2), 1.2, 0.2))
 		"gravity":
 			# Schwerkraftfeld am Ziel: zieht die Gegner dort zusammen und bremst sie
 			var r: float = float(data["radius"]) * (1.0 + 0.2 * sp())
+			var pull := 0.5 * (1.0 + float(skill_value("gravity", 1, skill(1))) / 100.0) if skill(1) > 0 else 0.5   # Mini-Loch
+			pull = minf(pull, 0.95)
+			var slow := 0.35 + (float(skill_value("gravity", 2, skill(2))) / 100.0 if skill(2) > 0 else 0.0)   # Zeitdehnung
 			battle.fire_bullet(from, target, 0.0, false, ammo_type, 0, 32.0, 1.0)
 			var eid2 := target.get_instance_id()
 			var travel2 := from.distance_to(target.aim_point()) / 32.0
 			get_tree().create_timer(travel2, false).timeout.connect(func() -> void:
 				var e := instance_from_id(eid2) as Enemy
 				if battle and e and e.alive:
-					battle.gravity_well(e.global_position, r, dmg, crit, ammo_type, 0.5, 0.35, 1.2))
+					battle.gravity_well(e.global_position, r, dmg, crit, ammo_type, pull, slow, 1.2 + (0.5 if skill(2) > 0 else 0.0)))
 	# Meisterfähigkeit „Doppelschuss“: jeder 3. Schuss trifft zusätzlich einen zweiten Gegner
 	if meister("rate") and _shot_n % 3 == 0 and not ult_active():
 		for other in battle.spread_targets(1, target):

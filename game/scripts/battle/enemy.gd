@@ -102,10 +102,20 @@ func ready_as_target() -> bool:
 	return alive and _appear > 0.35
 
 
+## Sternenstaub (Fünkchen): eine Weile mehr Schaden nehmen
+var _vuln := 0.0
+var _vuln_t := 0.0
+
+
+func mark_vulnerable(extra: float, duration: float) -> void:
+	_vuln = maxf(_vuln, extra)
+	_vuln_t = maxf(_vuln_t, duration)
+
+
 func take_damage(amount: float) -> float:
 	if not alive:
 		return 0.0
-	var dealt := amount * (1.0 - armor)
+	var dealt := amount * (1.0 - armor) * (1.0 + (_vuln if _vuln_t > 0.0 else 0.0))
 	hp -= dealt
 	_flash = 1.0
 	if hp <= 0.0:
@@ -195,6 +205,10 @@ func _update_effects(delta: float) -> void:
 		if hp <= 0.0:
 			_die()
 			return
+	if _vuln_t > 0.0:
+		_vuln_t -= delta
+		if _vuln_t <= 0.0:
+			_vuln = 0.0
 	if _slow_t > 0.0:
 		_slow_t -= delta
 		if _slow_t <= 0.0:
