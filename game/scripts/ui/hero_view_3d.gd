@@ -202,7 +202,7 @@ func set_hero(id: String) -> void:
 		# eigene Heldenpose wie auf dem Heldenbild („Pose“, mit leichtem Atmen), sonst die Siegerpose
 		var has_pose := _ap != null and _ap.has_animation("Pose")
 		_pose = {"anim": "Idle", "t0": 0.0, "t1": 0.0, "yaw": 0.0} if portrait else (
-			{"anim": "Pose", "t0": 0.0, "t1": 0.5, "yaw": -15.0} if has_pose else {"anim": "Victory", "t0": 0.0, "t1": 0.8, "yaw": -15.0})
+			{"anim": "Pose", "t0": 0.0, "t1": 0.5, "yaw": 18.0} if has_pose else {"anim": "Victory", "t0": 0.0, "t1": 0.8, "yaw": -15.0})
 	_holder.rotation_degrees.y = float(_pose["yaw"])
 	if not portrait and _pose.has("fig"):
 		fig = float(_pose["fig"])

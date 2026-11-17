@@ -507,6 +507,33 @@ def hand_data(arm, side):
     return {"c": Vector(c), "f": fing.normalized(), "p": palm.normalized(), "thick": float(size[0])}
 
 
+# Daumen in Skeletten ohne sprechende Namen (Seiten wie in DUSTY/BROCKEN bestimmt)
+THUMBS = {"dusty": {"Bone_036", "Bone_037", "Bone_038"}, "brocken": {"Bone_034", "Bone_035", "Bone_039", "Bone_040"}}
+
+
+def finger_curl(arm, side, hd, amount=1.0):
+    """Finger zur Faust krümmen, wo das Skelett Fingerknochen hat: jeder Fingerknochen dreht um die Querachse der
+    Hand (Finger x Handfläche), so dass die Fingerspitzen zur Handfläche gehen. Daumen schwächer."""
+    hand = arm.data.bones["mixamorig:%sHand" % side]
+    axis_rest = hand.matrix_local.to_3x3() @ hd["f"].cross(hd["p"]).normalized()
+    for b in hand.children_recursive:
+        n = b.name
+        if n.endswith("_End") or n.endswith("4") or b.length < 0.004:
+            continue
+        depth = 0
+        q = b
+        while q.parent and q.parent != hand:
+            depth += 1
+            q = q.parent
+        thumb = "Thumb" in n or n in THUMBS.get(hero, set())
+        deg = ([30, 35, 30] if thumb else [70, 85, 65])[min(depth, 2)] * amount
+        local = (b.matrix_local.to_3x3().inverted() @ axis_rest).normalized()
+        pb = arm.pose.bones[n]
+        pb.rotation_mode = 'QUATERNION'
+        pb.rotation_quaternion = Quaternion(local, math.radians(deg))
+    update()
+
+
 def build_armed():
     arm = [o for o in scene.objects if o.type == 'ARMATURE'][0]
     arm.name = "Armature"
@@ -549,6 +576,7 @@ def build_armed():
         head = pb.matrix.translation.copy()
         pb.matrix = Matrix.Translation(head) @ M.to_4x4()
         update()
+        finger_curl(arm, side, hd, 0.5 if side == "Right" else 0.3)   # stärker zerknittern Meshys verschmolzene Finger
         return (head + M @ hd["c"] - center).length   # wie weit die Faust das Ziel verfehlt (Arm zu kurz)
 
     def grip(center, barrel, up=UP, two=True, pole_r=(-0.7, 0.6, -0.5), far=False):
@@ -621,11 +649,24 @@ def build_armed():
         w = math.sin(t * 2 * math.pi)
         body(1.0 * w, 0.006 * w)
         if kind == "raised":
-            # Revolverhelden-Pose: Arm zur Seite gestreckt, Waffe zielt seitlich nach außen und leicht nach vorn.
-            # Von vorn: Waffe im Profil, Faust hinter dem Griff, Kopf frei.
-            c = sh_r + Vector((-0.4, -0.2, 0.02 + 0.008 * w))
+            # Revolverhelden-Pose: breiter Stand, Oberkörper und Blick zum Ziel, Arm zur Seite gestreckt, Waffe im
+            # Profil, Faust hinter dem Griff; linke Faust vorn an der Hüfte (von vorn sichtbar)
+            for leg, sgn in (("mixamorig:RightUpLeg", -1), ("mixamorig:LeftUpLeg", 1)):
+                if leg in arm.pose.bones:
+                    rot_world(arm, leg, (0, 1, 0), 9 * sgn)
+            if "mixamorig:Spine2" in arm.pose.bones:
+                rot_world(arm, "mixamorig:Spine2", (0, 0, 1), 10)
+            if "mixamorig:Head" in arm.pose.bones:
+                rot_world(arm, "mixamorig:Head", (0, 0, 1), 14)
+                rot_world(arm, "mixamorig:Head", (1, 0, 0), -4)
+            update()
+            c = sh_r + Vector((-0.4, -0.24, 0.02 + 0.008 * w))
             grip(c, Vector((-0.85, -0.5, 0.12)), two=False, pole_r=(-0.2, 0.6, -1.0))
-            left_free(left, w)
+            if left == "tablet":
+                left_free(left, w)
+            else:
+                hip = bone_head(arm, "mixamorig:LeftArm") + Vector((0.1, -0.12, -0.46 + 0.006 * w))
+                place("Left", HL, hip, Vector((-0.2, -0.3, -1.0)), Vector((-1.0, 0.2, 0.0)), (1.0, 0.6, 0.2))
         elif kind == "shoulder":
             c = sh_r + Vector((-0.03, -0.1, -0.3 + 0.006 * w))
             grip(c, Vector((-0.12, -0.9, 0.42)), two=False)
