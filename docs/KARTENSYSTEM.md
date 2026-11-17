@@ -76,3 +76,10 @@ Bosse 35–55 %, `scripts/balance-lab.py`). Der Wunsch „bis Level 30 entspannt
 - Grundkurve: „bis Level 30 entspannt“ (Vorschlag an den Nutzer)
 - Mockup der neuen Karten (Meisterfähigkeit, Symbiose, belegte Plätze), danach Einbau ins Spiel und ins Tutorial
   (dort wählt man bisher nach Welle 1 einen Helden)
+
+## Kampfkarten der Champions (freigegeben 17.11.2026)
+
+Jeder der zwölf Champions hat zwei Kampfkarten (`Hero.SKILLS` in `game/scripts/battle/hero.gd`, Werte je Stern in
+`Hero.skill_value`), die nach einer Welle wie die anderen Heldenkarten gezogen werden, je bis 3 Sterne. Übersicht mit
+Werten, Wirkung und Testbelegen: Artefakt „Kampfkarten der Champions“. Vom Nutzer am 17.11.2026 alle 24 freigegeben.
+Prüfen im Test: `--faehigkeiten=3` setzt alle Karten auf Stern 3 und gibt am Ende aus, wie oft jede gewirkt hat.
