@@ -53,6 +53,14 @@ const VIEW_SIZE := 300.0
 var hero := ""
 var _info: InfoLayer
 var _view3d: HeroView3D
+## Gemaltes Porträt (ChatGPT, Vorlage_Raw/Champion_Portraets_v1) statt der 3D-Figur, wo es eines gibt:
+## ui/portraits/<id>.webp, schon auf das Motiv zugeschnitten. Unterkante auf der Standlinie (Podest).
+const PORTRAIT_BOX := Vector2(330, 300)
+## Höhe relativ zur Box und Abstand über der Standlinie (aus PORTRAET_LAYOUT.json): Lynx kniet, Fritzi springt
+const PORTRAIT_FIT := {"lynx": [0.836, 0.0], "fritzi": [0.933, 0.1]}
+var _portrait: TextureRect
+var _portrait_id := ""
+var _feet := 0.0
 var _skill_view: MockView
 var _skill := ""
 var _level_view: MockView
@@ -69,8 +77,16 @@ func _ready() -> void:
 	super()
 	var hr := live_rect("hero")
 	var feet := hr.end.y   # Unterkante des Heldenbilds im Mockup (Größe/Lage je Held: HeroView3D.POSES)
+	_feet = feet
 	_view3d = HeroView3D.make(hero)
 	place_at(_view3d, Rect2(W * 0.5 - VIEW_SIZE * 0.5, feet - _view3d.feet * VIEW_SIZE, VIEW_SIZE, VIEW_SIZE))
+	_portrait = TextureRect.new()
+	_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_portrait.stretch_mode = TextureRect.STRETCH_SCALE
+	_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_portrait_id = "_frei_%d" % _placed.size()
+	place_at(_portrait, Rect2(0, 0, 1, 1))
+	_show_portrait(hero)
 	_info = InfoLayer.new()
 	_info.board = self
 	place_at(_info, Rect2(0, 0, W, H))
@@ -101,8 +117,34 @@ func _set_hero(id: String) -> void:
 	show_state(id if MockView.layout_of("held").get("states", {}).has(id) else "dusty")
 	if _view3d and _view3d.hero_id != id:
 		_view3d.set_hero(id)
+	_show_portrait(id)
 	_decorate()
 	refresh()
+
+
+## Porträt zeigen, wenn es für den Helden eines gibt (sonst die 3D-Figur)
+func _show_portrait(id: String) -> void:
+	if _portrait == null:
+		return
+	var path := "res://ui/portraits/%s.webp" % id
+	var has := ResourceLoader.exists(path)
+	_portrait.visible = has
+	if _view3d:
+		_view3d.visible = not has
+	if not has:
+		return
+	var tex: Texture2D = load(path)
+	_portrait.texture = tex
+	var fit: Array = PORTRAIT_FIT.get(id, [1.0, 0.0])
+	var h := PORTRAIT_BOX.y * float(fit[0])
+	var w := h * float(tex.get_width()) / float(tex.get_height())
+	if w > PORTRAIT_BOX.x:
+		h *= PORTRAIT_BOX.x / w
+		w = PORTRAIT_BOX.x
+	var r := Rect2(W * 0.5 - w * 0.5, _feet - PORTRAIT_BOX.y * float(fit[1]) - h, w, h)
+	_live[_portrait_id] = r
+	_portrait.position = to_screen(r.position)
+	_portrait.size = r.size * s
 
 
 ## Text im aktuellen Zustand über eine Bedingung finden (Nummer, -1 wenn keiner passt)

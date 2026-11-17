@@ -17,7 +17,7 @@ Bitte nacheinander abschicken, jeweils erst den nächsten, wenn der vorige gelie
 | H3 | Meshy-Modelle Iska, Brocken, Volta, Kalle, Margot, Lynx, Fritzi | `CHATGPT_PROMPTS.md`, Prompt H3 | etwa 210 Credits, **freigegeben 16.11.2026** | **geliefert 17.11.2026**, Einbau durch Claude |
 | W1 | Vorlagen für acht Champion-Waffen (seite, oben, vorn) | `CHATGPT_PROMPTS.md`, Prompt W1 | keine | **geliefert und geprüft 17.11.2026** |
 | W2 | Meshy-Modelle der acht Waffen | `CHATGPT_PROMPTS.md`, Prompt W2 | etwa 240 Credits, **freigegeben 17.11.2026** | **geliefert 17.11.2026**, im Spiel seit 0.10.14 |
-| H4 | Heldenposen mit Waffe in der Hand (Vergleich zu Claudes Fassung) | `CHATGPT_PROMPTS.md`, Prompt H4 | keine Credits | abgeschickt 17.11.2026 |
+| H4 | Heldenposen mit Waffe in der Hand (Vergleich zu Claudes Fassung) | `CHATGPT_PROMPTS.md`, Prompt H4 | keine Credits | **geliefert als gemalte Porträts (Champion_Portraets_v1)**, in „Held aufleveln“ seit 0.10.16 |
 
 ## Gemerkt für später (noch kein Auftrag)
 
