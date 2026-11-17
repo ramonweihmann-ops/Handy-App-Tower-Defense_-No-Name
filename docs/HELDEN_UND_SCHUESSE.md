@@ -75,3 +75,12 @@ räumlich aus.
    Champion zur Ansicht.
 3. Freigabe je Champion, dann die übrigen.
 4. Einstellung „Effekte: bisher / neu“ bleibt, bis alle freigegeben sind.
+
+## Stand 17.11.2026: alle zwölf Champions mit neuem Modell
+
+Alle Champions nutzen die neuen Comic-Modelle (`game/models/heroes_v2/`, Bauskripte in `tools/heroes/`), seit
+0.10.13 ohne Schalter für alle sichtbar. Die Waffen der sieben Menschen sind Platzhalter aus Grundformen, bis die
+Meshy-Waffen aus Auftrag W2 da sind (Vorlagen: `Vorlage_Raw/Waffen_Roh/`).
+
+**Regel des Nutzers (17.11.2026):** Solange er der einzige Tester ist, wird alles Neue sofort für alle sichtbar
+eingebaut, ohne Entwicklermodus oder Prüfschalter. Die Testkarte steht immer unter Spielmodi.
