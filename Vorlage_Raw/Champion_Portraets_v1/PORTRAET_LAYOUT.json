@@ -1,0 +1,138 @@
+{
+  "dusty": {
+    "datei": "ohne_hintergrund/dusty.png",
+    "name": "Dusty Jo",
+    "bildgroesse_px": [
+      1122,
+      1402
+    ],
+    "motivbereich_px": [
+      84,
+      49,
+      816,
+      1269
+    ],
+    "maximale_motivhoehe_relativ_zur_anzeigehoehe": 1.0,
+    "abstand_zur_standlinie_relativ_zur_anzeigehoehe": 0,
+    "datei_mit_hintergrund": "mit_hintergrund/dusty.png"
+  },
+  "iska": {
+    "datei": "ohne_hintergrund/iska.png",
+    "name": "Iska",
+    "bildgroesse_px": [
+      1122,
+      1402
+    ],
+    "motivbereich_px": [
+      189,
+      12,
+      718,
+      1376
+    ],
+    "maximale_motivhoehe_relativ_zur_anzeigehoehe": 1.0,
+    "abstand_zur_standlinie_relativ_zur_anzeigehoehe": 0,
+    "datei_mit_hintergrund": "mit_hintergrund/iska.png"
+  },
+  "brocken": {
+    "datei": "ohne_hintergrund/brocken.png",
+    "name": "Brocken",
+    "bildgroesse_px": [
+      1122,
+      1402
+    ],
+    "motivbereich_px": [
+      48,
+      47,
+      964,
+      1289
+    ],
+    "maximale_motivhoehe_relativ_zur_anzeigehoehe": 1.0,
+    "abstand_zur_standlinie_relativ_zur_anzeigehoehe": 0,
+    "datei_mit_hintergrund": "mit_hintergrund/brocken.png"
+  },
+  "volta": {
+    "datei": "ohne_hintergrund/volta.png",
+    "name": "Volta",
+    "bildgroesse_px": [
+      1122,
+      1402
+    ],
+    "motivbereich_px": [
+      83,
+      13,
+      903,
+      1358
+    ],
+    "maximale_motivhoehe_relativ_zur_anzeigehoehe": 1.0,
+    "abstand_zur_standlinie_relativ_zur_anzeigehoehe": 0,
+    "datei_mit_hintergrund": "mit_hintergrund/volta.png"
+  },
+  "kalle": {
+    "datei": "ohne_hintergrund/kalle.png",
+    "name": "Kalle",
+    "bildgroesse_px": [
+      1122,
+      1402
+    ],
+    "motivbereich_px": [
+      14,
+      108,
+      1077,
+      1170
+    ],
+    "maximale_motivhoehe_relativ_zur_anzeigehoehe": 1.0,
+    "abstand_zur_standlinie_relativ_zur_anzeigehoehe": 0,
+    "datei_mit_hintergrund": "mit_hintergrund/kalle.png"
+  },
+  "margot": {
+    "datei": "ohne_hintergrund/margot.png",
+    "name": "Käpt’n Margot",
+    "bildgroesse_px": [
+      1122,
+      1402
+    ],
+    "motivbereich_px": [
+      81,
+      37,
+      968,
+      1320
+    ],
+    "maximale_motivhoehe_relativ_zur_anzeigehoehe": 1.0,
+    "abstand_zur_standlinie_relativ_zur_anzeigehoehe": 0,
+    "datei_mit_hintergrund": "mit_hintergrund/margot.png"
+  },
+  "lynx": {
+    "datei": "ohne_hintergrund/lynx.png",
+    "name": "Lynx",
+    "bildgroesse_px": [
+      1122,
+      1402
+    ],
+    "motivbereich_px": [
+      40,
+      72,
+      1047,
+      1265
+    ],
+    "maximale_motivhoehe_relativ_zur_anzeigehoehe": 0.836,
+    "abstand_zur_standlinie_relativ_zur_anzeigehoehe": 0,
+    "datei_mit_hintergrund": "mit_hintergrund/lynx.png"
+  },
+  "fritzi": {
+    "datei": "ohne_hintergrund/fritzi.png",
+    "name": "Fritzi",
+    "bildgroesse_px": [
+      1122,
+      1402
+    ],
+    "motivbereich_px": [
+      108,
+      25,
+      924,
+      1270
+    ],
+    "maximale_motivhoehe_relativ_zur_anzeigehoehe": 0.933,
+    "abstand_zur_standlinie_relativ_zur_anzeigehoehe": 0.1,
+    "datei_mit_hintergrund": "mit_hintergrund/fritzi.png"
+  }
+}
