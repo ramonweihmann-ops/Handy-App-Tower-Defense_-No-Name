@@ -762,3 +762,44 @@ BITTE LIEFERN in Vorlage_Raw/Champion_Portraets_v2/:
 
 Nur die eingebaute Bildgenerierung im bestehenden Konto verwenden, keine weiteren kostenpflichtigen Dienste.
 ~~~~
+
+## Prompt S1b: Voltas Blitz überarbeiten (nach dem Spieltest)
+
+**Kosten:** keine · **Abschicken:** 17.11.2026
+
+~~~~text
+Danke für Voltas Schusseffekt (Vorlage_Raw/Schusseffekte_Volta_v1/). Das Format passt genau, Claude hat ihn eingebaut und
+im Spiel getestet. Repository Handy-App-Tower-Defense_-No-Name, Branch claude/amazing-hypatia-yl59v4.
+
+BEFUND IM SPIEL (Bild: Vorlage_Raw/Schusseffekte_Volta_Referenz/spieltest_v1.png, links Eisbrücke, rechts Raumdock)
+- Blitzbogen: viel zu dünn und blass. Selbst mit 2,1 m statt 0,7 m Höhe ist er auf der hellen Eisbrücke kaum zu
+  sehen, auf dem Raumdock nur als feiner Strich. Die Kamera schaut von hinten oben, der Bogen ist im Bild nur
+  1–2 Pixel breit.
+- Einschlag: zu groß und zu weiß, er deckt den Gegner fast ganz zu.
+- Mündungsblitz: passt so.
+
+BITTE ÜBERARBEITEN (gleiches Format, gleiche Dateinamen, neuer Ordner Vorlage_Raw/Schusseffekte_Volta_v2/)
+1. volta_blitzbogen (256 × 256 je Bild, 4 × 2, 24 fps, Start links bei x 20, Ziel rechts bei x 236, Mitte y 128)
+   - weißer Kern mindestens 6–8 px dick, durchgehend, ohne Lücken
+   - kräftiger Leuchtsaum in Türkis bis Blauviolett, etwa 30–40 px nach oben und unten auslaufend
+   - Zacken etwas ruhiger (Ausschlag höchstens ±35 px), damit der Bogen dick wirkt und nicht zittert
+   - 2–3 kurze Seitenäste mit Funken, aber keine dunklen oder grauen Ränder (die wirken auf hellem Boden wie
+     ein Schatten)
+   - erste Bilder hell aufblitzend, letzte 2–3 Bilder ausklingend
+   - in der JSON: feste_hoehe_m 2.0
+2. volta_einschlag (256 × 256 je Bild, 4 × 3, 24 fps)
+   - kleiner: groesse_m 1.0 statt 1.48
+   - Mitte nur kurz hell (2–3 Bilder), danach durchsichtig, damit der Gegner sichtbar bleibt
+   - Funken und kleine Blitzbögen nach außen, Glühen in Türkis statt Weiß
+3. volta_muendung: unverändert übernehmen
+
+PRÜFEN VOR DER LIEFERUNG
+- die Kampfvorschau auf zwei Brücken zeigen: der hellen Eiswelt (game/fields/ice_world.webp) und dem Raumdock
+  (game/fields/space_dock.webp), Kamera von hinten oben wie im Spiel, Bogen über 6–8 m Entfernung
+- der Bogen muss auf beiden Brücken auf den ersten Blick zu sehen sein, auch verkleinert auf Handygröße
+
+LIEFERN in Vorlage_Raw/Schusseffekte_Volta_v2/: die drei Ordner mit Sheet-PNG, JSON und Vorschau-GIF, ABLAUF_VOLTA.json,
+LIESMICH_CLAUDE.md, UEBERSICHT.png und VOLTA_KAMPF_VORSCHAU_EIS.gif sowie VOLTA_KAMPF_VORSCHAU_RAUMDOCK.gif.
+
+Nur die eingebaute Bildgenerierung und Bildbearbeitung im bestehenden Konto verwenden, keine kostenpflichtigen Dienste.
+~~~~
