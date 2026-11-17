@@ -720,3 +720,45 @@ LIEFERN in Vorlage_Raw/Helden_Posen_v1/<id>/:
 - LIESMICH_CLAUDE.md: was geändert wurde, Neu-Rigging ja/nein, Dreiecke
 Dazu Vorlage_Raw/Helden_Posen_v1/UEBERSICHT.png mit allen vorschau_pose.png und vorschau_hand.png.
 ~~~~
+
+## Prompt P2: Champion-Porträts für Fünkchen, Pip, Rollo und Nova
+
+**Kosten:** keine (eingebaute Bildgenerierung) · **Abschicken:** 17.11.2026
+
+~~~~text
+Bitte für mein Handyspiel „Station am Wurmloch“ vier weitere Champion-Porträts für den Auflevel-Bildschirm malen,
+genau im Stil und Format der acht Porträts, die du schon geliefert hast. Repository Handy-App-Tower-Defense_-No-Name,
+Branch claude/amazing-hypatia-yl59v4.
+
+VORBILD (bitte laden)
+- Deine acht Porträts: Vorlage_Raw/Champion_Portraets_v1/ (UEBERSICHT_CHAMPIONS.png, ohne_hintergrund/, mit_hintergrund/)
+- Deine Bildanweisungen dazu: Vorlage_Raw/Champion_Portraets_v1/BILDANWEISUNGEN.txt (gleiche Grundanweisung verwenden)
+- Aussehen der vier Figuren: game/ui/heroes2d/<id>.png und die Vorlagen Vorlage_Raw/Helden_Roh/<id>_comic_v1/<id>_vorn.png
+
+DIE VIER MOTIVE (Vorschläge, gern dramatischer ausarbeiten)
+- fuenkchen · Fünkchen, kleiner lila Weltraumdrache mit türkisen Flügeln und goldenem Stern-Medaillon. Steht stolz
+  auf den Hinterbeinen, Flügel weit gespreizt, haucht einen kleinen funkelnden Sternenatem (lila-goldene Funken)
+  zur Seite. Freches, freundliches Grinsen.
+- pip · Pip, kleiner Cyberbot mit Bildschirmgesicht (türkise Augen), oranger Brustplatte und Antenne. Hält in einem
+  Greifer einen großen Schraubenschlüssel, mit dem anderen winkt er; ein paar Schrauben schweben verspielt um ihn.
+- rollo · Rollo, Mini-Panzer mit orangen Ketten, blauem Turm mit Bildschirmaugen und Stern auf der Front. Leicht
+  schräg von vorn, Turm keck zur Seite gedreht, Rohr nach oben gerichtet, kleine Staubwölkchen an den Ketten,
+  als würde er gerade anfahren.
+- nova · Nova, Exo-Pilotin mit lockigem Haar, lila-weißem Anzug und türkisem Stirnband. Kraftvolle Pose mit einer
+  erhobenen Raketenfaust, deren Handgelenk-Düsen leise glühen, die andere Faust geballt vor dem Körper.
+
+GLEICH WIE BEI DEN ACHT
+- 1122 × 1402 Pixel, je Motiv zwei Fassungen: ohne Hintergrund (echter Alphakanal) und mit ruhigem Dunkelviolett #221935
+- ganze Figur, frontal oder leicht gedreht, Gesicht und Augen sichtbar, etwa 10 % Rand
+- kein Text, keine Logos, keine Benutzeroberfläche, kein Schuss, kein Blut, nur eine Figur
+- Hände bzw. Greifer fassen sichtbar und plastisch zu, nichts geht durcheinander
+
+BITTE LIEFERN in Vorlage_Raw/Champion_Portraets_v2/:
+- ohne_hintergrund/<id>.png und mit_hintergrund/<id>.png (ids: fuenkchen, pip, rollo, nova)
+- PORTRAET_LAYOUT.json mit denselben Feldern wie in v1 (datei, name, bildgroesse_px, motivbereich_px,
+  maximale_motivhoehe_relativ_zur_anzeigehoehe, abstand_zur_standlinie_relativ_zur_anzeigehoehe, datei_mit_hintergrund)
+- UEBERSICHT_CHAMPIONS.png mit allen zwölf Porträts (die acht aus v1 und die vier neuen) und Namen
+- LIESMICH_CLAUDE.md und BILDANWEISUNGEN.txt
+
+Nur die eingebaute Bildgenerierung im bestehenden Konto verwenden, keine weiteren kostenpflichtigen Dienste.
+~~~~
