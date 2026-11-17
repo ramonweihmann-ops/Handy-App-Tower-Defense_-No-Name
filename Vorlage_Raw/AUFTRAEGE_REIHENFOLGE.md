@@ -5,16 +5,16 @@ Bitte nacheinander abschicken, jeweils erst den nächsten, wenn der vorige gelie
 | Nr. | Auftrag | Datei | Kosten | Voraussetzung |
 |---|---|---|---|---|
 | 1 | Ranglisten, Ligen, Spielerrahmen, Überleben, Gegnersuche (31 Bilder) | `RANGLISTEN_FUER_CHATGPT.md` | keine | **geliefert und geprüft 16.11.2026** (`Ranglisten_v1`), in den Wettbewerb-Mockups eingesetzt |
-| 1c | Arenen neu: Bahn flach auf dem Arenaboden, Tribünen ringsum, Tunnel für die Gegner | `ARENEN_V2_FUER_CHATGPT.md` | keine | – |
-| 2 | Brücken der Planeten 06–15 neu gestalten (bisher überall dieselbe schlichte Brücke) | `BRUECKEN_06_15_FUER_CHATGPT.md` | keine | – |
+| 1c | Arenen neu: Bahn flach auf dem Arenaboden, Tribünen ringsum, Tunnel für die Gegner | `ARENEN_V2_FUER_CHATGPT.md` | keine | **geliefert (Arena_Karten_v2), im Spiel seit 0.10.7** |
+| 2 | Brücken der Planeten 06–15 neu gestalten (bisher überall dieselbe schlichte Brücke) | `BRUECKEN_06_15_FUER_CHATGPT.md` | keine | **als Nächstes, 17.11.2026** |
 | 3 | Quallenflieger: fehlerhaftes Modell mit acht Armen nachreichen | `Monster_Roh/QUALLE_FEHLMODELL_FUER_CHATGPT.md` | keine | – (vom Nutzer am 11.11.2026 freigegeben) |
 | 4 | Kartenmotive für sieben Symbiosen und das Meister-Abzeichen | `SYMBIOSE_MEISTER_MOTIVE_FUER_CHATGPT.md` | keine | Nutzer gibt Mockups „Karten-Meister“ und „Karten-Symbiose“ frei |
 | 4b | Fähigkeiten der Champions (19) und fehlende Kartenlogos (4) im neuen Stil | `TALENTE_LOGOS_FUER_CHATGPT.md` | keine | bestätigt am 16.11.2026, kann raus |
 | 5 | 3D-Modelle der Gegner für die Planeten 08–15 (Level 71–150), Planet für Planet | `Monster_Roh/PLANETEN_08_15_MESHY_FUER_CHATGPT.md` | je Planet etwa 60 Meshy-Credits, zusammen etwa 480 | eigene Freigabe je Planet |
 
 | H1 | Champion-Vorlagen (vorn, links, hinten) für elf Champions | `HELDEN_VORLAGEN_MESHY_FUER_CHATGPT.md` Teil A | keine | **geliefert und geprüft 16.11.2026** |
-| H2 | Meshy-Modelle Fünkchen, Pip, Rollo, Nova | dieselbe Datei, Teil B | etwa 120 Credits, **freigegeben 16.11.2026** | abgeschickt 16.11.2026 |
-| H3 | Meshy-Modelle Iska, Brocken, Volta, Kalle, Margot, Lynx, Fritzi | `CHATGPT_PROMPTS.md`, Prompt H3 | etwa 210 Credits, **freigegeben 16.11.2026** | nach H2 |
+| H2 | Meshy-Modelle Fünkchen, Pip, Rollo, Nova | dieselbe Datei, Teil B | etwa 120 Credits, **freigegeben 16.11.2026** | **geliefert und geprüft 16.11.2026**, als 0.10.9 zur Prüfung im Spiel |
+| H3 | Meshy-Modelle Iska, Brocken, Volta, Kalle, Margot, Lynx, Fritzi | `CHATGPT_PROMPTS.md`, Prompt H3 | etwa 210 Credits, **freigegeben 16.11.2026** | **geliefert 17.11.2026**, Einbau durch Claude |
 
 ## Gemerkt für später (noch kein Auftrag)
 
