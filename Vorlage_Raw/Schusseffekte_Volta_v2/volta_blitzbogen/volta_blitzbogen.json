@@ -1,0 +1,20 @@
+{
+  "name": "volta_blitzbogen",
+  "frames": 8,
+  "cols": 4,
+  "rows": 2,
+  "fps": 24,
+  "loop": false,
+  "anker": [
+    0.078125,
+    0.5
+  ],
+  "groesse_m": 2.0,
+  "mischung": "alpha",
+  "notiz": "Kern 7,1 px bei vollem Alpha, weicher violetter Saum. Schussrichtung nach rechts.",
+  "ziel_anker": [
+    0.921875,
+    0.5
+  ],
+  "feste_hoehe_m": 2.0
+}
