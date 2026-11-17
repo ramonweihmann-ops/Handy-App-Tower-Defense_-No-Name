@@ -637,3 +637,35 @@ Dazu Vorlage_Raw/Waffen_Roh/UEBERSICHT_WAFFEN.png mit allen 24 Bildern.
 
 Nur die eingebaute Bildgenerierung im bestehenden Konto verwenden, keine weiteren kostenpflichtigen Dienste.
 ~~~~
+
+## Prompt W2: Meshy-Modelle der acht Champion-Waffen
+
+**Kosten:** etwa 240 Meshy-Credits (8 × 30), **erst nach Freigabe durch den Nutzer** · **Abschicken:** nach W1
+
+~~~~text
+Bitte aus den freigegebenen Waffenvorlagen bei Meshy 3D-Modelle erzeugen, genau wie bei den Champions (H2/H3).
+Repository Handy-App-Tower-Defense_-No-Name, Branch claude/amazing-hypatia-yl59v4.
+
+KOSTENRAHMEN: vom Nutzer freigegeben, höchstens 8 Erzeugungen zu je etwa 30 Credits (zusammen etwa 240 Credits).
+Je Waffe ein Versuch; wenn er misslingt, melden statt neu erzeugen. Kein Rigging, keine Bewegungen.
+
+DIE ACHT WAFFEN (Vorlagen in Vorlage_Raw/Waffen_Roh/<id>_waffe_v1/, je seite, oben, vorn)
+dusty, iska, brocken, volta, kalle, margot, lynx, fritzi
+
+ERZEUGUNG
+- Meshy 7.1 Bild zu 3D mit Multi-View aus den drei Ansichten, Standardauflösung, Texturen 2K, privat
+- danach die kostenlose Reduktion auf etwa 3.000 Dreiecke (Waffen sind im Spiel klein); falls nur 10K möglich ist,
+  die 10K-Fassung speichern
+
+VOR DEM HOCHLADEN PRÜFEN
+- jede Waffe von der Seite, von oben, von vorn und schräg hinten rendern
+- Lauf, Griff, Abzugsbügel, Zielfernrohr und Tanks vollständig, nichts verschmolzen oder abgebrochen
+- besonders Lynx (dünner Lauf, Zielfernrohr) und Brocken (drei getrennte Mündungen)
+- Mündung zeigt in die gleiche Richtung wie in der Seitenansicht (nach rechts)
+
+ABLAGE in Vorlage_Raw/Waffen_Roh/<id>_waffe_v1/ je Waffe:
+- <id>_waffe_original.glb (unverändert), <id>_waffe_reduziert.glb
+- <id>_waffe_vorschau_seite.png, _oben.png, _vorn.png, _schraeg.png
+- Ergänzung in LIESMICH_CLAUDE.md: verbrauchte Credits, Einstellungen, Dreiecke, Prüfergebnis
+Dazu Vorlage_Raw/Waffen_Roh/UEBERSICHT_MODELLE_WAFFEN.png mit den Seitenansichten aller acht Modelle.
+~~~~
