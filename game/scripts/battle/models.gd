@@ -7,7 +7,7 @@ const HEROES := {
 	# v2: Comic-Modelle (GLB) mit eigener Waffe (WeaponSocket → Weapon → Muzzle) bzw. Mündung am Körper und den
 	# Animationen Idle, Shoot (beginnt im Anschlag), Victory; Dusty gebaut mit tools/heroes/build_dusty_jo.py,
 	# alle anderen (Meshy H2 und H3) mit tools/heroes/build_hero_v2.py
-	"dusty": {"file": "heroes_v2/dusty_jo", "gun": "", "v2": true},
+	"dusty": {"file": "heroes_v2/dusty_jo", "gun": "", "v2": true},   # seit 0.10.14 ebenfalls build_hero_v2.py (Meshy-Revolver)
 	"iska": {"file": "heroes_v2/iska", "gun": "", "v2": true},
 	"brocken": {"file": "heroes_v2/brocken", "gun": "", "v2": true},
 	"volta": {"file": "heroes_v2/volta", "gun": "", "v2": true},

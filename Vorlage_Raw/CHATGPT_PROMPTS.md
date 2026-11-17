@@ -669,3 +669,54 @@ ABLAGE in Vorlage_Raw/Waffen_Roh/<id>_waffe_v1/ je Waffe:
 - Ergänzung in LIESMICH_CLAUDE.md: verbrauchte Credits, Einstellungen, Dreiecke, Prüfergebnis
 Dazu Vorlage_Raw/Waffen_Roh/UEBERSICHT_MODELLE_WAFFEN.png mit den Seitenansichten aller acht Modelle.
 ~~~~
+
+## Prompt H4: Heldenposen mit Waffe in der Hand (Vergleich zu Claudes Fassung)
+
+**Kosten:** keine Meshy-Credits (nur Blender und, falls nötig, kostenloses Neu-Riggen) · **Abschicken:** 17.11.2026
+
+~~~~text
+Bitte für mein Handyspiel die acht menschlichen Champions so posieren, dass sie ihre Waffe sauber in der rechten Hand
+halten. Repository Handy-App-Tower-Defense_-No-Name, Branch claude/amazing-hypatia-yl59v4. Claude hat eine eigene
+Fassung gebaut; wir vergleichen danach beide.
+
+EINGABEN
+- Figuren mit Skelett: Vorlage_Raw/Helden_Roh/<id>_comic_v1/<id>_rig_roh.glb
+  (Dusty: Vorlage_Raw/Helden_Roh/dusty_jo_comic_v1/dusty_jo_smart_rig_roh.glb)
+- Waffen: Vorlage_Raw/Waffen_Roh/<id>_waffe_v1/<id>_waffe_reduziert.glb, Griff/Mündung/Länge in der LIESMICH_CLAUDE.md
+- Heldenbilder (Vorbild für die Pose): game/ui/heroes2d/<id>.png
+- Claudes Bauskript zum Nachlesen: tools/heroes/build_hero_v2.py
+- ids: dusty, iska, brocken, volta, kalle, margot, lynx, fritzi
+
+JE CHAMPION ZWEI POSEN (Blender, als Aktionen am Skelett)
+1. „Pose“: Heldenpose für das Menü, wie auf dem Heldenbild. Die Figur steht still (leichtes Atmen erlaubt).
+   Sie wird von vorn schräg gezeigt (etwa 15° gedreht).
+2. „Shoot“: Anschlag nach vorn für den Kampf, beginnt in der Zielhaltung, kurzer Rückstoß und zurück (0,4 s).
+   Die Figur wird im Kampf NUR von hinten oben gesehen: die Waffe muss rechts neben dem Körper sichtbar sein,
+   nicht vom großen Kopf verdeckt.
+Optional „Idle“ (Waffe gesenkt) und „Victory“ (Waffe erhoben).
+
+WICHTIG FÜR DIE HÄNDE
+- Die rechte Hand umschließt den Griff wie eine Faust. Nichts geht durch die Waffe: keine Hand im Griff, kein Arm
+  durch Schaft oder Lauf, keine Waffe im Kopf oder Gesicht.
+- Bei zweihändigen Waffen (Iska, Brocken, Margot, Lynx, Fritzi) liegt die linke Hand am Vorderschaft oder stützt ihn.
+- Finger krümmen, wo das Skelett Fingerknochen hat (Kalle, Lynx). Iska, Volta, Margot, Fritzi haben nur einen
+  Handknochen: dort bitte in Meshy kostenlos neu riggen mit der humanoiden Vorlage MIT Fingern (wie bei Pip und
+  Nova, Leistenmarkierung von Hand setzen), dann Finger um den Griff krümmen.
+- Keine verdrehten Unterarme (kein „Bonbonpapier“-Verdrehen); Drehung zwischen Unterarm und Hand verteilen.
+- Volta hält links ein Tablet (dunkler Rahmen, türkiser Bildschirm), Brocken trägt den Werfer auf der Schulter.
+
+TECHNIK (damit es ins Spiel passt)
+- Figur 2,0 Einheiten hoch, Füße auf dem Boden, Blick nach -Y in Blender (glTF mit +Y oben exportieren)
+- Knochennamen wie Mixamo: mixamorig:Hips, mixamorig:RightHand, mixamorig:LeftHand, mixamorig:Head usw.
+- Waffe als eigenes, starres Objekt: rechter Handknochen → Leerobjekt „WeaponSocket“ → „Weapon“ → Leerobjekt
+  „Muzzle“ an der Mündung (lokale -Z zeigt in Schussrichtung)
+- Texturen höchstens 1024 × 1024, je Figur unter 15.000 Dreiecke
+- Export: GLB mit allen Aktionen (export_animation_mode ACTIONS)
+
+LIEFERN in Vorlage_Raw/Helden_Posen_v1/<id>/:
+- <id>.glb
+- vorschau_pose.png (schräg vorn), vorschau_seite.png, vorschau_kampf.png (von hinten oben wie im Spiel),
+  vorschau_hand.png (Nahaufnahme rechte Hand mit Waffe)
+- LIESMICH_CLAUDE.md: was geändert wurde, Neu-Rigging ja/nein, Dreiecke
+Dazu Vorlage_Raw/Helden_Posen_v1/UEBERSICHT.png mit allen vorschau_pose.png und vorschau_hand.png.
+~~~~

@@ -297,11 +297,22 @@ BROCKEN = {"Bone_001": "mixamorig:Hips", "Bone_014": "mixamorig:Spine2", "Bone_0
            "Bone_009": "mixamorig:RightFoot", "Bone_004": "mixamorig:LeftFoot"}
 
 
+# Dusty Jo (Intelligentes Rig, Seiten aus der Textur bestimmt, wie in build_dusty_jo.py)
+DUSTY = {"Bone_000": "mixamorig:Hips", "Bone_016": "mixamorig:Head", "Bone_023": "mixamorig:RightHand",
+         "Bone_018": "mixamorig:LeftHand", "Bone_012": "mixamorig:RightFoot", "Bone_008": "mixamorig:LeftFoot",
+         "Bone_025": "mixamorig:RightArm", "Bone_024": "mixamorig:RightForeArm", "Bone_020": "mixamorig:LeftArm",
+         "Bone_019": "mixamorig:LeftForeArm", "Bone_005": "mixamorig:Spine2", "Bone_026": "mixamorig:RightShoulder",
+         "Bone_021": "mixamorig:LeftShoulder"}
+
+
 def normalize_bones(arm):
     names = [b.name for b in arm.data.bones]
     if "mixamorig:Hips" in names:
         return
-    ren = dict(BROCKEN) if "Bone_001" in names and "Hips" not in names else dict(MESHY2)
+    if hero == "dusty":
+        ren = dict(DUSTY)
+    else:
+        ren = dict(BROCKEN) if "Bone_001" in names and "Hips" not in names else dict(MESHY2)
     for n in names:
         if n in STD and n not in ren:
             ren[n] = "mixamorig:" + n
@@ -323,72 +334,77 @@ def mat(name, col, metal=0.0, rough=0.6, emit=0.0):
     return m
 
 
-R90 = 0.5 * math.pi
-# Waffen im Waffenraum: +Y = Lauf nach vorn, +Z = oben, Ursprung = Griff in der rechten Hand.
-# Teile: (Form, Maße, Lage, Drehung, Farbe). cyl: (Radius, Länge) entlang Y; box: (Breite, Länge, Höhe).
-# hold: rifle (zweihändig vor der Brust), shoulder (auf der Schulter), pistol (einhändig ausgestreckt)
-DARK, METAL, WOOD = (0.16, 0.17, 0.2), (0.45, 0.47, 0.52), (0.42, 0.24, 0.11)
+# Meshy-Waffen (Vorlage_Raw/Waffen_Roh/<id>_waffe_v1/<id>_waffe_reduziert.glb, Auftrag W2). Im Modell zeigt die
+# Mündung nach -X, oben ist +Z. Punkte (x, z) am Seitenraster abgelesen: grip = Griff der rechten Hand,
+# fore = Stelle für die linke Hand, muzzle = Mündung. len = Länge an der 2,0 hohen Figur (LIESMICH, Anteil der
+# Körperhöhe). hold: rifle (Anschlag an der rechten Schulter, zweihändig), shoulder (Werfer auf der Schulter),
+# pistol (einhändig, Arm gestreckt)
 WEAPONS = {
-    "iska": {"hold": "rifle", "fore": 0.30, "tip": 0.62, "parts": [
-        ("box", (0.07, 0.5, 0.11), (0, 0.12, 0.04), DARK), ("cyl", (0.024, 0.3), (0, 0.5, 0.06), METAL),
-        ("box", (0.08, 0.2, 0.085), (0, 0.3, 0.05), (0.15, 0.75, 0.8)), ("box", (0.05, 0.08, 0.17), (0, 0.13, -0.09), DARK, (-0.35, 0, 0)),
-        ("box", (0.06, 0.26, 0.1), (0, -0.2, 0.01), (0.3, 0.32, 0.38)), ("box", (0.045, 0.06, 0.12), (0, 0.0, -0.06), DARK, (-0.3, 0, 0))]},
-    "brocken": {"hold": "shoulder", "fore": 0.32, "tip": 0.66, "parts": [
-        ("cyl", (0.095, 0.95), (0, 0.18, 0.13), (0.85, 0.16, 0.12)), ("cyl", (0.11, 0.07), (0, 0.63, 0.13), DARK),
-        ("cyl", (0.11, 0.07), (0, -0.27, 0.13), DARK), ("box", (0.05, 0.07, 0.14), (0, 0.0, 0.0), DARK),
-        ("box", (0.05, 0.07, 0.12), (0, 0.32, 0.02), DARK), ("box", (0.04, 0.14, 0.06), (0, 0.12, 0.25), (0.95, 0.75, 0.15))]},
-    "volta": {"hold": "pistol", "tip": 0.33, "parts": [
-        ("box", (0.065, 0.22, 0.09), (0, 0.08, 0.05), (0.92, 0.93, 0.95)), ("cyl", (0.038, 0.16), (0, 0.22, 0.07), (0.2, 0.85, 0.9)),
-        ("cyl", (0.05, 0.025), (0, 0.17, 0.07), METAL), ("cyl", (0.05, 0.025), (0, 0.25, 0.07), METAL),
-        ("cyl", (0.02, 0.05), (0, 0.31, 0.07), (0.6, 1.0, 1.0)), ("box", (0.045, 0.06, 0.13), (0, -0.01, -0.04), DARK, (-0.35, 0, 0))]},
-    "kalle": {"hold": "pistol", "tip": 0.37, "parts": [
-        ("box", (0.075, 0.25, 0.1), (0, 0.09, 0.05), (0.55, 0.82, 0.95)), ("cyl", (0.04, 0.16), (0, 0.28, 0.06), (0.92, 0.96, 1.0)),
-        ("cyl", (0.03, 0.03), (0, 0.36, 0.06), (0.3, 0.9, 1.0)), ("cyl", (0.035, 0.12), (0, 0.03, 0.14), (0.3, 0.9, 1.0), (0, 0, 0)),
-        ("box", (0.05, 0.065, 0.13), (0, -0.01, -0.04), DARK, (-0.35, 0, 0))]},
-    "margot": {"hold": "rifle", "fore": 0.28, "tip": 0.66, "parts": [
-        ("cyl", (0.028, 0.6), (0.03, 0.36, 0.07), METAL), ("cyl", (0.028, 0.6), (-0.03, 0.36, 0.07), METAL),
-        ("box", (0.09, 0.22, 0.07), (0, 0.27, 0.03), WOOD), ("box", (0.065, 0.36, 0.11), (0, -0.12, 0.0), WOOD),
-        ("cyl", (0.045, 0.03), (0, 0.12, 0.07), (0.85, 0.65, 0.25)), ("box", (0.045, 0.06, 0.12), (0, 0.0, -0.06), WOOD, (-0.3, 0, 0))]},
-    "lynx": {"hold": "rifle", "fore": 0.32, "tip": 0.84, "parts": [
-        ("cyl", (0.022, 0.55), (0, 0.55, 0.06), DARK), ("box", (0.06, 0.42, 0.1), (0, 0.06, 0.04), (0.33, 0.4, 0.22)),
-        ("cyl", (0.036, 0.3), (0, 0.08, 0.15), DARK), ("cyl", (0.042, 0.03), (0, 0.24, 0.15), (0.25, 0.75, 0.9)),
-        ("box", (0.06, 0.28, 0.11), (0, -0.26, 0.01), WOOD), ("box", (0.045, 0.06, 0.12), (0, 0.0, -0.06), DARK, (-0.3, 0, 0))]},
-    "fritzi": {"hold": "rifle", "fore": 0.28, "tip": 0.6, "parts": [
-        ("box", (0.08, 0.4, 0.11), (0, 0.1, 0.05), (0.38, 0.27, 0.16)), ("cyl", (0.04, 0.24), (0, 0.42, 0.07), METAL),
-        ("cyl", (0.055, 0.04), (0, 0.55, 0.07), (1.0, 0.45, 0.1)), ("cyl", (0.06, 0.24), (0, 0.16, -0.07), (0.9, 0.25, 0.12)),
-        ("box", (0.06, 0.2, 0.1), (0, -0.18, 0.02), (0.38, 0.27, 0.16)), ("box", (0.045, 0.06, 0.12), (0, 0.0, -0.06), DARK, (-0.3, 0, 0))]},
+    "dusty": {"hold": "pistol", "len": 0.6, "grip": (0.69, -0.30), "muzzle": (-0.935, 0.41)},
+    "iska": {"hold": "rifle", "len": 0.94, "grip": (0.74, -0.36), "fore": (-0.22, -0.27), "muzzle": (-0.88, 0.22)},
+    "brocken": {"hold": "shoulder", "len": 0.98, "grip": (0.55, -0.44), "fore": (-0.44, -0.5), "muzzle": (-0.935, 0.275)},
+    "volta": {"hold": "pistol", "len": 0.70, "grip": (0.715, -0.275), "muzzle": (-0.935, 0.25)},
+    "kalle": {"hold": "pistol", "len": 0.62, "grip": (0.52, -0.50), "muzzle": (-0.935, 0.14)},
+    "margot": {"hold": "rifle", "len": 1.04, "grip": (0.74, -0.165), "fore": (-0.05, 0.0), "muzzle": (-0.935, 0.24)},
+    "lynx": {"hold": "rifle", "len": 1.34, "grip": (0.52, -0.22), "fore": (-0.22, -0.055), "muzzle": (-0.935, 0.0)},
+    "fritzi": {"hold": "rifle", "len": 1.30, "grip": (0.495, -0.165), "fore": (-0.3, 0.0), "muzzle": (-0.935, 0.18)},
 }
+WEAPON_DIR = sys.argv[-2].split("Vorlage_Raw")[0] + "Vorlage_Raw/Waffen_Roh"
+# Menü-Pose wie auf dem Heldenbild (game/ui/heroes2d): raised = Arm seitlich gestreckt, Waffe zielt nach außen
+# (Waffe neben dem Kopf nach oben ragt bei den großen Comic-Köpfen immer ins Gesicht), across = Waffe
+# quer vor dem Körper, shoulder = Werfer auf der Schulter. left: hip (Faust in der Hüfte), tablet, low (locker)
+POSES = {"dusty": ("raised", "hip"), "volta": ("raised", "tablet"), "kalle": ("raised", "low"),
+         "iska": ("across", None), "margot": ("across", None), "lynx": ("across", None), "fritzi": ("across", None),
+         "brocken": ("shoulder", "hip")}
 
 
-def build_weapon(spec):
-    objs = []
-    for part in spec["parts"]:
-        kind, size, loc, col = part[:4]
-        rot = part[4] if len(part) > 4 else None
-        if kind == "cyl":
-            bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=size[0], depth=size[1], location=loc,
-                                                rotation=rot if rot is not None else (R90, 0, 0))
-        else:
-            bpy.ops.mesh.primitive_cube_add(size=1.0, location=loc, rotation=rot or (0, 0, 0))
-            bpy.context.object.scale = size
-        o = bpy.context.object
-        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)   # Maße fest, bevor zusammengefügt wird
-        o.data.materials.append(mat("W_%d" % len(objs), col, 0.3 if col == METAL else 0.0))
-        objs.append(o)
+def load_weapon(spec):
+    """Meshy-Waffe laden und in den Waffenraum legen: +Y = Lauf nach vorn, +Z = oben, Ursprung = Griff.
+    Gibt die Punkte fore und muzzle im Waffenraum zurück."""
+    before = set(scene.objects)
+    bpy.ops.import_scene.gltf(filepath="%s/%s_waffe_v1/%s_waffe_reduziert.glb" % (WEAPON_DIR, hero, hero))
+    new = [o for o in scene.objects if o not in before]
+    w = [o for o in new if o.type == 'MESH'][0]
+    for o in new:
+        if o != w:
+            bpy.data.objects.remove(o, do_unlink=True)
+    w.parent = None
     bpy.ops.object.select_all(action='DESELECT')
-    for o in objs:
-        o.select_set(True)
-    bpy.context.view_layer.objects.active = objs[0]
-    bpy.ops.object.join()
-    w = bpy.context.object
-    w.name = "Weapon"
-    w.scale = (wscale(spec),) * 3   # im Spielmaßstab von hinten gut erkennbar (wie Dustys Revolver)
+    w.select_set(True)
+    bpy.context.view_layer.objects.active = w
     bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
-    return w
-
-
-def wscale(spec):
-    return {"rifle": 1.4, "shoulder": 1.15, "pistol": 1.6}[spec["hold"]]
+    vs = [v.co for v in w.data.vertices]
+    length = max(v.x for v in vs) - min(v.x for v in vs)
+    sc = spec["len"] / length
+    g = Vector((spec["grip"][0], 0.0, spec["grip"][1]))
+    # Modell (x, y, z) -> Waffenraum (y, -x, z): Mündung -X wird +Y
+    rot = Matrix(((0, 1, 0), (-1, 0, 0), (0, 0, 1))).to_4x4()
+    m = Matrix.Scale(sc, 4) @ rot @ Matrix.Translation(-g)
+    w.data.transform(m)
+    w.name = "Weapon"
+    for mt in w.data.materials:   # matt wie die Figuren
+        for n in mt.node_tree.nodes:
+            if n.type == 'BSDF_PRINCIPLED':
+                for key, val in (("Metallic", 0.0), ("Roughness", 0.65)):
+                    for l in list(n.inputs[key].links):
+                        mt.node_tree.links.remove(l)
+                    n.inputs[key].default_value = val
+    for img in bpy.data.images:
+        if img.size[0] > 1024:
+            img.scale(1024, 1024)
+            img.pack()
+    pt = lambda xz: (m @ Vector((xz[0], 0.0, xz[1])))
+    fore = pt(spec["fore"]) if "fore" in spec else None
+    # Waffe am Griff und am Vorderschaft vermessen: halbe Griffbreite (rechte Seite), Unterkante unter dem Vorderschaft
+    vs = [v.co for v in w.data.vertices]
+    near = [v for v in vs if abs(v.y) < 0.04 and abs(v.z) < 0.05]
+    spec["_grip_hw"] = max((v.x for v in near), default=0.03)
+    if fore is not None:
+        # halbe Breite des Vorderschafts zur linken Seite (dort liegt die linke Hand an)
+        side = [v for v in vs if abs(v.y - fore.y) < 0.04 and abs(v.z - fore.z) < 0.05]
+        spec["_fore_hw"] = max((-v.x for v in side), default=0.03)
+    print("WAFFE Griffbreite", round(2 * spec["_grip_hw"], 3), "Vorderschaft", round(2 * spec.get("_fore_hw", 0), 3))
+    return w, fore, pt(spec["muzzle"])
 
 
 def bone_head(arm, name):
@@ -427,6 +443,70 @@ def fix_volta_pocket():
     paint(lambda p, n: n.y > 0.3 and x0 - 0.05 < p.x < x1 + 0.05 and z0 - 0.05 < p.z < z1 + 0.05, rec)
 
 
+def add_tablet(arm, pose_fn):
+    """Voltas Tablet (wie auf dem Heldenbild) starr an der linken Hand: dunkler Rahmen, türkiser Bildschirm."""
+    bpy.ops.mesh.primitive_cube_add(size=1.0)
+    frame_o = bpy.context.object
+    frame_o.scale = (0.24, 0.028, 0.32)
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    bev = frame_o.modifiers.new("Rund", 'BEVEL')
+    bev.width, bev.segments = 0.02, 3
+    bpy.ops.object.modifier_apply(modifier="Rund")
+    frame_o.data.materials.append(mat("Tablet_Rahmen", (0.12, 0.16, 0.3)))
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -0.016, 0))
+    screen = bpy.context.object
+    screen.scale = (0.2, 0.008, 0.27)
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    screen.data.materials.append(mat("Tablet_Bild", (0.3, 0.85, 0.95), emit=0.6))
+    bpy.ops.object.select_all(action='DESELECT')
+    frame_o.select_set(True)
+    screen.select_set(True)
+    bpy.context.view_layer.objects.active = frame_o
+    bpy.ops.object.join()
+    tab = bpy.context.object
+    tab.name = "Tablet"
+    tab.parent = arm
+    tab.parent_type = 'BONE'
+    tab.parent_bone = "mixamorig:LeftHand"
+    tab.matrix_parent_inverse = Matrix.Identity(4)
+    # in der Menü-Pose: Tablet aufrecht vor der linken Hand, Bildschirm nach vorn (-Y) und leicht nach oben gekippt
+    pose_fn(0.0)
+    pb = arm.pose.bones["mixamorig:LeftHand"]
+    tail = arm.matrix_world @ pb.matrix @ Matrix.Translation((0, pb.bone.length, 0))
+    want = Matrix.Translation(tail.translation + Vector((0.02, -0.03, 0.08))) @ Matrix.Rotation(math.radians(-20), 4, "X")
+    tab.matrix_basis = tail.inverted() @ want
+    update()
+    reset_pose(arm)
+
+
+def hand_data(arm, side):
+    """Echte Hand aus dem Netz vermessen (in Knochenkoordinaten der Ruhehaltung): Mitte der Faust, Richtung der
+    Finger (längste Achse) und der Handfläche (flachste Achse, zeigt zum Körper hin)."""
+    import numpy as np
+    bone = arm.data.bones["mixamorig:%sHand" % side]
+    names = {bone.name} | {c.name for c in bone.children_recursive}
+    idx = {body.vertex_groups[n].index for n in names if n in body.vertex_groups}
+    Mb = arm.matrix_world @ bone.matrix_local
+    inv = Mb.inverted()
+    pts = []
+    for v in body.data.vertices:
+        if sum(g.weight for g in v.groups if g.group in idx) >= 0.6:
+            pts.append(inv @ (body.matrix_world @ v.co))
+    P = np.array([tuple(p) for p in pts])
+    c = P.mean(axis=0)
+    ev, evec = np.linalg.eigh(np.cov((P - c).T))
+    fing = Vector(evec[:, 2])
+    if fing.dot(Vector((0, 1, 0))) < 0:
+        fing = -fing
+    palm = Vector(evec[:, 0])
+    toward = 1.0 if side == "Right" else -1.0      # Handfläche zeigt in der A-Haltung zur Körpermitte
+    if (Mb.to_3x3() @ palm).x * toward < 0:
+        palm = -palm
+    size = np.sqrt(ev) * 2
+    print("HANDMASS", side, len(pts), "Punkte, Mitte", tuple(round(x, 3) for x in c), "Größe", tuple(round(float(x), 3) for x in size))
+    return {"c": Vector(c), "f": fing.normalized(), "p": palm.normalized(), "thick": float(size[0])}
+
+
 def build_armed():
     arm = [o for o in scene.objects if o.type == 'ARMATURE'][0]
     arm.name = "Armature"
@@ -436,29 +516,71 @@ def build_armed():
         fix_volta_pocket()
     spec = WEAPONS[hero]
     hold = spec["hold"]
+    weapon, fore_w, muzzle_w = load_weapon(spec)
     reset_pose(arm)
+    HR, HL = hand_data(arm, "Right"), hand_data(arm, "Left")
     sh_r = bone_head(arm, "mixamorig:RightArm")
     sh_l = bone_head(arm, "mixamorig:LeftArm")
-    reach = arm.data.bones["mixamorig:RightArm"].length + arm.data.bones["mixamorig:RightForeArm"].length
-    fwd = Vector((0, -1, 0))
-    if hold == "pistol":
-        grip = sh_r + Vector((0.1, -0.85 * reach, -0.06))
-    elif hold == "shoulder":
-        grip = sh_r + Vector((0.12, -0.45 * reach, -0.05))
-    else:
-        grip = sh_r + Vector((0.14, -0.6 * reach, -0.14))
-    print("GRIFF", tuple(round(c, 3) for c in grip), "Reichweite", round(reach, 3))
-    POLE_R, POLE_L = (-0.6, 0.3, -1.0), (0.6, 0.3, -1.0)
+    FWD, UP = Vector((0, -1, 0)), Vector((0, 0, 1))
+    kind, left = POSES[hero]
 
-    def arms(g, left, hand_dir=fwd):
-        ik(arm, "mixamorig:RightArm", "mixamorig:RightForeArm", g, POLE_R)
-        point_bones(arm, {"mixamorig:RightHand": hand_dir}, ["mixamorig:RightHand"])
-        if left is None:
-            point_bones(arm, {"mixamorig:LeftArm": Vector((0.35, -0.1, -1.0)), "mixamorig:LeftForeArm": Vector((0.2, -0.35, -1.0))},
-                        ["mixamorig:LeftArm", "mixamorig:LeftForeArm"])
+    def frame(barrel, up=UP):
+        b = barrel.normalized()
+        u = (up - b * up.dot(b)).normalized()
+        return b, u, b.cross(u)
+
+    def orient(hd, f, d):
+        """Drehung der Hand: Finger nach f, Handfläche nach d (beides Weltrichtungen)."""
+        fl = hd["f"]
+        pl = (hd["p"] - fl * hd["p"].dot(fl)).normalized()
+        L = Matrix((fl, pl, fl.cross(pl))).transposed()
+        f = f.normalized()
+        d = (d - f * d.dot(f)).normalized()
+        W = Matrix((f, d, f.cross(d))).transposed()
+        return W @ L.transposed()
+
+    def place(side, hd, center, f, d, pole):
+        """Handmitte (Faust) genau an center, Hand gedreht nach f/d, Arm per IK."""
+        M = orient(hd, f, d)
+        up, lo = "mixamorig:%sArm" % side, "mixamorig:%sForeArm" % side
+        for _ in range(2):   # Handgelenk so legen, dass die Faustmitte am Ziel sitzt
+            ik(arm, up, lo, center - M @ hd["c"], pole)
+        pb = arm.pose.bones["mixamorig:%sHand" % side]
+        head = pb.matrix.translation.copy()
+        pb.matrix = Matrix.Translation(head) @ M.to_4x4()
+        update()
+        return (head + M @ hd["c"] - center).length   # wie weit die Faust das Ziel verfehlt (Arm zu kurz)
+
+    def grip(center, barrel, up=UP, two=True, pole_r=(-0.7, 0.6, -0.5), far=False):
+        """Rechte Faust um den Griff (Griff läuft senkrecht durch die Faust, Waffe sitzt darüber); bei Gewehren
+        die linke Hand flach unter den Vorderschaft, Finger quer, Handfläche nach oben."""
+        b, u, x = frame(barrel, up)
+        # center = Griffmitte; die Faust liegt rechts außen am Griff an, Handfläche flach zum Griff
+        side = spec["_grip_hw"] + 0.45 * HR["thick"]
+        # far: Faust auf der Rückseite des Griffs (erhobene Waffe: Griff und Finger zum Betrachter, Handrücken weg)
+        if far:
+            place("Right", HR, center - x * side, b, x, pole_r)
         else:
-            ik(arm, "mixamorig:LeftArm", "mixamorig:LeftForeArm", left, POLE_L)
-            point_bones(arm, {"mixamorig:LeftHand": fwd}, ["mixamorig:LeftHand"])
+            place("Right", HR, center + x * side, b, -x, pole_r)
+        if two and fore_w is not None:
+            fp = center + x * fore_w.x + b * fore_w.y + u * fore_w.z
+            # linke Hand flach von links an den Vorderschaft, Finger nach vorn, Handfläche zur Waffe
+            miss = place("Left", HL, fp - x * (spec["_fore_hw"] + 0.45 * HL["thick"]), b - u * 0.25, x, (0.6, 0.3, -1.0))
+            if miss > 0.03:   # Vorderschaft außer Reichweite: lieber locker hängen lassen als in der Luft greifen
+                left_free("low", 0.0)
+        return b, u, x
+
+    def left_free(how, w):
+        if how == "hip":
+            point_bones(arm, {"mixamorig:LeftArm": Vector((0.6, 0.1, -1.0)), "mixamorig:LeftForeArm": Vector((-0.75, -0.3, -0.35 + 0.03 * w))},
+                        ["mixamorig:LeftArm", "mixamorig:LeftForeArm"])
+        elif how == "tablet":
+            point_bones(arm, {"mixamorig:LeftArm": Vector((0.3, -0.45, -0.85)), "mixamorig:LeftForeArm": Vector((-0.15, -1.0, 0.35 + 0.03 * w)),
+                              "mixamorig:LeftHand": Vector((-0.1, -1.0, 0.5))},
+                        ["mixamorig:LeftArm", "mixamorig:LeftForeArm", "mixamorig:LeftHand"])
+        else:
+            point_bones(arm, {"mixamorig:LeftArm": Vector((0.3, -0.05, -1.0)), "mixamorig:LeftForeArm": Vector((0.15, -0.35, -1.0))},
+                        ["mixamorig:LeftArm", "mixamorig:LeftForeArm"])
 
     def body(spine=0.0, hips_up=0.0):
         reset_pose(arm)
@@ -467,37 +589,63 @@ def build_armed():
         move_world(arm, "mixamorig:Hips", (0, 0, hips_up))
         update()
 
-    def fore(g):
-        return None if hold == "pistol" else g + Vector((-0.02, -spec["fore"] * wscale(spec), 0.0))
+    # Kampf (von hinten oben gesehen): die Waffe rechts außen neben dem Körper, sonst verdeckt sie der Kopf
+    AIM = {"rifle": Vector((-0.2, -0.2, -0.3)), "shoulder": Vector((-0.03, -0.16, -0.3)),
+           "pistol": Vector((-0.22, -0.32, -0.02))}[hold]
 
     def aim(r=0.0, spine=0.0):
         body(spine)
-        g = grip + Vector((0, 0.06 * r, 0.025 * r))
-        arms(g, fore(g), Vector((0, -1, 0.3 * r)))
+        c = sh_r + AIM + Vector((0, 0.05 * r, 0.02 * r))
+        grip(c, FWD + UP * (0.06 + 0.25 * r), two=hold != "pistol")
+        if hold == "pistol":
+            left_free("low", 0.0)
 
     def idle(t):
         w = math.sin(t * 2 * math.pi)
         body(1.5 * w, 0.008 * math.sin(t * 4 * math.pi))
-        g = grip + Vector((0.02, 0.1, -0.18 + 0.01 * w))
-        arms(g, fore(g) + Vector((0, 0.05, -0.04)) if hold != "pistol" else None, Vector((0, -1, -0.55)))
+        c = sh_r + Vector((-0.16, -0.14, -0.4 + 0.01 * w))
+        grip(c, Vector((0.1, -1.0, -0.75)), two=hold != "pistol")
+        if hold == "pistol":
+            left_free("low", w)
 
     def victory(t):
         w = math.sin(t * 2 * math.pi)
         body(-3, 0.06 * abs(w))
-        g = sh_r + Vector((-0.1, -0.1, 0.55 + 0.04 * w))
-        ik(arm, "mixamorig:RightArm", "mixamorig:RightForeArm", g, (-1.0, 0.2, 0.0))
-        point_bones(arm, {"mixamorig:RightHand": Vector((0, -0.3, 1.0))}, ["mixamorig:RightHand"])
+        c = sh_r + Vector((-0.24, -0.06, 0.34 + 0.03 * w))
+        grip(c, Vector((-0.1, -0.2, 1.0)), Vector((-1.0, 0.0, 0.0)), two=False, pole_r=(-0.8, 0.2, -1.0))
         point_bones(arm, {"mixamorig:LeftArm": Vector((0.5, -0.1, 0.9 + 0.1 * w)), "mixamorig:LeftForeArm": Vector((0.35, -0.1, 1.0))},
                     ["mixamorig:LeftArm", "mixamorig:LeftForeArm"])
+
+    def menu_pose(t):
+        """Heldenpose wie auf dem Heldenbild, mit leichtem Atmen (t 0..1)."""
+        w = math.sin(t * 2 * math.pi)
+        body(1.0 * w, 0.006 * w)
+        if kind == "raised":
+            # Revolverhelden-Pose: Arm zur Seite gestreckt, Waffe zielt seitlich nach außen und leicht nach vorn.
+            # Von vorn: Waffe im Profil, Faust hinter dem Griff, Kopf frei.
+            c = sh_r + Vector((-0.4, -0.2, 0.02 + 0.008 * w))
+            grip(c, Vector((-0.85, -0.5, 0.12)), two=False, pole_r=(-0.2, 0.6, -1.0))
+            left_free(left, w)
+        elif kind == "shoulder":
+            c = sh_r + Vector((-0.03, -0.1, -0.3 + 0.006 * w))
+            grip(c, Vector((-0.12, -0.9, 0.42)), two=False)
+            left_free(left, w)
+        else:
+            b = Vector((0.85, -0.42, -0.05 if hero == "lynx" else 0.15))
+            c = sh_r + Vector((0.04, -0.26, -0.32 + 0.008 * w))
+            grip(c, b, pole_r=(-0.6, 0.5, -0.7))
 
     make_actions(arm, [
         ("Idle", [(i * 15, (lambda t=i / 4.0: idle(t))) for i in range(5)]),
         ("Shoot", [(0, lambda: aim(0.0)), (2, lambda: aim(1.0, -4)), (6, lambda: aim(0.35, -1)), (12, lambda: aim(0.0))]),
         ("Victory", [(i * 12, (lambda t=i / 4.0: victory(t))) for i in range(5)]),
+        ("Pose", [(i * 15, (lambda t=i / 4.0: menu_pose(t))) for i in range(5)]),
     ])
+    if left == "tablet":
+        add_tablet(arm, menu_pose)
 
-    # Waffe: starr an der rechten Hand, in der Zielhaltung so gelegt, dass der Griff in der Hand sitzt
-    weapon = build_weapon(spec)
+    # Waffe starr an der rechten Hand: Griffmitte in der Faustmitte. Die Hand steht zur Waffe in jeder Pose gleich
+    # (grip/place), deshalb reicht die Lage aus der Zielhaltung.
     socket = bpy.data.objects.new("WeaponSocket", None)
     scene.collection.objects.link(socket)
     socket.parent = arm
@@ -506,23 +654,21 @@ def build_armed():
     socket.matrix_parent_inverse = Matrix.Identity(4)
     weapon.parent = socket
     weapon.matrix_parent_inverse = Matrix.Identity(4)
-    weapon.location = (0, 0, 0)
+    weapon.matrix_basis = Matrix.Identity(4)
     muzzle = bpy.data.objects.new("Muzzle", None)
     scene.collection.objects.link(muzzle)
     muzzle.parent = weapon
-    muzzle.location = Vector((0, spec["tip"], 0.07 if hold != "shoulder" else 0.13)) * wscale(spec)
+    muzzle.location = muzzle_w
     aim(0.0)
-    hand = (bone_head(arm, "mixamorig:RightHand") + bone_tail(arm, "mixamorig:RightHand")) * 0.5
-    up = Vector((0, 0, 1))
-    rot = Matrix((fwd.cross(up), fwd, up)).transposed()
-    want = Matrix.Translation(hand) @ rot.to_4x4()
+    b, u, x = frame(FWD + UP * 0.06)
     pb = arm.pose.bones["mixamorig:RightHand"]
+    center = pb.matrix.translation + pb.matrix.to_3x3() @ HR["c"]
+    center = center - x * (spec["_grip_hw"] + 0.45 * HR["thick"])   # zurück zur Griffmitte
+    want = Matrix.Translation(center) @ Matrix((x, b, u)).transposed().to_4x4()
     tail = arm.matrix_world @ pb.matrix @ Matrix.Translation((0, pb.bone.length, 0))
     socket.matrix_basis = tail.inverted() @ want
     update()
-    lh = bone_tail(arm, "mixamorig:LeftHand")
-    print("HAND", tuple(round(c, 3) for c in hand), "LINKS", tuple(round(c, 3) for c in lh),
-          "MUENDUNG", tuple(round(c, 3) for c in muzzle.matrix_world.translation))
+    print("FAUST", tuple(round(c, 3) for c in center), "MUENDUNG", tuple(round(c, 3) for c in muzzle.matrix_world.translation))
     reset_pose(arm)
     return arm
 
