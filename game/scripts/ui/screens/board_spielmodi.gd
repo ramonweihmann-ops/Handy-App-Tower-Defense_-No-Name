@@ -1,8 +1,8 @@
 extends MockScreen
 ## Spielmodi (Mockup „Spielmodi · Auswahl“), geöffnet über die Kachel „Modi“ im Hauptbildschirm:
 ## Multiplayer (4 Kommandanten), Universumsode (kommt bald), Weltraumschlacht (kommt bald).
-## Mit eingeschalteten Entwickler-Werkzeugen (Einstellungen, siebenmal auf die Version tippen) zusätzlich
-## der Knopf „Testkarte“ (nur zum Testen, nicht im Mockup).
+## Dazu der Knopf „Testkarte“ (Werkzeug zum Testen, nicht im Mockup; solange der Nutzer der einzige Tester
+## ist, immer sichtbar).
 
 var _test_btn: Button
 
@@ -13,7 +13,7 @@ func _init(m: MainMenu) -> void:
 
 func bind() -> void:
 	set_text("1.228", MockScreen.num(Save.trophies()))
-	if Save.developer and _test_btn == null:
+	if _test_btn == null:
 		_test_btn = Button.new()
 		_test_btn.text = "TESTKARTE"
 		_test_btn.focus_mode = Control.FOCUS_NONE

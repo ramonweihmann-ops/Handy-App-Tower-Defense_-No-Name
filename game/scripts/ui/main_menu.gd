@@ -37,9 +37,8 @@ var _nav: Dictionary = {}
 var _nav_icons: Dictionary = {}
 var _pill_icons: Dictionary = {}
 var _modal: Control
-## Testkarte: zuletzt gewählte Einstellungen; Tipp-Zähler für den versteckten Entwickler-Schalter
+## Testkarte: zuletzt gewählte Einstellungen
 var _test_cfg := {}
-var _dev_taps := 0
 var _toast: Label
 var _toast_t := 0.0
 var _tick := 0.0
@@ -532,7 +531,7 @@ func open_settings() -> void:
 	_open_settings()
 
 
-## Testkarte (nur Entwickler): Level, Welle und bis zu drei Champions wählen; die Welle kommt immer wieder.
+## Testkarte (Werkzeug zum Testen): Level, Welle und bis zu drei Champions wählen; die Welle kommt immer wieder.
 func open_test_map() -> void:
 	if _test_cfg.is_empty():
 		_test_cfg = {"level": Save.max_level(), "wave": 1, "heroes": [Save.squad()[0]], "god": false}
@@ -541,7 +540,7 @@ func open_test_map() -> void:
 	var waves := GameData.waves_in_level(int(cfg["level"]))
 	cfg["wave"] = clampi(int(cfg["wave"]), 1, waves)
 	var v := _modal_box("Testkarte")
-	v.add_child(_wrap_left("Nur für Entwickler: Die gewählte Welle kommt immer wieder. Keine Energie, keine Belohnung, kein Fortschritt.", 19, UiKit.C_MUTED))
+	v.add_child(_wrap_left("Zum Testen: Die gewählte Welle kommt immer wieder. Keine Energie, keine Belohnung, kein Fortschritt.", 19, UiKit.C_MUTED))
 	var lvl := int(cfg["level"])
 	v.add_child(_test_stepper("Level %d · %s" % [lvl, GameData.level_name(lvl)], "level", [-10, -1, 1, 10], 1, GameData.LEVEL_COUNT))
 	v.add_child(_test_stepper("Welle %d von %d" % [int(cfg["wave"]), waves], "wave", [-1, 1], 1, waves))
@@ -1589,18 +1588,7 @@ func _open_settings() -> void:
 	var ver := "Version %s" % (updater.current_name if updater else "?")
 	if updater and updater.current_stamp != "":
 		ver += " · Stand %s" % updater.current_stamp
-	var ver_label := UiKit.label(ver + ("  ·  Entwickler" if Save.developer else ""), 20, UiKit.C_MUTED)
-	# Versteckt: siebenmal auf die Versionsnummer tippen schaltet die Entwickler-Werkzeuge ein oder aus
-	ver_label.mouse_filter = Control.MOUSE_FILTER_STOP
-	ver_label.gui_input.connect(func(ev: InputEvent) -> void:
-		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
-			_dev_taps += 1
-			if _dev_taps >= 7:
-				_dev_taps = 0
-				Save.set_developer(not Save.developer)
-				toast("Entwickler-Werkzeuge: %s" % ("an – Testkarte unter Spielmodi" if Save.developer else "aus"))
-				_open_settings())
-	v.add_child(ver_label)
+	v.add_child(UiKit.label(ver, 20, UiKit.C_MUTED))
 	var high: bool = Save.data.get("quality", "hoch") == "hoch"
 	v.add_child(UiKit.secondary(UiKit.button("Grafik: %s" % ("Hoch (Leuchten, Schatten)" if high else "Sparsam"), func() -> void:
 		Save.data["quality"] = "sparsam" if high else "hoch"

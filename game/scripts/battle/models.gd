@@ -4,26 +4,10 @@ class_name Models
 ## Gegner ihre einfache Form wie bisher.
 
 const HEROES := {
-	# v2: neues Comic-Modell (GLB) mit eigener Waffe (WeaponSocket → Weapon → Muzzle) und den
-	# Animationen Idle, Shoot (beginnt im Anschlag), Victory; gebaut mit tools/heroes/build_dusty_jo.py
+	# v2: Comic-Modelle (GLB) mit eigener Waffe (WeaponSocket → Weapon → Muzzle) bzw. Mündung am Körper und den
+	# Animationen Idle, Shoot (beginnt im Anschlag), Victory; Dusty gebaut mit tools/heroes/build_dusty_jo.py,
+	# alle anderen (Meshy H2 und H3) mit tools/heroes/build_hero_v2.py
 	"dusty": {"file": "heroes_v2/dusty_jo", "gun": "", "v2": true},
-	"iska": {"file": "heroes/BlueSoldier_Female", "gun": "guns/AK"},
-	"brocken": {"file": "heroes/Worker_Male", "gun": "guns/RocketLauncher"},
-	"volta": {"file": "heroes/Doctor_Female_Young", "gun": ""},
-	"kalle": {"file": "heroes/Casual3_Male", "gun": ""},
-	"margot": {"file": "heroes/Pirate_Female", "gun": "guns/Shotgun"},
-	"lynx": {"file": "heroes/Soldier_Female", "gun": "guns/Sniper"},
-	"fritzi": {"file": "heroes/Worker_Female", "gun": ""},
-}
-## Neue Comic-Modelle zur Prüfung (Meshy H2 und H3, gebaut mit tools/heroes/build_hero_v2.py): nur mit eingeschalteten
-## Entwickler-Werkzeugen sichtbar, bis der Nutzer sie freigibt; danach wandern die Einträge nach HEROES.
-const HEROES_NEU := {
-	"pip": {"file": "heroes_v2/pip", "gun": "", "v2": true},
-	"nova": {"file": "heroes_v2/nova", "gun": "", "v2": true},
-	# size: Höhe im Verhältnis zu den Menschen (Rollo ist breit und gedrungen)
-	"fuenkchen": {"file": "heroes_v2/fuenkchen", "gun": "", "v2": true, "size": 0.95},
-	"rollo": {"file": "heroes_v2/rollo", "gun": "", "v2": true, "size": 0.72},
-	# H3: die sieben Menschen mit eigener Waffe an der rechten Hand (WeaponSocket → Weapon → Muzzle)
 	"iska": {"file": "heroes_v2/iska", "gun": "", "v2": true},
 	"brocken": {"file": "heroes_v2/brocken", "gun": "", "v2": true},
 	"volta": {"file": "heroes_v2/volta", "gun": "", "v2": true},
@@ -31,21 +15,16 @@ const HEROES_NEU := {
 	"margot": {"file": "heroes_v2/margot", "gun": "", "v2": true},
 	"lynx": {"file": "heroes_v2/lynx", "gun": "", "v2": true},
 	"fritzi": {"file": "heroes_v2/fritzi", "gun": "", "v2": true},
+	"pip": {"file": "heroes_v2/pip", "gun": "", "v2": true},
+	"nova": {"file": "heroes_v2/nova", "gun": "", "v2": true},
+	# size: Höhe im Verhältnis zu den Menschen (Rollo ist breit und gedrungen)
+	"fuenkchen": {"file": "heroes_v2/fuenkchen", "gun": "", "v2": true, "size": 0.95},
+	"rollo": {"file": "heroes_v2/rollo", "gun": "", "v2": true, "size": 0.72},
 }
-static var test_new_heroes := false
 
 
-## Entwickler-Werkzeuge an? (Spielstand über den Szenenbaum, damit Tests ohne Spielstand laufen)
-static func _developer() -> bool:
-	var tree := Engine.get_main_loop() as SceneTree
-	var save: Node = tree.root.get_node_or_null("Save") if tree else null
-	return save != null and bool(save.get("developer"))
-
-
-## Modell-Eintrag eines Helden (mit Entwickler-Werkzeugen auch die neuen, noch nicht freigegebenen)
+## Modell-Eintrag eines Helden
 static func hero_info(id: String) -> Dictionary:
-	if (test_new_heroes or _developer()) and HEROES_NEU.has(id):
-		return HEROES_NEU[id]
 	return HEROES.get(id, {})
 
 

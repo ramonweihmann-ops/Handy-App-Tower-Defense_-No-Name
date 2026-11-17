@@ -275,8 +275,6 @@ func _parse_args() -> void:
 			CardRules.SOLO_HP = float(arg.get_slice("=", 1))   # Labor: Gegnerleben mit einem Champion
 		elif arg.begins_with("--duo-hp="):
 			CardRules.DUO_HP = float(arg.get_slice("=", 1))   # Labor: Gegnerleben mit zwei Champions
-		elif arg == "--neue-helden":
-			Models.test_new_heroes = true   # noch nicht freigegebene Heldenmodelle zeigen (Prüfbilder)
 		elif arg == "--neue-monster":
 			Models.test_new = true   # noch nicht freigegebene Gegnermodelle zeigen (Prüfbilder)
 		elif arg == "--mp":
@@ -662,7 +660,6 @@ func _process(delta: float) -> void:
 					menu.open_building(bid2)
 				elif parts.size() > 2 and parts[2].begins_with("board:"):
 					# beliebiges Fenster fürs Bild, z. B. --menushot=bild.png,kampf,board:Spielmodi.dc.html[:test]
-					Save.developer = true
 					menu.show_tab(parts[1])
 					menu.open_board(parts[2].get_slice(":", 1))
 					if parts[2].get_slice_count(":") > 2:

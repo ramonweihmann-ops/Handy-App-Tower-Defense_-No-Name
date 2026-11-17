@@ -17,9 +17,6 @@ var sim := false
 ## Beide haben einen eigenen Spielstand in derselben Datei.
 var account := "normal"
 var data := {}
-## Entwickler-Werkzeuge (z. B. Testkarte unter Spielmodi); gilt für beide Testkonten. Freigeschaltet durch
-## siebenmaliges Tippen auf die Versionsnummer in den Einstellungen.
-var developer := false
 
 
 func _ready() -> void:
@@ -81,7 +78,6 @@ func load_game() -> void:
 	var cfg := ConfigFile.new()
 	if cfg.load(PATH) == OK:
 		account = String(cfg.get_value("meta", "account", "normal"))
-		developer = bool(cfg.get_value("meta", "entwickler", false))
 		var stored = cfg.get_value(_section(), "data", {})
 		if stored is Dictionary and not stored.is_empty():
 			for k in stored.keys():
@@ -96,17 +92,6 @@ func load_game() -> void:
 
 func _section() -> String:
 	return "spiel" if account == "normal" else "spiel_" + account
-
-
-## Entwickler-Werkzeuge ein- oder ausschalten (eigener Eintrag, nicht im Spielstand eines Kontos)
-func set_developer(on: bool) -> void:
-	developer = on
-	if test_mode:
-		return
-	var cfg := ConfigFile.new()
-	cfg.load(PATH)
-	cfg.set_value("meta", "entwickler", on)
-	cfg.save(PATH)
 
 
 ## Zwischen den Testkonten wechseln; der Stand des bisherigen Kontos bleibt erhalten.
