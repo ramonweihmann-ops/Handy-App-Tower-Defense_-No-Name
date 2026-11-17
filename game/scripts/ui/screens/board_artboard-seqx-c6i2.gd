@@ -53,11 +53,12 @@ const VIEW_SIZE := 300.0
 var hero := ""
 var _info: InfoLayer
 var _view3d: HeroView3D
-## Gemaltes Porträt (ChatGPT, Vorlage_Raw/Champion_Portraets_v1) statt der 3D-Figur, wo es eines gibt:
+## Gemaltes Porträt (ChatGPT, Vorlage_Raw/Champion_Portraets_v1 und _v2) statt der 3D-Figur, wo es eines gibt:
 ## ui/portraits/<id>.webp, schon auf das Motiv zugeschnitten. Unterkante auf der Standlinie (Podest).
-const PORTRAIT_BOX := Vector2(330, 300)
+const PORTRAIT_BOX := Vector2(262, 300)   # Breite: breite Motive (Rollo, Kalle) bleiben zwischen den Fähigkeitskarten
 ## Höhe relativ zur Box und Abstand über der Standlinie (aus PORTRAET_LAYOUT.json): Lynx kniet, Fritzi springt
-const PORTRAIT_FIT := {"lynx": [0.836, 0.0], "fritzi": [0.933, 0.1]}
+const PORTRAIT_FIT := {"lynx": [0.836, 0.0], "fritzi": [0.933, 0.1], "fuenkchen": [0.98, 0.0], "pip": [0.94, 0.0],
+	"rollo": [0.84, 0.0], "nova": [1.0, 0.0]}
 var _portrait: TextureRect
 var _portrait_id := ""
 var _feet := 0.0
