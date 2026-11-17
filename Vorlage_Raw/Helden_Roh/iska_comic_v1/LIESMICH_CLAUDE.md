@@ -18,9 +18,10 @@ Erzeugung am 16.11.2026. Ein Durchlauf für 30 Credits je Champion. Meshy 7.1, B
 | --- | --- |
 | [iska_original_statisch.glb](iska_original_statisch.glb) | 478.164 |
 | [iska_reduziert_statisch.glb](iska_reduziert_statisch.glb) | 10.316 |
+| [iska_rig_roh.glb](iska_rig_roh.glb) | 10.316 |
 
 **Sichtprüfung.** Ein Kopf, zwei Arme, zwei Beine. Beide Hände sind leer und vom Rumpf getrennt. Bei den vier Ansichten sind keine abgelösten Körperteile oder offensichtlichen Öffnungen an Kopf oder Kopfbedeckung sichtbar. Der lange braune Pferdeschwanz, die Jacke und die türkisen Schulterstreifen sind sichtbar.
 
 [Vorn](iska_vorschau_vorn.png) · [Seite](iska_vorschau_seite.png) · [Oben](iska_vorschau_oben.png) · [Hinten](iska_vorschau_hinten.png)
 
-**Rigging.** Noch offen. Das Rigging wurde wegen fehlender eindeutiger Preisangabe vor der Bestätigung in Meshy zurückgestellt.
+**Rigging.** Meshys humanoides Rigging war erfolgreich. Der GLB-Export nutzt MeshyRig und enthält eine Hautbindung mit 32 Gelenken sowie die von Meshy beigefügten Clips `Running` und `Walking`. Das angezeigte Guthaben blieb bei 925 Credits. Verformungen und Godot-Import stehen noch aus.

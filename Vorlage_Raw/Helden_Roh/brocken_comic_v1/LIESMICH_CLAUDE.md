@@ -18,9 +18,10 @@ Erzeugung am 16.11.2026. Ein Durchlauf für 30 Credits je Champion. Meshy 7.1, B
 | --- | --- |
 | [brocken_original_statisch.glb](brocken_original_statisch.glb) | 394.428 |
 | [brocken_reduziert_statisch.glb](brocken_reduziert_statisch.glb) | 10.300 |
+| [brocken_rig_roh.glb](brocken_rig_roh.glb) | 10.300 |
 
 **Sichtprüfung.** Ein Kopf, zwei Arme, zwei Beine. Beide Hände sind leer und vom Rumpf getrennt. Bei den vier Ansichten sind keine abgelösten Körperteile oder offensichtlichen Öffnungen an Kopf oder Kopfbedeckung sichtbar. Die gelbe Mütze sitzt auf dem Kopf. Beide rückwärtigen Latzhosengurte sind sichtbar. Meshy hat über dem unteren Rücken zusätzliche braune Schlaufen und helle Beschläge gezeichnet.
 
 [Vorn](brocken_vorschau_vorn.png) · [Seite](brocken_vorschau_seite.png) · [Oben](brocken_vorschau_oben.png) · [Hinten](brocken_vorschau_hinten.png)
 
-**Rigging.** Noch offen. Das Rigging wurde wegen fehlender eindeutiger Preisangabe vor der Bestätigung in Meshy zurückgestellt.
+**Rigging.** Der erste humanoide Versuch ist in Meshy fehlgeschlagen. Das intelligente Rig (Beta) war erfolgreich. Der GLB-Export hat eine Hautbindung mit 44 Gelenken und generische Knochennamen. Meshy liefert bei diesem Rig keine Bibliotheksbewegungen. Das Guthaben blieb bei 925 Credits. Verformungen und Godot-Import stehen noch aus.

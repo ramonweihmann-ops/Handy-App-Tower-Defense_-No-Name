@@ -18,9 +18,10 @@ Erzeugung am 16.11.2026. Ein Durchlauf für 30 Credits je Champion. Meshy 7.1, B
 | --- | --- |
 | [lynx_original_statisch.glb](lynx_original_statisch.glb) | 530.122 |
 | [lynx_reduziert_statisch.glb](lynx_reduziert_statisch.glb) | 10.360 |
+| [lynx_rig_roh.glb](lynx_rig_roh.glb) | 10.360 |
 
 **Sichtprüfung.** Ein Kopf, zwei Arme, zwei Beine. Beide Hände sind leer und vom Rumpf getrennt. Bei den vier Ansichten sind keine abgelösten Körperteile oder offensichtlichen Öffnungen an Kopf oder Kopfbedeckung sichtbar. Pferdeschwanz, grüner Schal und rückwärtige Gurte sind sichtbar. Die Haare sind im Export heller als in der Vorlage.
 
 [Vorn](lynx_vorschau_vorn.png) · [Seite](lynx_vorschau_seite.png) · [Oben](lynx_vorschau_oben.png) · [Hinten](lynx_vorschau_hinten.png)
 
-**Rigging.** Noch offen. Das Rigging wurde wegen fehlender eindeutiger Preisangabe vor der Bestätigung in Meshy zurückgestellt.
+**Rigging.** Meshys humanoides Rigging war erfolgreich. Der GLB-Export nutzt MeshyRig und enthält eine Hautbindung mit 46 Gelenken sowie die von Meshy beigefügten Clips `Running` und `Walking`. Das angezeigte Guthaben blieb bei 925 Credits. Verformungen und Godot-Import stehen noch aus.

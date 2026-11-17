@@ -18,9 +18,10 @@ Erzeugung am 16.11.2026. Ein Durchlauf für 30 Credits je Champion. Meshy 7.1, B
 | --- | --- |
 | [margot_original_statisch.glb](margot_original_statisch.glb) | 468.352 |
 | [margot_reduziert_statisch.glb](margot_reduziert_statisch.glb) | 10.217 |
+| [margot_rig_roh.glb](margot_rig_roh.glb) | 10.217 |
 
 **Sichtprüfung.** Ein Kopf, zwei Arme, zwei Beine. Beide Hände sind leer und vom Rumpf getrennt. Bei den vier Ansichten sind keine abgelösten Körperteile oder offensichtlichen Öffnungen an Kopf oder Kopfbedeckung sichtbar. Dreispitz, rotes Band und blauer Mantel mit Goldrand sind sichtbar. Der rückwärtige Hutrand ist stärker nach oben geschwungen als in der Vorlage.
 
 [Vorn](margot_vorschau_vorn.png) · [Seite](margot_vorschau_seite.png) · [Oben](margot_vorschau_oben.png) · [Hinten](margot_vorschau_hinten.png)
 
-**Rigging.** Noch offen. Das Rigging wurde wegen fehlender eindeutiger Preisangabe vor der Bestätigung in Meshy zurückgestellt.
+**Rigging.** Meshys humanoides Rigging war erfolgreich. Der GLB-Export nutzt MeshyRig und enthält eine Hautbindung mit 32 Gelenken sowie die von Meshy beigefügten Clips `Running` und `Walking`. Das angezeigte Guthaben blieb bei 925 Credits. Verformungen und Godot-Import stehen noch aus.
