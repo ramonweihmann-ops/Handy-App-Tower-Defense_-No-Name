@@ -149,6 +149,10 @@ func pull_to(c: Vector3, f: float) -> void:
 	position.z = nz
 
 
+func is_slowed() -> bool:
+	return _slow_t > 0.0 and _slow > 0.0
+
+
 func apply_slow(amount: float, duration: float) -> void:
 	_slow = maxf(_slow, amount)
 	_slow_t = maxf(_slow_t, duration)

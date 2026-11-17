@@ -55,6 +55,10 @@ var test_god := false
 var test_rounds := 0
 ## Zähler für Pips „Ersatzteile“
 var _parts_n := 0
+## Sekunden seit Beginn der aktuellen Welle (Dustys „Schnellzieher“)
+var wave_age := 0.0
+## Feuerspuren (Fritzis „Brandspur“): [Ort, Radius, Brandschaden je Sekunde, Restzeit]
+var _patches: Array = []
 var wave := 0
 var total_waves := 0
 var kills := 0
@@ -196,6 +200,8 @@ func setup(level_: int, ammo_: AmmoStore) -> void:
 	test_god = false
 	test_rounds = 0
 	_parts_n = 0
+	wave_age = 0.0
+	_patches.clear()
 	# Kampfeffekte: Bildfolgen (Standard) oder die bisherigen einfachen Effekte
 	FxSprite.enabled = fx_style() == "bilder"
 	FxSprite.preload_all()
@@ -303,6 +309,8 @@ func _process(delta: float) -> void:
 	if not running:
 		return
 	elapsed += delta
+	wave_age += delta
+	_update_patches(delta)
 	shield_guard = maxf(0.0, shield_guard - delta)
 	overdrive_left = maxf(0.0, overdrive_left - delta)
 	if ammo:
@@ -367,6 +375,7 @@ func _update_mp(delta: float) -> void:
 
 
 func _next_wave() -> void:
+	wave_age = 0.0
 	wave += 1
 	_spawn_queue.assign(_plan[wave - 1])
 	_spawn_timer = 0.6
@@ -458,14 +467,31 @@ func on_enemy_died(e: Enemy) -> void:
 		if not FxSprite.has(splat):
 			Fx.flash(self, e.aim_point(), col, 6.0, 0.5)
 		add_shake(0.8)
+	# Eissplitter (Kalle): gefrorene Gegner zerspringen und treffen Nachbarn
+	if e.is_slowed():
+		for h in heroes:
+			if is_instance_valid(h) and h.family() == "cryo" and h.skill(2) > 0:
+				var near: Array[Enemy] = []
+				var ex: Array[Enemy] = [e]
+				for k in int(Hero.skill_value("cryo", 2, h.skill(2))):
+					var n := _nearest_enemy(e.global_position, 2.5, ex)
+					if n == null:
+						break
+					ex.append(n)
+					near.append(n)
+				for n in near:
+					Hero.note("Eissplitter")
+					apply_hit(n, h.damage() * 0.6, false, "ice")
+				if not near.is_empty():
+					Fx.burst(self, e.aim_point(), Color(0.7, 0.95, 1.0), 12, 4.0, 0.07, 0.4)
+				break
 	# Ersatzteile (Pip): jeder n-te besiegte Gegner lässt ein Schildstück fallen
 	for h in heroes:
 		if is_instance_valid(h) and h.family() == "drone" and h.skill(2) > 0:
 			_parts_n += 1
 			if _parts_n % int(Hero.skill_value("drone", 2, h.skill(2))) == 0:
 				repair_fence(0.02, 0.0)
-				if Hero.test_skills > 0:
-					print("FAEHIGKEIT Ersatzteile")
+				Hero.note("Ersatzteile")
 				fence_heal_fx("pip_reparatur", [e.position.x])
 			break
 	enemy_killed.emit(e, e.xp)
@@ -483,6 +509,7 @@ func damage_fence(amount: float) -> void:
 		if is_instance_valid(h) and h.family() == "cannon":
 			plate = maxi(plate, h.skill(1))
 	if plate > 0:
+		Hero.note("Panzerplatte")
 		amount *= 1.0 - float(Hero.skill_value("cannon", 1, plate)) / 100.0
 	fence_hp -= amount
 	_fence_flash = minf(1.0, _fence_flash + amount * 0.02)
@@ -670,7 +697,25 @@ func fire_chain(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type:
 	if color.a > 0.0:
 		col = color
 	var beam := shot_style + "_geschoss"
-	if FxSprite.enabled and Fx3D.has(shot_style):
+	var arc := shot_style + "_blitzbogen"
+	if shot_style != "" and FxSprite.has(arc):
+		# Kettenblitz als gemalte Bögen (Schusseffekte_Volta_v1): je Verbindung ein Bogen, Folgebögen später und
+		# gedämpft, Einschlag am Trefferpunkt
+		var ai := FxSprite.info(arc)
+		for i in points.size() - 1:
+			var a := points[i]
+			var b := points[i + 1]
+			var first := i == 0
+			var delay := 0.083 * i
+			var go := func() -> void:
+				FxSprite.play(self, arc, a.lerp(b, 0.5), {"dir": b - a, "width": float(ai.get("feste_hoehe_m", 0.7)) / FxSprite.SCALE,
+					"length": a.distance_to(b) * float(ai.get("laenge_faktor", 1.0)), "alpha": 1.0 if first else 0.68})
+				FxSprite.play(self, shot_style + "_einschlag", b, {"alpha": 1.0 if first else 0.72, "scale": 1.0 if first else 0.82})
+			if delay <= 0.0:
+				go.call()
+			else:
+				get_tree().create_timer(delay, false).timeout.connect(go)
+	elif FxSprite.enabled and Fx3D.has(shot_style):
 		Fx3D.lightning(self, points, col if color.a > 0.0 or ammo_type != "normal" else Color(0.45, 0.8, 1.0))
 	elif shot_style != "" and FxSprite.has(beam):
 		for i in points.size() - 1:
@@ -735,6 +780,59 @@ func _fire_pellet(a: Vector3, b: Vector3, burn: bool) -> void:
 		if burn:
 			FxSprite.play(self, "fritzi_einschlag", b + Vector3(0, -0.1, 0), {"life": 0.4, "width": 0.75, "alpha": 0.85})
 		p.queue_free())
+
+
+## Splitterregen (Brocken): n Splitter fliegen von pos zu den nächsten Gegnern
+func splinters(pos: Vector3, n: int, dmg: float, ammo_type: String) -> void:
+	var ex: Array[Enemy] = []
+	for k in n:
+		var e := _nearest_enemy(pos, 3.5, ex)
+		if e == null:
+			break
+		ex.append(e)
+		apply_hit(e, dmg, false, ammo_type)
+		Fx.burst(self, e.aim_point(), Color(1.0, 0.7, 0.3), 5, 2.5, 0.05, 0.25)
+
+
+## Enterhaken (Margot): der vorderste Gegner (am nächsten an der Mauer) wird zurückgestoßen
+func hook_front(dist: float) -> void:
+	var front: Enemy = null
+	for e in enemies:
+		if is_instance_valid(e) and e.alive and (front == null or e.position.z > front.position.z):
+			front = e
+	if front:
+		front.knockback(dist)
+		Fx.flash(self, front.aim_point(), Color(0.9, 0.8, 0.5), 1.0, 0.2)
+
+
+## Hitzewelle (Fritzi): alle Gegner auf der Bahn fangen Feuer
+func heat_wave(burn_dps: float) -> void:
+	for e in enemies:
+		if is_instance_valid(e) and e.alive:
+			e.apply_burn(burn_dps * (1.0 + burn_bonus), 3.0)
+	Fx.flash(self, Vector3(0, 1, -6), Color(1.0, 0.5, 0.15), 9.0, 0.5)
+	add_shake(0.25)
+
+
+## Brandspur (Fritzi): eine Feuerstelle auf der Bahn, die Gegner darauf in Brand setzt
+func fire_patch(pos: Vector3, radius: float, burn_dps: float, duration: float) -> void:
+	if _patches.size() > 12:
+		_patches.pop_front()
+	_patches.append([pos, radius, burn_dps, duration])
+
+
+func _update_patches(delta: float) -> void:
+	if _patches.is_empty():
+		return
+	for p in _patches:
+		p[3] = float(p[3]) - delta
+		var c: Vector3 = p[0]
+		for e in enemies:
+			if is_instance_valid(e) and e.alive and Vector2(e.position.x - c.x, e.position.z - c.z).length() <= float(p[1]) + e.radius():
+				e.apply_burn(float(p[2]) * (1.0 + burn_bonus), 1.0)
+		if randf() < delta * 6.0:
+			Fx.burst(self, c + Vector3(randf_range(-0.4, 0.4), 0.1, randf_range(-0.4, 0.4)), Color(1.0, 0.45, 0.1), 2, 1.2, 0.05, 0.3)
+	_patches = _patches.filter(func(p: Array) -> bool: return float(p[3]) > 0.0)
 
 
 ## Schwerkraftfeld (Nova): trifft alle im Umkreis, zieht sie zum Mittelpunkt und bremst sie

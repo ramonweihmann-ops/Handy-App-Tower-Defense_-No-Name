@@ -13,6 +13,22 @@ var mods := {"damage": 0, "rate": 0, "reload": 0, "mag": 0, "crit": 0, "special"
 ## Kampfkarten der Champions (Fähigkeiten wie auf „Held aufleveln“), je bis 3 Sterne. Bisher für Fünkchen, Pip, Rollo
 ## und Nova umgesetzt: [Name, Text je Stufe]. Die Wirkung steht an der Stelle des Schusses bzw. in battle.gd.
 const SKILLS := {
+	"revolver": [["Fächerschuss", "Jeder %d. Schuss teilt sich in drei Kugeln."],
+		["Schnellzieher", "In den ersten %d Sekunden jeder Welle feuert Dusty 2x so schnell."]],
+	"mg": [["Leuchtspur", "Jede %d. Kugel explodiert und trifft Gegner daneben."],
+		["Doppelmagazin", "Nach dem Nachladen sind die ersten 8 Schüsse +%d %% stärker."]],
+	"rocket": [["Splitterregen", "Nach jedem Raketentreffer fliegen %d Splitter in die Menge."],
+		["Schwerer Treffer", "Raketen werfen große Gegner %s zurück."]],
+	"cryo": [["Frostmantel", "Getroffene Gegner sind %d %% langsamer."],
+		["Eissplitter", "Gefrorene Gegner zerspringen und treffen %d Nachbarn."]],
+	"flamer": [["Brandspur", "Brennende Gegner hinterlassen %d Sekunden lang eine Feuerspur."],
+		["Hitzewelle", "Alle %d Sekunden rollt eine Flammenwelle über die ganze Bahn."]],
+	"tesla": [["Kettenblitz", "Jeder Blitz springt auf %d weitere Gegner."],
+		["Überspannung", "Gegen Bosse +%d %% Blitzschaden."]],
+	"shotgun": [["Enterhaken", "Jeder %s. Schuss zieht den vordersten Gegner 2 Felder zurück."],
+		["Schrotregen", "Die Breitseite trifft zusätzlich alle Gegner am Rand (%d %% Schaden)."]],
+	"sniper": [["Durchschuss", "Jeder Schuss durchschlägt bis zu %d Gegner."],
+		["Zielfernrohr", "Gegen Bosse +%d %% kritische Treffer."]],
 	"beam": [["Sternenstaub", "Getroffene Gegner nehmen 3 Sekunden lang +%d %% Schaden."],
 		["Kometenschweif", "Jeder %d. Atemzug trifft auch die Nachbarreihen."]],
 	"drone": [["Notreparatur", "Unter 30 %% Schild repariert Pip %s so schnell."],
@@ -24,18 +40,57 @@ const SKILLS := {
 }
 
 
-## Nur für Tests (--faehigkeiten=N): alle Kampfkarten der Champions gleich auf Stufe N
+## Wirkung beim Einschlag: nach der Flugzeit des Geschosses, nur wenn der Gegner noch lebt
+func _after_flight(target: Enemy, from: Vector3, speed: float, fn: Callable) -> void:
+	var eid := target.get_instance_id()
+	get_tree().create_timer(from.distance_to(target.aim_point()) / speed, false).timeout.connect(func() -> void:
+		var e := instance_from_id(eid) as Enemy
+		if battle and e and e.alive:
+			fn.call(e))
+
+
+## Nur für Tests (--faehigkeiten=N): alle Kampfkarten der Champions gleich auf Stufe N; note() zählt, wie oft
+## jede Fähigkeit gewirkt hat (Ausgabe am Ende des Tests)
 static var test_skills := 0
+static var skill_count := {}
+
+
+static func note(name: String) -> void:
+	if test_skills > 0:
+		skill_count[name] = int(skill_count.get(name, 0)) + 1
 
 
 func skill(n: int) -> int:
 	return int(mods.get("skill%d" % n, 0))
 
 
+## Schwerer Treffer (Brocken): Rückstoß in Feldern je Stufe
+const HEAVY_PUSH := [1.0, 1.5, 2.0]
+## Zähler für Doppelmagazin (Iska) und Zeit bis zur nächsten Hitzewelle (Fritzi)
+var _fresh_shots := 0
+var _heat_t := 0.0
+
+
 ## Wert der Fähigkeit auf Stufe lvl (1–3), wie er auf der Karte steht
 static func skill_value(fam: String, n: int, lvl: int):
 	lvl = clampi(lvl, 1, 3)
 	match [fam, n]:
+		["revolver", 1]: return 5 - lvl           # jeder 4./3./2. Schuss
+		["revolver", 2]: return 3 + 2 * lvl       # 5/7/9 Sekunden
+		["mg", 1]: return 12 - 2 * lvl            # jede 10./8./6. Kugel
+		["mg", 2]: return 20 + 10 * lvl           # +30/40/50 %
+		["rocket", 1]: return 2 + lvl             # 3/4/5 Splitter
+		["rocket", 2]: return ["1 Feld", "1,5 Felder", "2 Felder"][lvl - 1]
+		["cryo", 1]: return 25 + 5 * lvl          # 30/35/40 % langsamer
+		["cryo", 2]: return 1 + lvl               # 2/3/4 Nachbarn
+		["flamer", 1]: return 2 + lvl             # 3/4/5 Sekunden
+		["flamer", 2]: return 12 - 2 * lvl        # alle 10/8/6 Sekunden
+		["tesla", 1]: return 2 + lvl              # 3/4/5 weitere Gegner (Grundkette 2 + Stufe)
+		["tesla", 2]: return 20 + 20 * lvl        # +40/60/80 %
+		["shotgun", 1]: return 7 - lvl            # jeder 6./5./4. Schuss
+		["shotgun", 2]: return 35 + 15 * lvl      # 50/65/80 %
+		["sniper", 1]: return 1 + lvl             # 2/3/4 Gegner
+		["sniper", 2]: return 15 + 10 * lvl       # +25/35/45 %
 		["beam", 1]: return 10 + 5 * lvl          # +15/20/25 % Schaden (Stufe 1 laut Seite: +15 %)
 		["beam", 2]: return 6 - lvl               # jeder 5./4./3. Atemzug
 		["drone", 1]: return ["doppelt", "zweieinhalbmal", "dreimal"][lvl - 1]
@@ -138,7 +193,11 @@ func activate_ult() -> bool:
 						return
 					for e in battle.enemies.duplicate():
 						if is_instance_valid(e) and e.alive and e.position.z > -12.0 * battle.z_scale:
-							battle.fire_bullet(_muzzle.global_position, e, dmg * 1.4, false, "normal", 0, 34.0, 0.8))
+							battle.fire_bullet(_muzzle.global_position, e, dmg * 1.4, false, "normal", 0, 34.0, 0.8)
+						elif skill(2) > 0 and is_instance_valid(e) and e.alive and absf(e.position.x) > 1.1:
+							note("Schrotregen")
+							# Schrotregen: auch die Gegner am Rand weiter hinten
+							battle.fire_bullet(_muzzle.global_position, e, dmg * 1.4 * float(skill_value("shotgun", 2, skill(2))) / 100.0, false, "normal", 0, 34.0, 0.8))
 		"drone":
 			battle.repair_fence(0.1 + 0.05 * (lvl - 1), 0.0)
 			_show_turret(true)
@@ -262,6 +321,9 @@ func damage() -> float:
 func interval() -> float:
 	# Energiekern entladen: doppelt so schnell feuern
 	var boost := 2.0 if battle and battle.overdrive_left > 0.0 else 1.0
+	# Schnellzieher (Dusty): am Anfang jeder Welle doppelt so schnell
+	if skill(2) > 0 and family() == "revolver" and battle and battle.wave_age < float(skill_value("revolver", 2, skill(2))):
+		boost *= 2.0
 	return float(data["interval"]) / (1.0 + 0.15 * mods["rate"]) / boost
 
 
@@ -330,6 +392,12 @@ func _process(delta: float) -> void:
 	if battle == null or not battle.running:
 		return
 	_update_ult(delta)
+	if skill(2) > 0 and family() == "flamer":
+		_heat_t += delta
+		if _heat_t >= float(skill_value("flamer", 2, skill(2))):
+			_heat_t = 0.0
+			note("Hitzewelle")
+			battle.heat_wave(damage() * 0.3)
 	if ult_active():
 		_shot_cd -= delta
 		var t2 := battle.pick_target()
@@ -370,6 +438,7 @@ func _try_reload() -> void:
 		var idx := mini(int(floor(float(i) * balls.size() / shots)), balls.size() - 1)
 		magazine.append(balls[idx])
 	reloading = true
+	_fresh_shots = 8
 	reload_total = reload_time()
 	reload_left = reload_total
 	# Meisterfähigkeit „Blitzladen“
@@ -385,11 +454,26 @@ func _fire(target: Enemy) -> void:
 		# Meisterfähigkeit „Sparmagazin“: manchmal bleibt der Schuss im Magazin
 		ammo_type = magazine.front() if meister("mag") and randf() < 0.25 else magazine.pop_front()
 	_shot_n += 1
-	var crit := randf() < crit_chance()
+	var cc := crit_chance()
+	if skill(2) > 0 and family() == "sniper" and target.is_boss():
+		cc += float(skill_value("sniper", 2, skill(2))) / 100.0   # Zielfernrohr
+	var crit := randf() < cc
+	if crit and skill(2) > 0 and family() == "sniper" and target.is_boss():
+		note("Zielfernrohr")
 	var dmg := damage() * ((3.0 if meister("crit") else 2.0) if crit else 1.0)
 	# Meisterfähigkeit „Wuchttreffer“: jeder 4. Schuss dreifach
 	if meister("damage") and _shot_n % 4 == 0:
 		dmg *= 3.0
+	if _fresh_shots > 0:
+		_fresh_shots -= 1
+		if skill(2) > 0 and family() == "mg":
+			note("Doppelmagazin")
+			dmg *= 1.0 + float(skill_value("mg", 2, skill(2))) / 100.0   # Doppelmagazin
+	if skill(2) > 0 and family() == "tesla" and target.is_boss():
+		note("Überspannung")
+		dmg *= 1.0 + float(skill_value("tesla", 2, skill(2))) / 100.0   # Überspannung
+	if skill(2) > 0 and family() == "revolver" and battle.wave_age < float(skill_value("revolver", 2, skill(2))):
+		note("Schnellzieher")
 	var from := _muzzle.global_position
 	Sfx.play(SHOT_SOUND.get(family(), "shot"))
 	var style := str(FX_STYLE.get(family(), ""))
@@ -398,6 +482,10 @@ func _fire(target: Enemy) -> void:
 	match family():
 		"revolver":
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, 0, 30.0, 1.0)
+			if skill(1) > 0 and _shot_n % int(skill_value("revolver", 1, skill(1))) == 0:
+				note("Fächerschuss")
+				for other in battle.spread_targets(2, target):   # Fächerschuss
+					battle.fire_bullet(from, other, dmg * 0.7, false, ammo_type, 0, 30.0, 0.9)
 			if magazine.is_empty() or ult_active():
 				var extra := 2 + 2 * sp()
 				for other in battle.spread_targets(extra, target):
@@ -407,9 +495,29 @@ func _fire(target: Enemy) -> void:
 				battle.fire_bullet(from, target, dmg, crit, "normal", sp() + 1 + (1 if sym("durchschlagsalve") else 0), 42.0, 1.1)
 			else:
 				battle.fire_bullet(from, target, dmg, crit, ammo_type, sp() + (1 if sym("durchschlagsalve") else 0), 34.0, 0.75)
+			if skill(1) > 0 and _shot_n % int(skill_value("mg", 1, skill(1))) == 0:
+				_after_flight(target, from, 34.0, func(e: Enemy) -> void:   # Leuchtspur
+					note("Leuchtspur")
+					battle.explode(e.global_position, 1.0, dmg, false, ammo_type))
 		"rocket":
 			var radius: float = float(data["splash"]) * (1.0 + 0.25 * sp())
 			battle.fire_rocket(from, target, dmg, crit, ammo_type, radius)
+			if skill(1) > 0 or skill(2) > 0:
+				var n_split := int(skill_value("rocket", 1, skill(1))) if skill(1) > 0 else 0
+				var heavy := float(HEAVY_PUSH[skill(2) - 1]) if skill(2) > 0 else 0.0
+				var eid_r := target.get_instance_id()
+				var hit_at := target.global_position
+				get_tree().create_timer(from.distance_to(target.aim_point()) / 11.0, false).timeout.connect(func() -> void:
+					if battle == null:
+						return
+					var e := instance_from_id(eid_r) as Enemy
+					var alive_e := e != null and is_instance_valid(e) and e.alive
+					if n_split > 0:   # Splitterregen: auch wenn die Rakete ihr Ziel schon besiegt hat
+						note("Splitterregen")
+						battle.splinters(e.global_position if alive_e else hit_at, n_split, dmg * 0.3, ammo_type)
+					if heavy > 0.0 and alive_e and (e.is_boss() or e.data["tier"] == "stark"):
+						note("Schwerer Treffer")
+						e.knockback(heavy * battle.z_scale))   # Schwerer Treffer
 			if sym("schwerkraftbombe"):
 				var eid3 := target.get_instance_id()
 				get_tree().create_timer(from.distance_to(target.aim_point()) / 11.0, false).timeout.connect(func() -> void:
@@ -418,22 +526,37 @@ func _fire(target: Enemy) -> void:
 						battle.gravity_well(e.global_position, radius * 1.2, 0.0, false, "normal", 0.5, 0.35, 1.0))
 		"tesla":
 			var t_ammo := "ice" if sym("frostblitz") and ammo_type == "normal" else ammo_type
-			battle.fire_chain(from, target, dmg, crit, t_ammo, int(data["chain"]) + sp(), Color(0, 0, 0, 0), 1.3 if sym("kettenexplosion") else 0.0)
+			var jumps := int(data["chain"]) + sp() + skill(1)   # Kettenblitz: +1/2/3 Sprünge
+			if skill(1) > 0:
+				note("Kettenblitz")
+			battle.fire_chain(from, target, dmg, crit, t_ammo, jumps, Color(0, 0, 0, 0), 1.3 if sym("kettenexplosion") else 0.0)
 		"cryo":
 			# Frost-Strahl: immer Eismunition, springt mit der Spezialkarte auf Nachbarn über
 			battle.fire_chain(from, target, dmg, crit, "ice", sp(), Color(0.55, 0.95, 1.0))
+			if skill(1) > 0:
+				note("Frostmantel")
+				target.apply_slow(float(skill_value("cryo", 1, skill(1))) / 100.0 + 0.45, 2.5)   # Frostmantel: stärker und länger
 		"shotgun":
 			var pellets := int(data["pellets"]) + sp()
 			if sym("brandschrot") and ammo_type == "normal":
 				ammo_type = "fire"
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, 0, 32.0, 0.7)
+			if skill(1) > 0 and _shot_n % int(skill_value("shotgun", 1, skill(1))) == 0:
+				note("Enterhaken")
+				battle.hook_front(2.0 * battle.z_scale)   # Enterhaken
 			for other in battle.spread_targets(pellets - 1, target):
 				battle.fire_bullet(from, other, dmg, false, ammo_type, 0, 30.0, 0.7)
 		"sniper":
-			battle.fire_bullet(from, target, dmg, crit, ammo_type, int(data["pierce"]) + sp() + (1 if sym("durchschlagsalve") else 0), 60.0, 1.3)
+			var extra_pierce := int(skill_value("sniper", 1, skill(1))) if skill(1) > 0 else 0   # Durchschuss
+			if extra_pierce > 0:
+				note("Durchschuss")
+			battle.fire_bullet(from, target, dmg, crit, ammo_type, int(data["pierce"]) + sp() + (1 if sym("durchschlagsalve") else 0) + extra_pierce, 60.0, 1.3)
 		"flamer":
 			var cone: float = float(data["cone"]) * (1.0 + 0.2 * sp()) * (2.2 if ult_active() else 1.0)
 			battle.flame(from, target, dmg, crit, ammo_type, cone)
+			if skill(1) > 0:
+				note("Brandspur")
+				battle.fire_patch(target.global_position, 0.9, dmg * 0.25, float(skill_value("flamer", 1, skill(1))))   # Brandspur
 		"beam":
 			# Sternenatem: durchschlägt die ganze Reihe; mit der Superfähigkeit drei Reihen
 			var pierce := int(data["pierce"]) + sp()
@@ -444,8 +567,11 @@ func _fire(target: Enemy) -> void:
 				FxSprite.beam(battle, "fuenkchen_geschoss", from, far, 0.25, 0.6, 0.7)
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, pierce, 60.0, 1.3)
 			if skill(1) > 0:
+				note("Sternenstaub")
 				target.mark_vulnerable(float(skill_value("beam", 1, skill(1))) / 100.0, 3.0)
 			var comet := skill(2) > 0 and _shot_n % int(skill_value("beam", 2, skill(2))) == 0
+			if comet:
+				note("Kometenschweif")
 			if ult_active() or comet:
 				for other in battle.spread_targets(2, target):
 					battle.fire_bullet(from, other, dmg, false, ammo_type, pierce, 60.0, 1.3)
@@ -454,6 +580,7 @@ func _fire(target: Enemy) -> void:
 			var fix := float(data["repair"]) * (1.0 + 0.5 * sp())
 			if skill(1) > 0 and battle.fence_hp < battle.fence_max * 0.3:
 				fix *= 1.5 + 0.5 * skill(1)   # Notreparatur: doppelt / zweieinhalbmal / dreimal
+				note("Notreparatur")
 			battle.repair_fence(fix, 0.0)
 			_repair_n += 1
 			if _repair_n % 4 == 0:
@@ -475,6 +602,7 @@ func _fire(target: Enemy) -> void:
 				if e and e.alive:
 					e.knockback(push)
 					if twice:
+						note("Doppelwumms")
 						e.knockback(push)   # Doppelwumms
 						if battle:
 							Fx.flash(battle, e.aim_point(), Color(1.0, 0.65, 0.2), 1.2, 0.2))
@@ -490,6 +618,10 @@ func _fire(target: Enemy) -> void:
 			get_tree().create_timer(travel2, false).timeout.connect(func() -> void:
 				var e := instance_from_id(eid2) as Enemy
 				if battle and e and e.alive:
+					if skill(1) > 0:
+						note("Mini-Loch")
+					if skill(2) > 0:
+						note("Zeitdehnung")
 					battle.gravity_well(e.global_position, r, dmg, crit, ammo_type, pull, slow, 1.2 + (0.5 if skill(2) > 0 else 0.0)))
 	# Meisterfähigkeit „Doppelschuss“: jeder 3. Schuss trifft zusätzlich einen zweiten Gegner
 	if meister("rate") and _shot_n % 3 == 0 and not ult_active():

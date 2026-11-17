@@ -44,9 +44,9 @@ const CARDS := {
 	"kalle": [["Frostmantel", "Getroffene Gegner sind ", "30 %", " langsamer."], ["Eissplitter", "Gefrorene Gegner zerspringen und treffen ", "2", " Nachbarn."]],
 	"fritzi": [["Brandspur", "Brennende Gegner hinterlassen ", "3 Sekunden", " lang eine Feuerspur."], ["Hitzewelle", "Alle ", "10 Sekunden", " rollt eine Flammenwelle über die ganze Bahn."]],
 	"volta": [["Kettenblitz", "Jeder Blitz springt auf ", "3", " weitere Gegner."], ["Überspannung", "Gegen Bosse ", "+40 %", " Blitzschaden."]],
-	"margot": [["Enterhaken", "Zieht den vordersten Gegner ", "2 Felder", " zurück."], ["Schrotregen", "Die Breitseite trifft zusätzlich ", "alle", " Gegner am Rand."]],
+	"margot": [["Enterhaken", "Jeder ", "6.", " Schuss zieht den vordersten Gegner 2 Felder zurück."], ["Schrotregen", "Die Breitseite trifft auch die Gegner am Rand mit ", "50 %", " Schaden."]],
 	"lynx": [["Durchschuss", "Jeder Schuss durchschlägt bis zu ", "2", " Gegner."], ["Zielfernrohr", "Gegen Bosse ", "+25 %", " kritische Treffer."]],
-	# Fünkchen, Pip, Rollo, Nova: im Kampf umgesetzt (Hero.SKILLS), Werte der Stufe 1
+	# Alle zwölf: im Kampf umgesetzt (Hero.SKILLS), Werte der Stufe 1
 	"fuenkchen": [["Sternenstaub", "Getroffene Gegner nehmen 3 Sekunden lang ", "+15 %", " Schaden."], ["Kometenschweif", "Jeder ", "5.", " Atemzug trifft auch die Nachbarreihen."]],
 	"pip": [["Notreparatur", "Unter 30 % Schild repariert Pip ", "doppelt", " so schnell."], ["Ersatzteile", "Jeder ", "8.", " besiegte Gegner lässt ein Schildstück fallen."]],
 	"rollo": [["Panzerplatte", "Die Mauer nimmt ", "10 %", " weniger Schaden."], ["Doppelwumms", "Jeder ", "4.", " Schuss stößt zweimal zurück."]],

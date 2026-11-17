@@ -1595,6 +1595,8 @@ func double_rewards(rewards: Dictionary) -> Dictionary:
 
 
 func _finish_autotest(result: String) -> void:
+	if Hero.test_skills > 0:
+		print("FAEHIGKEITEN ", JSON.stringify(Hero.skill_count))
 	var names: Array[String] = []
 	for h in battle.heroes:
 		names.append(h.id)

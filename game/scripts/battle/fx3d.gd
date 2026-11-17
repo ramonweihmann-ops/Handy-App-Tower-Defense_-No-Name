@@ -5,7 +5,7 @@ extends RefCounted
 ## Volta (Blitz) und Fritzi (Flammen), die von schräg oben wie Striche wirkten.
 
 ## Champions mit neuen 3D-Schüssen (Effekt-Stil laut Hero.FX_STYLE)
-const STYLES := ["brocken", "volta", "fritzi"]
+const STYLES := ["brocken", "fritzi"]   # Volta: Bildfolgen von ChatGPT (Schusseffekte_Volta_v1)
 ## Größe der Rakete (aus der Spielkamera muss sie deutlich als Rakete erkennbar sein)
 const ROCKET_SCALE := 2.8
 
