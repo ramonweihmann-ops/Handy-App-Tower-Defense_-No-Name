@@ -1,0 +1,25 @@
+{
+  "held": "pip",
+  "modell": "../../game/models/heroes_v2/pip.glb",
+  "abschussanimation": {
+    "aktion": "Shoot",
+    "dauer_s": 0.4,
+    "loop": false
+  },
+  "muendungsknoten": "Muzzle",
+  "effekte": {
+    "muendung": "pip_muendung/pip_muendung.json",
+    "geschoss": "pip_geschoss/pip_geschoss.json",
+    "einschlag": "pip_einschlag/pip_einschlag.json"
+  },
+  "kampfvorschau": {
+    "flugzeit_s": 0.292,
+    "schussrichtung": [
+      1,
+      0
+    ],
+    "eiswelt": "PIP_EISWELT_VORSCHAU.gif",
+    "raumdock": "PIP_RAUMDOCK_VORSCHAU.gif"
+  },
+  "hinweis": "Vorschauzeiten beschreiben nur die Darstellung. Ziele und Trefferzeiten kommen aus dem Spiel."
+}

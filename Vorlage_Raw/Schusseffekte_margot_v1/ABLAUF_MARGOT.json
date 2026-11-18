@@ -1,0 +1,25 @@
+{
+  "held": "margot",
+  "modell": "../../game/models/heroes_v2/margot.glb",
+  "abschussanimation": {
+    "aktion": "Shoot",
+    "dauer_s": 0.4,
+    "loop": false
+  },
+  "muendungsknoten": "Muzzle",
+  "effekte": {
+    "muendung": "margot_muendung/margot_muendung.json",
+    "geschoss": "margot_geschoss/margot_geschoss.json",
+    "einschlag": "margot_einschlag/margot_einschlag.json"
+  },
+  "kampfvorschau": {
+    "flugzeit_s": 0.208,
+    "schussrichtung": [
+      1,
+      0
+    ],
+    "eiswelt": "MARGOT_EISWELT_VORSCHAU.gif",
+    "raumdock": "MARGOT_RAUMDOCK_VORSCHAU.gif"
+  },
+  "hinweis": "Vorschauzeiten beschreiben nur die Darstellung. Ziele und Trefferzeiten kommen aus dem Spiel."
+}

@@ -1,0 +1,25 @@
+{
+  "held": "kalle",
+  "modell": "../../game/models/heroes_v2/kalle.glb",
+  "abschussanimation": {
+    "aktion": "Shoot",
+    "dauer_s": 0.4,
+    "loop": false
+  },
+  "muendungsknoten": "Muzzle",
+  "effekte": {
+    "muendung": "kalle_muendung/kalle_muendung.json",
+    "geschoss": "kalle_geschoss/kalle_geschoss.json",
+    "einschlag": "kalle_einschlag/kalle_einschlag.json"
+  },
+  "kampfvorschau": {
+    "flugzeit_s": 0.042,
+    "schussrichtung": [
+      1,
+      0
+    ],
+    "eiswelt": "KALLE_EISWELT_VORSCHAU.gif",
+    "raumdock": "KALLE_RAUMDOCK_VORSCHAU.gif"
+  },
+  "hinweis": "Vorschauzeiten beschreiben nur die Darstellung. Ziele und Trefferzeiten kommen aus dem Spiel."
+}

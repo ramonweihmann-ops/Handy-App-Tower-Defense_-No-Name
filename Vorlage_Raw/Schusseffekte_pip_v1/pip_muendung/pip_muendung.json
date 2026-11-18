@@ -1,0 +1,15 @@
+{
+  "name": "pip_muendung",
+  "frames": 8,
+  "cols": 4,
+  "rows": 2,
+  "fps": 24,
+  "loop": false,
+  "anker": [
+    0.25,
+    0.5
+  ],
+  "groesse_m": 0.59,
+  "mischung": "alpha",
+  "notiz": "Am Knoten Muzzle abspielen. Schuss nach rechts."
+}
