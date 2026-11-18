@@ -54,10 +54,13 @@ TUNING = {
         'geschoss': {'groesse_m': 2.4, 'feste_hoehe_m': 2.2, 'schleife_bilder': 4},
         'einschlag': {'groesse_m': 1.2, 'tempo': 1.0},
     },
-    'fuenkchen': {
+    'fuenkchen': {   # v3: Drachenatem bis zur Vorderkante des Gegners, Flammenbögen um ihn herum
         'muendung': {'groesse_m': 1.1, 'tempo': 1.3},
-        'geschoss': {'feste_hoehe_m': 2.6},   # Sternenatem, vom Maul quer durch die Reihe gespannt (hero.gd)
-        'einschlag': {'groesse_m': 1.3, 'tempo': 1.0},
+        'geschoss': {'feste_hoehe_m': 2.4},
+        # freie_mitte: Anteil der Kachel zwischen den Flammenbögen (gemessen 55 von 256 px); das Spiel rechnet die
+        # Größe je Gegner so, dass die Flammen um ihn herumgehen und ihn nicht verdecken (projectile.gd)
+        # laenge_anteil: Kachel in Schussrichtung nur halb so lang wie breit, die Bögen liegen dann eng am Gegner
+        'einschlag': {'freie_mitte': 0.21, 'laenge_anteil': 0.5, 'tempo': 1.0},
     },
     'rollo': {
         'muendung': {'groesse_m': 1.2, 'tempo': 1.3},

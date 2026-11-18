@@ -165,16 +165,29 @@ func _make_tracer(col: Color) -> void:
 	add_child(head)
 
 
+## Einschlag-Bildfolge des Helden am Trefferpunkt (gerichtet in Schussrichtung, wenn die JSON es sagt)
+static func play_impact(battle_: Node, style_: String, at: Vector3, dir: Vector3, target_: Enemy) -> void:
+	var ei := FxSprite.info(style_ + "_einschlag")
+	if not bool(ei.get("gerichtet", false)):
+		FxSprite.play(battle_, style_ + "_einschlag", at, {"speed": 1.5})
+		return
+	var eo := {"dir": dir, "speed": float(ei.get("tempo", 1.0))}
+	if ei.has("freie_mitte") and is_instance_valid(target_):
+		# Flammen schmiegen sich um den Gegner (Fünkchens Drachenatem): die freie Mitte etwas breiter als der Gegner
+		# und flacher als geliefert (laenge_anteil), damit die Bögen den Gegner eng umschließen statt hinter ihm hochzustehen
+		var w := clampf(target_.radius() * 2.0 * 1.15 / float(ei["freie_mitte"]), 1.5, 8.0)
+		eo.merge({"width": w / FxSprite.SCALE, "length": w * float(ei.get("laenge_anteil", 1.0)), "stretch": false}, true)
+	FxSprite.play(battle_, style_ + "_einschlag", at, eo)
+
+
 func _impact() -> void:
 	if _smoke:
 		Fx3D.release_smoke(_smoke, battle)
 		_smoke = null
-	if kind != "rocket" and style != "" and style != "nova":
-		var ei := FxSprite.info(style + "_einschlag")
-		if bool(ei.get("gerichtet", false)):
-			FxSprite.play(battle, style + "_einschlag", _last_target, {"dir": _last_target - _start, "speed": float(ei.get("tempo", 1.0))})
-		else:
-			FxSprite.play(battle, style + "_einschlag", _last_target, {"speed": 1.5})
+	# Strahl-Helden mit gespanntem Atem (Fünkchen) zeigen den Einschlag schon beim Aufprall des Atems (hero.gd)
+	var beam_hit := style in BEAM_STYLES and str(FxSprite.info(style + "_geschoss").get("darstellung", "")) == "bogen"
+	if kind != "rocket" and style != "" and style != "nova" and not beam_hit:
+		play_impact(battle, style, _last_target, _last_target - _start, target)
 	if kind == "rocket":
 		battle.explode(_last_target, splash, dmg, crit, ammo_type)
 	elif is_instance_valid(target) and target.alive:

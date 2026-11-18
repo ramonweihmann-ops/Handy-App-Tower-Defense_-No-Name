@@ -40,6 +40,32 @@ const SKILLS := {
 }
 
 
+func _breath_is_painted() -> bool:
+	return str(FxSprite.info("fuenkchen_geschoss").get("darstellung", "")) == "bogen"
+
+
+## Fünkchens Atem. Gemalt (Schusseffekte_fuenkchen_v3): Drachenatem vom Maul bis unten vorn an den Gegner (so bleibt
+## sein Körper frei), beim Aufprall legen sich Flammenbögen um ihn (Projectile.play_impact). Sonst der alte Strahl.
+func _breath_fx(from: Vector3, target: Enemy) -> void:
+	if not FxSprite.has("fuenkchen_geschoss"):
+		return
+	var fi := FxSprite.info("fuenkchen_geschoss")
+	if not _breath_is_painted():
+		var far := from + (target.aim_point() - from).normalized() * maxf(8.0, from.distance_to(target.aim_point()) + 4.0)
+		FxSprite.beam(battle, "fuenkchen_geschoss", from, far, 0.25, 0.6, 0.7)
+		return
+	var tp := target.global_position
+	var flat := Vector3(tp.x - from.x, 0.0, tp.z - from.z).normalized()
+	FxSprite.span(battle, "fuenkchen_geschoss", from, tp + Vector3(0, 0.15, 0) - flat * target.radius() * 1.6,
+		{"width": float(fi.get("feste_hoehe_m", 1.0)) / FxSprite.SCALE})
+	# Flammenbögen, sobald der Atem aufprallt (zweites Bild des Atems)
+	var eid := target.get_instance_id()
+	get_tree().create_timer(0.08, false).timeout.connect(func() -> void:
+		var e := instance_from_id(eid) as Enemy
+		if battle and e and is_instance_valid(e) and e.alive:
+			Projectile.play_impact(battle, "fuenkchen", e.aim_point(), e.aim_point() - from, e))
+
+
 ## Wirkung beim Einschlag: nach der Flugzeit des Geschosses, nur wenn der Gegner noch lebt
 func _after_flight(target: Enemy, from: Vector3, speed: float, fn: Callable) -> void:
 	var eid := target.get_instance_id()
@@ -562,14 +588,7 @@ func _fire(target: Enemy) -> void:
 			var pierce := int(data["pierce"]) + sp()
 			if sym("sternenfeuer") and ammo_type == "normal":
 				ammo_type = "fire"
-			if FxSprite.has("fuenkchen_geschoss"):
-				var far := from + (target.aim_point() - from).normalized() * maxf(8.0, from.distance_to(target.aim_point()) + 4.0)
-				var fi := FxSprite.info("fuenkchen_geschoss")
-				if str(fi.get("darstellung", "")) == "bogen":
-					# Sternenatem (Schusseffekte_fuenkchen_v1): Sternenband vom Maul quer durch die Reihe
-					FxSprite.span(battle, "fuenkchen_geschoss", from, far, {"width": float(fi.get("feste_hoehe_m", 1.0)) / FxSprite.SCALE})
-				else:
-					FxSprite.beam(battle, "fuenkchen_geschoss", from, far, 0.25, 0.6, 0.7)
+			_breath_fx(from, target)
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, pierce, 60.0, 1.3)
 			if skill(1) > 0:
 				note("Sternenstaub")
@@ -579,6 +598,8 @@ func _fire(target: Enemy) -> void:
 				note("Kometenschweif")
 			if ult_active() or comet:
 				for other in battle.spread_targets(2, target):
+					if _breath_is_painted():
+						_breath_fx(from, other)
 					battle.fire_bullet(from, other, dmg, false, ammo_type, pierce, 60.0, 1.3)
 		"drone":
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, 0, 34.0, 0.8)
@@ -631,6 +652,8 @@ func _fire(target: Enemy) -> void:
 	# Meisterfähigkeit „Doppelschuss“: jeder 3. Schuss trifft zusätzlich einen zweiten Gegner
 	if meister("rate") and _shot_n % 3 == 0 and not ult_active():
 		for other in battle.spread_targets(1, target):
+			if family() == "beam" and _breath_is_painted():
+				_breath_fx(from, other)
 			battle.fire_bullet(from, other, maxf(dmg, damage()) * 0.8, false, ammo_type, 0, 34.0, 0.8)
 	battle.shot_style = ""
 	_recoil = 1.0
