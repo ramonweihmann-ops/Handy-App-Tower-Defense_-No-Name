@@ -86,7 +86,7 @@ static func _make(name: String, opts: Dictionary) -> FxSprite:
 	s.mesh = _mesh
 	s.material_override = _material(name)
 	s.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	s.frames = int(d.get("frames", 1))
+	s.frames = int(opts.get("frames", d.get("frames", 1)))
 	s.fps = float(d.get("fps", 24))
 	s.loop = bool(opts.get("loop", d.get("loop", false)))
 	s.speed = float(opts.get("speed", 1.0))
@@ -99,7 +99,8 @@ static func _make(name: String, opts: Dictionary) -> FxSprite:
 	s.set_instance_shader_parameter("frame", 0.0)
 	s.base_alpha = float(opts.get("alpha", 1.0)) * (1.0 if opts.get("solid", false) else ALPHA)
 	s.set_instance_shader_parameter("alpha", s.base_alpha)
-	s.set_instance_shader_parameter("stretch", 1.0 if opts.has("length") else 0.0)
+	# Strahlen werden in die Tiefe verkürzt; fliegende Geschosse nicht (sonst nur ein Punkt bei flacher Kamera)
+	s.set_instance_shader_parameter("stretch", 1.0 if opts.get("stretch", opts.has("length")) else 0.0)
 	s.sorting_offset = float(opts.get("sort", 0.0))
 	_live += 1
 	s._counted = true
@@ -128,6 +129,29 @@ static func beam(parent: Node, name: String, a: Vector3, b: Vector3, life_s: flo
 	var at := a if float(anchor[1]) > 0.6 else a.lerp(b, 0.5)
 	var l := len / maxf(0.25, float(anchor[1])) if float(anchor[1]) > 0.6 else len
 	return play(parent, name, at, {"dir": b - a, "width": w, "length": l, "loop": true, "life": life_s, "fade": minf(0.1, life_s * 0.4), "alpha": alpha})
+
+
+## Linie von a nach b, die auf dem Bildschirm genau an beiden Punkten endet (Durchschuss): beide Enden werden entlang
+## des Sehstrahls auf die Tiefe der Mitte geschoben, das Viereck liegt dann flach vor der Kamera, ohne Verkürzung.
+## Ohne Kamera wie play() mit Verkürzung. opts wie bei play(), "width" in Weltmaß ohne SCALE.
+static func span(parent: Node, name: String, a: Vector3, b: Vector3, opts := {}) -> FxSprite:
+	var d := info(name)
+	if d.is_empty():
+		return null
+	var o := opts.duplicate()
+	var f := float(d.get("laenge_faktor", 1.0))
+	var cam := parent.get_viewport().get_camera_3d() if parent.is_inside_tree() else null
+	if cam == null or cam.projection != Camera3D.PROJECTION_PERSPECTIVE:
+		o.merge({"dir": b - a, "length": a.distance_to(b) * f}, true)
+		return play(parent, name, a.lerp(b, 0.5), o)
+	var eye := cam.global_position
+	var fwd := -cam.global_basis.z
+	var m := a.lerp(b, 0.5)
+	var dm := maxf(0.05, (m - eye).dot(fwd))
+	var a2 := eye + (a - eye) * (dm / maxf(0.05, (a - eye).dot(fwd)))
+	var b2 := eye + (b - eye) * (dm / maxf(0.05, (b - eye).dot(fwd)))
+	o.merge({"dir": b2 - a2, "length": a2.distance_to(b2) * f, "stretch": false}, true)
+	return play(parent, name, a2.lerp(b2, 0.5), o)
 
 
 ## Als Schleife an einen Knoten hängen (Geschoss); verschwindet mit ihm

@@ -646,7 +646,7 @@ func _muzzle_fx(style: String, from: Vector3, target: Enemy) -> void:
 	if style == "":
 		return
 	var name := style + "_muendung"
-	if style == "iska":
+	if style == "iska" and not bool(FxSprite.info("iska_muendung").get("v2", false)):
 		_muzzle_n += 1
 		var v := _muzzle_n % 3
 		if v > 0 and FxSprite.has("iska_muendung_variante_%d" % (v + 1)):
@@ -661,7 +661,8 @@ func _muzzle_fx(style: String, from: Vector3, target: Enemy) -> void:
 		return
 	if style == "brocken":
 		d = -d
-	FxSprite.play(battle, name, from, {"dir": d, "speed": 2.4, "scale": 0.8})
+	var mi := FxSprite.info(name)
+	FxSprite.play(battle, name, from, {"dir": d, "speed": float(mi.get("tempo", 2.4)), "scale": 1.0 if mi.get("v2", false) else 0.8})
 
 
 func _aim_at(target_pos: Vector3, delta: float) -> void:

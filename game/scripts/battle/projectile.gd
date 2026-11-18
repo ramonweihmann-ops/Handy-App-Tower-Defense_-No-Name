@@ -52,6 +52,21 @@ func launch(battle_: Battle, kind_: String, from: Vector3, target_: Enemy, dmg_:
 	_length = maxf(0.5, from.distance_to(_last_target))
 	global_position = from
 	var col: Color = AMMO_COLORS.get(ammo_type, AMMO_COLORS["normal"])
+	# Gemalte Geschosse (Schusseffekte_<held>_v2): Darstellung steht in der JSON
+	var gname := style + "_geschoss"
+	var gi := FxSprite.info(gname) if style != "" and FxSprite.has(gname) else {}
+	match str(gi.get("darstellung", "")):
+		"durchschuss":
+			# eine Linie von der Mündung bis zum Ziel, das Projektil selbst bleibt unsichtbar
+			FxSprite.span(battle, gname, from, _last_target, {"width": float(gi.get("feste_hoehe_m", 1.0)) / FxSprite.SCALE,
+				"alpha": float(gi.get("deckkraft", 1.0))})
+			return
+		"leuchtspur", "bolzen":
+			# kurzer Streifen am Geschoss, Spitze vorn (Anker an der Spitze)
+			_sprite = FxSprite.attach(self, gname, {"dir": _last_target - from, "stretch": false,
+				"width": float(gi.get("feste_hoehe_m", 1.0)) / FxSprite.SCALE, "length": float(gi.get("groesse_m", 1.0)),
+				"frames": int(gi.get("schleife_bilder", gi.get("frames", 1)))})
+			return
 	if style in TRACER_STYLES and FxSprite.enabled:
 		_make_tracer(col)
 		return
@@ -154,7 +169,11 @@ func _impact() -> void:
 		Fx3D.release_smoke(_smoke, battle)
 		_smoke = null
 	if kind != "rocket" and style != "" and style != "nova":
-		FxSprite.play(battle, style + "_einschlag", _last_target, {"speed": 1.5})
+		var ei := FxSprite.info(style + "_einschlag")
+		if bool(ei.get("gerichtet", false)):
+			FxSprite.play(battle, style + "_einschlag", _last_target, {"dir": _last_target - _start, "speed": float(ei.get("tempo", 1.0))})
+		else:
+			FxSprite.play(battle, style + "_einschlag", _last_target, {"speed": 1.5})
 	if kind == "rocket":
 		battle.explode(_last_target, splash, dmg, crit, ammo_type)
 	elif is_instance_valid(target) and target.alive:
