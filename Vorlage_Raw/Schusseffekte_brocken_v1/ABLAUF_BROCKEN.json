@@ -1,0 +1,24 @@
+{
+  "held": "brocken",
+  "modell": "../../game/models/heroes_v2/brocken.glb",
+  "abschussanimation": {
+    "aktion": "Shoot",
+    "dauer_s": 0.4,
+    "loop": false
+  },
+  "muendungsknoten": "Muzzle",
+  "effekte": {
+    "muendung": "brocken_muendung/brocken_muendung.json",
+    "geschoss": "brocken_geschoss/brocken_geschoss.json"
+  },
+  "kampfvorschau": {
+    "flugzeit_s": 0.375,
+    "schussrichtung": [
+      1,
+      0
+    ],
+    "eiswelt": "BROCKEN_EISWELT_VORSCHAU.gif",
+    "raumdock": "BROCKEN_RAUMDOCK_VORSCHAU.gif"
+  },
+  "hinweis": "Beim Treffer bestehende brocken_explosion verwenden. Die Vorschauflugzeit dient der Darstellung."
+}

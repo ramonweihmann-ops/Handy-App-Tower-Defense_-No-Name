@@ -1,0 +1,16 @@
+{
+  "name": "brocken_muendung",
+  "frames": 8,
+  "cols": 4,
+  "rows": 2,
+  "fps": 24,
+  "loop": false,
+  "anker": [
+    0.25,
+    0.5
+  ],
+  "groesse_m": 0.7,
+  "mischung": "alpha",
+  "notiz": "Kurzer Abschussblitz am Muzzle. Schussrichtung nach rechts.",
+  "deckkraft": 1.0
+}

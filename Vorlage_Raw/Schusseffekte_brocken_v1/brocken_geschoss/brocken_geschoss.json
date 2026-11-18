@@ -1,0 +1,23 @@
+{
+  "name": "brocken_geschoss",
+  "frames": 8,
+  "cols": 4,
+  "rows": 2,
+  "fps": 24,
+  "loop": false,
+  "anker": [
+    0.078125,
+    0.5
+  ],
+  "groesse_m": 1.45,
+  "mischung": "alpha",
+  "notiz": "Start (20, 128), Spitze (236, 128). Flugphase 1–4, Ausblenden 5–8.",
+  "ziel_anker": [
+    0.921875,
+    0.5
+  ],
+  "feste_hoehe_m": 1.45,
+  "darstellung": "rakete",
+  "schleife_bilder": 4,
+  "deckkraft": 1.0
+}
