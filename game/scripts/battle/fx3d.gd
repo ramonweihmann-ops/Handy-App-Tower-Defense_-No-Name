@@ -6,8 +6,8 @@ extends RefCounted
 
 ## Champions mit neuen 3D-Schüssen (Effekt-Stil laut Hero.FX_STYLE)
 const STYLES := ["brocken", "fritzi"]   # Volta: Bildfolgen von ChatGPT (Schusseffekte_Volta_v1)
-## Größe der Rakete (aus der Spielkamera muss sie deutlich als Rakete erkennbar sein)
-const ROCKET_SCALE := 2.8
+## Größe der Rakete: deutlich als Rakete erkennbar, aber kleiner als die Gegner (2,8 wirkte wie ein Raumschiff, 18.11.)
+const ROCKET_SCALE := 1.25
 
 
 static func has(style: String) -> bool:
