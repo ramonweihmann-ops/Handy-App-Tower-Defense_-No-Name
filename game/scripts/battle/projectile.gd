@@ -54,7 +54,8 @@ func launch(battle_: Battle, kind_: String, from: Vector3, target_: Enemy, dmg_:
 	var col: Color = AMMO_COLORS.get(ammo_type, AMMO_COLORS["normal"])
 	# Gemalte Geschosse (Schusseffekte_<held>_v2): Darstellung steht in der JSON
 	var gname := style + "_geschoss"
-	var gi := FxSprite.info(gname) if style != "" and FxSprite.has(gname) else {}
+	# Strahl-Helden (Fünkchen) zeichnen ihren Schuss selbst (hero.gd), das Projektil bleibt dann unsichtbar
+	var gi := FxSprite.info(gname) if style != "" and not style in BEAM_STYLES and FxSprite.has(gname) else {}
 	match str(gi.get("darstellung", "")):
 		"durchschuss", "bogen":
 			# eine Linie (Lynx) oder ein Strahl (Kalle) von der Mündung bis zum Ziel, das Projektil selbst bleibt unsichtbar

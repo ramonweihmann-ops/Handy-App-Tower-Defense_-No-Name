@@ -859,7 +859,9 @@ func gravity_well(center: Vector3, radius: float, dmg: float, crit: bool, ammo_t
 			e.pull_to(center, pull)
 			e.apply_slow(slow, slow_t)
 	if FxSprite.has("nova_einschlag"):
-		FxSprite.play(self, "nova_einschlag", center + Vector3(0, 0.3, 0), {"width": maxf(1.6, radius * 2.0)})
+		# Wirbel nach innen; „tempo“ in der JSON (Schusseffekte_nova_v1) streckt ihn auf die Dauer des Felds
+		FxSprite.play(self, "nova_einschlag", center + Vector3(0, 0.3, 0), {"width": maxf(1.6, radius * 2.0),
+			"speed": float(FxSprite.info("nova_einschlag").get("tempo", 1.0))})
 	else:
 		Fx.flash(self, center + Vector3(0, 0.6, 0), Color(0.6, 0.35, 1.0), radius * 0.9, 0.35)
 

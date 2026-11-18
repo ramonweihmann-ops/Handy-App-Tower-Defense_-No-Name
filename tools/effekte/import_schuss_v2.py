@@ -54,6 +54,21 @@ TUNING = {
         'geschoss': {'groesse_m': 2.4, 'feste_hoehe_m': 2.2, 'schleife_bilder': 4},
         'einschlag': {'groesse_m': 1.2, 'tempo': 1.0},
     },
+    'fuenkchen': {
+        'muendung': {'groesse_m': 1.1, 'tempo': 1.3},
+        'geschoss': {'feste_hoehe_m': 2.6},   # Sternenatem, vom Maul quer durch die Reihe gespannt (hero.gd)
+        'einschlag': {'groesse_m': 1.3, 'tempo': 1.0},
+    },
+    'rollo': {
+        'muendung': {'groesse_m': 1.2, 'tempo': 1.3},
+        'geschoss': {'groesse_m': 2.4, 'feste_hoehe_m': 2.4, 'schleife_bilder': 4},   # Kanonenkugel
+        'einschlag': {'groesse_m': 1.4, 'tempo': 1.0},
+    },
+    'nova': {
+        'muendung': {'groesse_m': 1.2, 'tempo': 1.3},
+        'geschoss': {'groesse_m': 2.4, 'feste_hoehe_m': 2.4, 'schleife_bilder': 4},   # Schwerkraftkugel
+        'einschlag': {'tempo': 0.7},   # Wirbel; Größe kommt vom Schwerkraftfeld (battle.gravity_well)
+    },
     'lynx': {
         'muendung': {'groesse_m': 1.2, 'tempo': 1.3},
         'geschoss': {'feste_hoehe_m': 2.4},

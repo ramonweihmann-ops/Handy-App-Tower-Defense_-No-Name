@@ -564,7 +564,12 @@ func _fire(target: Enemy) -> void:
 				ammo_type = "fire"
 			if FxSprite.has("fuenkchen_geschoss"):
 				var far := from + (target.aim_point() - from).normalized() * maxf(8.0, from.distance_to(target.aim_point()) + 4.0)
-				FxSprite.beam(battle, "fuenkchen_geschoss", from, far, 0.25, 0.6, 0.7)
+				var fi := FxSprite.info("fuenkchen_geschoss")
+				if str(fi.get("darstellung", "")) == "bogen":
+					# Sternenatem (Schusseffekte_fuenkchen_v1): Sternenband vom Maul quer durch die Reihe
+					FxSprite.span(battle, "fuenkchen_geschoss", from, far, {"width": float(fi.get("feste_hoehe_m", 1.0)) / FxSprite.SCALE})
+				else:
+					FxSprite.beam(battle, "fuenkchen_geschoss", from, far, 0.25, 0.6, 0.7)
 			battle.fire_bullet(from, target, dmg, crit, ammo_type, pierce, 60.0, 1.3)
 			if skill(1) > 0:
 				note("Sternenstaub")

@@ -22,7 +22,7 @@ Bitte nacheinander abschicken, jeweils erst den nächsten, wenn der vorige gelie
 | S1 | Schusseffekt Volta (Mündung, Blitzbogen, Einschlag) | Schusseffekte_Volta_v1/v2 | keine | **v2 im Spiel seit 0.10.23** |
 | S2 | Schusseffekte Dusty, Iska, Lynx | `CHATGPT_PROMPTS.md`, Prompt S2 | keine | **im Spiel seit 0.10.24** (Größen im Spiel abgestimmt, voll deckend) |
 | S3 | Schusseffekte Kalle, Margot, Pip | `CHATGPT_PROMPTS.md`, Prompt S3 | keine | geliefert 18.11.2026, Test im Spiel |
-| S4 | Schusseffekte Fünkchen, Rollo, Nova | `CHATGPT_PROMPTS.md`, Prompt S4 | keine | nach Freigabe von S3 abschicken |
+| S4 | Schusseffekte Fünkchen, Rollo, Nova | `CHATGPT_PROMPTS.md`, Prompt S4 | keine | geliefert 18.11.2026, Test im Spiel |
 
 ## Gemerkt für später (noch kein Auftrag)
 
