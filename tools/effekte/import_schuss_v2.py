@@ -72,6 +72,10 @@ TUNING = {
         'geschoss': {'groesse_m': 2.4, 'feste_hoehe_m': 2.4, 'schleife_bilder': 4},   # Schwerkraftkugel
         'einschlag': {'tempo': 0.7},   # Wirbel; Größe kommt vom Schwerkraftfeld (battle.gravity_well)
     },
+    'brocken': {   # v2: gemalte Rakete; Körper 155 von 256 px, sichtbar etwa 1,35 m → Kachel 2,23 m (Lieferhinweis)
+        'muendung': {'groesse_m': 1.1, 'tempo': 1.3},
+        'geschoss': {'groesse_m': 2.23, 'feste_hoehe_m': 2.23, 'schleife_bilder': 4},
+    },
     'lynx': {
         'muendung': {'groesse_m': 1.2, 'tempo': 1.3},
         'geschoss': {'feste_hoehe_m': 2.4},
@@ -99,6 +103,10 @@ def convert(held, dst):
     gid = GAME_ID.get(held, held)
     for teil in ('muendung', 'geschoss', 'einschlag'):
         d = os.path.join(src, '%s_%s' % (held, teil))
+        if not os.path.isdir(d):
+            # z. B. Brocken: nur Mündung und Rakete, die freigegebene Explosion (brocken_explosion) bleibt
+            print('%-22s fehlt in der Lieferung, bleibt wie im Spiel' % ('%s_%s' % (gid, teil)))
+            continue
         meta = json.load(open(os.path.join(d, '%s_%s.json' % (held, teil))))
         im = Image.open(os.path.join(d, '%s_%s_sheet.png' % (held, teil))).convert('RGBA')
         cols, rows = int(meta['cols']), int(meta['rows'])

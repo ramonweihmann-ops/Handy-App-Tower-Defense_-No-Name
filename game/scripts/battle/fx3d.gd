@@ -189,7 +189,87 @@ static func _polyline(root: Node3D, path: Array[Vector3], thickness: float, m: M
 
 ## Flammenstoß von der Waffe zum Ziel: Feuerteilchen wachsen, werden von Gelb über Orange zu dunklem Rot und
 ## verglühen; am Ziel züngeln Flammen hoch. Reine Optik, der Schaden ist schon verrechnet.
+## Fritzis Flammen. Vorschlag 18.11.2026 (FLAMMEN_ZUNGEN): schlanker Strahl aus länglichen, weich auslaufenden
+## Flammenzungen, die in Flugrichtung zeigen und am Ziel verglühen, dazu ein Kranz kleiner Flammen außen um den
+## Trefferkreis, die Gegner in der Mitte bleiben frei. Bisher (false): dichte Wolke aus runden Kugeln.
+const FLAMMEN_ZUNGEN := false   # Vorschlag noch nicht freigegeben (18.11.): bisher die Kugeln
+
+
 static func flame_burst(battle: Node, from: Vector3, to: Vector3, radius: float) -> void:
+	if not FLAMMEN_ZUNGEN:
+		_flame_burst_kugeln(battle, from, to, radius)
+		return
+	var d := to - from
+	var dist := maxf(d.length(), 0.5)
+	var life := 0.36
+	# Strahl: Zungen fliegen bis knapp vor das Ziel und verglühen dort (werden zum Ende kleiner, nicht größer)
+	var p := _one_shot(battle, from, 56, life)
+	p.explosiveness = 0.5
+	p.mesh = _tongue_mesh(0.22, 0.85)
+	p.particle_flag_align_y = true
+	p.direction = d.normalized()
+	p.spread = clampf(rad_to_deg(atan2(radius * 0.45, dist)), 4.0, 12.0)
+	p.initial_velocity_min = dist / life * 0.8
+	p.initial_velocity_max = dist / life * 0.98
+	p.gravity = Vector3(0, 1.2, 0)
+	p.scale_amount_min = 0.7
+	p.scale_amount_max = 1.15
+	p.scale_amount_curve = _curve([Vector2(0, 0.45), Vector2(0.4, 1.2), Vector2(0.8, 1.35), Vector2(1, 0.6)])
+	p.color_ramp = _ramp([Color(1.0, 0.98, 0.75, 1.0), Color(1.0, 0.72, 0.2, 1.0), Color(1.0, 0.38, 0.08, 0.85), Color(0.9, 0.2, 0.05, 0.0)], [0.0, 0.3, 0.7, 1.0])
+	p.emitting = true
+	# heller Kern: wenige schnelle, schmale Zungen in der Mitte des Strahls
+	var c := _one_shot(battle, from, 16, life * 0.9)
+	c.explosiveness = 0.6
+	c.mesh = _tongue_mesh(0.11, 0.6)
+	c.particle_flag_align_y = true
+	c.direction = d.normalized()
+	c.spread = 2.5
+	c.initial_velocity_min = dist / (life * 0.9) * 0.85
+	c.initial_velocity_max = dist / (life * 0.9) * 0.95
+	c.scale_amount_curve = _curve([Vector2(0, 0.6), Vector2(0.5, 1.0), Vector2(1, 0.4)])
+	c.color_ramp = _ramp([Color(1.0, 1.0, 0.92, 1.0), Color(1.0, 0.85, 0.4, 0.95), Color(1.0, 0.5, 0.1, 0.0)], [0.0, 0.6, 1.0])
+	c.emitting = true
+	# Kranz am Ziel: kleine Flammen schlagen außen um den Trefferkreis hoch, die Mitte bleibt frei
+	var ring_at := to + Vector3(0, -0.35, 0)
+	battle.get_tree().create_timer(life * 0.6, false).timeout.connect(func() -> void:
+		if not is_instance_valid(battle):
+			return
+		var q := _one_shot(battle, ring_at, 40, 0.55)
+		q.explosiveness = 0.5
+		q.emission_shape = CPUParticles3D.EMISSION_SHAPE_RING
+		q.emission_ring_axis = Vector3.UP
+		q.emission_ring_radius = radius * 0.9
+		q.emission_ring_inner_radius = radius * 0.72
+		q.emission_ring_height = 0.05
+		q.mesh = _tongue_mesh(0.17, 0.7)
+		q.particle_flag_align_y = true
+		q.direction = Vector3.UP
+		q.spread = 12.0
+		q.initial_velocity_min = 1.4
+		q.initial_velocity_max = 2.4
+		q.gravity = Vector3(0, 1.0, 0)
+		q.scale_amount_curve = _curve([Vector2(0, 0.5), Vector2(0.3, 1.0), Vector2(1, 0.2)])
+		q.color_ramp = _ramp([Color(1.0, 0.95, 0.6, 1.0), Color(1.0, 0.55, 0.12, 0.95), Color(0.85, 0.2, 0.05, 0.0)], [0.0, 0.45, 1.0])
+		q.emitting = true)
+
+
+## Längliche, weiche Flammenzunge (shaders/flammenzunge.gdshader), richtet sich mit particle_flag_align_y nach der
+## Flugrichtung aus
+static func _tongue_mesh(r: float, h: float) -> Mesh:
+	return Fx.shared_mesh("fx3d_zunge:%.2f:%.2f" % [r, h], func() -> Mesh:
+		var m := SphereMesh.new()
+		m.radius = r
+		m.height = h
+		m.radial_segments = 10
+		m.rings = 6
+		var sm := ShaderMaterial.new()
+		sm.shader = preload("res://shaders/flammenzunge.gdshader")
+		m.material = sm
+		return m)
+
+
+## Bisherige Flammen (bis 0.10.25): dichte Wolke aus runden Kugeln, die am Ziel stark anwachsen
+static func _flame_burst_kugeln(battle: Node, from: Vector3, to: Vector3, radius: float) -> void:
 	var d := to - from
 	var dist := d.length()
 	var p := _one_shot(battle, from, 70, 0.45)

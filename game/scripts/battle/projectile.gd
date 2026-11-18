@@ -65,7 +65,9 @@ func launch(battle_: Battle, kind_: String, from: Vector3, target_: Enemy, dmg_:
 			FxSprite.span(battle, gname, from, _last_target, {"width": float(gi.get("feste_hoehe_m", 1.0)) / FxSprite.SCALE,
 				"alpha": float(gi.get("deckkraft", 1.0))})
 			return
-		"leuchtspur", "bolzen":
+		"leuchtspur", "bolzen", "rakete":
+			# Rakete (Schusseffekte_brocken_v2): gemalt statt 3D, Spitze vorn an der Geschossposition, dreht sich über
+			# set_dir entlang der flachen Raketenbahn (_rocket_lift); die Explosion kommt weiter aus battle.explode
 			# kurzer Streifen am Geschoss, Spitze vorn (Anker an der Spitze)
 			_sprite = FxSprite.attach(self, gname, {"dir": _last_target - from, "stretch": false,
 				"width": float(gi.get("feste_hoehe_m", 1.0)) / FxSprite.SCALE, "length": float(gi.get("groesse_m", 1.0)),
