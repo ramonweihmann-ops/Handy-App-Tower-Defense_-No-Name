@@ -1,0 +1,49 @@
+{
+  "muendung": {
+    "bilder": 8,
+    "kachel": [
+      128,
+      128
+    ],
+    "letztes_bild_leer": true,
+    "alpha": "RGBA, gerades Alpha"
+  },
+  "geschoss": {
+    "bilder": 8,
+    "kachel": [
+      256,
+      256
+    ],
+    "letztes_bild_leer": true,
+    "alpha": "RGBA, gerades Alpha",
+    "helle_kernbreite_px": [
+      13,
+      14,
+      15,
+      15
+    ]
+  },
+  "einschlag": {
+    "bilder": 12,
+    "kachel": [
+      256,
+      256
+    ],
+    "letztes_bild_leer": true,
+    "alpha": "RGBA, gerades Alpha",
+    "alpha_mitte": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}
