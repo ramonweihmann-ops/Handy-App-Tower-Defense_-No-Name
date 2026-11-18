@@ -15,7 +15,7 @@ Weitere Schlüssel für das Spiel: v2, tempo (Abspieltempo), gerichtet (Treffer 
 darstellung (leuchtspur, bolzen: Streifen fliegt mit; durchschuss: Linie von der Mündung bis zum Ziel),
 schleife_bilder (fliegende Geschosse wiederholen nur die ersten n Bilder, der Rest ist das Ausblenden),
 laenge_faktor (Linie: Quadlänge = Abstand × 256 / 216, weil Start und Spitze 20 px vom Rand liegen),
-deckkraft (Linie: Faktor auf die gedämpfte Grunddeckkraft 0,8 der Effekte; 1,25 = voll deckend).
+deckkraft (Linie: Faktor auf die Deckkraft, Vorgabe 1). Alles mit v2 wird voll deckend gezeichnet (FxSprite).
 
 Aufruf: import_schuss_v2.py <ziel> <held> [<held> …]     z. B. import_schuss_v2.py game/fx dusty iska lynx
 """
@@ -36,12 +36,12 @@ TUNING = {
     },
     'iska': {
         'muendung': {'groesse_m': 1.1, 'tempo': 1.3},
-        'geschoss': {'groesse_m': 2.6, 'feste_hoehe_m': 2.6, 'schleife_bilder': 4},
+        'geschoss': {'groesse_m': 2.0, 'feste_hoehe_m': 2.4, 'schleife_bilder': 4},   # kürzer (Wunsch 18.11.)
         'einschlag': {'groesse_m': 1.4, 'tempo': 1.0},
     },
     'lynx': {
         'muendung': {'groesse_m': 1.2, 'tempo': 1.3},
-        'geschoss': {'feste_hoehe_m': 2.4, 'deckkraft': 1.25},
+        'geschoss': {'feste_hoehe_m': 2.4},
         'einschlag': {'groesse_m': 1.6, 'tempo': 1.0},
     },
 }
