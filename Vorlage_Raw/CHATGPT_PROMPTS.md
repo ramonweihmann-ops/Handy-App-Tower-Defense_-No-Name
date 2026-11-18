@@ -976,3 +976,56 @@ und Vorschau-GIF, ABLAUF_BROCKEN.json, LIESMICH_CLAUDE.md, UEBERSICHT.png, Vorsc
 
 Nur die eingebaute Bildgenerierung und Bildbearbeitung im bestehenden Konto verwenden, keine kostenpflichtigen Dienste.
 ~~~~
+
+## Prompt S5: Fritzis Flammenstrahl (gemalt, gleiches Format wie S2–S4)
+
+**Kosten:** keine · **Abschicken:** 18.11.2026 · Wunsch des Nutzers: Fritzis bisherige Flammen (Partikel-Kugeln)
+wirken klobig und verdecken die Gegner; ein gemalter Flammenstrahl soll zu den anderen Champions passen.
+
+~~~~text
+Noch ein Champion, dann haben alle gemalte Schusseffekte: Fritzi. Ihre Flammen sind bisher eine dichte Wolke aus
+runden orangen Kugeln, die klobig wirkt und die Gegner fast ganz verdeckt. Bitte einen gemalten Flammenstrahl im
+gleichen Format wie die anderen Schusseffekte bauen. Repository Handy-App-Tower-Defense_-No-Name, Branch
+claude/amazing-hypatia-yl59v4. Vorbild für Ordner, Dateinamen, JSON und Lieferung: Vorlage_Raw/Schusseffekte_kalle_v1/
+(gleiche Struktur, Kalles Froststrahl ist ebenfalls ein gespannter Strahl).
+
+FRITZI UND IHRE WAFFE
+- fritzi: orange Mütze, braune Weste mit Werkzeuggurt, blaue Hose; Modell mit Aktion „Shoot“ und Knoten „Muzzle“:
+  game/models/heroes_v2/fritzi.glb, Porträt: game/ui/portraits/fritzi.webp
+- Waffe: Flammenwerfer mit braunem Gehäuse, Metalldüse mit orangem Ring und rotem Brennstofftank unter dem Lauf
+  (Vorlage_Raw/Waffen_Roh/fritzi_waffe_v1/, Ansichten seite/oben/vorn)
+
+SO WIRKT FRITZI IM SPIEL
+- Jeder Schuss ist ein kurzer Flammenstoß von der Düse zum Ziel. Er trifft alle Gegner in einem Kreis um das Ziel
+  (etwa 1,5–3 m, mit der Superfähigkeit gut doppelt so groß) und setzt sie in Brand. Fritzi schießt schnell
+  hintereinander, darum darf ein einzelner Stoß nicht überladen wirken.
+
+JE TEIL (Namen fritzi_muendung, fritzi_geschoss, fritzi_einschlag)
+- fritzi_muendung: kleine Zündflamme mit kurzem Aufflackern an der Düse, Schussrichtung nach RECHTS,
+  128 × 128 je Bild, 4 × 2, Anker an der Düse (links Mitte)
+- fritzi_geschoss: echter Flammenstrahl aus Feuerzungen in Gelb, Orange und etwas Rot, an der Düse schmal und hell,
+  zum Ziel hin breiter und lebendig züngelnd; KEINE runden Kugeln, keine Rauchwolke. Schussrichtung nach RECHTS,
+  256 × 256 je Bild, 4 × 2, Start bei x 20, Ziel bei x 236, Mitte y 128; JSON mit feste_hoehe_m, ziel_anker und
+  darstellung „bogen“ (das Spiel spannt den Strahl von der Düse bis zum Ziel). Bild 1–4 voller Stoß (gleich hell, nur
+  züngelnd), Bild 5–8 ausblenden.
+- fritzi_einschlag: das Feuer breitet sich am Boden um das Ziel aus, ein flacher Flammenkranz mit Feuerzungen, die
+  außen hochschlagen; die MITTE bleibt frei, damit man die Gegner darin sieht. Das Spiel skaliert ihn auf den
+  Trefferkreis. 256 × 256 je Bild, 4 × 3, Anker in der Mitte, positive x-Richtung folgt der Schussrichtung.
+- 24 fps, einmal abspielen, gerades Alpha, keine dunklen oder grauen Ränder
+
+WAS WIR BEI DEN ANDEREN GELERNT HABEN (bitte beachten)
+- Im Spiel werden die Schusseffekte voll deckend gezeichnet. Darum keine großen, weichen Dunst- oder Rauchflächen.
+- Gegner dürfen nie ganz verdeckt sein: Strahl endet am Ziel, Flammen beim Einschlag liegen außen herum.
+- Alles muss auch verkleinert auf Handygröße auf den ersten Blick zu sehen sein (heller Kern mindestens 8 px bei
+  256 px Kachelhöhe).
+
+PRÜFEN VOR DER LIEFERUNG
+- Kampfvorschau auf der hellen Eisbrücke (game/fields/ice_world.webp) und dem Raumdock (game/fields/space_dock.webp),
+  Kamera von hinten oben wie im Spiel, mit zwei Gegnern im Trefferkreis
+- verkleinert auf Handygröße (390 × 844) müssen Strahl und Einschlag sofort zu sehen sein und die Gegner sichtbar bleiben
+
+LIEFERN in Vorlage_Raw/Schusseffekte_fritzi_v1/: drei Ordner mit Sheet-PNG, JSON und Vorschau-GIF, ABLAUF_FRITZI.json,
+LIESMICH_CLAUDE.md, UEBERSICHT.png, Vorschau-GIFs für Eiswelt und Raumdock.
+
+Nur die eingebaute Bildgenerierung und Bildbearbeitung im bestehenden Konto verwenden, keine kostenpflichtigen Dienste.
+~~~~
