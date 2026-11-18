@@ -87,8 +87,9 @@ eingebaut, ohne Entwicklermodus oder Prüfschalter. Die Testkarte steht immer un
 
 ## Stand 18.11.2026: gemalte Schusseffekte von ChatGPT (v2)
 
-Seit 0.10.23 (Volta) und 0.10.24 (Dusty Jo, Iska, Lynx) kommen Mündungsblitz, Geschoss und Einschlag dieser
-Champions als Bildfolgen von ChatGPT (`Vorlage_Raw/Schusseffekte_<held>_v2/`). Übernahme mit
+Seit 0.10.23 (Volta), 0.10.24 (Dusty Jo, Iska, Lynx) und 0.10.25 (Kalle, Käpt'n Margot, Pip, Fünkchen, Rollo, Nova)
+kommen Mündungsblitz, Geschoss und Einschlag dieser Champions als Bildfolgen von ChatGPT
+(`Vorlage_Raw/Schusseffekte_<held>_v<n>/`, jeweils die neueste Fassung). Übernahme mit
 `tools/effekte/import_schuss_v2.py game/fx <held> …`; das Werkzeug dreht die Bilder (Schussrichtung im Bild nach
 rechts → im Spiel nach oben) und trägt die **im Spiel abgestimmten Größen** ein (Tabelle TUNING im Werkzeug).
 ChatGPTs eigene Größen passen zu seiner Vorschau, nicht zu unserer Kamera.
@@ -97,8 +98,13 @@ ChatGPTs eigene Größen passen zu seiner Vorschau, nicht zu unserer Kamera.
 |---|---|---|
 | `leuchtspur` | Streifen fliegt mit der Kugel, Spitze vorn, wiederholt nur die hellen Bilder (`schleife_bilder`) | Dusty Jo |
 | `bolzen` | wie Leuchtspur, kürzer (Wunsch 18.11.: Iskas Bolzen nicht zu lang gezogen) | Iska |
+| `leuchtspur` (Bündel) | drei glühende Schrotkugeln je Geschoss, mehrere Bündel im Fächer | Käpt'n Margot |
+| `bolzen` | Energiebolzen, Kanonenkugel, Schwerkraftkugel | Pip, Rollo, Nova |
 | `durchschuss` | Linie von der Mündung bis zum Ziel, endet auf dem Bildschirm genau dort (`FxSprite.span`) | Lynx |
+| `bogen` | Strahl über die ganze Strecke, auch beim Überspringen auf Nachbarn (battle.fire_chain) | Kalle |
+| `bogen` (Atem) | Drachenatem bis unten vorn an den Gegner; Flammenbögen legen sich um ihn (`freie_mitte` je Gegner, `laenge_anteil`), Wunsch 18.11.: den Gegner nicht verdecken | Fünkchen |
 | Blitzbogen | ein Bogen je Sprung der Kette (battle.gd) | Volta |
+| Wirbel | Novas Schwerkraftfeld, läuft im Tempo aus der JSON (battle.gravity_well) | Nova |
 
 - Fliegende Geschosse werden nicht in die Tiefe verkürzt, sonst sind sie bei der flachen Kamera nur Punkte.
 - **Voll deckend (Entscheidung 18.11.2026):** Gemalte Schusseffekte (`v2` oder `deckend` in der JSON) werden nicht
@@ -106,4 +112,4 @@ ChatGPTs eigene Größen passen zu seiner Vorschau, nicht zu unserer Kamera.
   Effekte (Explosionen, Fähigkeiten, Strahlen) behalten die Dämpfung (`FxSprite.ALPHA`).
 - Abnahme: Aufnahme im Spiel mit fester Bildrate (`--fixed-fps 20`, sonst ruckelt der Film bei langsamem Rechner)
   und `--shot-show=<ordner>`, je Champion Eiswelt (Level 12) und Raumdock (Level 3), dem Nutzer nebeneinander zeigen.
-- Offen: S3 (Kalle, Margot, Pip) und S4 (Fünkchen, Rollo, Nova). Brocken und Fritzi behalten ihre 3D-Effekte.
+- Alle Champions haben gemalte Schusseffekte, außer Brocken (3D-Rakete) und Fritzi (Flammen als Partikel).

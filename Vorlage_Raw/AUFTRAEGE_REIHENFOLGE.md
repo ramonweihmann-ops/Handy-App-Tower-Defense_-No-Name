@@ -21,8 +21,8 @@ Bitte nacheinander abschicken, jeweils erst den nächsten, wenn der vorige gelie
 | P2 | Porträts für Fünkchen, Pip, Rollo, Nova (Auflevel-Bildschirm) | `CHATGPT_PROMPTS.md`, Prompt P2 | keine | **geliefert 17.11.2026, im Spiel seit 0.10.18** |
 | S1 | Schusseffekt Volta (Mündung, Blitzbogen, Einschlag) | Schusseffekte_Volta_v1/v2 | keine | **v2 im Spiel seit 0.10.23** |
 | S2 | Schusseffekte Dusty, Iska, Lynx | `CHATGPT_PROMPTS.md`, Prompt S2 | keine | **im Spiel seit 0.10.24** (Größen im Spiel abgestimmt, voll deckend) |
-| S3 | Schusseffekte Kalle, Margot, Pip | `CHATGPT_PROMPTS.md`, Prompt S3 | keine | geliefert 18.11.2026, Test im Spiel |
-| S4 | Schusseffekte Fünkchen, Rollo, Nova | `CHATGPT_PROMPTS.md`, Prompt S4 | keine | geliefert 18.11.2026, Test im Spiel |
+| S3 | Schusseffekte Kalle, Margot, Pip | `CHATGPT_PROMPTS.md`, Prompt S3 | keine | **im Spiel seit 0.10.25** |
+| S4 | Schusseffekte Fünkchen, Rollo, Nova | `CHATGPT_PROMPTS.md`, Prompt S4 | keine | **im Spiel seit 0.10.25** (Fünkchen v3, Rollo v2, Nova v1) |
 
 ## Gemerkt für später (noch kein Auftrag)
 

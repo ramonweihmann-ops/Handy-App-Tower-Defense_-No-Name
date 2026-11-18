@@ -842,7 +842,7 @@ Nur die eingebaute Bildgenerierung und Bildbearbeitung im bestehenden Konto verw
 
 ## Prompt S3: Schusseffekte Kalle, Margot, Pip (gleiches Format wie S2)
 
-**Kosten:** keine · **Abschicken:** 18.11.2026 (abgeschickt, geliefert in Vorlage_Raw/Schusseffekte_<id>_v1/) · danach S4 Fünkchen, Rollo, Nova
+**Kosten:** keine · **Abschicken:** 18.11.2026 (abgeschickt, im Spiel seit 0.10.25) · danach S4 Fünkchen, Rollo, Nova
 
 ~~~~text
 Dusty Jo, Iska und Lynx sind im Spiel und freigegeben, danke! Bitte jetzt im gleichen Format die Schusseffekte für
@@ -893,7 +893,7 @@ Nur die eingebaute Bildgenerierung und Bildbearbeitung im bestehenden Konto verw
 
 ## Prompt S4: Schusseffekte Fünkchen, Rollo, Nova (gleiches Format wie S3)
 
-**Kosten:** keine · **Abschicken:** nach der Freigabe von S3 · danach sind alle Champions außer Brocken und Fritzi
+**Kosten:** keine · **Abschicken:** 18.11.2026 (abgeschickt, im Spiel seit 0.10.25 mit Fünkchen v3 und Rollo v2) · danach sind alle Champions außer Brocken und Fritzi
 (eigene 3D-Effekte) mit gemalten Schusseffekten ausgestattet
 
 ~~~~text

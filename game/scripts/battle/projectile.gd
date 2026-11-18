@@ -166,13 +166,14 @@ func _make_tracer(col: Color) -> void:
 
 
 ## Einschlag-Bildfolge des Helden am Trefferpunkt (gerichtet in Schussrichtung, wenn die JSON es sagt)
-static func play_impact(battle_: Node, style_: String, at: Vector3, dir: Vector3, target_: Enemy) -> void:
+## target_ ohne Typ: das Ziel kann beim Einschlag schon besiegt und freigegeben sein
+static func play_impact(battle_: Node, style_: String, at: Vector3, dir: Vector3, target_) -> void:
 	var ei := FxSprite.info(style_ + "_einschlag")
 	if not bool(ei.get("gerichtet", false)):
 		FxSprite.play(battle_, style_ + "_einschlag", at, {"speed": 1.5})
 		return
 	var eo := {"dir": dir, "speed": float(ei.get("tempo", 1.0))}
-	if ei.has("freie_mitte") and is_instance_valid(target_):
+	if ei.has("freie_mitte") and is_instance_valid(target_) and target_ is Enemy:
 		# Flammen schmiegen sich um den Gegner (Fünkchens Drachenatem): die freie Mitte etwas breiter als der Gegner
 		# und flacher als geliefert (laenge_anteil), damit die Bögen den Gegner eng umschließen statt hinter ihm hochzustehen
 		var w := clampf(target_.radius() * 2.0 * 1.15 / float(ei["freie_mitte"]), 1.5, 8.0)
