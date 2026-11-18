@@ -806,7 +806,7 @@ Nur die eingebaute Bildgenerierung und Bildbearbeitung im bestehenden Konto verw
 
 ## Prompt S2: Schusseffekte Dusty, Iska, Lynx (gleiches Format wie Volta v2)
 
-**Kosten:** keine · **Abschicken:** 17.11.2026 (abgeschickt) · danach S3 Kalle, Margot, Pip und S4 Fünkchen, Rollo, Nova
+**Kosten:** keine · **Abschicken:** 17.11.2026 (abgeschickt, im Spiel seit 0.10.24) · danach S3 Kalle, Margot, Pip und S4 Fünkchen, Rollo, Nova
 
 ~~~~text
 Voltas Blitz v2 ist im Spiel und freigegeben, danke! Bitte jetzt im gleichen Format und mit den gleichen Prüfvorgaben
@@ -833,6 +833,57 @@ PRÜFEN VOR DER LIEFERUNG
 - Kampfvorschau je Champion auf der hellen Eisbrücke (game/fields/ice_world.webp) und dem Raumdock
   (game/fields/space_dock.webp), Kamera von hinten oben wie im Spiel
 - alles muss auch verkleinert auf Handygröße auf den ersten Blick zu sehen sein
+
+LIEFERN in Vorlage_Raw/Schusseffekte_<id>_v1/ je Champion: drei Ordner mit Sheet-PNG, JSON und Vorschau-GIF,
+ABLAUF_<ID>.json, LIESMICH_CLAUDE.md, UEBERSICHT.png, Vorschau-GIFs für Eiswelt und Raumdock.
+
+Nur die eingebaute Bildgenerierung und Bildbearbeitung im bestehenden Konto verwenden, keine kostenpflichtigen Dienste.
+~~~~
+
+## Prompt S3: Schusseffekte Kalle, Margot, Pip (gleiches Format wie S2)
+
+**Kosten:** keine · **Abschicken:** nach der Freigabe von S2 (18.11.2026) · danach S4 Fünkchen, Rollo, Nova
+
+~~~~text
+Dusty Jo, Iska und Lynx sind im Spiel und freigegeben, danke! Bitte jetzt im gleichen Format die Schusseffekte für
+die nächsten drei Champions bauen. Repository Handy-App-Tower-Defense_-No-Name, Branch claude/amazing-hypatia-yl59v4.
+Vorbild für Ordner, Dateinamen, JSON und Lieferung: Vorlage_Raw/Schusseffekte_dusty_v2/ (gleiche Struktur).
+
+WAS WIR BEIM EINBAU VON S2 GELERNT HABEN (bitte beachten)
+- Im Spiel werden die Schusseffekte VOLL DECKEND gezeichnet (keine Abschwächung). Darum keine großen, weichen
+  Dunst- oder Rauchflächen; Rauch nur klein und kompakt. Beim Einschlag bleibt die Mitte frei, damit man den Gegner sieht.
+- Fliegende Geschosse: Bild 1–4 sind die volle Flugphase (das Spiel wiederholt sie, solange das Geschoss fliegt),
+  Bild 5–8 blenden aus. Bild 1–4 also gleich hell, nur leicht flackernd.
+- Die Streifen nicht zu lang ziehen (Iskas Bolzen waren uns zu lang): der helle Kopf des Geschosses etwa 40 % der
+  Kachelbreite, die Spur dahinter kurz und schnell auslaufend.
+- Größen in Metern stimmen wir im Spiel selbst ab; wichtig ist, dass alles auch verkleinert auf Handygröße auf den
+  ersten Blick zu sehen ist (heller Kern mindestens 8 px bei 256 px Kachelhöhe).
+
+DIE DREI CHAMPIONS (Waffen: Vorlage_Raw/Waffen_Roh/<id>_waffe_v1/ beziehungsweise Pips Modell, Modelle mit Aktion
+„Shoot“ und Knoten „Muzzle“: game/models/heroes_v2/<id>.glb)
+- kalle · Eisblaster (hellblaues Gehäuse, weiße Mündung, kleiner Kältetank): Frost-STRAHL, der vom Blaster bis zum
+  Gegner reicht und mit einer Fähigkeit auf Nachbarn überspringt (wie Voltas Blitzbogen, Vorbild
+  Vorlage_Raw/Schusseffekte_Volta_v2/). Eisblau-weißer Strahl mit hellem Kern und kleinen Eiskristallen entlang des
+  Strahls. Mündung: kurze kalte Frostwolke mit Glitzern. Einschlag: Eisbruch, kleine Splitter fliegen nach außen.
+- margot · doppelläufige Piratenflinte (Holzschaft, Messingband): großer, kurzer Mündungsblitz in Orange-Gelb mit
+  kleiner, kompakter Pulverrauchwolke. Geschoss: ein Bündel aus drei kleinen glühenden Schrotkugeln mit kurzen
+  Spuren (das Spiel schießt mehrere solcher Bündel gleichzeitig im Fächer). Einschlag: kleine Funken.
+- pip · kleiner Cyberbot (orange Brustplatte, türkise Augen, schießt aus dem Arm): ein einzelner grüner
+  Energiebolzen (nicht zwei wie bei Iska), rund und freundlich, kein Laser. Mündung: kleiner grüner Lichtring.
+  Einschlag: grünes Funkeln. Pips Reparaturfunkeln an der Mauer (pip_reparatur) bleibt wie es ist.
+
+JE CHAMPION DREI TEILE (Namen <id>_muendung, <id>_geschoss, <id>_einschlag)
+- Mündung: 128 × 128 je Bild, 4 × 2, Schussrichtung nach RECHTS, Anker am Waffenende (links Mitte)
+- Geschoss: 256 × 256 je Bild, 4 × 2, Schussrichtung nach RECHTS, Start bei x 20, Spitze/Ziel bei x 236, Mitte y 128;
+  JSON mit feste_hoehe_m, ziel_anker und darstellung: kalle „bogen“ (über die ganze Strecke gespannt, wie Voltas
+  Blitzbogen), margot „leuchtspur“, pip „bolzen“
+- Einschlag: 256 × 256 je Bild, 4 × 3, freie Mitte, positive x-Richtung folgt der Schussrichtung
+- 24 fps, einmal abspielen, gerades Alpha, keine dunklen oder grauen Ränder
+
+PRÜFEN VOR DER LIEFERUNG
+- Kampfvorschau je Champion auf der hellen Eisbrücke (game/fields/ice_world.webp) und dem Raumdock
+  (game/fields/space_dock.webp), Kamera von hinten oben wie im Spiel, Effekte voll deckend
+- verkleinert auf Handygröße (390 × 844) muss jeder Schuss sofort zu sehen sein
 
 LIEFERN in Vorlage_Raw/Schusseffekte_<id>_v1/ je Champion: drei Ordner mit Sheet-PNG, JSON und Vorschau-GIF,
 ABLAUF_<ID>.json, LIESMICH_CLAUDE.md, UEBERSICHT.png, Vorschau-GIFs für Eiswelt und Raumdock.

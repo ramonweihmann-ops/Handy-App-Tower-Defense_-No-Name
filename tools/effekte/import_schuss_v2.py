@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Schusseffekte von ChatGPT (Vorlage_Raw/Schusseffekte_<held>_v2/) ins Spiel übernehmen: game/fx/<spielname>_<teil>.webp + .json.
+"""Schusseffekte von ChatGPT (Vorlage_Raw/Schusseffekte_<held>_v<n>/, die neueste) ins Spiel übernehmen: game/fx/<spielname>_<teil>.webp + .json.
 
 Geliefert wird je Champion: <held>_muendung, <held>_geschoss, <held>_einschlag (Sheet + JSON, Schussrichtung im Bild
 nach rechts). Das Spiel dreht Effekte so, dass die Bild-Oberkante in Schussrichtung zeigt (shaders/fx_sprite.gdshader),
@@ -19,7 +19,7 @@ deckkraft (Linie: Faktor auf die Deckkraft, Vorgabe 1). Alles mit v2 wird voll d
 
 Aufruf: import_schuss_v2.py <ziel> <held> [<held> …]     z. B. import_schuss_v2.py game/fx dusty iska lynx
 """
-import json, os, sys
+import glob, json, os, re, sys
 from PIL import Image
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
@@ -60,7 +60,9 @@ def rotate_sheet(im, cols, rows):
 
 
 def convert(held, dst):
-    src = os.path.join(ROOT, 'Vorlage_Raw', 'Schusseffekte_%s_v2' % held)
+    # neueste Lieferung (Schusseffekte_<held>_v1, _v2, …)
+    found = glob.glob(os.path.join(ROOT, 'Vorlage_Raw', 'Schusseffekte_%s_v*' % held))
+    src = max(found, key=lambda p: int(re.sub(r'\D', '', p.rsplit('_v', 1)[1]) or 0))
     gid = GAME_ID.get(held, held)
     for teil in ('muendung', 'geschoss', 'einschlag'):
         d = os.path.join(src, '%s_%s' % (held, teil))

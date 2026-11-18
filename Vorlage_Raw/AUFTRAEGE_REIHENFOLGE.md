@@ -20,8 +20,9 @@ Bitte nacheinander abschicken, jeweils erst den nächsten, wenn der vorige gelie
 | H4 | Heldenposen mit Waffe in der Hand (Vergleich zu Claudes Fassung) | `CHATGPT_PROMPTS.md`, Prompt H4 | keine Credits | **geliefert als gemalte Porträts (Champion_Portraets_v1)**, in „Held aufleveln“ seit 0.10.16 |
 | P2 | Porträts für Fünkchen, Pip, Rollo, Nova (Auflevel-Bildschirm) | `CHATGPT_PROMPTS.md`, Prompt P2 | keine | **geliefert 17.11.2026, im Spiel seit 0.10.18** |
 | S1 | Schusseffekt Volta (Mündung, Blitzbogen, Einschlag) | Schusseffekte_Volta_v1/v2 | keine | **v2 im Spiel seit 0.10.23** |
-| S2 | Schusseffekte Dusty, Iska, Lynx | `CHATGPT_PROMPTS.md`, Prompt S2 | keine | abgeschickt 17.11.2026 |
-| S3/S4 | Schusseffekte Kalle, Margot, Pip / Fünkchen, Rollo, Nova | folgt nach S2 | keine | nach Prüfung von S2 |
+| S2 | Schusseffekte Dusty, Iska, Lynx | `CHATGPT_PROMPTS.md`, Prompt S2 | keine | **im Spiel seit 0.10.24** (Größen im Spiel abgestimmt, voll deckend) |
+| S3 | Schusseffekte Kalle, Margot, Pip | `CHATGPT_PROMPTS.md`, Prompt S3 | keine | bereit zum Abschicken |
+| S4 | Schusseffekte Fünkchen, Rollo, Nova | folgt nach S3 | keine | nach Prüfung von S3 |
 
 ## Gemerkt für später (noch kein Auftrag)
 

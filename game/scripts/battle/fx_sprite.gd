@@ -17,7 +17,7 @@ const MAX_LIVE := 90
 ## bewusst etwas kleiner als die Figuren es verlangen würden, damit die Gegner sichtbar bleiben
 const SCALE := 1.2
 ## Effekte abgeschwächt: leicht durchsichtig (außer festen Dingen wie den Raumjägern, Option „solid“, und den
-## gemalten Schusseffekten der Champions mit „v2“ in der JSON, die voll decken sollen)
+## gemalten Schusseffekten der Champions mit „v2“ oder „deckend“ in der JSON, die voll decken sollen; entschieden 18.11.)
 const ALPHA := 0.8
 
 static var enabled := true
@@ -98,8 +98,8 @@ static func _make(name: String, opts: Dictionary) -> FxSprite:
 	s.set_instance_shader_parameter("size", Vector2(w, l))
 	s.set_instance_shader_parameter("dir", opts.get("dir", Vector3.ZERO))
 	s.set_instance_shader_parameter("frame", 0.0)
-	# Gemalte Schusseffekte (v2) voll deckend, alle anderen leicht gedämpft (ALPHA)
-	var full: bool = opts.get("solid", false) or bool(d.get("v2", false))
+	# Gemalte Schusseffekte (v2 oder „deckend“ in der JSON, z. B. Voltas Blitz) voll deckend, alle anderen leicht gedämpft
+	var full: bool = opts.get("solid", false) or bool(d.get("v2", false)) or bool(d.get("deckend", false))
 	s.base_alpha = float(opts.get("alpha", 1.0)) * (1.0 if full else ALPHA)
 	s.set_instance_shader_parameter("alpha", s.base_alpha)
 	# Strahlen werden in die Tiefe verkürzt; fliegende Geschosse nicht (sonst nur ein Punkt bei flacher Kamera)

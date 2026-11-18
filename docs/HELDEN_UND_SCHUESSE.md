@@ -84,3 +84,26 @@ Meshy-Waffen aus Auftrag W2 da sind (Vorlagen: `Vorlage_Raw/Waffen_Roh/`).
 
 **Regel des Nutzers (17.11.2026):** Solange er der einzige Tester ist, wird alles Neue sofort für alle sichtbar
 eingebaut, ohne Entwicklermodus oder Prüfschalter. Die Testkarte steht immer unter Spielmodi.
+
+## Stand 18.11.2026: gemalte Schusseffekte von ChatGPT (v2)
+
+Seit 0.10.23 (Volta) und 0.10.24 (Dusty Jo, Iska, Lynx) kommen Mündungsblitz, Geschoss und Einschlag dieser
+Champions als Bildfolgen von ChatGPT (`Vorlage_Raw/Schusseffekte_<held>_v2/`). Übernahme mit
+`tools/effekte/import_schuss_v2.py game/fx <held> …`; das Werkzeug dreht die Bilder (Schussrichtung im Bild nach
+rechts → im Spiel nach oben) und trägt die **im Spiel abgestimmten Größen** ein (Tabelle TUNING im Werkzeug).
+ChatGPTs eigene Größen passen zu seiner Vorschau, nicht zu unserer Kamera.
+
+| Darstellung (JSON) | Wirkung im Spiel | Champion |
+|---|---|---|
+| `leuchtspur` | Streifen fliegt mit der Kugel, Spitze vorn, wiederholt nur die hellen Bilder (`schleife_bilder`) | Dusty Jo |
+| `bolzen` | wie Leuchtspur, kürzer (Wunsch 18.11.: Iskas Bolzen nicht zu lang gezogen) | Iska |
+| `durchschuss` | Linie von der Mündung bis zum Ziel, endet auf dem Bildschirm genau dort (`FxSprite.span`) | Lynx |
+| Blitzbogen | ein Bogen je Sprung der Kette (battle.gd) | Volta |
+
+- Fliegende Geschosse werden nicht in die Tiefe verkürzt, sonst sind sie bei der flachen Kamera nur Punkte.
+- **Voll deckend (Entscheidung 18.11.2026):** Gemalte Schusseffekte (`v2` oder `deckend` in der JSON) werden nicht
+  mehr auf 80 % gedämpft. Das sieht kräftiger aus; die Explosionen bleiben dafür bewusst klein. Alle übrigen
+  Effekte (Explosionen, Fähigkeiten, Strahlen) behalten die Dämpfung (`FxSprite.ALPHA`).
+- Abnahme: Aufnahme im Spiel mit fester Bildrate (`--fixed-fps 20`, sonst ruckelt der Film bei langsamem Rechner)
+  und `--shot-show=<ordner>`, je Champion Eiswelt (Level 12) und Raumdock (Level 3), dem Nutzer nebeneinander zeigen.
+- Offen: S3 (Kalle, Margot, Pip) und S4 (Fünkchen, Rollo, Nova). Brocken und Fritzi behalten ihre 3D-Effekte.
