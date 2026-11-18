@@ -533,7 +533,7 @@ func _fire(target: Enemy) -> void:
 				var heavy := float(HEAVY_PUSH[skill(2) - 1]) if skill(2) > 0 else 0.0
 				var eid_r := target.get_instance_id()
 				var hit_at := target.global_position
-				get_tree().create_timer(from.distance_to(target.aim_point()) / 11.0, false).timeout.connect(func() -> void:
+				get_tree().create_timer(from.distance_to(target.aim_point()) / Battle.ROCKET_SPEED, false).timeout.connect(func() -> void:
 					if battle == null:
 						return
 					var e := instance_from_id(eid_r) as Enemy
@@ -546,7 +546,7 @@ func _fire(target: Enemy) -> void:
 						e.knockback(heavy * battle.z_scale))   # Schwerer Treffer
 			if sym("schwerkraftbombe"):
 				var eid3 := target.get_instance_id()
-				get_tree().create_timer(from.distance_to(target.aim_point()) / 11.0, false).timeout.connect(func() -> void:
+				get_tree().create_timer(from.distance_to(target.aim_point()) / Battle.ROCKET_SPEED, false).timeout.connect(func() -> void:
 					var e := instance_from_id(eid3) as Enemy
 					if battle and e and e.alive:
 						battle.gravity_well(e.global_position, radius * 1.2, 0.0, false, "normal", 0.5, 0.35, 1.0))

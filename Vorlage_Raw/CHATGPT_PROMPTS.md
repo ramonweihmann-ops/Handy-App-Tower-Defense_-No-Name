@@ -934,3 +934,45 @@ ABLAUF_<ID>.json, LIESMICH_CLAUDE.md, UEBERSICHT.png, Vorschau-GIFs für Eiswelt
 
 Nur die eingebaute Bildgenerierung und Bildbearbeitung im bestehenden Konto verwenden, keine kostenpflichtigen Dienste.
 ~~~~
+
+## Prompt R1: Alternative Rakete für Brocken (gemalt, gleiches Format wie S2–S4)
+
+**Kosten:** keine · **Abschicken:** 18.11.2026 · Wunsch des Nutzers: eine Rakete, die zu den Designs der anderen
+Waffen passt und nicht so kantig aussieht. Claudes 3D-Rakete (verkleinert) bleibt bis zum Vergleich im Spiel.
+
+~~~~text
+Alle Schusseffekte sind im Spiel, danke! Ein Champion fehlt noch: Brocken. Seine Rakete ist bisher ein einfaches
+3D-Modell aus Grundformen und wirkt zu kantig. Bitte eine gemalte Rakete im gleichen Format wie die anderen
+Schusseffekte bauen, damit sie zu den übrigen Champions passt. Repository Handy-App-Tower-Defense_-No-Name, Branch
+claude/amazing-hypatia-yl59v4. Vorbild für Ordner, Dateinamen, JSON und Lieferung: Vorlage_Raw/Schusseffekte_rollo_v2/
+(gleiche Struktur).
+
+BROCKEN UND SEINE WAFFE
+- brocken: gelbe Mütze, weißes Shirt, braune Latzhose mit Gurten, große Handschuhe, kräftige Statur; Modell mit Aktion
+  „Shoot“ und Knoten „Muzzle“: game/models/heroes_v2/brocken.glb, Porträt: game/ui/portraits/brocken.webp
+- Waffe: großer roter Schulter-Raketenwerfer mit dunklen Metallringen und drei Mündungen
+  (Vorlage_Raw/Waffen_Roh/brocken_waffe_v1/, Ansichten seite/oben/vorn)
+
+DIE RAKETE (bitte zwei Teile, die Explosion bleibt die vorhandene, freigegebene)
+- brocken_muendung: kurzer Abschussblitz mit kleiner, kompakter Rauchwolke am Werfer, Schussrichtung nach RECHTS,
+  128 × 128 je Bild, 4 × 2, Anker am Werferende (links Mitte)
+- brocken_geschoss: eine runde, freundliche Comic-Rakete passend zum Werfer: rotes Gehäuse mit dunklen Ringen, runde
+  Spitze, weiche, abgerundete Flossen (nichts Eckiges, kein Raumschiff), kleine helle Flamme am Heck und eine kurze,
+  kompakte Rauchspur dahinter. Spitze nach RECHTS. 256 × 256 je Bild, 4 × 2, Start bei x 20, Spitze bei x 236, Mitte
+  y 128; JSON mit feste_hoehe_m, ziel_anker und darstellung „rakete“. Bild 1–4 Flugphase (wird wiederholt, Flamme
+  und Rauch flackern leicht), Bild 5–8 ausblenden.
+- Größe: im Spiel etwa 1,2–1,5 m lang, kleiner als die Gegner. Die Rakete fliegt in einer flachen Bahn (kurz steigen,
+  fast gerade, zum Ziel hin absenken); das Spiel dreht sie entlang der Flugbahn.
+- 24 fps, gerades Alpha, keine dunklen oder grauen Ränder; im Spiel voll deckend, darum keine großen weichen
+  Rauchflächen.
+
+PRÜFEN VOR DER LIEFERUNG
+- Kampfvorschau auf der hellen Eisbrücke (game/fields/ice_world.webp) und dem Raumdock (game/fields/space_dock.webp),
+  Kamera von hinten oben wie im Spiel, mit der vorhandenen Explosion (game/fx/brocken_explosion.webp) beim Treffer
+- verkleinert auf Handygröße (390 × 844) muss die Rakete sofort als Rakete zu erkennen sein
+
+LIEFERN in Vorlage_Raw/Schusseffekte_brocken_v1/: zwei Ordner (brocken_muendung, brocken_geschoss) mit Sheet-PNG, JSON
+und Vorschau-GIF, ABLAUF_BROCKEN.json, LIESMICH_CLAUDE.md, UEBERSICHT.png, Vorschau-GIFs für Eiswelt und Raumdock.
+
+Nur die eingebaute Bildgenerierung und Bildbearbeitung im bestehenden Konto verwenden, keine kostenpflichtigen Dienste.
+~~~~

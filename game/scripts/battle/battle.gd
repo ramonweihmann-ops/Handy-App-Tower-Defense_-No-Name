@@ -11,6 +11,8 @@ signal level_lost
 ## Testkarte: die gewählte Welle beginnt von vorn (Durchgang 2, 3, …)
 signal test_round(round: int)
 
+## Fluggeschwindigkeit der Rakete (Brocken); vorher 11, dann kam sie gefühlt eine Sekunde nach allen anderen Schüssen an
+const ROCKET_SPEED := 24.0
 const FENCE_Z := 0.0
 const SPAWN_Z := -27.0
 ## Gemaltes Schlachtfeld (Battlefields): Die Brücke im Bild ist doppelt so lang wie die frühere
@@ -665,7 +667,7 @@ func fire_rocket(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type
 	add_child(p)
 	p.splash = radius
 	p.style = shot_style
-	p.launch(self, "rocket", from, target, dmg, crit, ammo_type, 11.0, 1.0)
+	p.launch(self, "rocket", from, target, dmg, crit, ammo_type, ROCKET_SPEED, 1.0)
 
 
 func fire_chain(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type: String, jumps: int, color := Color(0, 0, 0, 0), boom := 0.0) -> void:

@@ -52,6 +52,9 @@ func launch(battle_: Battle, kind_: String, from: Vector3, target_: Enemy, dmg_:
 	_length = maxf(0.5, from.distance_to(_last_target))
 	global_position = from
 	var col: Color = AMMO_COLORS.get(ammo_type, AMMO_COLORS["normal"])
+	if kind == "rocket":
+		# flache Raketenbahn (siehe _rocket_lift): höchstens gut 1 m über der geraden Linie
+		_arc = clampf(_length * 0.05, 0.35, 1.1)
 	# Gemalte Geschosse (Schusseffekte_<held>_v2): Darstellung steht in der JSON
 	var gname := style + "_geschoss"
 	# Strahl-Helden (Fünkchen) zeichnen ihren Schuss selbst (hero.gd), das Projektil bleibt dann unsichtbar
@@ -72,7 +75,6 @@ func launch(battle_: Battle, kind_: String, from: Vector3, target_: Enemy, dmg_:
 		_make_tracer(col)
 		return
 	if kind == "rocket" and FxSprite.enabled and Fx3D.has(style):
-		_arc = clampf(_length * 0.12, 0.6, 2.5)
 		_smoke = Fx3D.build_rocket(self)
 		return
 	if style != "" and FxSprite.has(style + "_geschoss"):
@@ -80,7 +82,6 @@ func launch(battle_: Battle, kind_: String, from: Vector3, target_: Enemy, dmg_:
 			_sprite = FxSprite.attach(self, style + "_geschoss", {"dir": _last_target - from, "scale": 0.6 * size if kind != "rocket" else 0.8, "alpha": 0.9})
 		return
 	if kind == "rocket":
-		_arc = clampf(_length * 0.12, 0.6, 2.5)
 		var body := Fx.inst(Fx.shared_mesh("rocket_body", func() -> Mesh:
 			var m := CylinderMesh.new()
 			m.top_radius = 0.08
@@ -117,6 +118,11 @@ func launch(battle_: Battle, kind_: String, from: Vector3, target_: Enemy, dmg_:
 		add_child(b)
 
 
+## Raketenbahn statt rundem Bogen: nach dem Abschuss kurz steigen, fast gerade fliegen, zum Ziel hin absenken
+static func _rocket_lift(s: float) -> float:
+	return smoothstep(0.0, 0.22, s) * (1.0 - smoothstep(0.72, 1.0, s))
+
+
 func _process(delta: float) -> void:
 	_t += delta
 	if _smoke:
@@ -126,7 +132,7 @@ func _process(delta: float) -> void:
 	_s += speed * delta / _length
 	var s := minf(_s, 1.0)
 	var pos := _start.lerp(_last_target, s)
-	pos.y += _arc * 4.0 * s * (1.0 - s)
+	pos.y += _arc * _rocket_lift(s)
 	var dir := pos - global_position
 	if dir.length() > 0.001:
 		look_at(global_position + dir, Vector3.UP)
