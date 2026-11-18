@@ -76,6 +76,13 @@ TUNING = {
         'muendung': {'groesse_m': 1.1, 'tempo': 1.3},
         'geschoss': {'groesse_m': 2.23, 'feste_hoehe_m': 2.23, 'schleife_bilder': 4},
     },
+    'fritzi': {   # S5: Flammenstrahl wie Kalles Froststrahl gespannt, Bodenkranz um den Trefferkreis (battle.flame)
+        'muendung': {'groesse_m': 1.0, 'tempo': 1.3},
+        'geschoss': {'feste_hoehe_m': 2.2},
+        # kranz_innen: freie Mitte des Kranzes als Anteil der Kachel (gemessen 160 von 256 px); die Größe kommt aus
+        # Fritzis Trefferkreis. Der Kranz ist schon als flache Ellipse gemalt, darum nicht drehen und nicht ausrichten.
+        'einschlag': {'ungedreht': True, 'gerichtet': False, 'kranz_innen': 0.625, 'tempo': 1.0},
+    },
     'lynx': {
         'muendung': {'groesse_m': 1.2, 'tempo': 1.3},
         'geschoss': {'feste_hoehe_m': 2.4},
@@ -110,10 +117,16 @@ def convert(held, dst):
         meta = json.load(open(os.path.join(d, '%s_%s.json' % (held, teil))))
         im = Image.open(os.path.join(d, '%s_%s_sheet.png' % (held, teil))).convert('RGBA')
         cols, rows = int(meta['cols']), int(meta['rows'])
-        out, px = rotate_sheet(im, cols, rows)
+        tune = dict(TUNING.get(held, {}).get(teil, {}))
+        # ungedreht: Bild schon so gezeichnet, wie es vor der Kamera stehen soll (Fritzis flacher Bodenkranz)
+        straight = tune.pop('ungedreht', False)
+        if straight:
+            out, px = im, im.width // cols
+        else:
+            out, px = rotate_sheet(im, cols, rows)
         ax, ay = meta.get('anker', [0.5, 0.5])
         info = {k: meta[k] for k in KEEP if k in meta}
-        info['anker'] = [round(ay, 6), round(1.0 - ax, 6)]
+        info['anker'] = [round(ax, 6), round(ay, 6)] if straight else [round(ay, 6), round(1.0 - ax, 6)]
         info['frame_px'] = px
         info['v2'] = True
         if teil == 'geschoss':
@@ -126,7 +139,7 @@ def convert(held, dst):
             info['laenge_faktor'] = 256.0 / 216.0
         if teil == 'einschlag':
             info['gerichtet'] = True
-        info.update(TUNING.get(held, {}).get(teil, {}))
+        info.update(tune)
         name = '%s_%s' % (gid, teil)
         out.save(os.path.join(dst, name + '.webp'), 'WEBP', quality=90, method=6)
         json.dump(info, open(os.path.join(dst, name + '.json'), 'w'))

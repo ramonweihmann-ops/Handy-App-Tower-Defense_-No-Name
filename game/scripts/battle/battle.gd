@@ -750,7 +750,10 @@ func flame(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type: Stri
 			apply_hit(e, dmg, crit, ammo_type)
 			e.apply_burn(dmg * 0.6 * (1.0 + burn_bonus), 2.5)
 	_flame_tick += 1
-	if FxSprite.enabled and Fx3D.has(shot_style):
+	var fg := FxSprite.info(shot_style + "_geschoss") if shot_style != "" else {}
+	if bool(fg.get("v2", false)) and str(fg.get("darstellung", "")) == "bogen":
+		_flame_painted(from, target, radius)
+	elif FxSprite.enabled and Fx3D.has(shot_style):
 		Fx3D.flame_burst(self, from, target.aim_point(), radius)
 	elif FxSprite.has("fritzi_geschoss"):
 		# Brandflinte: je Schuss zwei Feuerkugeln mit Flammenschweif, gestreut über den Kegel; jede zweite
@@ -769,6 +772,20 @@ func flame(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type: Stri
 		var mid := from.lerp(target.aim_point(), 0.7)
 		Fx.flash(self, mid, Color(1.0, 0.55, 0.15), 0.9, 0.2)
 		Fx.flash(self, target.aim_point(), Color(1.0, 0.35, 0.1), radius * 0.8, 0.25)
+
+
+## Gemalter Flammenstrahl (Schusseffekte_fritzi_v1): von der Düse genau bis zum Ziel gespannt, dazu der flache
+## Bodenkranz um den Trefferkreis (Mitte frei, Größe aus dem Radius, auch mit Superfähigkeit)
+func _flame_painted(from: Vector3, target: Enemy, radius: float) -> void:
+	var gname := shot_style + "_geschoss"
+	var gi := FxSprite.info(gname)
+	FxSprite.span(self, gname, from, target.aim_point(), {"width": float(gi.get("feste_hoehe_m", 2.0)) / FxSprite.SCALE})
+	var ename := shot_style + "_einschlag"
+	var ei := FxSprite.info(ename)
+	var w := radius * 2.0 * 1.1 / float(ei.get("kranz_innen", 0.6))
+	var ground := target.global_position + Vector3(0, 0.12, 0)
+	get_tree().create_timer(0.08, false).timeout.connect(func() -> void:
+		FxSprite.play(self, ename, ground, {"width": w / FxSprite.SCALE, "speed": float(ei.get("tempo", 1.0))}))
 
 
 ## Eine Feuerkugel der Brandflinte: heller Kern, Flammen als Schweif nach hinten, fliegt von a nach b
