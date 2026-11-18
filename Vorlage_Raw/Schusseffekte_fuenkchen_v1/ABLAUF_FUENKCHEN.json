@@ -1,0 +1,25 @@
+{
+  "held": "fuenkchen",
+  "modell": "../../game/models/heroes_v2/fuenkchen.glb",
+  "abschussanimation": {
+    "aktion": "Shoot",
+    "dauer_s": 0.4,
+    "loop": false
+  },
+  "muendungsknoten": "Muzzle",
+  "effekte": {
+    "muendung": "fuenkchen_muendung/fuenkchen_muendung.json",
+    "geschoss": "fuenkchen_geschoss/fuenkchen_geschoss.json",
+    "einschlag": "fuenkchen_einschlag/fuenkchen_einschlag.json"
+  },
+  "kampfvorschau": {
+    "flugzeit_s": 0.083,
+    "schussrichtung": [
+      1,
+      0
+    ],
+    "eiswelt": "FUENKCHEN_EISWELT_VORSCHAU.gif",
+    "raumdock": "FUENKCHEN_RAUMDOCK_VORSCHAU.gif"
+  },
+  "hinweis": "Vorschauzeiten beschreiben nur die Darstellung. Ziele und Trefferzeiten kommen aus dem Spiel."
+}

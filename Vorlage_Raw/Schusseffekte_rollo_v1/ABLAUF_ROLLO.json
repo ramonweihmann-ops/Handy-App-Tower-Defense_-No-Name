@@ -1,0 +1,25 @@
+{
+  "held": "rollo",
+  "modell": "../../game/models/heroes_v2/rollo.glb",
+  "abschussanimation": {
+    "aktion": "Shoot",
+    "dauer_s": 0.4,
+    "loop": false
+  },
+  "muendungsknoten": "Muzzle",
+  "effekte": {
+    "muendung": "rollo_muendung/rollo_muendung.json",
+    "geschoss": "rollo_geschoss/rollo_geschoss.json",
+    "einschlag": "rollo_einschlag/rollo_einschlag.json"
+  },
+  "kampfvorschau": {
+    "flugzeit_s": 0.375,
+    "schussrichtung": [
+      1,
+      0
+    ],
+    "eiswelt": "ROLLO_EISWELT_VORSCHAU.gif",
+    "raumdock": "ROLLO_RAUMDOCK_VORSCHAU.gif"
+  },
+  "hinweis": "Vorschauzeiten beschreiben nur die Darstellung. Ziele und Trefferzeiten kommen aus dem Spiel."
+}

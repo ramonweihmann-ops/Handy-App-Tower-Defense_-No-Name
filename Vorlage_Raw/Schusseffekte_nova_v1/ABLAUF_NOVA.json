@@ -1,0 +1,25 @@
+{
+  "held": "nova",
+  "modell": "../../game/models/heroes_v2/nova.glb",
+  "abschussanimation": {
+    "aktion": "Shoot",
+    "dauer_s": 0.4,
+    "loop": false
+  },
+  "muendungsknoten": "Muzzle",
+  "effekte": {
+    "muendung": "nova_muendung/nova_muendung.json",
+    "geschoss": "nova_geschoss/nova_geschoss.json",
+    "einschlag": "nova_einschlag/nova_einschlag.json"
+  },
+  "kampfvorschau": {
+    "flugzeit_s": 0.292,
+    "schussrichtung": [
+      1,
+      0
+    ],
+    "eiswelt": "NOVA_EISWELT_VORSCHAU.gif",
+    "raumdock": "NOVA_RAUMDOCK_VORSCHAU.gif"
+  },
+  "hinweis": "Vorschauzeiten beschreiben nur die Darstellung. Ziele und Trefferzeiten kommen aus dem Spiel."
+}
