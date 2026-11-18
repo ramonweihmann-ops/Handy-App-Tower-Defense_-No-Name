@@ -192,7 +192,7 @@ static func _polyline(root: Node3D, path: Array[Vector3], thickness: float, m: M
 ## Fritzis Flammen. Vorschlag 18.11.2026 (FLAMMEN_ZUNGEN): schlanker Strahl aus länglichen, weich auslaufenden
 ## Flammenzungen, die in Flugrichtung zeigen und am Ziel verglühen, dazu ein Kranz kleiner Flammen außen um den
 ## Trefferkreis, die Gegner in der Mitte bleiben frei. Bisher (false): dichte Wolke aus runden Kugeln.
-const FLAMMEN_ZUNGEN := false   # Vorschlag noch nicht freigegeben (18.11.): bisher die Kugeln
+const FLAMMEN_ZUNGEN := true   # enge Fassung, vom Nutzer gewählt (18.11.)
 
 
 static func flame_burst(battle: Node, from: Vector3, to: Vector3, radius: float) -> void:
@@ -203,27 +203,27 @@ static func flame_burst(battle: Node, from: Vector3, to: Vector3, radius: float)
 	var dist := maxf(d.length(), 0.5)
 	var life := 0.36
 	# Strahl: Zungen fliegen bis knapp vor das Ziel und verglühen dort (werden zum Ende kleiner, nicht größer)
-	var p := _one_shot(battle, from, 56, life)
+	var p := _one_shot(battle, from, 66, life)
 	p.explosiveness = 0.5
-	p.mesh = _tongue_mesh(0.22, 0.85)
+	p.mesh = _tongue_mesh(0.16, 0.64)
 	p.particle_flag_align_y = true
 	p.direction = d.normalized()
-	p.spread = clampf(rad_to_deg(atan2(radius * 0.45, dist)), 4.0, 12.0)
+	p.spread = clampf(rad_to_deg(atan2(radius * 0.28, dist)), 3.0, 7.0)
 	p.initial_velocity_min = dist / life * 0.8
 	p.initial_velocity_max = dist / life * 0.98
 	p.gravity = Vector3(0, 1.2, 0)
 	p.scale_amount_min = 0.7
 	p.scale_amount_max = 1.15
-	p.scale_amount_curve = _curve([Vector2(0, 0.45), Vector2(0.4, 1.2), Vector2(0.8, 1.35), Vector2(1, 0.6)])
+	p.scale_amount_curve = _curve([Vector2(0, 0.45), Vector2(0.4, 1.1), Vector2(0.8, 1.15), Vector2(1, 0.5)])
 	p.color_ramp = _ramp([Color(1.0, 0.98, 0.75, 1.0), Color(1.0, 0.72, 0.2, 1.0), Color(1.0, 0.38, 0.08, 0.85), Color(0.9, 0.2, 0.05, 0.0)], [0.0, 0.3, 0.7, 1.0])
 	p.emitting = true
 	# heller Kern: wenige schnelle, schmale Zungen in der Mitte des Strahls
-	var c := _one_shot(battle, from, 16, life * 0.9)
+	var c := _one_shot(battle, from, 18, life * 0.9)
 	c.explosiveness = 0.6
-	c.mesh = _tongue_mesh(0.11, 0.6)
+	c.mesh = _tongue_mesh(0.08, 0.48)
 	c.particle_flag_align_y = true
 	c.direction = d.normalized()
-	c.spread = 2.5
+	c.spread = 1.8
 	c.initial_velocity_min = dist / (life * 0.9) * 0.85
 	c.initial_velocity_max = dist / (life * 0.9) * 0.95
 	c.scale_amount_curve = _curve([Vector2(0, 0.6), Vector2(0.5, 1.0), Vector2(1, 0.4)])
@@ -234,17 +234,17 @@ static func flame_burst(battle: Node, from: Vector3, to: Vector3, radius: float)
 	battle.get_tree().create_timer(life * 0.6, false).timeout.connect(func() -> void:
 		if not is_instance_valid(battle):
 			return
-		var q := _one_shot(battle, ring_at, 40, 0.55)
+		var q := _one_shot(battle, ring_at, 46, 0.5)
 		q.explosiveness = 0.5
 		q.emission_shape = CPUParticles3D.EMISSION_SHAPE_RING
 		q.emission_ring_axis = Vector3.UP
-		q.emission_ring_radius = radius * 0.9
-		q.emission_ring_inner_radius = radius * 0.72
+		q.emission_ring_radius = radius * 0.62
+		q.emission_ring_inner_radius = radius * 0.5
 		q.emission_ring_height = 0.05
-		q.mesh = _tongue_mesh(0.17, 0.7)
+		q.mesh = _tongue_mesh(0.12, 0.5)
 		q.particle_flag_align_y = true
 		q.direction = Vector3.UP
-		q.spread = 12.0
+		q.spread = 8.0
 		q.initial_velocity_min = 1.4
 		q.initial_velocity_max = 2.4
 		q.gravity = Vector3(0, 1.0, 0)
