@@ -1,0 +1,21 @@
+{
+  "name": "iska_geschoss",
+  "frames": 8,
+  "cols": 4,
+  "rows": 2,
+  "fps": 24,
+  "loop": false,
+  "anker": [
+    0.078125,
+    0.5
+  ],
+  "groesse_m": 0.85,
+  "mischung": "alpha",
+  "notiz": "Zwei kurze Energiebolzen. Start (20, 128), Ziel (236, 128).",
+  "ziel_anker": [
+    0.921875,
+    0.5
+  ],
+  "feste_hoehe_m": 1.55,
+  "darstellung": "bolzen"
+}

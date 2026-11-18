@@ -1,0 +1,15 @@
+{
+  "name": "dusty_einschlag",
+  "frames": 12,
+  "cols": 4,
+  "rows": 3,
+  "fps": 24,
+  "loop": false,
+  "anker": [
+    0.5,
+    0.5
+  ],
+  "groesse_m": 0.9,
+  "mischung": "alpha",
+  "notiz": "Goldene Funken nach außen. Freie Mitte am Trefferpunkt. Positive X-Richtung folgt der Schussrichtung."
+}

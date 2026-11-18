@@ -1,0 +1,25 @@
+{
+  "held": "lynx",
+  "modell": "../../game/models/heroes_v2/lynx.glb",
+  "abschussanimation": {
+    "aktion": "Shoot",
+    "dauer_s": 0.4,
+    "loop": false
+  },
+  "muendungsknoten": "Muzzle",
+  "effekte": {
+    "muendung": "lynx_muendung/lynx_muendung.json",
+    "geschoss": "lynx_geschoss/lynx_geschoss.json",
+    "einschlag": "lynx_einschlag/lynx_einschlag.json"
+  },
+  "kampfvorschau": {
+    "flugzeit_s": 0.0,
+    "schussrichtung": [
+      1,
+      0
+    ],
+    "eiswelt": "LYNX_EISWELT_VORSCHAU.gif",
+    "raumdock": "LYNX_RAUMDOCK_VORSCHAU.gif"
+  },
+  "hinweis": "Vorschauzeiten dienen der Darstellung. Ziele, Treffer und Schadenszeitpunkte stammen aus dem Spiel."
+}
