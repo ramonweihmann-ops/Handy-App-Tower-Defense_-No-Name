@@ -1,0 +1,24 @@
+{
+  "held": "fritzi",
+  "modell": "../../game/models/heroes_v2/fritzi.glb",
+  "abschussanimation": {
+    "aktion": "Shoot",
+    "dauer_s": 0.4,
+    "loop": false
+  },
+  "muendungsknoten": "Muzzle",
+  "effekte": {
+    "muendung": "fritzi_muendung/fritzi_muendung.json",
+    "geschoss": "fritzi_geschoss/fritzi_geschoss.json",
+    "einschlag": "fritzi_einschlag/fritzi_einschlag.json"
+  },
+  "kampfvorschau": {
+    "schussrichtung": [
+      1,
+      0
+    ],
+    "eiswelt": "FRITZI_EISWELT_VORSCHAU.gif",
+    "raumdock": "FRITZI_RAUMDOCK_VORSCHAU.gif"
+  },
+  "hinweis": "Vorschau zeigt vorhandenes Spielmodell mit Shoot. Trefferkreis, Schaden und Schussrate stammen aus dem Spiel."
+}
