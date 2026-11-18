@@ -803,3 +803,39 @@ LIESMICH_CLAUDE.md, UEBERSICHT.png und VOLTA_KAMPF_VORSCHAU_EIS.gif sowie VOLTA_
 
 Nur die eingebaute Bildgenerierung und Bildbearbeitung im bestehenden Konto verwenden, keine kostenpflichtigen Dienste.
 ~~~~
+
+## Prompt S2: Schusseffekte Dusty, Iska, Lynx (gleiches Format wie Volta v2)
+
+**Kosten:** keine · **Abschicken:** 17.11.2026 (abgeschickt) · danach S3 Kalle, Margot, Pip und S4 Fünkchen, Rollo, Nova
+
+~~~~text
+Voltas Blitz v2 ist im Spiel und freigegeben, danke! Bitte jetzt im gleichen Format und mit den gleichen Prüfvorgaben
+die Schusseffekte für drei weitere Champions bauen. Repository Handy-App-Tower-Defense_-No-Name,
+Branch claude/amazing-hypatia-yl59v4. Vorbild für Format, JSON und Lieferung: Vorlage_Raw/Schusseffekte_Volta_v2/.
+
+DIE DREI CHAMPIONS (Waffen: Vorlage_Raw/Waffen_Roh/<id>_waffe_v1/, Modelle mit Aktion „Shoot“ und Knoten „Muzzle“:
+game/models/heroes_v2/<id>.glb, für Dusty dusty_jo.glb)
+- dusty · Revolver: kurzer, warmer Mündungsblitz in Gelb-Orange mit kleiner Rauchwolke, schnelle Kugel als heller
+  gelber Leuchtstrich, Einschlag als kleiner Funkenstern
+- iska · Energieblaster: türkiser Mündungsblitz, kurze türkise Energiebolzen (schnelles Dauerfeuer, darf nicht
+  überladen wirken), kleiner türkiser Einschlag
+- lynx · Scharfschützengewehr: kräftiger, kurzer Mündungsblitz mit Rauchring, langer dünner Leuchtstrich in Weiß-Grün
+  quer über die Bahn, deutlicher Einschlag mit kleinem Durchschuss-Funken nach hinten
+
+JE CHAMPION DREI TEILE (Namen <id>_muendung, <id>_geschoss, <id>_einschlag)
+- Mündung: 128 × 128 je Bild, 4 × 2, Schussrichtung nach RECHTS, Anker am Waffenende
+- Geschoss: 256 × 256 je Bild, 4 × 2, als Leuchtstrich von links (Start bei x 20) nach rechts (Ziel bei x 236),
+  Mitte y 128; heller Kern mindestens 6 px, Leuchtsaum 25–35 px; JSON mit feste_hoehe_m
+- Einschlag: 256 × 256 je Bild, 4 × 3, durchsichtige Mitte, damit der Gegner sichtbar bleibt, groesse_m etwa 0,8–1,0
+- 24 fps, einmal abspielen, gerades Alpha, keine dunklen oder grauen Ränder
+
+PRÜFEN VOR DER LIEFERUNG
+- Kampfvorschau je Champion auf der hellen Eisbrücke (game/fields/ice_world.webp) und dem Raumdock
+  (game/fields/space_dock.webp), Kamera von hinten oben wie im Spiel
+- alles muss auch verkleinert auf Handygröße auf den ersten Blick zu sehen sein
+
+LIEFERN in Vorlage_Raw/Schusseffekte_<id>_v1/ je Champion: drei Ordner mit Sheet-PNG, JSON und Vorschau-GIF,
+ABLAUF_<ID>.json, LIESMICH_CLAUDE.md, UEBERSICHT.png, Vorschau-GIFs für Eiswelt und Raumdock.
+
+Nur die eingebaute Bildgenerierung und Bildbearbeitung im bestehenden Konto verwenden, keine kostenpflichtigen Dienste.
+~~~~

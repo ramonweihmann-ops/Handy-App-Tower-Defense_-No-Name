@@ -19,6 +19,9 @@ Bitte nacheinander abschicken, jeweils erst den nächsten, wenn der vorige gelie
 | W2 | Meshy-Modelle der acht Waffen | `CHATGPT_PROMPTS.md`, Prompt W2 | etwa 240 Credits, **freigegeben 17.11.2026** | **geliefert 17.11.2026**, im Spiel seit 0.10.14 |
 | H4 | Heldenposen mit Waffe in der Hand (Vergleich zu Claudes Fassung) | `CHATGPT_PROMPTS.md`, Prompt H4 | keine Credits | **geliefert als gemalte Porträts (Champion_Portraets_v1)**, in „Held aufleveln“ seit 0.10.16 |
 | P2 | Porträts für Fünkchen, Pip, Rollo, Nova (Auflevel-Bildschirm) | `CHATGPT_PROMPTS.md`, Prompt P2 | keine | **geliefert 17.11.2026, im Spiel seit 0.10.18** |
+| S1 | Schusseffekt Volta (Mündung, Blitzbogen, Einschlag) | Schusseffekte_Volta_v1/v2 | keine | **v2 im Spiel seit 0.10.23** |
+| S2 | Schusseffekte Dusty, Iska, Lynx | `CHATGPT_PROMPTS.md`, Prompt S2 | keine | abgeschickt 17.11.2026 |
+| S3/S4 | Schusseffekte Kalle, Margot, Pip / Fünkchen, Rollo, Nova | folgt nach S2 | keine | nach Prüfung von S2 |
 
 ## Gemerkt für später (noch kein Auftrag)
 
