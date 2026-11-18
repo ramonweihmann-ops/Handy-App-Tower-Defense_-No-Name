@@ -1,0 +1,25 @@
+{
+  "held": "iska",
+  "modell": "../../game/models/heroes_v2/iska.glb",
+  "abschussanimation": {
+    "aktion": "Shoot",
+    "dauer_s": 0.4,
+    "loop": false
+  },
+  "muendungsknoten": "Muzzle",
+  "effekte": {
+    "muendung": "iska_muendung/iska_muendung.json",
+    "geschoss": "iska_geschoss/iska_geschoss.json",
+    "einschlag": "iska_einschlag/iska_einschlag.json"
+  },
+  "kampfvorschau": {
+    "flugzeit_s": 0.16,
+    "schussrichtung": [
+      1,
+      0
+    ],
+    "eiswelt": "ISKA_EISWELT_VORSCHAU.gif",
+    "raumdock": "ISKA_RAUMDOCK_VORSCHAU.gif"
+  },
+  "hinweis": "Vorschauzeiten dienen der Darstellung. Ziele, Treffer und Schadenszeitpunkte stammen aus dem Spiel."
+}
