@@ -8,6 +8,8 @@ extends RefCounted
 const STYLES := ["brocken", "fritzi"]   # Volta: Bildfolgen von ChatGPT (Schusseffekte_Volta_v1)
 ## Größe der Rakete: deutlich als Rakete erkennbar, aber kleiner als die Gegner (2,8 wirkte wie ein Raumschiff, 18.11.)
 const ROCKET_SCALE := 1.25
+## Rakete nach dem freigegebenen Entwurf (Vorlage_Raw/Schusseffekte_brocken_v2, Form und Farben), 18.11.2026
+const ROCKET_MODEL: PackedScene = preload("res://models/fx/brocken_rakete.glb")
 
 
 static func has(style: String) -> bool:
@@ -19,14 +21,53 @@ static func has(style: String) -> bool:
 ## Baut die Rakete an das Geschoss (zeigt mit -Z nach vorn, wie look_at es dreht). Gibt den Rauch zurück,
 ## damit das Geschoss ihn beim Einschlag stehen lassen kann.
 static func build_rocket(p: Node3D) -> CPUParticles3D:
-	var body_mat := Fx.mat(Color(0.86, 0.2, 0.16), 0.15, 0.2, 0.45)
-	var band_mat := Fx.mat(Color(0.95, 0.93, 0.88), 0.1, 0.0, 0.5)
-	var metal := Fx.mat(Color(0.62, 0.65, 0.7), 0.05, 0.7, 0.35)
-	var dark := Fx.mat(Color(0.25, 0.26, 0.3), 0.0, 0.4, 0.5)
 	var rocket := Node3D.new()
 	rocket.name = "Rakete"
 	rocket.scale = Vector3.ONE * ROCKET_SCALE
 	p.add_child(rocket)
+	if ROCKET_MODEL != null:
+		# Modell nach dem freigegebenen Entwurf (tools/effekte/build_rakete.py): Spitze bei −Z, Heck bei +0,47
+		rocket.add_child(ROCKET_MODEL.instantiate())
+	else:
+		_rocket_primitives(rocket)
+	# Feuerstrahl am Heck: zwei Leuchtkegel (außen orange, innen gelb), flackern über rocket_tick
+	var outer := Fx.cylinder(0.0, 0.085, 0.3, Fx.shared_glow(Color(1.0, 0.45, 0.1), 0.85), 10)
+	outer.rotation.x = PI * 0.5
+	outer.position.z = 0.62
+	outer.name = "Flamme"
+	rocket.add_child(outer)
+	var inner := Fx.cylinder(0.0, 0.045, 0.18, Fx.shared_glow(Color(1.0, 0.95, 0.6)), 8)
+	inner.rotation.x = PI * 0.5
+	inner.position.z = 0.56
+	inner.name = "Kern"
+	rocket.add_child(inner)
+	# Rauchfahne in Weltkoordinaten: bleibt in der Luft stehen, während die Rakete weiterfliegt
+	var smoke := CPUParticles3D.new()
+	smoke.local_coords = false
+	smoke.amount = 48
+	smoke.lifetime = 0.9
+	smoke.mesh = _puff_mesh(0.12)
+	smoke.direction = Vector3(0, 1, 0)
+	smoke.spread = 30.0
+	smoke.initial_velocity_min = 0.2
+	smoke.initial_velocity_max = 0.6
+	smoke.gravity = Vector3(0, 0.6, 0)
+	smoke.scale_amount_min = 0.7
+	smoke.scale_amount_max = 1.2
+	smoke.scale_amount_curve = _curve([Vector2(0, 0.5), Vector2(0.4, 1.0), Vector2(1, 1.6)])
+	smoke.color_ramp = _ramp([Color(1.0, 0.8, 0.5, 0.9), Color(0.75, 0.74, 0.76, 0.75), Color(0.55, 0.55, 0.6, 0.0)], [0.0, 0.25, 1.0])
+	smoke.position.z = 0.66
+	rocket.add_child(smoke)
+	smoke.emitting = true
+	return smoke
+
+
+## Bisherige Rakete aus Grundformen (falls das Modell fehlt)
+static func _rocket_primitives(rocket: Node3D) -> void:
+	var body_mat := Fx.mat(Color(0.86, 0.2, 0.16), 0.15, 0.2, 0.45)
+	var band_mat := Fx.mat(Color(0.95, 0.93, 0.88), 0.1, 0.0, 0.5)
+	var metal := Fx.mat(Color(0.62, 0.65, 0.7), 0.05, 0.7, 0.35)
+	var dark := Fx.mat(Color(0.25, 0.26, 0.3), 0.0, 0.4, 0.5)
 	var body := Fx.cylinder(0.11, 0.11, 0.56, body_mat, 12)
 	body.rotation.x = PI * 0.5
 	rocket.add_child(body)
@@ -48,36 +89,6 @@ static func build_rocket(p: Node3D) -> CPUParticles3D:
 		fin.position = Vector3(cos(a) * 0.15, sin(a) * 0.15, 0.2)
 		fin.rotation.z = a - PI * 0.5
 		rocket.add_child(fin)
-	# Feuerstrahl am Heck: zwei Leuchtkegel (außen orange, innen gelb), flackern über rocket_tick
-	var outer := Fx.cylinder(0.0, 0.11, 0.5, Fx.shared_glow(Color(1.0, 0.45, 0.1), 0.85), 10)
-	outer.rotation.x = PI * 0.5
-	outer.position.z = 0.62
-	outer.name = "Flamme"
-	rocket.add_child(outer)
-	var inner := Fx.cylinder(0.0, 0.06, 0.3, Fx.shared_glow(Color(1.0, 0.95, 0.6)), 8)
-	inner.rotation.x = PI * 0.5
-	inner.position.z = 0.5
-	inner.name = "Kern"
-	rocket.add_child(inner)
-	# Rauchfahne in Weltkoordinaten: bleibt in der Luft stehen, während die Rakete weiterfliegt
-	var smoke := CPUParticles3D.new()
-	smoke.local_coords = false
-	smoke.amount = 48
-	smoke.lifetime = 0.9
-	smoke.mesh = _puff_mesh(0.12)
-	smoke.direction = Vector3(0, 1, 0)
-	smoke.spread = 30.0
-	smoke.initial_velocity_min = 0.2
-	smoke.initial_velocity_max = 0.6
-	smoke.gravity = Vector3(0, 0.6, 0)
-	smoke.scale_amount_min = 0.7
-	smoke.scale_amount_max = 1.2
-	smoke.scale_amount_curve = _curve([Vector2(0, 0.5), Vector2(0.4, 1.0), Vector2(1, 1.6)])
-	smoke.color_ramp = _ramp([Color(1.0, 0.8, 0.5, 0.9), Color(0.75, 0.74, 0.76, 0.75), Color(0.55, 0.55, 0.6, 0.0)], [0.0, 0.25, 1.0])
-	smoke.position.z = 0.55
-	rocket.add_child(smoke)
-	smoke.emitting = true
-	return smoke
 
 
 ## Pro Bild: Rakete dreht sich um die Längsachse, der Feuerstrahl flackert
