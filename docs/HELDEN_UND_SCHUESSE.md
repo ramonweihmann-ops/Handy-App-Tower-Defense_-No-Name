@@ -113,3 +113,17 @@ ChatGPTs eigene Größen passen zu seiner Vorschau, nicht zu unserer Kamera.
 - Abnahme: Aufnahme im Spiel mit fester Bildrate (`--fixed-fps 20`, sonst ruckelt der Film bei langsamem Rechner)
   und `--shot-show=<ordner>`, je Champion Eiswelt (Level 12) und Raumdock (Level 3), dem Nutzer nebeneinander zeigen.
 - Alle Champions haben gemalte Schusseffekte, außer Brocken (3D-Rakete) und Fritzi (Flammen als Partikel).
+
+### Brocken und Fritzi (Stand 0.10.26, 18.11.2026)
+
+- **Brockens Rakete:** 3D-Modell `game/models/fx/brocken_rakete.glb`, gebaut mit `tools/effekte/build_rakete.py` genau
+  nach ChatGPTs freigegebenem Entwurf (`Vorlage_Raw/Schusseffekte_brocken_v2/`): rotes rundes Gehäuse, runde Spitze,
+  zwei Metallringe, türkiser Leuchtstreifen (beidseitig, weil die Rakete sich dreht), abgerundete Flossen.
+  Größe `Fx3D.ROCKET_SCALE` 1,25 (2,8 wirkte wie ein Raumschiff). Fluggeschwindigkeit `Battle.ROCKET_SPEED` 24 statt
+  11 m/s, flache Bahn statt rundem Bogen (`Projectile._rocket_lift`: kurz steigen, fast gerade, zum Ziel absenken,
+  höchstens gut 1 m). Die gemalte Rakete wurde verworfen: ein flaches Bild verkürzt sich nicht in die Tiefe und
+  wirkte im Flug wie ein langer Stab.
+- **Fritzis Flammen:** enge Fassung aus weichen Flammenzungen (`Fx3D.flame_burst`, `FLAMMEN_ZUNGEN`,
+  `shaders/flammenzunge.gdshader`): schmaler Strahl, der am Ziel verglüht, Flammenkranz eng um den Trefferkreis,
+  die Gegner bleiben sichtbar. ChatGPTs gemalter Flammenstrahl (Auftrag S5, `Vorlage_Raw/Schusseffekte_fritzi_v1/`)
+  ist vorbereitet (`Battle._flame_painted`) und wird nach seiner Fertigstellung im Spiel verglichen.

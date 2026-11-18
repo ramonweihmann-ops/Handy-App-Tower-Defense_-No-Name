@@ -23,8 +23,8 @@ Bitte nacheinander abschicken, jeweils erst den nächsten, wenn der vorige gelie
 | S2 | Schusseffekte Dusty, Iska, Lynx | `CHATGPT_PROMPTS.md`, Prompt S2 | keine | **im Spiel seit 0.10.24** (Größen im Spiel abgestimmt, voll deckend) |
 | S3 | Schusseffekte Kalle, Margot, Pip | `CHATGPT_PROMPTS.md`, Prompt S3 | keine | **im Spiel seit 0.10.25** |
 | S4 | Schusseffekte Fünkchen, Rollo, Nova | `CHATGPT_PROMPTS.md`, Prompt S4 | keine | **im Spiel seit 0.10.25** (Fünkchen v3, Rollo v2, Nova v1) |
-| R1 | Alternative Rakete für Brocken (gemalt, rund statt kantig) | `CHATGPT_PROMPTS.md`, Prompt R1 | keine | bereit zum Abschicken |
-| S5 | Fritzis Flammenstrahl (gemalt, Gegner bleiben sichtbar) | `CHATGPT_PROMPTS.md`, Prompt S5 | keine | bereit zum Abschicken |
+| R1 | Alternative Rakete für Brocken (gemalt, rund statt kantig) | `CHATGPT_PROMPTS.md`, Prompt R1 | keine | Entwurf v2 freigegeben, im Spiel als 3D-Modell danach (0.10.26); gemalt verworfen |
+| S5 | Fritzis Flammenstrahl (gemalt, Gegner bleiben sichtbar) | `CHATGPT_PROMPTS.md`, Prompt S5 | keine | abgeschickt, Nutzer überarbeitet noch; Einbau vorbereitet. Im Spiel bis dahin Claudes Flammenzungen (0.10.26) |
 
 ## Gemerkt für später (noch kein Auftrag)
 
