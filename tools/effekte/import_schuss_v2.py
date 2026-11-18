@@ -39,6 +39,21 @@ TUNING = {
         'geschoss': {'groesse_m': 2.0, 'feste_hoehe_m': 2.4, 'schleife_bilder': 4},   # kürzer (Wunsch 18.11.)
         'einschlag': {'groesse_m': 1.4, 'tempo': 1.0},
     },
+    'kalle': {
+        'muendung': {'groesse_m': 1.15, 'tempo': 1.3},
+        'geschoss': {'feste_hoehe_m': 2.8},   # Froststrahl, gespannt wie Voltas Blitzbogen (battle.fire_chain)
+        'einschlag': {'groesse_m': 1.3, 'tempo': 1.0},
+    },
+    'margot': {
+        'muendung': {'groesse_m': 1.2, 'tempo': 1.3},
+        'geschoss': {'groesse_m': 3.2, 'feste_hoehe_m': 3.0, 'schleife_bilder': 4},   # Bündel aus drei Schrotkugeln
+        'einschlag': {'groesse_m': 1.2, 'tempo': 1.0},
+    },
+    'pip': {
+        'muendung': {'groesse_m': 1.0, 'tempo': 1.3},
+        'geschoss': {'groesse_m': 2.4, 'feste_hoehe_m': 2.2, 'schleife_bilder': 4},
+        'einschlag': {'groesse_m': 1.2, 'tempo': 1.0},
+    },
     'lynx': {
         'muendung': {'groesse_m': 1.2, 'tempo': 1.3},
         'geschoss': {'feste_hoehe_m': 2.4},
@@ -76,7 +91,7 @@ def convert(held, dst):
         info['frame_px'] = px
         info['v2'] = True
         if teil == 'geschoss':
-            if info.get('darstellung') == 'durchschuss':
+            if info.get('darstellung') in ('durchschuss', 'bogen'):
                 info['anker'] = [0.5, 0.5]
             else:
                 # Spitze vorn: Ursprung an der Spitze (ziel_anker), damit der Streifen hinter dem Geschoss herzieht

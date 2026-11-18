@@ -842,7 +842,7 @@ Nur die eingebaute Bildgenerierung und Bildbearbeitung im bestehenden Konto verw
 
 ## Prompt S3: Schusseffekte Kalle, Margot, Pip (gleiches Format wie S2)
 
-**Kosten:** keine · **Abschicken:** nach der Freigabe von S2 (18.11.2026) · danach S4 Fünkchen, Rollo, Nova
+**Kosten:** keine · **Abschicken:** 18.11.2026 (abgeschickt, geliefert in Vorlage_Raw/Schusseffekte_<id>_v1/) · danach S4 Fünkchen, Rollo, Nova
 
 ~~~~text
 Dusty Jo, Iska und Lynx sind im Spiel und freigegeben, danke! Bitte jetzt im gleichen Format die Schusseffekte für
@@ -877,6 +877,50 @@ JE CHAMPION DREI TEILE (Namen <id>_muendung, <id>_geschoss, <id>_einschlag)
 - Geschoss: 256 × 256 je Bild, 4 × 2, Schussrichtung nach RECHTS, Start bei x 20, Spitze/Ziel bei x 236, Mitte y 128;
   JSON mit feste_hoehe_m, ziel_anker und darstellung: kalle „bogen“ (über die ganze Strecke gespannt, wie Voltas
   Blitzbogen), margot „leuchtspur“, pip „bolzen“
+- Einschlag: 256 × 256 je Bild, 4 × 3, freie Mitte, positive x-Richtung folgt der Schussrichtung
+- 24 fps, einmal abspielen, gerades Alpha, keine dunklen oder grauen Ränder
+
+PRÜFEN VOR DER LIEFERUNG
+- Kampfvorschau je Champion auf der hellen Eisbrücke (game/fields/ice_world.webp) und dem Raumdock
+  (game/fields/space_dock.webp), Kamera von hinten oben wie im Spiel, Effekte voll deckend
+- verkleinert auf Handygröße (390 × 844) muss jeder Schuss sofort zu sehen sein
+
+LIEFERN in Vorlage_Raw/Schusseffekte_<id>_v1/ je Champion: drei Ordner mit Sheet-PNG, JSON und Vorschau-GIF,
+ABLAUF_<ID>.json, LIESMICH_CLAUDE.md, UEBERSICHT.png, Vorschau-GIFs für Eiswelt und Raumdock.
+
+Nur die eingebaute Bildgenerierung und Bildbearbeitung im bestehenden Konto verwenden, keine kostenpflichtigen Dienste.
+~~~~
+
+## Prompt S4: Schusseffekte Fünkchen, Rollo, Nova (gleiches Format wie S3)
+
+**Kosten:** keine · **Abschicken:** nach der Freigabe von S3 · danach sind alle Champions außer Brocken und Fritzi
+(eigene 3D-Effekte) mit gemalten Schusseffekten ausgestattet
+
+~~~~text
+Kalle, Margot und Pip sind im Spiel, danke! Bitte jetzt im gleichen Format wie S3 die Schusseffekte für die letzten
+drei Champions bauen. Repository Handy-App-Tower-Defense_-No-Name, Branch claude/amazing-hypatia-yl59v4.
+Vorbild für Ordner, Dateinamen, JSON und Lieferung: Vorlage_Raw/Schusseffekte_kalle_v1/ (gleiche Struktur).
+
+Es gelten dieselben Regeln wie bei S3: im Spiel voll deckend (keine großen weichen Dunst- oder Rauchflächen),
+fliegende Geschosse Bild 1–4 volle Flugphase und Bild 5–8 ausblenden, Streifen nicht zu lang, alles verkleinert auf
+Handygröße auf den ersten Blick sichtbar, beim Einschlag bleibt die Mitte frei.
+
+DIE DREI CHAMPIONS (Modelle mit Aktion „Shoot“ und Knoten „Muzzle“: game/models/heroes_v2/<id>.glb, Porträts:
+game/ui/portraits/<id>.webp)
+- fuenkchen · kleiner Drache, Sternenatem: ein Band aus kleinen leuchtenden Sternen und warmem Licht, das vom Maul
+  quer über die ganze Bahn reicht und alle Gegner in der Reihe durchdringt (darstellung „strahl“, über die ganze
+  Strecke gespannt wie Kalles Froststrahl). Mündung: Funkeln am Maul. Einschlag: kleiner Sternregen.
+- rollo · kleiner Panzer mit Kanone: schwere, dunkle Kanonenkugel mit kurzer, kompakter Rauchspur (darstellung
+  „leuchtspur“, Kugel vorn). Mündung: dicke, aber kompakte Rauchwolke mit kurzem Feuerblitz. Einschlag: Staubring und
+  ein paar Brocken, der Gegner wird zurückgestoßen.
+- nova · Schwerkraft-Heldin: violette Schwerkraftkugel mit wirbelnden Teilchen (darstellung „bolzen“). Mündung:
+  kleiner violetter Wirbel. Einschlag: Sog nach innen, ein violetter Wirbel, der die Gegner zusammenzieht; dieser
+  Einschlag darf größer sein (er zeigt das Schwerkraftfeld, etwa 2–3 m), Mitte trotzdem frei.
+
+JE CHAMPION DREI TEILE (Namen <id>_muendung, <id>_geschoss, <id>_einschlag)
+- Mündung: 128 × 128 je Bild, 4 × 2, Schussrichtung nach RECHTS, Anker am Waffenende beziehungsweise Maul (links Mitte)
+- Geschoss: 256 × 256 je Bild, 4 × 2, Schussrichtung nach RECHTS, Start bei x 20, Spitze/Ziel bei x 236, Mitte y 128;
+  JSON mit feste_hoehe_m, ziel_anker und darstellung (siehe oben)
 - Einschlag: 256 × 256 je Bild, 4 × 3, freie Mitte, positive x-Richtung folgt der Schussrichtung
 - 24 fps, einmal abspielen, gerades Alpha, keine dunklen oder grauen Ränder
 

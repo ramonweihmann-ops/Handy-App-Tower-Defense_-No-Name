@@ -56,8 +56,8 @@ func launch(battle_: Battle, kind_: String, from: Vector3, target_: Enemy, dmg_:
 	var gname := style + "_geschoss"
 	var gi := FxSprite.info(gname) if style != "" and FxSprite.has(gname) else {}
 	match str(gi.get("darstellung", "")):
-		"durchschuss":
-			# eine Linie von der Mündung bis zum Ziel, das Projektil selbst bleibt unsichtbar
+		"durchschuss", "bogen":
+			# eine Linie (Lynx) oder ein Strahl (Kalle) von der Mündung bis zum Ziel, das Projektil selbst bleibt unsichtbar
 			FxSprite.span(battle, gname, from, _last_target, {"width": float(gi.get("feste_hoehe_m", 1.0)) / FxSprite.SCALE,
 				"alpha": float(gi.get("deckkraft", 1.0))})
 			return

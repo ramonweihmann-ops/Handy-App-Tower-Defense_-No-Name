@@ -698,19 +698,32 @@ func fire_chain(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type:
 		col = color
 	var beam := shot_style + "_geschoss"
 	var arc := shot_style + "_blitzbogen"
+	# Kalles Froststrahl (Schusseffekte_kalle_v1): Geschoss mit Darstellung „bogen“ wird wie Voltas Blitzbogen gespannt
+	if shot_style != "" and not FxSprite.has(arc) and str(FxSprite.info(beam).get("darstellung", "")) == "bogen":
+		arc = beam
 	if shot_style != "" and FxSprite.has(arc):
 		# Kettenblitz als gemalte Bögen (Schusseffekte_Volta_v1): je Verbindung ein Bogen, Folgebögen später und
 		# gedämpft, Einschlag am Trefferpunkt
 		var ai := FxSprite.info(arc)
+		var exact := str(ai.get("darstellung", "")) == "bogen"
+		var ei := FxSprite.info(shot_style + "_einschlag")
 		for i in points.size() - 1:
 			var a := points[i]
 			var b := points[i + 1]
 			var first := i == 0
 			var delay := 0.083 * i
 			var go := func() -> void:
-				FxSprite.play(self, arc, a.lerp(b, 0.5), {"dir": b - a, "width": float(ai.get("feste_hoehe_m", 0.7)) / FxSprite.SCALE,
-					"length": a.distance_to(b) * float(ai.get("laenge_faktor", 1.0)), "alpha": 1.0 if first else 0.68})
-				FxSprite.play(self, shot_style + "_einschlag", b, {"alpha": 1.0 if first else 0.72, "scale": 1.0 if first else 0.82})
+				var w := float(ai.get("feste_hoehe_m", 0.7)) / FxSprite.SCALE
+				if exact:
+					# endet auf dem Bildschirm genau an Mündung und Gegner
+					FxSprite.span(self, arc, a, b, {"width": w, "alpha": 1.0 if first else 0.68})
+				else:
+					FxSprite.play(self, arc, a.lerp(b, 0.5), {"dir": b - a, "width": w,
+						"length": a.distance_to(b) * float(ai.get("laenge_faktor", 1.0)), "alpha": 1.0 if first else 0.68})
+				var eo := {"alpha": 1.0 if first else 0.72, "scale": 1.0 if first else 0.82}
+				if bool(ei.get("gerichtet", false)):
+					eo.merge({"dir": b - a, "speed": float(ei.get("tempo", 1.0))}, true)
+				FxSprite.play(self, shot_style + "_einschlag", b, eo)
 			if delay <= 0.0:
 				go.call()
 			else:
