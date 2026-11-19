@@ -164,6 +164,11 @@ const TALENTS := {
 	"feuerkraft": {"title": "Feuerkraft", "desc": "Schaden +3 % je Stufe", "color": Color(1.0, 0.35, 0.25)},
 	"glueckspilz": {"title": "Glückspilz", "desc": "4 % je Stufe: Plasma zählt doppelt", "color": Color(0.4, 1.0, 0.55)},
 	"lernfreude": {"title": "Lernfreude", "desc": "Erfahrung +5 % je Stufe", "color": Color(0.7, 0.5, 1.0)},
+	# Talente der vier neueren Champions (erster Talent-Platz auf „Held aufleveln“), wirken wie alle Talente in jedem Kampf
+	"funkenherz": {"title": "Funkenherz", "desc": "Superfähigkeiten laden 4 % schneller je Stufe", "color": Color(1.0, 0.6, 0.88), "hero": "fuenkchen"},
+	"werkzeugkiste": {"title": "Werkzeugkiste", "desc": "Booster laden 4 % schneller je Stufe", "color": Color(0.56, 0.91, 0.91), "hero": "pip"},
+	"bollwerk": {"title": "Bollwerk", "desc": "Schild +4 % je Stufe", "color": Color(1.0, 0.75, 0.44), "hero": "rollo"},
+	"schwerefeld": {"title": "Schwerefeld", "desc": "Gegner laufen 2 % langsamer je Stufe", "color": Color(0.82, 0.66, 1.0), "hero": "nova"},
 }
 const TALENT_SLOTS := 12
 

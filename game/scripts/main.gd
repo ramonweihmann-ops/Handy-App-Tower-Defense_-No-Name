@@ -69,6 +69,9 @@ var _boost_override: Array[String] = []
 ## Nur für Tests mit Fenster: Menübild speichern (--menushot=pfad.png[,reiter[,lager-voll|held:<id>|bau:<id>[:leer]|unterreiter]]) und beenden.
 var _menu_shot := ""
 var _squad := ""
+## Balance-Labor: Talente fest auf eine Stufe setzen (--talente=funkenherz:5,bollwerk:0 oder --talente=neu:5 für die vier
+## Talente von Fünkchen, Pip, Rollo und Nova), nach dem Profil
+var _talent_override := ""
 var _pick_shot := ""
 var _card_shot := ""
 var _tut_shot := false   # --tut: Tutorial auch in Prüfbildern zeigen
@@ -81,6 +84,24 @@ var _menu_shot_t := 0
 ## Testkarte (nur Entwickler, Spielmodi): {"level", "wave", "heroes", "god"}; leer = normaler Kampf
 var test_run := {}
 var _side_bg: ColorRect   # Rand neben dem Spielfeld; im Menü verdeckt
+
+
+## Balance-Labor: Talentstufen aus --talente setzen („neu“ steht für die Talente der vier neueren Champions)
+func _apply_talent_override() -> void:
+	for part in _talent_override.split(","):
+		var id := part.get_slice(":", 0)
+		var lvl := clampi(int(part.get_slice(":", 1)), 0, MetaData.TALENT_MAX)
+		var ids: Array = []
+		if id == "neu":
+			for k in MetaData.TALENTS.keys():
+				if MetaData.TALENTS[k].has("hero"):
+					ids.append(k)
+		elif MetaData.TALENTS.has(id):
+			ids.append(id)
+		else:
+			push_error("FEHLER: unbekanntes Talent %s" % id)
+		for k in ids:
+			Save.data["talents"][k] = lvl
 
 
 func _ready() -> void:
@@ -96,6 +117,8 @@ func _ready() -> void:
 			load("res://tests/balance_profiles.gd").apply(Save, _profile, level)
 			if _squad != "":
 				Save.data["squad"] = Array(_squad.split(","))
+		if _talent_override != "":
+			_apply_talent_override()
 	_build_layout()
 	# Geführter Einstieg; in Prüfbildern nur mit --tut
 	Tutorial.enabled = not _autotest and (_tut_shot or (_menu_shot == "" and _pick_shot == "" and _shot_path == ""))
@@ -275,6 +298,8 @@ func _parse_args() -> void:
 			CardRules.SOLO_HP = float(arg.get_slice("=", 1))   # Labor: Gegnerleben mit einem Champion
 		elif arg.begins_with("--duo-hp="):
 			CardRules.DUO_HP = float(arg.get_slice("=", 1))   # Labor: Gegnerleben mit zwei Champions
+		elif arg.begins_with("--talente="):
+			_talent_override = arg.get_slice("=", 1)
 		elif arg.begins_with("--faehigkeiten="):
 			Hero.test_skills = int(arg.get_slice("=", 1))   # alle Kampfkarten der Champions auf diese Stufe (Test)
 		elif arg == "--neue-monster":
@@ -513,7 +538,7 @@ var _perf_t := 0.0
 func _update_boosters(delta: float) -> void:
 	for i in _boosters.size():
 		var id := _boosters[i]
-		var full := MetaData.booster_cd(id, Save.booster_level(id))
+		var full := MetaData.booster_cd(id, Save.booster_level(id)) * (1.0 - float(bonus.get("booster_cd", 0.0)))
 		_booster_cd[i] = maxf(0.0, _booster_cd[i] - delta)
 		hud.set_booster_ready(i, 1.0 - _booster_cd[i] / full)
 
@@ -865,6 +890,8 @@ func _start(n: int, hard_mode: bool, multi: bool, found: MpMatch = null) -> void
 	battle.heavy_bonus = float(bonus.get("heavy_dmg", 0.0))
 	battle.frost_bonus = float(bonus.get("frost", 0.0))
 	battle.burn_bonus = float(bonus.get("burn", 0.0))
+	battle.ult_rate_bonus = float(bonus.get("ult_rate", 0.0))
+	battle.enemy_slow = float(bonus.get("enemy_slow", 0.0))
 	battle.hero_damage = {}
 	for id in GameData.HERO_IDS:
 		battle.hero_damage[id] = MetaData.hero_damage_mult(Save.hero_level(id)) * (1.0 + float(bonus["damage"]))

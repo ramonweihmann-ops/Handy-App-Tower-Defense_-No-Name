@@ -171,7 +171,7 @@ func _process(delta: float) -> void:
 	_update_effects(delta)
 	if not alive:
 		return
-	var spd := speed * (1.0 - _slow)
+	var spd := speed * (1.0 - _slow) * (1.0 - battle.enemy_slow)
 	if not attacking:
 		position.z += spd * delta
 		if data["tier"] == "leicht" or data["tier"] == "mittel":
@@ -246,9 +246,9 @@ func _animate(_delta: float, moving: bool) -> void:
 			if d.has("stride") and moving and not attacking:
 				# Schritte passend zum echten Tempo: schnelle Gegner laufen sichtbar schneller
 				var natural := float(d["stride"]) * float(d["height"]) * VIS_SCALE
-				_anim.speed_scale = clampf(speed * (1.0 - _slow) / natural, 0.5, 2.2)
+				_anim.speed_scale = clampf(speed * (1.0 - _slow) * (1.0 - battle.enemy_slow) / natural, 0.5, 2.2)
 			else:
-				_anim.speed_scale = (1.0 - _slow) * (1.0 if moving else 0.6)
+				_anim.speed_scale = (1.0 - _slow) * (1.0 - battle.enemy_slow) * (1.0 if moving else 0.6)
 		return
 	var t := _t
 	match kind:

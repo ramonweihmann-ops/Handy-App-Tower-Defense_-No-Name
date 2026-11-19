@@ -148,3 +148,41 @@ ChatGPTs eigene Größen passen zu seiner Vorschau, nicht zu unserer Kamera.
 - **Rote Punkte der Reiterleiste:** Regeln an einer Stelle (`MockScreen.nav_badges`), auf allen Seiten gleich, auch
   auf der Hauptseite „Kampf“ (dort fehlten sie, weil die Leiste zum Hintergrundbild gehört).
 - Mockup: Brett „Kampf · Ladekreise“ neben den Schlachtfeldern zeigt die Zustände aus dem Spiel.
+
+## Talente der vier neueren Champions (19.11.2026)
+
+Auf „Held aufleveln“ zeigt der erste Talent-Platz jedes Champions ein Talent der Talente-Seite. Für Fünkchen, Pip, Rollo
+und Nova gab es keins, ihr Platz war gesperrt. Jetzt hat jeder sein eigenes Talent; die Talente-Seite hat damit 12
+statt 8 Talente. Wie alle Talente zieht man sie mit Sternen (bis Stufe 5), und sie wirken in jedem Kampf, auch wenn der
+Champion nicht dabei ist.
+
+| Champion | Talent | Wirkung je Stufe | Stufe 5 | Stelle im Code |
+|---|---|---|---|---|
+| Fünkchen | Funkenherz | Superfähigkeiten laden 4 % schneller | +20 % | `Battle.ult_rate_bonus`, `Hero._update_ult` |
+| Pip | Werkzeugkiste | Booster laden 4 % schneller | −20 % Wartezeit | Bonus `booster_cd` (wie die Schiffswerft) |
+| Rollo | Bollwerk | Schild +4 % | +20 % | Bonus `shield` (wie die Tech-Werft) |
+| Nova | Schwerefeld | Gegner laufen 2 % langsamer | −10 % Tempo | `Battle.enemy_slow`, `Enemy._process` |
+
+- Werte: `MetaData.TALENTS`, Boni: `Save.battle_bonus()`.
+- Testkonto „alles frei“: fehlende Talente setzt das Spiel beim Laden auf Stufe 5, so sind die neuen sofort testbar.
+- Symbole: vorläufig aus den Formen des Mockups (`tools/talent_symbole.js`), gemalte Fassung über Prompt T1.
+- Balance-Labor: `--talente=neu:5` (alle vier) oder `--talente=bollwerk:5,schwerefeld:0` setzt Stufen nach dem Profil;
+  `scripts/talent-lab.py` vergleicht die Varianten. Die Profile verteilen ihre Talente reihum auf jetzt 12 statt 8
+  Talente, wie beim echten Ziehen.
+
+Erste Labormessung (19.11.2026, `scripts/talent-lab.py`, je Variante dieselben Level und Seeds):
+
+| Profil, Level | Variante | Kämpfe | Siege | übriges Schild | Kampfzeit |
+|---|---|---|---|---|---|
+| durchschnitt, 36/38/40 | ohne die vier Talente | 6 | 100 % | 96 % | 283 s |
+| | alle vier auf Stufe 5 | 6 | 100 % | 100 % | 276 s |
+| | nur Funkenherz 5 | 6 | 100 % | 98 % | 280 s |
+| | nur Werkzeugkiste 5 | 6 | 100 % | 99 % | 276 s |
+| | nur Bollwerk 5 | 6 | 100 % | 97 % | 283 s |
+| | nur Schwerefeld 5 | 6 | 100 % | 95 % | 288 s |
+| anfaenger, 38/40 | ohne die vier Talente | 4 | 0 % | 0 % | 173 s |
+| | alle vier auf Stufe 5 | 4 | 50 % | 43 % | 255 s |
+
+Im Profil „durchschnitt“ gewinnt in diesen Leveln jede Variante, die Unterschiede zeigen sich nur am Schild. Für knappe
+Kämpfe (Profil „anfaenger“) sind alle vier zusammen auf Stufe 5 ein großer Schritt; das sind aber auch 20 Sterne, so
+viel wie vier andere Talente auf Stufe 5. Einzelwerte stimmen wir nach dem Spieltest ab.

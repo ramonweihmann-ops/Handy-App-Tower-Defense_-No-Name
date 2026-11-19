@@ -79,6 +79,10 @@ var bonus_reload := 0.0
 var heavy_bonus := 0.0
 var frost_bonus := 0.0
 var burn_bonus := 0.0
+## Talent „Funkenherz“ (Fünkchen): Superfähigkeiten laden um diesen Anteil schneller
+var ult_rate_bonus := 0.0
+## Talent „Schwerefeld“ (Nova): alle Gegner laufen um diesen Anteil langsamer
+var enemy_slow := 0.0
 var hero_damage := {}
 ## Schadensbonus für alle Helden durch dazugerufene Verstärkungs-Helden.
 var team_aura := 0.0

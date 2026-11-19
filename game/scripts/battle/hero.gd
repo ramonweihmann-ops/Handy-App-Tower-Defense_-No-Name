@@ -300,7 +300,7 @@ func _exit_tree() -> void:
 
 
 func _update_ult(delta: float) -> void:
-	_ult_cd = maxf(0.0, _ult_cd - delta)
+	_ult_cd = maxf(0.0, _ult_cd - delta * (1.0 + battle.ult_rate_bonus))
 	_ult_t = maxf(0.0, _ult_t - delta)
 	if _turret and _ult_t <= 0.0:
 		_show_turret(false)

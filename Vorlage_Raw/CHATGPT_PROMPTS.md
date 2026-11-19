@@ -1075,3 +1075,45 @@ LIESMICH_CLAUDE.md mit kurzer Beschreibung je Variante.
 
 Nur die eingebaute Bildgenerierung und Bildbearbeitung im bestehenden Konto verwenden, keine kostenpflichtigen Dienste.
 ~~~~
+
+## Prompt T1: Talent-Symbole für Fünkchen, Pip, Rollo und Nova (gemalt, wie die acht vorhandenen)
+
+**Kosten:** keine Kosten · **Abschicken:** jederzeit; bis zur Lieferung zeigt das Spiel vorläufige Symbole (tools/talent_symbole.js)
+
+~~~~text
+Bitte für mein Handyspiel (Tower Defense, Comic-Stil) vier neue Talent-Symbole malen. Sie erscheinen auf der Seite
+„Talente“ in grünen Karten (Symbol etwa 44 × 44 Punkte) neben acht vorhandenen Symbolen.
+
+STILVORLAGE: genau wie die vorhandenen Talent-Symbole im Repository Handy-App-Tower-Defense_-No-Name, Branch
+claude/amazing-hypatia-yl59v4, Ordner game/ui/upgrades_v2/ (tal_feuerkraft.webp, tal_glueckspilz.webp,
+tal_kopfgeld.webp, tal_lernfreude.webp, tal_munitionslager.webp, tal_scharfschuetze.webp; Herkunft
+Vorlage_Raw/Talente_v1/). Glänzende Comic-Gegenstände mit kräftigem dunklem Umriss, Glanzlicht oben links, rechts
+oben ein kleines helles „+“ wie bei den vorhandenen Symbolen.
+
+DIE VIER TALENTE (Form und Farbe bitte so, damit sie zu den Sechsecken auf „Held aufleveln“ passen)
+- tal_funkenherz.png – Funkenherz (Fünkchen): Superfähigkeiten laden schneller. Großer rosa Funkelstern mit vier
+  Spitzen, daneben ein kleiner goldener Funke. Rosa #ff9ae0, Gold #ffd34d.
+- tal_werkzeugkiste.png – Werkzeugkiste (Pip): Booster laden schneller. Türkiser Schraubenschlüssel, schräg von
+  links unten nach rechts oben. Türkis #8fe8e8.
+- tal_bollwerk.png – Bollwerk (Rollo): mehr Schild. Orangefarbener Wappenschild mit dunklerem Kreuz aus Metallbändern
+  und kleinen Nieten. Orange #ffc070, Rand #d8661a.
+- tal_schwerefeld.png – Schwerefeld (Nova): Gegner laufen langsamer. Violette Spirale (Schwerkraftwirbel) mit leichtem
+  Leuchten in der Mitte. Violett #d0a8ff.
+
+FORMAT
+- je 256 × 256 Pixel, PNG mit durchsichtigem Hintergrund (RGBA), Motiv mittig, etwa 8 % Rand frei
+- keine Schrift, keine Zahlen, keine Karte, kein Hintergrund
+- muss auch klein (44 Punkte) sofort erkennbar sein: wenige, große Formen
+- jedes Symbol ein eigenes Bild, nicht aus einem Sammelbild ausschneiden
+
+ZUSÄTZLICH
+- uebersicht.png: die vier neuen Symbole neben den sechs vorhandenen tal_*-Symbolen, auf Grün (#3c8c3c), je 44 und 88 px
+
+BITTE LIEFERN in Vorlage_Raw/Talente_v2/ auf GitHub (Branch claude/amazing-hypatia-yl59v4):
+1. die vier PNG-Dateien
+2. uebersicht.png
+3. LIESMICH_CLAUDE.md: je Datei Motiv und Farben
+4. BILDANWEISUNG.txt: die verwendeten Bildprompts
+
+Nur die eingebaute Bildgenerierung im bestehenden Konto verwenden, keine weiteren kostenpflichtigen Dienste.
+~~~~

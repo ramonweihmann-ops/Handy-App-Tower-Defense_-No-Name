@@ -85,6 +85,11 @@ func load_game() -> void:
 			# Spielstände von vor dem Tutorial: diese Spieler kennen das Spiel schon
 			if not stored.has("tut"):
 				data["tut"] = {"done": true}
+			# Konto „alles frei“: später dazugekommene Talente (z. B. die der vier neueren Champions) gleich voll
+			if account == "voll":
+				for id in MetaData.TALENTS.keys():
+					if not data["talents"].has(id):
+						data["talents"][id] = MetaData.TALENT_MAX
 		elif account == "voll":
 			data = full_data()
 	_ensure_heroes()
@@ -1137,7 +1142,7 @@ func mp_season_check() -> Array:
 
 ## Alle Boni gesammelt, damit main.gd sie beim Levelstart anwenden kann.
 func battle_bonus() -> Dictionary:
-	var shield := 0.0
+	var shield := 0.04 * talent_level("bollwerk")
 	if has_tech("shield1"):
 		shield += 0.1
 	if has_tech("shield2"):
@@ -1171,6 +1176,9 @@ func battle_bonus() -> Dictionary:
 		"gold": 0.08 * talent_level("kopfgeld") + (0.1 if has_tech("gold") else 0.0),
 		"damage": 0.03 * talent_level("feuerkraft") + (0.05 if has_tech("damage") else 0.0),
 		"lucky": 0.04 * talent_level("glueckspilz"),
+		"ult_rate": 0.04 * talent_level("funkenherz"),
+		"booster_cd": 0.04 * talent_level("werkzeugkiste"),
+		"enemy_slow": 0.02 * talent_level("schwerefeld"),
 	}
 	# Basislager: Verstärker kommen dazu (ganze Zahlen bei Plasma-Werten)
 	for k in bb.keys():

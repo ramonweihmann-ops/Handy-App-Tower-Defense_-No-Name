@@ -31,6 +31,8 @@ const GRID_CELLS := 16
 const GRID_RECT := Rect2(0, 60, 390, 396)
 ## Symbole der Talente: aus dem Entwurf, sonst die bisherigen (mit eingezeichnetem Plus)
 const TALENT_ICON := {"schnelllader": "icon_core", "sanitaet": "booster_medipack"}
+## Vorläufige Symbole ohne gemaltes Plus (Talente der vier neueren Champions, tools/talent_symbole.js), bis ChatGPT liefert
+const TALENT_PLUS := ["funkenherz", "werkzeugkiste", "bollwerk", "schwerefeld"]
 
 ## Tech-Werft (Mockup-Punkte)
 const TECH_RECT := Rect2(0, 56, 390, 562)
@@ -391,7 +393,7 @@ func draw_card(ci: CanvasItem, id: String, level: int, r: Rect2, origin: Vector2
 	text_box(ci, title, p.x, p.y + 5.0 * k + (10.5 * k - fs) * 0.6, r.size.x, origin, "Fredoka", 700, fs, Color.WHITE, 0, Color("#1d6b2a"), Vector2(0, 1) * k)
 	var icon := str(TALENT_ICON.get(id, "tal_" + id))
 	pic_fit(ci, icon, p + Vector2(CARD.x * 0.5, 44.0) * k, 44.0 * k, origin)
-	if TALENT_ICON.has(id):
+	if TALENT_ICON.has(id) or id in TALENT_PLUS:
 		text_box(ci, "+", p.x + (CARD.x - 24.0) * k, p.y + 20.0 * k, 14.0 * k, origin, "Nunito", 800, 15.0 * k, Color.WHITE, 0, Color("#1d6b2a"), Vector2(0, 1) * k)
 	text_box(ci, "Stufe %d" % level, p.x, p.y + (CARD.y - 17.0) * k, r.size.x, origin, "Fredoka", 700, 12.0 * k, Color("#163f12"))
 
@@ -825,8 +827,10 @@ class TalentGrid:
 					Sfx.play("click")
 					if k < ids.size():
 						tab.open_talent_info(ids[k])
-					else:
+					elif k < MetaData.TALENTS.size():
 						tab.menu.toast("Noch nicht entdeckt. Öffne ein Talent für einen Stern.")
+					else:
+						tab.menu.toast("Hier kommen später weitere Talente dazu.")
 					return
 
 

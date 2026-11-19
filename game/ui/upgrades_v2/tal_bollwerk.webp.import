@@ -2,22 +2,22 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://05th6fjb85hn"
-path="res://.godot/imported/fuenkchen_bg.webp-2539f9e44e4322a0b3fbb2a7853b5089.ctex"
+uid="uid://bf717n2h4h3r4"
+path="res://.godot/imported/tal_bollwerk.webp-1a03149082712ed9cdd56fe6c8f63554.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui_mock/held/fuenkchen_bg.webp"
-dest_files=["res://.godot/imported/fuenkchen_bg.webp-2539f9e44e4322a0b3fbb2a7853b5089.ctex"]
+source_file="res://ui/upgrades_v2/tal_bollwerk.webp"
+dest_files=["res://.godot/imported/tal_bollwerk.webp-1a03149082712ed9cdd56fe6c8f63554.ctex"]
 
 [params]
 
-compress/mode=1
+compress/mode=0
 compress/high_quality=false
-compress/lossy_quality=0.82
+compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
