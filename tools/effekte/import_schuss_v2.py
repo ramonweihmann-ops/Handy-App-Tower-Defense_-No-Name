@@ -76,12 +76,13 @@ TUNING = {
         'muendung': {'groesse_m': 1.1, 'tempo': 1.3},
         'geschoss': {'groesse_m': 2.23, 'feste_hoehe_m': 2.23, 'schleife_bilder': 4},
     },
-    'fritzi': {   # S5: Flammenstrahl wie Kalles Froststrahl gespannt, Bodenkranz um den Trefferkreis (battle.flame)
+    'fritzi': {   # v4: Flammenstrahl bis an den Körperrand, kleiner Treffer am zugewandten Körperrand (battle.flame)
         'muendung': {'groesse_m': 1.0, 'tempo': 1.3},
         'geschoss': {'feste_hoehe_m': 2.2},
-        # kranz_innen: freie Mitte des Kranzes als Anteil der Kachel (gemessen 160 von 256 px); die Größe kommt aus
-        # Fritzis Trefferkreis. Der Kranz ist schon als flache Ellipse gemalt, darum nicht drehen und nicht ausrichten.
-        'einschlag': {'ungedreht': True, 'gerichtet': False, 'kranz_innen': 0.625, 'tempo': 1.0},
+        # kontakt: Kachelgröße als Vielfaches des Gegnerdurchmessers (ChatGPTs Vorschau: Kachel 58 px bei Gegnern
+        # von gut 45 px); weitere Gegner im Trefferkreis bekommen kontakt_neben davon
+        # laenge_anteil: Kachel in Schussrichtung flacher, damit die Flammen unten am Körper bleiben (Gesicht frei)
+        'einschlag': {'gerichtet': True, 'kontakt': 1.7, 'kontakt_neben': 0.8, 'laenge_anteil': 0.5, 'tempo': 1.0},
     },
     'lynx': {
         'muendung': {'groesse_m': 1.2, 'tempo': 1.3},

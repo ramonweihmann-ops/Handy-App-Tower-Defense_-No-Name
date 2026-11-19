@@ -774,18 +774,51 @@ func flame(from: Vector3, target: Enemy, dmg: float, crit: bool, ammo_type: Stri
 		Fx.flash(self, target.aim_point(), Color(1.0, 0.35, 0.1), radius * 0.8, 0.25)
 
 
-## Gemalter Flammenstrahl (Schusseffekte_fritzi_v1): von der Düse genau bis zum Ziel gespannt, dazu der flache
-## Bodenkranz um den Trefferkreis (Mitte frei, Größe aus dem Radius, auch mit Superfähigkeit)
+## Gemalter Flammenstrahl (Schusseffekte_fritzi_v4): von der Düse bis an den zugewandten Körperrand des Ziels
+## gespannt; dort ein kleiner Flammenkontakt, der in Schussrichtung um den Körper ausläuft und mit dem Gegner
+## mitwandert. Weitere Gegner im Trefferkreis bekommen einen kleineren Kontakt ohne eigenen Strahl. Der Trefferkreis
+## selbst wird nicht gezeichnet (Radius, Schaden und Brand bleiben Spielwerte).
 func _flame_painted(from: Vector3, target: Enemy, radius: float) -> void:
 	var gname := shot_style + "_geschoss"
 	var gi := FxSprite.info(gname)
-	FxSprite.span(self, gname, from, target.aim_point(), {"width": float(gi.get("feste_hoehe_m", 2.0)) / FxSprite.SCALE})
+	FxSprite.span(self, gname, from, _flame_contact(from, target), {"width": float(gi.get("feste_hoehe_m", 2.0)) / FxSprite.SCALE})
 	var ename := shot_style + "_einschlag"
+	if not FxSprite.has(ename):
+		return
 	var ei := FxSprite.info(ename)
-	var w := radius * 2.0 * 1.1 / float(ei.get("kranz_innen", 0.6))
-	var ground := target.global_position + Vector3(0, 0.12, 0)
+	var others: Array[Enemy] = []
+	for e in enemies:
+		if e != target and is_instance_valid(e) and e.alive \
+				and Vector2(e.position.x - target.position.x, e.position.z - target.position.z).length() <= radius + e.radius():
+			others.append(e)
+	others.sort_custom(func(x: Enemy, y: Enemy) -> bool:
+		return x.position.distance_squared_to(target.position) < y.position.distance_squared_to(target.position))
+	var hit := [target] + others.slice(0, 3)   # höchstens drei Nebenkontakte, Fritzi schießt schnell
+	var ids := hit.map(func(e: Enemy) -> int: return e.get_instance_id())
 	get_tree().create_timer(0.08, false).timeout.connect(func() -> void:
-		FxSprite.play(self, ename, ground, {"width": w / FxSprite.SCALE, "speed": float(ei.get("tempo", 1.0))}))
+		for i in ids.size():
+			var e := instance_from_id(ids[i]) as Enemy
+			if e == null or not is_instance_valid(e) or not e.alive:
+				continue
+			var f := float(ei.get("kontakt", 1.3)) * (1.0 if i == 0 else float(ei.get("kontakt_neben", 0.8)))
+			var at := _flame_contact(from, e)
+			# flacher als geliefert (laenge_anteil): die Gabeln umfassen die untere Körperhälfte, das Gesicht bleibt frei
+			var w := e.radius() * 2.0 * f
+			var s := FxSprite.play(e, ename, at, {"dir": at - from, "width": w / FxSprite.SCALE,
+				"length": w * float(ei.get("laenge_anteil", 1.0)), "stretch": false, "speed": float(ei.get("tempo", 1.0))})
+			if s:
+				s.global_position = at)
+
+
+## Zugewandter Körperrand des Gegners in Richtung des Schützen, unten vorn (wie in ChatGPTs Vorschau), damit Gesicht
+## und Körpermitte frei bleiben; die Flammen laufen von dort in Schussrichtung am Körper entlang
+func _flame_contact(from: Vector3, e: Enemy) -> Vector3:
+	var base := e.global_position
+	var c := base.lerp(e.aim_point(), 0.2)
+	var flat := Vector3(c.x - from.x, 0.0, c.z - from.z)
+	if flat.length() < 0.001:
+		return c
+	return c - flat.normalized() * e.radius() * 1.1
 
 
 ## Eine Feuerkugel der Brandflinte: heller Kern, Flammen als Schweif nach hinten, fliegt von a nach b
