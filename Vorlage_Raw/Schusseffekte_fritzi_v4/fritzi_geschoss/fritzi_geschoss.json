@@ -1,0 +1,23 @@
+{
+  "name": "fritzi_geschoss",
+  "frames": 8,
+  "cols": 4,
+  "rows": 2,
+  "fps": 24,
+  "loop": false,
+  "anker": [
+    0.078125,
+    0.5
+  ],
+  "groesse_m": 2.0,
+  "mischung": "alpha",
+  "notiz": "Start (20,128), Ziel (236,128). Bilder 1–4 voller Stoß; 5–8 Ausblenden.",
+  "ziel_anker": [
+    0.921875,
+    0.5
+  ],
+  "feste_hoehe_m": 2.0,
+  "darstellung": "bogen",
+  "deckkraft": 1.0,
+  "schleife_bilder": 4
+}

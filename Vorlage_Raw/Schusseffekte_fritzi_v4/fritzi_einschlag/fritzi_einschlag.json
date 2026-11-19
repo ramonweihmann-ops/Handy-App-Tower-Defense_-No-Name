@@ -1,0 +1,16 @@
+{
+  "name": "fritzi_einschlag",
+  "frames": 12,
+  "cols": 4,
+  "rows": 3,
+  "fps": 24,
+  "loop": false,
+  "anker": [
+    0.5,
+    0.5
+  ],
+  "groesse_m": 1.8,
+  "mischung": "alpha",
+  "deckkraft": 1.0,
+  "notiz": "Am zugewandten Körperrand platzieren, nach Schussrichtung drehen. Kurzes seitlich abgelenktes Aufflackern. Pro getroffenem Gegner, nicht als Bodenkranz skalieren."
+}
