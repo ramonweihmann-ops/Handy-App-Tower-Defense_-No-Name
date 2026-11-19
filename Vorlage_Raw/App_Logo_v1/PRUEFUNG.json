@@ -1,0 +1,53 @@
+{
+  "A": {
+    "vordergrund_bbox": [
+      105,
+      86,
+      328,
+      346
+    ],
+    "sicherheitskreis": {
+      "mitte": [
+        216,
+        216
+      ],
+      "durchmesser": 288,
+      "sichtbare_pixel_ausserhalb": 0
+    },
+    "1024_modus": "RGB"
+  },
+  "B": {
+    "vordergrund_bbox": [
+      97,
+      84,
+      335,
+      348
+    ],
+    "sicherheitskreis": {
+      "mitte": [
+        216,
+        216
+      ],
+      "durchmesser": 288,
+      "sichtbare_pixel_ausserhalb": 0
+    },
+    "1024_modus": "RGB"
+  },
+  "C": {
+    "vordergrund_bbox": [
+      85,
+      93,
+      347,
+      339
+    ],
+    "sicherheitskreis": {
+      "mitte": [
+        216,
+        216
+      ],
+      "durchmesser": 288,
+      "sichtbare_pixel_ausserhalb": 0
+    },
+    "1024_modus": "RGB"
+  }
+}
