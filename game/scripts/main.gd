@@ -685,9 +685,11 @@ func _process(delta: float) -> void:
 			get_tree().quit()
 	if _card_shot != "" and state == "battle" and battle.elapsed > 6.0:
 		_show_card_shot()
-	if _shot_path != "" and state == "battle" and battle.elapsed > 8.0:
-		get_viewport().get_texture().get_image().save_png(_shot_path)
-		print("BILD gespeichert: ", _shot_path)
+	# Prüfbild: --shot=pfad.png (nach 8 s Kampf) oder --shot=pfad.png@45 (nach 45 s)
+	if _shot_path != "" and state == "battle" and battle.elapsed > (float(_shot_path.get_slice("@", 1)) if "@" in _shot_path else 8.0):
+		var sp := _shot_path.get_slice("@", 0)
+		get_viewport().get_texture().get_image().save_png(sp)
+		print("BILD gespeichert: ", sp)
 		get_tree().quit()
 	if _autotest and state == "battle":
 		if battle.elapsed > 900.0:

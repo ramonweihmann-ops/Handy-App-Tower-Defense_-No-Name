@@ -27,6 +27,7 @@ var _btn_layer: Control
 var _buttons: Array[MockButton] = []
 var _overrides := {}   # Text-Nummer -> neuer Text
 var _hidden := {}      # Text-Nummer -> true
+var _text_dx := {}   # waagerechte Verschiebung einzelner Texte (Mockup-Punkte)
 var _colors := {}      # Text-Nummer -> andere Farbe (z. B. je Planet)
 var _live := {}        # Live-Kennung -> Rect2 (Mockup-Punkte)
 var _placed := {}      # Live-Kennung -> Control
@@ -197,6 +198,15 @@ func set_text_color(key: Variant, col: Color) -> void:
 	_redraw_texts()
 
 
+## Einen Text waagerecht verschieben (Mockup-Punkte), z. B. „/s“ hinter eine breitere Zahl
+func shift_text(key: Variant, dx: float) -> void:
+	var i := _find_text(key)
+	if i < 0 or is_equal_approx(float(_text_dx.get(i, 0.0)), dx):
+		return
+	_text_dx[i] = dx
+	_redraw_texts()
+
+
 func hide_text(key: Variant, hide := true) -> void:
 	var i := _find_text(key)
 	if i < 0:
@@ -225,6 +235,7 @@ func draw_text(ci: CanvasItem, t: Dictionary, origin: Vector2) -> void:
 	var i := int(t["i"])
 	if _hidden.has(i):
 		return
+	origin.x += float(_text_dx.get(i, 0.0)) * s
 	var lines: Array = t["lines"]
 	if lines.is_empty():
 		return

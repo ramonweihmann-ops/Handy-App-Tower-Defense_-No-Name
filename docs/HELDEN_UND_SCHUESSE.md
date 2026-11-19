@@ -130,3 +130,21 @@ ChatGPTs eigene Größen passen zu seiner Vorschau, nicht zu unserer Kamera.
   JSON, damit das Gesicht frei bleibt); bis zu drei weitere Gegner im Trefferkreis bekommen einen kleineren Kontakt,
   der Trefferkreis selbst wird nicht gezeichnet. Claudes Flammenzungen (`Fx3D.flame_burst`, 0.10.26) bleiben als
   Rückfall, falls die Bilder fehlen.
+
+## Kampfanzeige: Ladekreise, Mauerleiste, Hinweispunkte (19.11.2026)
+
+- **Ring unter jedem Champion** (`BattleHud._charge_ring`, wie im Mockup `Feld-*`): dunkle Spur; der Bogen lädt
+  sich in der Farbe des Champions mit der Superfähigkeit auf (`Hero.ult_charge`), voll golden und blinkend, dazu
+  „TIPPEN!“ über dem Kopf (liegt es auf dem Schild-Balken, rückt es knapp darüber). Ohne Superfähigkeit nur die Spur.
+  Der frühere große Leuchtring in der Szene ist aus (`Hero.SHOW_3D_ULT_RING`), er überdeckte die Nachbarn.
+- **Energiekern:** Ladering mit Prozent in einer Ebene vor den Knöpfen (`BattleHud.FrontLayer`), vorher verdeckte
+  ihn das Knopfbild. Voll: Leuchten und „TIPPEN!“ mitten im Kern (darüber läge es auf der Plasma-Anzeige).
+- **Mauerleiste:** gehört zum Anzeigebild, stand aber über der 3D-Szene und schnitt große Champions ab (Brockens Kopf).
+  Sie wird aus den Bildstreifen genommen und als Fläche in der Szene gezeichnet, genau an derselben Stelle, in der
+  Tiefe zwischen Mauer und Champions (`BattleHud._split_rail`, `_update_rail`). Geprüft mit allen zwölf Champions
+  auf sieben Planeten.
+- **Zahlen mit Einheit:** „/s“ bei Nachladen und „/ Vorrat“ beim Plasma rücken hinter die tatsächliche Zahlenbreite
+  (`MockView.shift_text`), zweistellige Werte liefen vorher hinein.
+- **Rote Punkte der Reiterleiste:** Regeln an einer Stelle (`MockScreen.nav_badges`), auf allen Seiten gleich, auch
+  auf der Hauptseite „Kampf“ (dort fehlten sie, weil die Leiste zum Hintergrundbild gehört).
+- Mockup: Brett „Kampf · Ladekreise“ neben den Schlachtfeldern zeigt die Zustände aus dem Spiel.

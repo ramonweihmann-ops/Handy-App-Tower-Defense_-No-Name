@@ -185,6 +185,17 @@ func ult_active() -> bool:
 	return _ult_t > 0.0
 
 
+## Ladestand der Superfähigkeit 0..1 für den Ring unter dem Champion (Mockup „Kampf“); 0 ohne Superfähigkeit,
+## 1 wenn bereit oder gerade aktiv
+func ult_charge() -> float:
+	var lvl := ult_level()
+	if lvl <= 0:
+		return 0.0
+	if _ult_t > 0.0:
+		return 1.0
+	return clampf(1.0 - _ult_cd / maxf(1.0, ULT_CD - 4.0 * (lvl - 1)), 0.0, 1.0)
+
+
 ## Superfähigkeit auslösen (Antippen des Helden). Gibt false zurück, wenn sie nicht bereit ist.
 func activate_ult() -> bool:
 	if not ult_ready() or battle == null or not battle.running:
@@ -293,7 +304,11 @@ func _update_ult(delta: float) -> void:
 	_ult_t = maxf(0.0, _ult_t - delta)
 	if _turret and _ult_t <= 0.0:
 		_show_turret(false)
-	if _ult_ring == null:
+	# Bereitschaft zeigt der Ladering der Kampfanzeige (BattleHud._charge_ring, wie im Mockup); der frühere
+	# Leuchtring in der Szene war größer als die Champions und überdeckte die Nachbarn
+	if _ult_ring == null or not SHOW_3D_ULT_RING:
+		if _ult_ring:
+			_ult_ring.visible = false
 		return
 	var ready := ult_ready()
 	_ult_ring.visible = ready or ult_active()
@@ -301,6 +316,9 @@ func _update_ult(delta: float) -> void:
 		var pulse := 1.0 + 0.12 * sin(_t * 6.0)
 		_ult_ring.scale = Vector3(pulse, 1.0, pulse) * (1.25 if ult_active() else 1.0)
 		_ult_mat.emission_energy_multiplier = 2.5 + (2.0 if ult_active() else sin(_t * 6.0))
+
+
+const SHOW_3D_ULT_RING := false
 
 
 func _build_ult_ring() -> void:

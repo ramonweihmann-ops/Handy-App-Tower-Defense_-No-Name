@@ -15,6 +15,10 @@ const MAX_FLOATERS := 40
 ## Farben der Helden für Magazin, Ring und Verbrauchs-Punkt (wie im Mockup: Dusty cyan, Iska lila)
 const HERO_COLORS := [Color(0.44, 0.88, 1.0), Color(0.75, 0.54, 1.0), Color(1.0, 0.71, 0.24), Color(0.49, 1.0, 0.54)]
 const TEMPO_RECT := Rect2(338, 12, 42, 36)
+## Mauerleiste mit den Pfosten (Seite y 551..584 im Mockup): steht als Fläche in der 3D-Szene zwischen Mauer und
+## Champions, damit große Champions (z. B. Brocken mit erhobenem Werfer) davor stehen und nicht abgeschnitten werden
+const RAIL_TOP := 551.0
+const RAIL_BOTTOM := 584.0
 
 var battle: Battle
 var plasma: PlasmaCore
@@ -31,6 +35,10 @@ var _t := 0.0
 var _layer: HudLayer
 ## Wo das 3D-Kampfbild in dieser Anzeige liegt (main.gd, gemaltes Schlachtfeld = Mockup-Rahmen)
 var world_frame := Rect2()
+var _rail: MeshInstance3D
+var _rail_key := ""
+var _rail_src := -1.0   # Lage der Leiste im Anzeigebild (Mockup-Punkte), −1 = keine
+var _front: FrontLayer
 ## Multiplayer: Rangliste der vier Kommandanten, Restzeit, Hinweis auf den Boss (Mockup „Multiplayer · Kampf“)
 var _mp := false
 var _mp_rows: Array = []
@@ -48,6 +56,11 @@ func _ready() -> void:
 	_layer = HudLayer.new()
 	_layer.hud = self
 	place_at(_layer, Rect2(0, 0, W, H))
+	# vor den Knöpfen: Ladering des Energiekerns (das Knopfbild würde ihn sonst verdecken)
+	_front = FrontLayer.new()
+	_front.hud = self
+	place_at(_front, Rect2(0, 0, W, H), true)
+	_split_rail()
 	button_pressed.connect(_on_button)
 	for b in buttons():
 		b.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -195,12 +208,88 @@ func _process(delta: float) -> void:
 		set_text("52", str(battle.ammo.total()))
 		set_text("/ 80", "/ %d" % battle.ammo.cap)
 		set_text("+4", _dec(plasma.rate_per_sec()))
+		# Nachsatz hinter die tatsächliche Zahlenbreite (sonst läuft „10,5“ in „/s“ und „122“ in „/ 154“)
+		_follow("/ 80", str(battle.ammo.total()), 18.0, 30, 700, 62.0, 6.0)
+		_follow("/s", _dec(plasma.rate_per_sec()), 317.0, 22, 700, 344.0, 3.0)
 		var use := 0.0
 		for h in battle.heroes:
 			use += _hero_use(h)
 		set_text("−5/s", "−%s/s" % _dec(use))
 	set_text("480", MockScreen.num(Save.gold()))
 	_layer.queue_redraw()
+	_front.queue_redraw()
+	_update_rail()
+
+
+## Mauerleiste aus den Bildstreifen der Anzeige herausnehmen (sie wird in der 3D-Szene gezeichnet)
+func _split_rail() -> void:
+	var rows: Array = []
+	for r in _bg_rows.rows:
+		var y0 := float(r[0])
+		var y1 := float(r[1])
+		var src := float(r[2]) if r.size() > 2 else y0
+		if y0 < RAIL_BOTTOM and y1 > RAIL_TOP:
+			if y0 < RAIL_TOP:
+				rows.append([y0, RAIL_TOP, src])
+			if y1 > RAIL_BOTTOM:
+				rows.append([RAIL_BOTTOM, y1, src + RAIL_BOTTOM - y0])
+			_rail_src = src + RAIL_TOP - y0
+		else:
+			rows.append(r)
+	_bg_rows.rows = rows
+	_bg_rows.queue_redraw()
+
+
+## Leiste als Fläche vor der Kamera, genau dort, wo sie im Mockup liegt, in der Tiefe zwischen Mauer und
+## Champions: die Champions verdecken die Leiste, nicht umgekehrt. Neu berechnet, wenn sich Kamera oder Größe ändern.
+func _update_rail() -> void:
+	if _rail_src < 0.0 or battle == null or battle.camera == null or _bg_rows.texture == null:
+		return
+	var cam := battle.camera
+	if not cam.is_inside_tree():
+		return
+	var vs := Vector2(cam.get_viewport().get_visible_rect().size)
+	var fr := world_frame if world_frame.size != Vector2.ZERO else Rect2(Vector2.ZERO, size)
+	var key := "%s|%s|%s|%s|%s|%s" % [cam.global_transform, cam.fov, vs, fr, s, off]
+	if key == _rail_key and is_instance_valid(_rail) and _rail.get_parent() == battle:
+		return
+	_rail_key = key
+	if not is_instance_valid(_rail) or _rail.get_parent() != battle:
+		_rail = MeshInstance3D.new()
+		_rail.name = "Mauerleiste"
+		_rail.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var m := StandardMaterial3D.new()
+		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		m.cull_mode = BaseMaterial3D.CULL_DISABLED
+		m.albedo_texture = _bg_rows.texture
+		m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR
+		_rail.material_override = m
+		battle.add_child(_rail)
+	var fwd := -cam.global_basis.z
+	var depth := (Vector3(0, 0.6, Battle.FENCE_Z + 1.2) - cam.global_position).dot(fwd)
+	var ts := _bg_rows.texture.get_size()
+	var k := ts.x / W
+	var v0 := _rail_src * k / ts.y
+	var v1 := (_rail_src + RAIL_BOTTOM - RAIL_TOP) * k / ts.y
+	var corners := [Vector2(0, RAIL_TOP), Vector2(W, RAIL_TOP), Vector2(W, RAIL_BOTTOM), Vector2(0, RAIL_BOTTOM)]
+	var uvs := [Vector2(0, v0), Vector2(1, v0), Vector2(1, v1), Vector2(0, v1)]
+	var pts: Array[Vector3] = []
+	for c in corners:
+		var px := ((c as Vector2) * s + off - fr.position) / fr.size * vs
+		pts.append(battle.to_local(cam.project_position(px, depth)))
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for i in [0, 1, 2, 0, 2, 3]:
+		st.set_uv(uvs[i])
+		st.add_vertex(pts[i])
+	_rail.mesh = st.commit()
+
+
+## Text „key“ (im Mockup bei x_key) hinter die Zahl schieben, die bei x_num mit Schriftgröße size beginnt
+func _follow(key: String, num_text: String, x_num: float, size: int, weight: int, x_key: float, gap: float) -> void:
+	var end := x_num + MockPaint.text_width(num_text, "Fredoka", weight, size) + gap
+	shift_text(key, maxf(0.0, end - x_key))
 
 
 ## Plasma pro Sekunde, das ein Held beim Dauerfeuern verbraucht
@@ -225,6 +314,19 @@ static func _dec(v: float) -> String:
 
 
 ## Zeichnet alles, was sich bewegt oder Werte zeigt
+## Vordere Ebene über den Knöpfen: Ladering des Energiekerns
+class FrontLayer:
+	extends Control
+	var hud: BattleHud
+
+	func _ready() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _draw() -> void:
+		if hud._layer:
+			hud._layer.draw_core_on(self)
+
+
 class HudLayer:
 	extends Control
 	var hud: BattleHud
@@ -296,7 +398,6 @@ class HudLayer:
 				sb.set_corner_radius_all(roundi(_s(3)))
 				draw_style_box(sb, Rect2(_p(pf.position), Vector2(w, _s(6))))
 		_draw_usage(b)
-		_draw_core()
 		_draw_boosters()
 		_draw_enemies(b)
 		_draw_heroes(b)
@@ -392,34 +493,42 @@ class HudLayer:
 			var txt := "−%s/s" % BattleHud._dec(BattleHud._hero_use(h))
 			draw_string(font, _p(c + Vector2(9.0, 4.5)), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("ffb53d"))
 
-	## Energiekern: Ladering, Prozent, Leuchten wenn voll
-	func _draw_core() -> void:
+	## Energiekern wie im Mockup: Ring auf der dunklen Spur, Prozent dunkel auf dem leuchtenden Kern, Leuchten und
+	## „TIPPEN!“, wenn voll (wird in der vorderen Ebene gezeichnet, sonst verdeckt ihn das Knopfbild)
+	func draw_core_on(ci: CanvasItem) -> void:
 		var pl := hud.plasma
 		if pl == null:
 			return
 		var r := hud.live_rect("core_ring")
+		if r.size == Vector2.ZERO:
+			return
 		var c := _p(r.get_center())
 		var ratio := pl.core_ratio()
-		var rad := _s(r.size.x * 0.5 - 2.5)
+		var rad := _s(r.size.x * 0.5)
 		if pl.core_ready():
 			var a := 0.35 + 0.25 * sin(hud._t * 6.0)
-			draw_circle(c, rad + _s(10), Color(0.44, 0.88, 1.0, a * 0.5))
-		draw_arc(c, rad, -PI * 0.5, -PI * 0.5 + TAU * ratio, 48, Color("6fe0ff"), _s(5), true)
+			ci.draw_circle(c, rad + _s(10), Color(0.44, 0.88, 1.0, a * 0.5))
+		if ratio > 0.005:
+			ci.draw_arc(c, rad, -PI * 0.5, -PI * 0.5 + TAU * ratio, 64, Color("6fe0ff"), _s(4.3), true)
 		var font := MockFonts.font("Fredoka", 700)
-		var fs := roundi(_s(10.3))
-		var txt := "%d%%" % roundi(ratio * 100.0)
-		var tw := font.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-		draw_string(font, c + Vector2(-tw * 0.5, _s(18)), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color.WHITE)
 		if pl.core_ready():
+			# „TIPPEN!“ mitten im Kern (darüber läge es auf der Plasma-Anzeige)
 			var t2 := "TIPPEN!"
-			var f2 := roundi(_s(11))
+			var f2 := roundi(_s(9.5))
 			var w2 := font.get_string_size(t2, HORIZONTAL_ALIGNMENT_LEFT, -1, f2).x
-			var pill := Rect2(c + Vector2(-w2 * 0.5 - _s(8), -rad - _s(26)), Vector2(w2 + _s(16), _s(17)))
+			var pill := Rect2(c + Vector2(-w2 * 0.5 - _s(4), -_s(7.5)), Vector2(w2 + _s(8), _s(15)))
 			var sb := StyleBoxFlat.new()
 			sb.bg_color = Color("ffd34d")
-			sb.set_corner_radius_all(roundi(_s(8)))
-			draw_style_box(sb, pill)
-			draw_string(font, pill.position + Vector2(_s(8), _s(13)), t2, HORIZONTAL_ALIGNMENT_LEFT, -1, f2, Color("5a2400"))
+			sb.set_corner_radius_all(roundi(_s(7)))
+			sb.shadow_color = Color(1.0, 0.84, 0.35, 0.8)
+			sb.shadow_size = roundi(_s(4))
+			ci.draw_style_box(sb, pill)
+			ci.draw_string(font, pill.position + Vector2(_s(4), _s(11)), t2, HORIZONTAL_ALIGNMENT_LEFT, -1, f2, Color("5a2400"))
+		else:
+			var fs := roundi(_s(10.3))
+			var txt := "%d%%" % roundi(ratio * 100.0)
+			var tw := font.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+			ci.draw_string(font, c + Vector2(-tw * 0.5, _s(3.9)), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("0a2a5a"))
 
 	## Booster: dunkler Kreisausschnitt, solange sie laden
 	func _draw_boosters() -> void:
@@ -488,10 +597,8 @@ class HudLayer:
 				continue
 			var col: Color = HERO_COLORS[i % HERO_COLORS.size()]
 			var feet := _screen(cam, h.global_position)
-			# Ring unter den Füßen
-			draw_set_transform(feet + Vector2(0, -_s(2)), 0.0, Vector2(1.0, 0.32))
-			draw_arc(Vector2.ZERO, _s(28), 0.0, TAU, 40, Color(col, 0.85), _s(3) / 0.32 * 0.5, true)
-			draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+			# Ring unter den Füßen: lädt sich mit der Superfähigkeit auf (Heldenfarbe), voll golden und blinkend
+			_charge_ring(feet + Vector2(0, -_s(2)), h, col)
 			# Stufe (Abzeichen aus dem Mockup) links unten am Helden
 			var badge := _tex("badge")
 			var bc := feet + _p(Vector2(-22, 10))
@@ -536,11 +643,43 @@ class HudLayer:
 				if tp:
 					var ir2: Array = hud._live_info["tippen"]["img_rect"]
 					var ts := _p(Vector2(ir2[2], ir2[3]))
+					# nicht auf den Schild-Balken legen: dann knapp darüber (nur Brücke dahinter)
+					var shield := _p(Vector2(8, 532))   # Schild-Balken im Mockup: links 8, oben 532, 132 × 16
+					var sr := Rect2(shield, _p(Vector2(132, 16))).grow(_s(2))
+					var pr := Rect2(head - Vector2(ts.x * 0.5, ts.y) + Vector2(0, -_s(4)), ts + Vector2(0, _s(8)))
+					if pr.intersects(sr):
+						head.y = sr.position.y - _s(4)
 					draw_texture_rect(tp, Rect2(head - Vector2(ts.x * 0.5, ts.y) + Vector2(0, bob), ts), false)
 				var t3 := "TIPPEN!"
 				var f3 := roundi(_s(12))
 				var w3 := font.get_string_size(t3, HORIZONTAL_ALIGNMENT_LEFT, -1, f3).x
 				draw_string(font, head + Vector2(-w3 * 0.5, -_s(7) + bob), t3, HORIZONTAL_ALIGNMENT_LEFT, -1, f3, Color("5a2400"))
+
+	## Ladering der Superfähigkeit wie im Mockup (Ellipse 28 × 11 Punkte): dunkle Spur, Bogen ab rechts im
+	## Uhrzeigersinn; ohne Superfähigkeit nur die Spur
+	func _charge_ring(c: Vector2, h: Hero, col: Color) -> void:
+		var rx := _s(28)
+		var ry := _s(11)
+		var n := 48
+		var full := PackedVector2Array()
+		for k in n + 1:
+			var a := TAU * k / n
+			full.append(c + Vector2(cos(a) * rx, sin(a) * ry))
+		draw_colored_polygon(full, Color(0, 0, 0, 0.35))
+		draw_polyline(full, Color(1, 1, 1, 0.25), _s(3), true)
+		var charge := h.ult_charge()
+		if charge <= 0.0:
+			return
+		var ready := h.ult_ready() or h.ult_active()
+		var arc_col := Color("ffe27a") if ready else col
+		if h.ult_ready():
+			arc_col.a = 0.7 + 0.3 * cos(hud._t * TAU / 0.7)   # blinkt wie im Mockup (1 → 0,4 → 1 in 0,7 s)
+		var m := maxi(2, roundi(n * charge))
+		var arc := PackedVector2Array()
+		for k in m + 1:
+			var a := TAU * charge * k / m
+			arc.append(c + Vector2(cos(a) * rx, sin(a) * ry))
+		draw_polyline(arc, arc_col, _s(3.5), true)
 
 	## Schadenszahlen: weiß mit dunklem Rand, Krit groß in Gold
 	func _draw_floaters(b: Battle) -> void:
