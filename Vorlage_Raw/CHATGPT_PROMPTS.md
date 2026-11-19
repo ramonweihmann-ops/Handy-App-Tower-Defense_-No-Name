@@ -1029,3 +1029,49 @@ LIESMICH_CLAUDE.md, UEBERSICHT.png, Vorschau-GIFs für Eiswelt und Raumdock.
 
 Nur die eingebaute Bildgenerierung und Bildbearbeitung im bestehenden Konto verwenden, keine kostenpflichtigen Dienste.
 ~~~~
+
+## Prompt L1: Neues App-Logo auf Basis des Ladebildschirms
+
+**Kosten:** keine · **Abschicken:** 19.11.2026 · Wunsch des Nutzers: das bisherige Logo (`game/icon.svg`, einfacher
+Kreis mit Punkten) passt nicht; das neue soll die Grafik des Spiels zeigen, Vorbild ist der neue Ladebildschirm.
+
+~~~~text
+Ich brauche ein neues App-Logo (App-Symbol für den Startbildschirm des Handys) für unser Spiel „Station am Wurmloch“.
+Das bisherige Logo ist nur ein abstrakter Kreis mit drei Punkten und zeigt nichts von unserer Grafik. Grundlage ist
+der neue Ladebildschirm. Repository Handy-App-Tower-Defense_-No-Name, Branch claude/amazing-hypatia-yl59v4.
+
+VORLAGEN
+- Ladebildschirm: game/ui/start/ladebildschirm_comic.webp (violettes Wurmloch, pinkes Monster, die Champions vorn,
+  Schriftzug „Station am Wurmloch“) – Stil, Farben und Licht bitte genau so
+- Champions: game/ui/portraits/<id>.webp (dusty, iska, brocken, volta, kalle, margot, lynx, fritzi, fuenkchen, pip,
+  rollo, nova), Dusty Jo (Cowboyhut, rotes Halstuch) ist das Gesicht des Spiels
+- bisheriges Logo zum Vergleich: game/icon.svg
+
+WAS DAS LOGO ZEIGEN SOLL
+- Eine klare, einfache Szene aus dem Ladebildschirm, die auch winzig auf dem Handy (48 px) sofort lesbar ist:
+  großes, leuchtendes violettes Wurmloch als Hintergrund, davor ein Champion groß und freundlich im Comic-Stil
+- Bitte DREI Varianten zur Auswahl:
+  A) Dusty Jo (Kopf und Schultern, Hut, Halstuch) vor dem Wurmloch
+  B) das pinke Monster, das aus dem Wurmloch herausschaut, Dusty Jo vorn klein angeschnitten
+  C) drei Champions (Dusty Jo, Brocken, Iska) als Gruppe vor dem Wurmloch
+- KEIN Text und keine Buchstaben im Logo (auf dem Handy unlesbar); keine dünnen Linien, keine kleinen Details am Rand
+- kräftige Kontraste, damit es auf hellem und dunklem Hintergrundbild auffällt
+
+FORMATE JE VARIANTE (Android, Godot-Export)
+- <variante>_1024.png: 1024 × 1024, quadratisch, randlos bis an die Kanten gemalt, OHNE abgerundete Ecken (das Handy
+  schneidet selbst rund oder eckig zu), keine Transparenz
+- <variante>_vordergrund_432.png: 432 × 432 mit Transparenz, nur das Motiv (Champion/Monster), alles Wichtige
+  innerhalb des mittleren Kreises mit 288 px Durchmesser (Android schneidet den Rand je nach Handy ab)
+- <variante>_hintergrund_432.png: 432 × 432 ohne Transparenz, nur das Wurmloch mit Sternenhimmel
+- <variante>_192.png: 192 × 192, aus dem 1024er verkleinert
+
+PRÜFEN VOR DER LIEFERUNG
+- Vorschau jeder Variante auf einem Handy-Startbildschirm in 48, 72 und 96 px, mit runder und mit eckig-abgerundeter
+  Maske, je einmal auf hellem und dunklem Hintergrundbild, daneben das bisherige Logo zum Vergleich
+- die Variante muss auch in 48 px als „Comic-Held vor violettem Wurmloch“ erkennbar sein
+
+LIEFERN in Vorlage_Raw/App_Logo_v1/: je Variante die vier Dateien (A_, B_, C_), UEBERSICHT.png mit allen Vorschauen,
+LIESMICH_CLAUDE.md mit kurzer Beschreibung je Variante.
+
+Nur die eingebaute Bildgenerierung und Bildbearbeitung im bestehenden Konto verwenden, keine kostenpflichtigen Dienste.
+~~~~
