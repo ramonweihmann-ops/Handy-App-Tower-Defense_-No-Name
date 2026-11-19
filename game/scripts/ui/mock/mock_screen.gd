@@ -13,7 +13,8 @@ const TAB_OF := {"#shop": "shop", "#helden": "sammlung", "#kampf": "kampf", "#up
 const NAV_TOP := 750.0
 const NAV_HITS := {"#shop": Rect2(14, 778, 60, 66), "#helden": Rect2(87, 778, 60, 66), "#kampf": Rect2(163, 758, 64, 68),
 	"#upgrades": Rect2(243, 778, 62, 66), "#basis": Rect2(320, 778, 60, 66)}
-const NAV_BADGES := {"#shop": Vector2(61, 785), "#helden": Vector2(134, 785), "#upgrades": Vector2(289, 785), "#basis": Vector2(367, 785)}
+const NAV_BADGES := {"#shop": Vector2(61, 785), "#helden": Vector2(134, 785), "#kampf": Vector2(216, 768),
+	"#upgrades": Vector2(289, 785), "#basis": Vector2(367, 785)}
 
 var menu: MainMenu
 var _nav_bar: NavBar
@@ -102,19 +103,42 @@ func refresh_top() -> void:
 		set_text(top_texts["stars"], num(Save.stars()))
 	if top_texts.has("level"):
 		set_text(top_texts["level"], str(Save.max_level()))
-	var want := {
-		"#shop": Save.shop_free_ready(),
-		"#helden": Save.any_hero_ready(),
-		"#upgrades": Save.can_buy_tech() or Save.any_ammo_upgrade() or Save.any_booster_upgrade() or Save.can_draw_talent(),
-		"#basis": Save.any_building_ready(),
-	}
+	var want := nav_badges()
 	for b in buttons():
 		var href := str(b.info.get("href", ""))
-		if want.has(href) and b.badge_rect.size != Vector2.ZERO:
+		if not want.has(href):
+			continue
+		# Reiterleiste unten, die zum Bild gehört (Kampf-Bildschirm): Punkt an derselben Stelle wie in der
+		# einheitlichen Leiste, auch wenn das Mockup dort keinen Punkt vorsieht
+		if b.badge_rect.size == Vector2.ZERO and float((b.info["rect"] as Array)[1]) > 700.0 and NAV_BADGES.has(href):
+			b.badge_rect = Rect2(NAV_BADGES[href] - Vector2(6, 6), Vector2(12, 12))
+		if b.badge_rect.size != Vector2.ZERO:
 			b.badge = bool(want[href])
 	if _nav_bar:
 		_nav_bar.badges = want
 		_nav_bar.queue_redraw()
+
+
+## Rote Punkte an den Reitern unten, auf jedem Bildschirm gleich: Dort wartet etwas (abholen, aufwerten, ziehen)
+static func nav_badges() -> Dictionary:
+	return {
+		"#shop": Save.shop_free_ready(),
+		"#helden": Save.any_hero_ready(),
+		"#kampf": not Save.pass_claimable().is_empty() or mission_ready() or Save.daily_ready("daily_date") \
+			or Save.daily_ready("wheel_date"),
+		"#upgrades": Save.can_buy_tech() or Save.any_ammo_upgrade() or Save.any_booster_upgrade() or Save.can_draw_talent(),
+		"#basis": Save.any_building_ready(),
+	}
+
+
+## Eine Tagesmission ist erfüllt und noch nicht abgeholt
+static func mission_ready() -> bool:
+	var m := Save.missions()
+	for id in m["ids"]:
+		var d := Save.mission_def(id)
+		if not m["claimed"].has(id) and int(m["progress"].get(id, 0)) >= int(d["goal"]):
+			return true
+	return false
 
 
 ## Zahl mit Tausenderpunkt wie im Mockup („4.573“)

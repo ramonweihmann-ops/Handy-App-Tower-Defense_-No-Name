@@ -263,13 +263,10 @@ func _refresh_top() -> void:
 
 ## Rote Punkte an den Reitern unten: Dort wartet etwas (aufwerten, abholen, ziehen).
 func _update_badges() -> void:
-	var want := {
-		"shop": Save.shop_free_ready(),
-		"sammlung": Save.any_hero_ready(),
-		"kampf": not Save.pass_claimable().is_empty() or _mission_ready() or Save.daily_ready("daily_date") or Save.daily_ready("wheel_date"),
-		"upgrades": Save.can_buy_tech() or Save.any_ammo_upgrade() or Save.any_booster_upgrade() or Save.can_draw_talent(),
-		"basis": Save.any_building_ready(),
-	}
+	var nb := MockScreen.nav_badges()
+	var want := {}
+	for href in nb:
+		want[MockScreen.TAB_OF[href]] = nb[href]
 	for id in _nav_icons.keys():
 		var ic: Icon = _nav_icons[id]
 		ic.badge = bool(want.get(id, false))
