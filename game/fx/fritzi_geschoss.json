@@ -1,1 +1,1 @@
-{"frames": 16, "cols": 4, "rows": 4, "fps": 24, "loop": true, "anker": [0.5, 0.75], "groesse_m": 2.2, "frame_px": 256}
+{"frames": 8, "cols": 4, "rows": 2, "fps": 24, "loop": false, "groesse_m": 2.0, "feste_hoehe_m": 2.2, "darstellung": "bogen", "anker": [0.5, 0.5], "frame_px": 256, "v2": true, "laenge_faktor": 1.1851851851851851}

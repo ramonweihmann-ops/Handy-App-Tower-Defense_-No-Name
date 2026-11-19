@@ -1,1 +1,1 @@
-{"frames": 16, "cols": 4, "rows": 4, "fps": 24, "loop": true, "anker": [0.5, 0.5], "groesse_m": 1.1, "frame_px": 128}
+{"frames": 12, "cols": 4, "rows": 3, "fps": 24, "loop": false, "groesse_m": 1.8, "anker": [0.5, 0.5], "frame_px": 256, "v2": true, "gerichtet": true, "kontakt": 1.7, "kontakt_neben": 0.8, "laenge_anteil": 0.5, "tempo": 1.0}

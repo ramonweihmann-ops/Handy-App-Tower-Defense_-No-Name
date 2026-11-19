@@ -123,7 +123,10 @@ ChatGPTs eigene Größen passen zu seiner Vorschau, nicht zu unserer Kamera.
   11 m/s, flache Bahn statt rundem Bogen (`Projectile._rocket_lift`: kurz steigen, fast gerade, zum Ziel absenken,
   höchstens gut 1 m). Die gemalte Rakete wurde verworfen: ein flaches Bild verkürzt sich nicht in die Tiefe und
   wirkte im Flug wie ein langer Stab.
-- **Fritzis Flammen:** enge Fassung aus weichen Flammenzungen (`Fx3D.flame_burst`, `FLAMMEN_ZUNGEN`,
-  `shaders/flammenzunge.gdshader`): schmaler Strahl, der am Ziel verglüht, Flammenkranz eng um den Trefferkreis,
-  die Gegner bleiben sichtbar. ChatGPTs gemalter Flammenstrahl (Auftrag S5, `Vorlage_Raw/Schusseffekte_fritzi_v1/`)
-  ist vorbereitet (`Battle._flame_painted`) und wird nach seiner Fertigstellung im Spiel verglichen.
+- **Fritzis Flammen (seit 0.10.27):** ChatGPTs gemalte Fassung v4 (`Vorlage_Raw/Schusseffekte_fritzi_v4/`, Auftrag S5),
+  vom Nutzer nach dem Vergleich im Team (Dusty Jo, Fritzi, Kalle) gewählt: schmaler Flammenstrahl von der Düse bis an
+  den zugewandten Körperrand unten vorn (`Battle._flame_contact`), dort ein kleiner Flammenkontakt, der in
+  Schussrichtung dreht, mit dem Gegner mitwandert und je Gegner skaliert wird (`kontakt`, `laenge_anteil` in der
+  JSON, damit das Gesicht frei bleibt); bis zu drei weitere Gegner im Trefferkreis bekommen einen kleineren Kontakt,
+  der Trefferkreis selbst wird nicht gezeichnet. Claudes Flammenzungen (`Fx3D.flame_burst`, 0.10.26) bleiben als
+  Rückfall, falls die Bilder fehlen.
