@@ -11,6 +11,7 @@ Bitte nacheinander abschicken, jeweils erst den nächsten, wenn der vorige gelie
 | 4 | Kartenmotive für die sieben Symbiosen (Meister-Abzeichen als M1) | `CHATGPT_PROMPTS.md`, Prompt 4 | keine | bereit zum Abschicken (beide Mockups freigegeben, Symbiose im Spiel seit 0.10.37) |
 | 4b | Fähigkeiten der Champions (19) und fehlende Kartenlogos (4) im neuen Stil | `TALENTE_LOGOS_FUER_CHATGPT.md` | keine | bestätigt am 16.11.2026, kann raus |
 | 5 | 3D-Modelle der Gegner für die Planeten 08–15 (Level 71–150), Planet für Planet | `Monster_Roh/PLANETEN_08_15_MESHY_FUER_CHATGPT.md` | je Planet etwa 60 Meshy-Credits, zusammen etwa 480 | eigene Freigabe je Planet |
+| 6 | Mauern je Planet (bisher überall dieselbe graue Leiste), Teil 1: Planeten 01–05, danach 06–10 und 11–15 + Arenen | `MAUERN_FUER_CHATGPT.md` | keine | Teil 1 bereit zum Abschicken (Wunsch 20.11.2026) |
 
 | H1 | Champion-Vorlagen (vorn, links, hinten) für elf Champions | `HELDEN_VORLAGEN_MESHY_FUER_CHATGPT.md` Teil A | keine | **geliefert und geprüft 16.11.2026** |
 | H2 | Meshy-Modelle Fünkchen, Pip, Rollo, Nova | dieselbe Datei, Teil B | etwa 120 Credits, **freigegeben 16.11.2026** | **geliefert und geprüft 16.11.2026**, als 0.10.9 zur Prüfung im Spiel |
