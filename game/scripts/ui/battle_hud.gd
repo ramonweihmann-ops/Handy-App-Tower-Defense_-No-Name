@@ -38,6 +38,19 @@ var world_frame := Rect2()
 var _rail: MeshInstance3D
 var _rail_key := ""
 var _rail_src := -1.0   # Lage der Leiste im Anzeigebild (Mockup-Punkte), −1 = keine
+## Eigene Mauer je Schlachtfeld (gerendert, 780 × 260 = Ausschnitt y 940..1200 des Schlachtfelds): ersetzt die Leiste
+## aus dem Anzeigebild. Labor: --mauer=/pfad/bild.png zeigt ein Bild von außerhalb auf jedem Feld.
+const WALL_TOP := 470.0
+const WALL_BOTTOM := 600.0
+## Mit eigener Mauer: Anzeigebild ab hier bis zur Leiste weglassen, Rahmen des Schildbalkens einzeln zeichnen
+const WALL_CUT_TOP := 522.0
+const SHIELD_FRAME := Rect2(7, 531, 136, 19)
+static var wall_test := ""
+var _wall_tex: Texture2D
+var _wall_field := "-"
+var _rows_rail: Array = []
+var _rows_wall: Array = []
+var _shield_src := -1.0
 var _front: FrontLayer
 ## Multiplayer: Rangliste der vier Kommandanten, Restzeit, Hinweis auf den Boss (Mockup „Multiplayer · Kampf“)
 var _mp := false
@@ -221,23 +234,34 @@ func _process(delta: float) -> void:
 	_update_rail()
 
 
-## Mauerleiste aus den Bildstreifen der Anzeige herausnehmen (sie wird in der 3D-Szene gezeichnet)
+## Mauerleiste aus den Bildstreifen der Anzeige herausnehmen (sie wird in der 3D-Szene gezeichnet). Für Felder mit
+## eigener Mauer zusätzlich den Lichtschleier darüber (522..551): der Schildbalken wird dann einzeln gezeichnet.
 func _split_rail() -> void:
-	var rows: Array = []
+	_rows_rail = _cut_rows(_bg_rows.rows, RAIL_TOP, true)
+	_rows_wall = _cut_rows(_bg_rows.rows, WALL_CUT_TOP, false)
 	for r in _bg_rows.rows:
+		if float(r[0]) <= SHIELD_FRAME.position.y and float(r[1]) > SHIELD_FRAME.position.y:
+			_shield_src = (float(r[2]) if r.size() > 2 else float(r[0])) + SHIELD_FRAME.position.y - float(r[0])
+	_bg_rows.rows = _rows_rail
+	_bg_rows.queue_redraw()
+
+
+func _cut_rows(src_rows: Array, top: float, remember: bool) -> Array:
+	var rows: Array = []
+	for r in src_rows:
 		var y0 := float(r[0])
 		var y1 := float(r[1])
 		var src := float(r[2]) if r.size() > 2 else y0
-		if y0 < RAIL_BOTTOM and y1 > RAIL_TOP:
-			if y0 < RAIL_TOP:
-				rows.append([y0, RAIL_TOP, src])
+		if y0 < RAIL_BOTTOM and y1 > top:
+			if y0 < top:
+				rows.append([y0, top, src])
 			if y1 > RAIL_BOTTOM:
 				rows.append([RAIL_BOTTOM, y1, src + RAIL_BOTTOM - y0])
-			_rail_src = src + RAIL_TOP - y0
+			if remember:
+				_rail_src = src + RAIL_TOP - y0
 		else:
 			rows.append(r)
-	_bg_rows.rows = rows
-	_bg_rows.queue_redraw()
+	return rows
 
 
 ## Leiste als Fläche vor der Kamera, genau dort, wo sie im Mockup liegt, in der Tiefe zwischen Mauer und
@@ -250,7 +274,7 @@ func _update_rail() -> void:
 		return
 	var vs := Vector2(cam.get_viewport().get_visible_rect().size)
 	var fr := world_frame if world_frame.size != Vector2.ZERO else Rect2(Vector2.ZERO, size)
-	var key := "%s|%s|%s|%s|%s|%s" % [cam.global_transform, cam.fov, vs, fr, s, off]
+	var key := "%s|%s|%s|%s|%s|%s|%s" % [cam.global_transform, cam.fov, vs, fr, s, off, battle.field]
 	if key == _rail_key and is_instance_valid(_rail) and _rail.get_parent() == battle:
 		return
 	_rail_key = key
@@ -268,12 +292,22 @@ func _update_rail() -> void:
 		battle.add_child(_rail)
 	var fwd := -cam.global_basis.z
 	var depth := (Vector3(0, 0.6, Battle.FENCE_Z + 1.2) - cam.global_position).dot(fwd)
-	var ts := _bg_rows.texture.get_size()
-	var k := ts.x / W
-	var v0 := _rail_src * k / ts.y
-	var v1 := (_rail_src + RAIL_BOTTOM - RAIL_TOP) * k / ts.y
-	var corners := [Vector2(0, RAIL_TOP), Vector2(W, RAIL_TOP), Vector2(W, RAIL_BOTTOM), Vector2(0, RAIL_BOTTOM)]
-	var uvs := [Vector2(0, v0), Vector2(1, v0), Vector2(1, v1), Vector2(0, v1)]
+	var wall := _field_wall()
+	var mat := _rail.material_override as StandardMaterial3D
+	var corners: Array
+	var uvs: Array
+	if wall:
+		mat.albedo_texture = wall
+		corners = [Vector2(0, WALL_TOP), Vector2(W, WALL_TOP), Vector2(W, WALL_BOTTOM), Vector2(0, WALL_BOTTOM)]
+		uvs = [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1)]
+	else:
+		mat.albedo_texture = _bg_rows.texture
+		var ts := _bg_rows.texture.get_size()
+		var k := ts.x / W
+		var v0 := _rail_src * k / ts.y
+		var v1 := (_rail_src + RAIL_BOTTOM - RAIL_TOP) * k / ts.y
+		corners = [Vector2(0, RAIL_TOP), Vector2(W, RAIL_TOP), Vector2(W, RAIL_BOTTOM), Vector2(0, RAIL_BOTTOM)]
+		uvs = [Vector2(0, v0), Vector2(1, v0), Vector2(1, v1), Vector2(0, v1)]
 	var pts: Array[Vector3] = []
 	for c in corners:
 		var px := ((c as Vector2) * s + off - fr.position) / fr.size * vs
@@ -284,6 +318,34 @@ func _update_rail() -> void:
 		st.set_uv(uvs[i])
 		st.add_vertex(pts[i])
 	_rail.mesh = st.commit()
+
+
+## Mauerbild des aktuellen Schlachtfelds (ui/mauern/<feld>.webp) oder null für die Leiste aus dem Anzeigebild
+func _field_wall() -> Texture2D:
+	var f := str(battle.field) if battle else ""
+	if f == _wall_field:
+		return _wall_tex
+	_wall_field = f
+	_wall_tex = null
+	if wall_test != "":
+		var img := Image.load_from_file(wall_test)
+		if img:
+			_wall_tex = ImageTexture.create_from_image(img)
+	elif f != "" and ResourceLoader.exists("res://ui/mauern/%s.webp" % f):
+		_wall_tex = load("res://ui/mauern/%s.webp" % f)
+	if not _rows_rail.is_empty():
+		_bg_rows.rows = _rows_wall if _wall_tex else _rows_rail
+		_bg_rows.queue_redraw()
+	return _wall_tex
+
+
+## Rahmen des Schildbalkens aus dem Anzeigebild (nur bei eigener Mauer, sonst ist er Teil der Bildstreifen)
+func draw_shield_frame(layer: Control) -> void:
+	if _wall_tex == null or _shield_src < 0.0 or _bg_rows.texture == null:
+		return
+	var k := _bg_rows.texture.get_width() / W
+	var src := Rect2(SHIELD_FRAME.position.x * k, _shield_src * k, SHIELD_FRAME.size.x * k, SHIELD_FRAME.size.y * k)
+	layer.draw_texture_rect_region(_bg_rows.texture, Rect2(SHIELD_FRAME.position * s, SHIELD_FRAME.size * s), src)
 
 
 ## Text „key“ (im Mockup bei x_key) hinter die Zahl schieben, die bei x_num mit Schriftgröße size beginnt
@@ -385,6 +447,7 @@ class HudLayer:
 			return
 		# Wellen-Fortschritt, Schild, Plasma
 		_bar("wave_fill", float(hud._wave) / maxf(1.0, hud._total), Color("ff9f1c"), Color("ffe27a"))
+		hud.draw_shield_frame(self)
 		var fr := b.fence_hp / maxf(1.0, b.fence_max)
 		var low := fr <= 0.35
 		_bar("shield_fill", fr, Color("ff5a5a") if low else Color("7dff8a"), Color(1.0, 0.35, 0.35, 0.8) if low else Color(0.49, 1.0, 0.54, 0.8))

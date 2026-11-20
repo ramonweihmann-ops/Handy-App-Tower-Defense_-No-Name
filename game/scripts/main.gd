@@ -311,6 +311,8 @@ func _parse_args() -> void:
 					GameData.SW_HP = float(part.substr(2))
 				elif part.begins_with("p"):
 					GameData.SW_PAUSE = float(part.substr(1))
+		elif arg.begins_with("--mauer="):
+			BattleHud.wall_test = arg.get_slice("=", 1)   # Labor: Mauerbild von außerhalb zeigen
 		elif arg == "--karten-alt":
 			CardRules.disable_all()   # Labor: Kartenregeln wie vor 0.10.31 (ohne Meisterfähigkeit)
 		elif arg == "--karten-neu" or arg.begins_with("--karten-neu="):
