@@ -1,0 +1,54 @@
+{
+  "funkenherz": {
+    "groesse": [
+      256,
+      256
+    ],
+    "modus": "RGBA",
+    "motivbereich": [
+      23,
+      22,
+      232,
+      234
+    ]
+  },
+  "werkzeugkiste": {
+    "groesse": [
+      256,
+      256
+    ],
+    "modus": "RGBA",
+    "motivbereich": [
+      26,
+      22,
+      230,
+      234
+    ]
+  },
+  "bollwerk": {
+    "groesse": [
+      256,
+      256
+    ],
+    "modus": "RGBA",
+    "motivbereich": [
+      37,
+      22,
+      218,
+      234
+    ]
+  },
+  "schwerefeld": {
+    "groesse": [
+      256,
+      256
+    ],
+    "modus": "RGBA",
+    "motivbereich": [
+      27,
+      22,
+      229,
+      234
+    ]
+  }
+}
