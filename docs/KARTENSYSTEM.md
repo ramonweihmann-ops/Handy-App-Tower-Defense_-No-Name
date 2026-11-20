@@ -4,9 +4,15 @@ Nach jeder geschafften Welle wählt man eine Karte. Vorschlag des Nutzers vom 14
 16.11.2026 (`game/scripts/battle/card_rules.gd`).
 
 - **Im Spiel:** Meisterfähigkeit (Regel 3) seit 0.10.31, Mockup „Karten-Meister“ freigegeben am 19.11.2026;
-  Platzgrenze (Regel 2) seit 0.10.35, freigegeben am 20.11.2026.
-- **Nur im Labor:** die anderen Teile mit `--karten-neu=held5,symbiose`; `--karten-alt` schaltet auch Meisterfähigkeit
-  und Platzgrenze aus (Vergleich wie vor 0.10.31).
+  Platzgrenze (Regel 2) seit 0.10.35, freigegeben am 20.11.2026; Symbiosen (Regel 4) seit 0.10.37, Mockup
+  „Karten-Symbiose“ freigegeben am 20.11.2026.
+- **Nur im Labor:** „Neue Champions erst ab Welle 5“ mit `--karten-neu=held5`; `--karten-alt` schaltet alle neuen
+  Regeln aus (Vergleich wie vor 0.10.31).
+- Symbiose-Karte wie im Mockup: Kärtchen mit beiden Spezialmotiven, Kurztitel (`CardRules.SYMBIOSE_SHORT`) und beiden
+  Namen in Mint; Detailfeld mit beiden Porträts, Plakette „∞ SYMBIOSE“ (Zeichen als Linie gezeichnet) und „EINMALIG“.
+  Liegt ein eigenes Motiv `game/ui/karten/sym_<id>.webp` vor (Prompt 4), ersetzt es das Motivpaar.
+- Kartentitel auf den Kärtchen werden erst verkleinert (bis 10,5), bevor etwas abgeschnitten wird; Rakete heißt dort
+  wie im Mockup „Explosion“.
 - Kartenwahl (`game/scripts/ui/card_pick.gd`) wie im Mockup: im Detailfeld „Stufe 2 → 3“ mit Plakette „★ MEISTER“,
   die Meister-Stufe grün mit goldenem Ring, darunter die Zusatzzeile in Gold (`CardRules.meister_line`, für die
   Spezialfähigkeit je Champion eigener Text in `CardRules.MEISTER_SPECIAL`). „Plätze 2/3“ zeichnet die Kartenwahl nur
@@ -20,6 +26,9 @@ Nach jeder geschafften Welle wählt man eine Karte. Vorschlag des Nutzers vom 14
 - Labor 20.11.2026 (Level 25/30/35/40, je 3 Seeds): „nur Meister“ und „Meister + Plätze“ gleich (durchschnitt 100 %,
   anfaenger 42 % Siege). Der automatische Spieler nimmt je Kampf nur 3 bis 5 verschiedene Waffenfähigkeiten über alle
   drei Champions, die Grenze greift bei ihm selten; Meisterfähigkeiten 0,1–0,2 je Kampf.
+- Labor 20.11.2026 (gleiche Level und Seeds) mit und ohne Symbiose: Siegquoten gleich (durchschnitt 100 %, anfaenger
+  42 %). Symbiosen kommen bei „durchschnitt“ in etwa jedem fünften Kampf vor (0,2 je Kampf), bei „anfaenger“ nicht:
+  dafür muss das passende Paar im Team sein.
 
 ## Regeln
 
@@ -91,7 +100,7 @@ Bosse 35–55 %, `scripts/balance-lab.py`). Der Wunsch „bis Level 30 entspannt
 ## Offen
 
 - Grundkurve: „bis Level 30 entspannt“ (Vorschlag an den Nutzer)
-- Mockup „Karten-Symbiose“ wartet auf Freigabe; danach Symbiosen ins Spiel und die sieben Motive (Prompt 4)
+- Sieben Symbiose-Motive von ChatGPT (Prompt 4)
 - „Neue Champions erst ab Welle 5“: noch nicht entschieden (Tutorial wählt nach Welle 1 einen Helden)
 
 ## Kampfkarten der Champions (freigegeben 17.11.2026)

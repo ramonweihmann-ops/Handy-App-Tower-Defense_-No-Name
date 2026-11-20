@@ -1028,6 +1028,7 @@ func _show_card_shot() -> void:
 		var pool: Array = _machine_cards() + [_card_repair()]
 		for h in battle.heroes:
 			pool.append_array(_hero_cards(h))
+		pool.append_array(_symbiosis_cards())
 		for id in GameData.HERO_IDS:
 			if not battle.has_hero(id):
 				pool.append(_card_add_hero(id))

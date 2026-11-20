@@ -20,10 +20,10 @@ static var SOLO_HP := 0.55
 static var DUO_HP := 0.8
 
 ## Im normalen Spiel an: Meisterfähigkeit seit 0.10.31 (Mockup „Karten-Meister“ freigegeben am 19.11.2026),
-## Platzgrenze seit 0.10.35 (freigegeben am 20.11.2026); --karten-alt schaltet alles aus (Vergleich im Labor),
-## --karten-neu schaltet Teile dazu
-const LIVE := ["meister", "plaetze"]
-static var on := {"meister": true, "plaetze": true}
+## Platzgrenze seit 0.10.35 (freigegeben am 20.11.2026), Symbiosen seit 0.10.37 (Mockup „Karten-Symbiose“ freigegeben
+## am 20.11.2026); --karten-alt schaltet alles aus (Vergleich im Labor), --karten-neu schaltet Teile dazu
+const LIVE := ["meister", "plaetze", "symbiose"]
+static var on := {"meister": true, "plaetze": true, "symbiose": true}
 
 
 static func has(part: String) -> bool:
@@ -80,7 +80,13 @@ static func meister_line(mod: String, family: String) -> String:
 	var m: Array = MEISTER[mod]
 	return "Meisterfähigkeit %s: %s" % [m[0], m[1]]
 
-## Symbiosen: zwei Waffenfamilien, beide Spezialfähigkeiten mindestens Stufe 1
+## Kurztitel auf dem Kärtchen (der volle Titel steht im Detailfeld), Mockup „Karten-Symbiose“
+const SYMBIOSE_SHORT := {
+	"kettenexplosion": "Kettenknall", "frostblitz": "Frostblitz", "brandschrot": "Brandschrot",
+	"schwerkraftbombe": "Sogbombe", "durchschlagsalve": "Doppelsalve", "reparaturwucht": "Flickwucht",
+	"sternenfeuer": "Sternenfeuer",
+}
+## Symbiosen: zwei Waffenfamilien im Team, mindestens einer der beiden hat seine Spezialfähigkeit (Entscheidung 16.11.2026)
 const SYMBIOSES := {
 	"kettenexplosion": {"a": "tesla", "b": "rocket", "title": "Explosiver Kettenblitz",
 		"desc": "Voltas Kettenblitz lässt jeden getroffenen Gegner mit Brockens Sprengkraft explodieren."},

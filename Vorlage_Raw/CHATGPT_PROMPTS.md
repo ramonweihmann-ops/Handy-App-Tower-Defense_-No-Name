@@ -266,23 +266,25 @@ ABLAGE in Vorlage_Raw/Monster_Roh/Modelltests_v6/:
   Dreiecke, keine weiteren Credits
 ~~~~
 
-## Prompt 4: Kartenmotive für sieben Symbiosen und das Meister-Abzeichen
+## Prompt 4: Kartenmotive für die sieben Symbiosen
 
-**Kosten:** keine Kosten · **Abschicken:** erst wenn du die Mockups „Karten-Meister“ und „Karten-Symbiose“ freigegeben hast
+**Kosten:** keine Kosten · **Abschicken:** jetzt; Mockup „Karten-Symbiose“ am 20.11.2026 freigegeben (das Meister-Abzeichen
+lief als Prompt M1). Bis zur Lieferung zeigt das Spiel auf der Symbiose-Karte die beiden Spezialmotive zusammen.
 
 ~~~~text
-Bitte für mein Handyspiel (Tower Defense, Comic-Stil) acht neue Kartenmotive erzeugen. Sie erscheinen auf den
-Karten, die man nach jeder Welle wählt: klein auf dem Kärtchen (70 × 70 Punkte) und groß im Detailfeld
-(104 × 104 Punkte).
+Bitte für mein Handyspiel (Tower Defense, Comic-Stil) sieben neue Kartenmotive erzeugen. Sie erscheinen auf den
+Symbiose-Karten, die man nach einer Welle wählen kann: klein auf dem Kärtchen (70 × 70 Punkte) und groß im
+Detailfeld (104 × 104 Punkte).
 
-STILVORLAGE: genau wie die 31 vorhandenen Motive im Repository Handy-App-Tower-Defense_-No-Name, Branch
+STILVORLAGE: genau wie die vorhandenen Motive im Repository Handy-App-Tower-Defense_-No-Name, Branch
 claude/amazing-hypatia-yl59v4, Ordner Vorlage_Raw/Kartenmotive_v2/ (zum Beispiel tesla_special.png,
-rocket_special.png, cryo_special.png; Fritzis Flammenmotiv liegt im Spiel unter game/ui/karten/flamer_special.webp). Kräftige Comic-Umrisse, satte Farben, leichte Glanzlichter, ein Gegenstand
-oder Effekt groß in der Mitte.
+rocket_special.png, cryo_special.png; Fritzis Flammenmotiv liegt im Spiel unter game/ui/karten/flamer_special.webp).
+Kräftige Comic-Umrisse, satte Farben, leichte Glanzlichter, ein Gegenstand oder Effekt groß in der Mitte.
 
-NEU: SYMBIOSEN. Zwei Champions verbinden ihre Spezialfähigkeiten zu einer neuen Wirkung. Jedes Symbiose-Motiv
-verschmilzt deshalb die beiden vorhandenen Motive zu **einem** neuen Effekt, gut erkennbar als Mischung aus beiden.
-Ein feiner mintgrüner Schimmer (#7cf2c2) um den Effekt kennzeichnet alle Symbiosen als Familie.
+SYMBIOSEN: Zwei Champions verbinden ihre Spezialfähigkeiten zu einer neuen Wirkung. Jedes Motiv verschmilzt deshalb
+die beiden vorhandenen Motive zu EINEM neuen Effekt, gut erkennbar als Mischung aus beiden. Ein feiner mintgrüner
+Schimmer (#7cf2c2) um den Effekt kennzeichnet alle Symbiosen als Familie. Bisher zeigt das Spiel einfach beide
+Spezialmotive nebeneinander; das neue Motiv ersetzt dieses Paar.
 
 FORMAT
 - je 512 × 512 Pixel, PNG mit durchsichtigem Hintergrund (RGBA), Motiv mittig, etwa 8 % Rand frei
@@ -292,8 +294,6 @@ FORMAT
 - jedes Motiv ein eigenes Bild, nicht aus einem Sammelbild ausschneiden
 
 DATEINAMEN UND INHALT (Dateiname genau so, das Spiel ordnet über den Namen zu)
-
-Symbiosen (Mischung aus den beiden genannten vorhandenen Motiven):
 - sym_kettenexplosion.png – Explosiver Kettenblitz (tesla_special + rocket_special): Zickzack-Blitz springt
   zwischen drei Kugeln, an jeder Kugel eine runde Comic-Explosion
 - sym_frostblitz.png – Frostblitz (tesla_special + cryo_special): hellblauer Blitz aus Eis, an den Spitzen
@@ -309,15 +309,11 @@ Symbiosen (Mischung aus den beiden genannten vorhandenen Motiven):
 - sym_sternenfeuer.png – Sternenfeuer (beam_special + flamer_special): leuchtender Sternenstrahl (lila und gold),
   der in Flammen übergeht
 
-Meisterfähigkeit (erscheint klein neben jeder Waffenfähigkeit, die Stufe 3 erreicht hat):
-- meister_abzeichen.png – goldenes Abzeichen: Stern in einem Lorbeerkranz mit kleiner Krone, glänzend,
-  sehr einfach und klar (wird auch mit 20 Punkten Breite gezeigt)
-
 ZUSÄTZLICH
-- uebersicht_70px.png: alle acht Motive verkleinert auf 70 Punkte nebeneinander, zur Kontrolle der Lesbarkeit
+- uebersicht_70px.png: alle sieben Motive verkleinert auf 70 Punkte nebeneinander, zur Kontrolle der Lesbarkeit
 
 BITTE LIEFERN in Vorlage_Raw/Kartenmotive_v3/ auf GitHub (Branch claude/amazing-hypatia-yl59v4):
-1. die acht PNG-Dateien
+1. die sieben PNG-Dateien
 2. uebersicht_70px.png
 3. LIESMICH_CLAUDE.md: je Datei Motiv und Größe
 4. BILDANWEISUNG.txt: die verwendeten Bildprompts

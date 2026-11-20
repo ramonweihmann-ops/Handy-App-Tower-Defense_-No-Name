@@ -18,7 +18,7 @@ const CATS := {
 	"super": ["SUPER", Color("ffab52"), "star"],
 	"champion": ["CHAMPION", Color("dfa0fc"), "crown"],
 	"schild": ["SCHILD", Color("8ff04d"), "shield"],
-	"symbiose": ["SYMBIOSE", Color("7cf2c2"), "spark"],
+	"symbiose": ["SYMBIOSE", Color("7cf2c2"), "infinity"],
 }
 const GOLD := Color("ffd367")
 const GREEN := Color("8ff04d")
@@ -52,6 +52,8 @@ const SHORT := {
 	"plasma:core": "Energiekern", "damage": "Mehr Schaden", "rate": "Feuerrate", "reload": "Nachladen",
 	"mag": "Magazin", "crit": "Kritisch",
 }
+## Kurztitel der Spezialfähigkeiten, wo der volle Titel zu lang fürs Kärtchen ist (Mockup „Karten-Symbiose“)
+const SPECIAL_SHORT := {"rocket": "Explosion"}
 ## Titel im Detailfeld, wo der Kartentitel nur ein Wert ist
 const LONG := {
 	"plasma:mag": "+2 Schuss für alle", "plasma:reload": "Schneller nachladen",
@@ -127,14 +129,27 @@ func face(c: Dictionary) -> Dictionary:
 			f["hero"] = hid
 			f["cat"] = "super" if mod == "ult" else "waffe"
 			f["image"] = _first([KARTEN_DIR + "%s_%s.webp" % [fam, mod], KARTEN_DIR + "held_%s.webp" % mod, IMAGES.get(mod, "")])
-			f["short"] = SHORT.get(mod, f["title"])
+			f["short"] = SHORT.get(mod, f["title"]) if mod != "special" else SPECIAL_SHORT.get(fam, f["title"])
 			if mod == "ult":
 				var ult: Array = Hero.ULTS[fam]
 				f["text"] = "%s Danach %s antippen." % [ult[1], first] if f["stars"] == 0 else "%s wird stärker, länger und schneller wieder bereit." % ult[0]
 		"station":
 			f["cat"] = "schild"
 		"symbiosis":
+			# Mockup „Karten-Symbiose“: beide Spezialmotive übereinander, Kurztitel, darunter die beiden Champions;
+			# liegt ein eigenes Motiv sym_<id>.webp vor (ChatGPT, Prompt 4), steht dieses allein
 			f["cat"] = "symbiose"
+			var sid := key.get_slice(":", 1)
+			f["short"] = str(CardRules.SYMBIOSE_SHORT.get(sid, f["title"]))
+			var pair: Array = c.get("heroes", [])
+			f["pair_heroes"] = pair
+			if pair.size() == 2:
+				var na := String(GameData.HEROES[pair[0]]["name"]).split(" ")[0] if pair[0] != "margot" else "Margot"
+				var nb := String(GameData.HEROES[pair[1]]["name"]).split(" ")[0] if pair[1] != "margot" else "Margot"
+				f["pair_names"] = "%s + %s" % [na, nb]
+				if f["image"] == "":
+					f["pair_images"] = [KARTEN_DIR + "%s_special.webp" % GameData.HEROES[pair[0]]["family"],
+						KARTEN_DIR + "%s_special.webp" % GameData.HEROES[pair[1]]["family"]]
 		_:
 			f["cat"] = "plasma"
 			f["short"] = SHORT.get(key, f["title"])
@@ -206,13 +221,29 @@ func _draw_tile(i: int) -> void:
 	# Motiv
 	var isz := 70.0 * minf(1.0, k)
 	var irect := Rect2(inner.get_center().x - isz * 0.5, inner.position.y + 26, isz, isz)
-	_image(f, irect, col)
+	if f.has("pair_images"):
+		_pair(f, Rect2(inner.position.x + 6 * k, inner.position.y + 26, 66 * k, 66 * k),
+			Rect2(inner.end.x - 6 * k - 48 * k, inner.position.y + 44, 48 * k, 48 * k), col)
+	else:
+		_image(f, irect, col)
 	# Kurztitel und Stufen
-	var ft := _font("Fredoka", 700, 13)
-	var title := _ellipsis(ft, str(f["short"]), inner.size.x - 8)
-	_text_center(ft, title, inner.get_center().x, inner.position.y + 97, 13, TEXT)
+	# Kurztitel: lange Namen erst etwas kleiner (bis 10,5), abgeschnitten wird nur, was dann noch nicht passt
+	var tsz := 13.0
+	var short := str(f["short"])
+	while tsz > 10.5 and _font("Fredoka", 700, tsz).get_string_size(short, HORIZONTAL_ALIGNMENT_LEFT, -1, _fs(tsz)).x / s > inner.size.x - 8:
+		tsz -= 0.5
+	var ft := _font("Fredoka", 700, tsz)
+	var title := _ellipsis(ft, short, inner.size.x - 8, tsz)
+	_text_center(ft, title, inner.get_center().x, inner.position.y + 97 + (13.0 - tsz) * 0.5, tsz, TEXT)
 	if f["new"]:
 		_text_center(_font("Nunito", 800, 9, 0.04), "NEU IM TEAM", inner.get_center().x, inner.position.y + 114, 9, GREEN)
+	elif f.has("pair_names"):
+		# beide Namen ganz zeigen: lieber etwas kleiner als abgeschnitten
+		var pn := str(f["pair_names"]).to_upper()
+		var psz := 9.0
+		while psz > 7.0 and _font("Nunito", 800, psz, 0.04).get_string_size(pn, HORIZONTAL_ALIGNMENT_LEFT, -1, _fs(psz)).x / s > inner.size.x - 4:
+			psz -= 0.5
+		_text_center(_font("Nunito", 800, psz, 0.04), pn, inner.get_center().x, inner.position.y + 114 + (9.0 - psz) * 0.5, psz, col)
 	else:
 		_dots(f, Vector2(inner.get_center().x, inner.position.y + 116 + 4.5), true)
 	if f["hero"] != "":
@@ -231,7 +262,15 @@ func _draw_panel(c: Dictionary) -> void:
 	# Motiv im Kästchen mit Leuchten
 	var box := Rect2(o + Vector2(12, 14), Vector2(104, 104))
 	_fill_round(box, 16, _rgrad(Color(col, 0.33), Color(col, 0.063)))
-	_image(f, Rect2(box.get_center() - Vector2(49, 49), Vector2(98, 98)), col)
+	if f.has("pair_images"):
+		_pair(f, Rect2(box.position + Vector2(4, 10), Vector2(76, 76)), Rect2(box.end - Vector2(4 + 56, 6 + 56), Vector2(56, 56)), col)
+	else:
+		_image(f, Rect2(box.get_center() - Vector2(49, 49), Vector2(98, 98)), col)
+	var pair: Array = f.get("pair_heroes", [])
+	if pair.size() == 2:
+		# beide Champions oben rechts am Motiv (38 Punkte), der zweite ganz außen, der erste davor (Mockup)
+		_portrait(pair[1], Rect2(box.end.x + 6 - 38, box.position.y - 6, 38, 38), 2.5)
+		_portrait(pair[0], Rect2(box.end.x - 24 - 38, box.position.y - 6, 38, 38), 2.5)
 	var hero_name := ""
 	if f["hero"] != "":
 		hero_name = String(GameData.HEROES[f["hero"]]["name"])
@@ -245,18 +284,27 @@ func _draw_panel(c: Dictionary) -> void:
 	_label_with_symbol(cat[0], cat[2], pill.get_center(), 11, 0.04, INK, false)
 	if hero_name != "":
 		_text_left(_font("Nunito", 800, 12), hero_name, pill.end.x + 6, o.y + 14 + 0.5, 12, TEXT)
+	elif f.has("pair_names"):
+		_text_left(_font("Nunito", 800, 12), str(f["pair_names"]), pill.end.x + 6, o.y + 14 + 0.5, 12, TEXT)
 	elif f["new"]:
 		# Champion-Karte: Name des neuen Champions groß neben der Plakette
 		var champ_name := String(GameData.HEROES[f["champ"]]["name"])
 		_text_left(_font("Nunito", 800, 15), champ_name, pill.end.x + 6, o.y + 14 - 1.0, 15, TEXT)
 	# Titel einzeilig (wird bei langen Namen kleiner), darunter Stufen und bei Heldenkarten die Champion-Zeile
 	var tw := inner_w - 128 - 10
-	var size_pt := 21.0
+	var size_pt := 18.0 if f["cat"] == "symbiose" else 21.0
 	while size_pt > 15 and _font("Fredoka", 700, size_pt).get_string_size(str(f["title"]), HORIZONTAL_ALIGNMENT_LEFT, -1, _fs(size_pt)).x > tw * s:
 		size_pt -= 0.5
 	_text_left(_font("Fredoka", 700, size_pt), str(f["title"]), x, o.y + 36 + (21.0 - size_pt) * 0.5, size_pt, TEXT, 1.1)
 	var row_y := o.y + 64.0
-	if f["new"]:
+	if f["cat"] == "symbiose":
+		# einmalige Karte: Plakette „EINMALIG“ statt Stufen
+		var ef := _font("Nunito", 800, 11)
+		var ew := ef.get_string_size("EINMALIG", HORIZONTAL_ALIGNMENT_LEFT, -1, _fs(11)).x / s + 16
+		var er := Rect2(x, row_y, ew, 18)
+		_round_border(er, 8, 1.5, col)
+		_text_center(ef, "EINMALIG", er.get_center().x, row_y + 1.5, 11, col)
+	elif f["new"]:
 		# „NEU IM TEAM“ und die Stufe, mit der der Champion dazukommt
 		var nf := _font("Nunito", 800, 11)
 		var nx := x
@@ -329,6 +377,15 @@ func _image(f: Dictionary, r: Rect2, col: Color) -> void:
 	var k := minf(r.size.x / ts.x, r.size.y / ts.y)
 	var sz := ts * k
 	draw_texture_rect(t, _r(Rect2(r.get_center() - sz * 0.5, sz)), false)
+
+
+## Zwei Motive einer Symbiose: das erste groß links oben, das zweite kleiner rechts unten davor
+func _pair(f: Dictionary, a: Rect2, b: Rect2, col: Color) -> void:
+	var imgs: Array = f["pair_images"]
+	for i in 2:
+		var g := f.duplicate()
+		g["image"] = imgs[i] if ResourceLoader.exists(imgs[i]) else ""
+		_image(g, a if i == 0 else b, col)
 
 
 func _fallback_icon(f: Dictionary, r: Rect2, col: Color) -> void:
@@ -419,8 +476,8 @@ func _lines(font: Font, txt: String, width: float, size_pt: float) -> Array:
 	return out
 
 
-func _ellipsis(font: Font, txt: String, width: float) -> String:
-	var fs := _fs(13)
+func _ellipsis(font: Font, txt: String, width: float, size_pt := 13.0) -> String:
+	var fs := _fs(size_pt)
 	if font.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x <= width * s:
 		return txt
 	var t := txt
@@ -480,6 +537,15 @@ func _symbol(kind: String, c: Vector2, sz: float, col: Color) -> void:
 			pts = [[-0.46, 0.34], [-0.46, -0.28], [-0.22, 0.02], [0.0, -0.4], [0.22, 0.02], [0.46, -0.28], [0.46, 0.34]]
 		"shield":
 			pts = [[-0.4, -0.42], [0.4, -0.42], [0.4, 0.02], [0.0, 0.5], [-0.4, 0.02]]
+		"infinity":
+			# liegende Acht als Linie (Lemniskate)
+			var line := PackedVector2Array()
+			for k in 41:
+				var tt := TAU * k / 40.0
+				var den := 1.0 + sin(tt) * sin(tt)
+				line.append(_p(c + Vector2(0.5 * cos(tt) / den, 0.5 * sin(tt) * cos(tt) / den) * sz * 1.05))
+			draw_polyline(line, col, maxf(1.0, sz * 0.16 * s), true)
+			return
 	var poly := PackedVector2Array()
 	for p in pts:
 		poly.append(_p(c + Vector2(p[0], p[1]) * sz))
