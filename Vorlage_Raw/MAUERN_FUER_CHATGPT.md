@@ -1,5 +1,8 @@
 # Mauern je Planet – Auftrag für ChatGPT (Stand 20.11.2026)
 
+**Nicht mehr nötig (20.11.2026):** Die Mauern hat Claude in Blender gebaut, im Stil der gemalten Brücken
+(`tools/mauern/`, im Spiel seit 0.10.40). Der Auftrag bleibt nur zum Nachlesen.
+
 **Kosten: keine.** Nur die eingebaute Bildgenerierung im bestehenden Konto.
 
 Befund: Im Kampf liegt auf allen 15 Planeten und in beiden Arenen dieselbe schlichte graue Leiste mit Pfosten als

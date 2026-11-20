@@ -267,7 +267,9 @@ func _cut_rows(src_rows: Array, top: float, remember: bool) -> Array:
 ## Leiste als Fläche vor der Kamera, genau dort, wo sie im Mockup liegt, in der Tiefe zwischen Mauer und
 ## Champions: die Champions verdecken die Leiste, nicht umgekehrt. Neu berechnet, wenn sich Kamera oder Größe ändern.
 func _update_rail() -> void:
-	if _rail_src < 0.0 or battle == null or battle.camera == null or _bg_rows.texture == null:
+	if battle == null or battle.camera == null or _bg_rows.texture == null:
+		return
+	if _rail_src < 0.0 and _field_wall() == null:
 		return
 	var cam := battle.camera
 	if not cam.is_inside_tree():
