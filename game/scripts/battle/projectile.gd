@@ -126,6 +126,8 @@ static func _rocket_lift(s: float) -> float:
 
 
 func _process(delta: float) -> void:
+	if _t == 0.0:
+		Fx.over_wall(self)   # über der Mauer fliegen, nicht in sie hinein
 	_t += delta
 	if _smoke:
 		Fx3D.rocket_tick(self, _t)

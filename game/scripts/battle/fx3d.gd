@@ -145,6 +145,7 @@ static func lightning(battle: Node, points: Array[Vector3], col: Color) -> void:
 	var core := Fx.glow_mat(Color(1, 1, 1), 1.0)
 	for m in [halo, mid, core]:
 		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		m.render_priority = Fx.OVER_WALL   # über der Mauer
 	var draw := func() -> void:
 		for c in root.get_children():
 			c.queue_free()
@@ -275,6 +276,7 @@ static func _tongue_mesh(r: float, h: float) -> Mesh:
 		m.rings = 6
 		var sm := ShaderMaterial.new()
 		sm.shader = preload("res://shaders/flammenzunge.gdshader")
+		sm.render_priority = Fx.OVER_WALL   # Flammen über der Mauer
 		m.material = sm
 		return m)
 
@@ -342,6 +344,7 @@ static func _puff_mesh(r: float) -> Mesh:
 		pm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		pm.vertex_color_use_as_albedo = true
 		pm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		pm.render_priority = Fx.OVER_WALL   # Flammen über der Mauer
 		m.material = pm
 		return m)
 

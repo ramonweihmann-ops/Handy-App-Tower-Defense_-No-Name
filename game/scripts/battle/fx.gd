@@ -36,6 +36,46 @@ static func shared_mesh(key: String, make: Callable) -> Mesh:
 	return c[key]
 
 
+## Schüsse und Effekte über der Mauer zeichnen: Die Mauer ist eine durchsichtige Ebene zwischen Gegnern und Champions
+## (battle_hud.gd, Mauerleiste). Alles mit dieser Priorität wird danach gezeichnet und taucht nicht in sie ein.
+const OVER_WALL := 10
+static var _over := {}
+
+
+## Fassung eines Materials, die über der Mauer gezeichnet wird (durchsichtig gezeichnet, höhere Priorität; je Material einmal)
+static func over_wall_mat(m: Material) -> Material:
+	if m == null or m.render_priority >= OVER_WALL:
+		return m
+	var key := m.get_instance_id()
+	if not _over.has(key):
+		var c := m.duplicate() as Material
+		if c is BaseMaterial3D and (c as BaseMaterial3D).transparency == BaseMaterial3D.TRANSPARENCY_DISABLED:
+			(c as BaseMaterial3D).transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		c.render_priority = OVER_WALL
+		_over[key] = c
+	return _over[key]
+
+
+## Alle Teile eines Schusses (Kugel, Rakete, Flamme, Rauch, Leuchtspur) über der Mauer zeichnen
+static func over_wall(n: Node) -> void:
+	if n is MeshInstance3D:
+		var mi := n as MeshInstance3D
+		if mi.material_override:
+			mi.material_override = over_wall_mat(mi.material_override)
+		elif mi.mesh:
+			for i in mi.mesh.get_surface_count():
+				var sm := mi.get_surface_override_material(i)
+				if sm == null:
+					sm = mi.mesh.surface_get_material(i)
+				if sm:
+					mi.set_surface_override_material(i, over_wall_mat(sm))
+	elif n is GeometryInstance3D and (n as GeometryInstance3D).material_override:
+		var gi := n as GeometryInstance3D
+		gi.material_override = over_wall_mat(gi.material_override)
+	for c in n.get_children():
+		over_wall(c)
+
+
 static func shared_glow(color: Color, alpha := 1.0) -> StandardMaterial3D:
 	var c := _cache()
 	var key := "glow:%s:%.2f" % [color.to_html(), alpha]
@@ -177,6 +217,10 @@ static func lightning(parent: Node, points: Array[Vector3], color: Color) -> voi
 	parent.add_child(root)
 	var m := glow_mat(color, 1.0)
 	var core := glow_mat(Color(1, 1, 1), 1.0)
+	# Blitz über der Mauer (Fx.OVER_WALL)
+	m.render_priority = OVER_WALL
+	core.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	core.render_priority = OVER_WALL
 	for i in points.size() - 1:
 		var a: Vector3 = points[i]
 		var b: Vector3 = points[i + 1]

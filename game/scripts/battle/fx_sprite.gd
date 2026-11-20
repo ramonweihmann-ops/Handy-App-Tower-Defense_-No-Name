@@ -60,6 +60,7 @@ static func _material(name: String) -> ShaderMaterial:
 		var a: Array = d.get("anker", [0.5, 0.5])
 		m.set_shader_parameter("anchor", Vector2(float(a[0]), float(a[1])))
 		m.set_shader_parameter("inset", 0.5 / maxf(1.0, float(d.get("frame_px", 128))))
+		m.render_priority = Fx.OVER_WALL   # Schüsse, Einschläge und Mündungsfeuer liegen über der Mauer
 		_mats[name] = m
 	return _mats[name]
 
