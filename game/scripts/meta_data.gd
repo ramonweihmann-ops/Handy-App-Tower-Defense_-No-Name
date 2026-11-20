@@ -219,9 +219,11 @@ const EVENT_THEMES := [
 	{"id": "lavawoche", "title": "Lavawoche", "foes": "Starke Gegner", "tiers": ["stark"],
 		"desc": "Besiege starke Gegner, fülle die Leiste und hol dir die Event-Truhe!"},
 ]
-## Punkte je Stufe der Belohnungsleiste (zehn Stufen, die letzte ist die Event-Truhe)
-const EVENT_STEP := 100
-const EVENT_POINTS := {"win": 20, "foe": 1, "boss": 50, "mission": 30}
+## Punkte je Stufe der Belohnungsleiste (zehn Stufen, die letzte ist die Event-Truhe). Abgestimmt am 20.11.2026: Wer
+## jeden Tag etwa 5 Runden spielt, kommt auf rund 2.100 Punkte; für die Truhe (2.500) braucht es an manchen Tagen
+## auch 10 Runden. Thema-Gegner zählen höchstens „foe_cap“ je Level, damit die Welt nicht alles entscheidet.
+const EVENT_STEP := 250
+const EVENT_POINTS := {"win": 20, "foe": 1, "foe_cap": 20, "boss": 50, "mission": 30}
 const EVENT_REWARDS := [
 	{"type": "gold", "amount": 300}, {"type": "gems", "amount": 10}, {"type": "cards", "amount": 5},
 	{"type": "stars", "amount": 1}, {"type": "silver_chest"}, {"type": "gold", "amount": 600},

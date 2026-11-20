@@ -69,3 +69,15 @@ Blütenschnapper (mittel, neues `build_flieger.py`), Urwaldriese (Boss, `build_z
 `own_look` (keine Färbung, keine Vorsilbe der Welt). Borkenkäfer (stark): zweiter Meshy-Versuch mit Draufsicht
 beauftragt (`BORKENKAEFER_NEU_FUER_CHATGPT.md`, etwa 15 Credits, freigegeben); bis dahin eingefärbter Panzerkäfer
 bzw. Brecher. Nahaufnahmen eines Modells in Bewegung: `game/tests/model_frames.gd`.
+
+
+## Boss im Portal (Abenteuer-Pfad, seit 0.10.39)
+
+Das Portal auf dem Abenteuer-Pfad zeigt den Boss der gewählten Welt als rundes Porträt (Mockups „Boss je Welt“ und
+„Abenteuer-Pfad · Boss Welt 2/4“, freigegeben 20.11.2026). Bilder: `game/ui/bosse/welt_NN.webp`, erzeugt mit
+`tools/boss_portraits.py` (Färbung der Welt, eigene Bosse wie Urwaldriese und Tiefseekrake ungefärbt). Gezeichnet in
+`HomeScreen.PathLayer` über dem gemalten Portal. Kommt ein neuer Boss dazu, das Skript erneut laufen lassen.
+
+Später (Wunsch des Nutzers 20.11.2026): Welt 1–10 und die eingefärbten Planeten-Bosse haben nur zwei Grundmodelle
+(Schleimmutter, Koloss) mit anderer Farbe. Das wirkt zu schwach; eigene Bosse je Welt kommen später (Wege: Aufsätze
+in Blender ohne Kosten oder neue Modelle über ChatGPT-Vorlagen und Meshy-Credits).

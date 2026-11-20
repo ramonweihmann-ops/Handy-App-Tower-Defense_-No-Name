@@ -15,9 +15,9 @@ gibt. Mockup „Shop · Event“ (Shop-Event-Neu.dc.html), freigegeben am 20.11.
 | Zombienacht | Krabbler, Zombies, Brecher, Kolosse | Zombie-Koloss |
 | Lavawoche | starke Gegner (Panzerkäfer, Brecher, Krabbenpanzer …) | Lava-Koloss |
 
-- Event-Punkte (`MetaData.EVENT_POINTS`): gewonnenes Level +20, Thema-Gegner +1, Boss +50, Tagesmission abgeholt
-  +30. Nur im Abenteuer, nicht im Multiplayer und nicht in Tests.
-- Belohnungsleiste: zehn Stufen zu je 100 Punkten (`MetaData.EVENT_REWARDS`): 300 Gold, 10 Edelsteine, 5 Heldenkarten,
+- Event-Punkte (`MetaData.EVENT_POINTS`): gewonnenes Level +20, Thema-Gegner +1 (höchstens 20 je Level), Boss +50,
+  Tagesmission abgeholt +30. Nur im Abenteuer, nicht im Multiplayer und nicht in Tests.
+- Belohnungsleiste: zehn Stufen zu je 250 Punkten (`MetaData.EVENT_REWARDS`): 300 Gold, 10 Edelsteine, 5 Heldenkarten,
   1 Stern, Silbertruhe, 600 Gold, 20 Edelsteine, 10 Heldenkarten, 2 Sterne, Event-Truhe (Goldtruhe). Truhen geben
   Booster-Teile wie im Shop.
 - Erreichte Stufen holt man durch Antippen der Karte („Holen“). Roter Punkt am Reiter „Event“ und am Shop in der
@@ -31,4 +31,7 @@ gibt. Mockup „Shop · Event“ (Shop-Event-Neu.dc.html), freigegeben am 20.11.
   Restzeit, Punkte, Balken und die Karten zeichnet `tab_shop.gd` (`EventCard`, `EventBar`). Der Shop-Rahmen
   (`cfg/shop.json`) zeigt beim Reiter Event nur noch den Rahmen.
 - Prüfung: `--eventcheck` (in `scripts/test.sh`): Wochenwechsel, Themen, Zählung, Stufen, Abholen, Truhen.
-- Offen: Werte im Labor abstimmen (bei fünf Leveln am Tag sind 1.000 Punkte schon nach wenigen Tagen erreicht).
+- Abstimmung (Wunsch des Nutzers 20.11.2026: nicht einfach zu schaffen, mindestens 5 Runden jeden Tag, manchmal 10):
+  eine Runde bringt im Schnitt etwa 40 Punkte (Sieg 20, Thema-Gegner bis 20, alle fünf Level ein Boss), dazu bis 90
+  am Tag aus Missionen. 5 Runden täglich ergeben rund 2.100 Punkte in der Woche; für die Event-Truhe (2.500) braucht
+  es an etwa zwei Tagen 10 Runden. `--eventcheck` prüft diese Rechnung mit.

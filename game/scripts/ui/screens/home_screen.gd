@@ -7,6 +7,9 @@ extends MockScreen
 
 ## Boss-Marker im Mockup „1 · Abenteuer-Pfad (neu, Comic v4)“ (Mitte 200, 256)
 const BOSS_RECT := Rect2(168, 224, 64, 64)
+## Boss der gewählten Welt im Portal (Mockups „Abenteuer-Pfad · Boss Welt 2/4“, freigegeben 20.11.2026): rundes Porträt
+## über dem gemalten Portal, ui/bosse/welt_NN.webp (gerendert mit tests/boss_portrait.gd in der Färbung der Welt)
+const BOSS_PORTRAIT := Rect2(171.5, 229.5, 57, 57)
 
 var _path: PathLayer
 ## Zeile „Level X · 5 ⚡“ unter SPIELEN (Mockup: Energiekosten mit Energielogo direkt an der Zahl)
@@ -114,6 +117,14 @@ class PathLayer:
 		out.append(BOSS_RECT)
 		return out
 
+	## Porträt des Bosses einer Welt (0-basiert); fehlt es, bleibt das gemalte Portal
+	func _boss_tex(w: int) -> Texture2D:
+		var key := "boss_%d" % w
+		if not _cache.has(key):
+			var path := "res://ui/bosse/welt_%02d.webp" % (w + 1)
+			_cache[key] = load(path) if ResourceLoader.exists(path) else null
+		return _cache[key]
+
 	func _tex(id: String) -> Texture2D:
 		if not _cache.has(id):
 			var l: Dictionary = home._live_info.get(id, {})
@@ -143,6 +154,9 @@ class PathLayer:
 		var first := w * GameData.LEVELS_PER_WORLD + 1
 		var sel := home.menu.selected_level
 		var slots := _slot_rects()
+		var boss_img := _boss_tex(w)
+		if boss_img:
+			draw_texture_rect(boss_img, _r(BOSS_PORTRAIT), false)
 		_road(slots)
 		var cur_src := home.live_rect("node_cur")
 		for k in 4:

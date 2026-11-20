@@ -15,6 +15,6 @@
  ],
  "live": [
   {"sel": "div[aria-label^=\"Stufe \"]", "id": "stufe"},
-  {"sel": "div[style*=\"width: 85%\"]", "id": "balken"}
+  {"sel": "div[style*=\"width: 84%\"]", "id": "balken"}
  ]
 }

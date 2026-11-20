@@ -72,6 +72,8 @@ var _squad := ""
 ## Balance-Labor: Talente fest auf eine Stufe setzen (--talente=funkenherz:5,bollwerk:0 oder --talente=neu:5 für die vier
 ## Talente von Fünkchen, Pip, Rollo und Nova), nach dem Profil
 var _talent_override := ""
+## Wöchentliches Event: in diesem Kampf schon gezählte Thema-Gegner (höchstens EVENT_POINTS["foe_cap"])
+var _event_foes := 0
 var _pick_shot := ""
 var _card_shot := ""
 var _tut_shot := false   # --tut: Tutorial auch in Prüfbildern zeigen
@@ -875,6 +877,7 @@ func _start(n: int, hard_mode: bool, multi: bool, found: MpMatch = null) -> void
 	bonus = Save.battle_bonus()
 	ammo.reset(START_CAP + int(bonus["cap"]), START_AMMO + int(bonus["start_ammo"]))
 	_xp_carry = 0.0
+	_event_foes = 0
 	xp = 0
 	levelups = 0
 	xp_needed = GameData.xp_needed(0)
@@ -999,7 +1002,9 @@ func _on_enemy_killed(e: Enemy, gained: int) -> void:
 			Save.track("boss")
 		if not mp:
 			# Wöchentliches Event: Gegner des Wochenthemas +1, Boss +50 (Siege +20 bei der Belohnung)
-			if MetaData.event_counts(Save.event_theme(), e.kind, str(e.data.get("tier", "")), e.is_slowed()):
+			if MetaData.event_counts(Save.event_theme(), e.kind, str(e.data.get("tier", "")), e.is_slowed()) \
+					and _event_foes < int(MetaData.EVENT_POINTS["foe_cap"]):
+				_event_foes += 1
 				Save.event_add(int(MetaData.EVENT_POINTS["foe"]))
 			if e.is_boss():
 				Save.event_add(int(MetaData.EVENT_POINTS["boss"]))

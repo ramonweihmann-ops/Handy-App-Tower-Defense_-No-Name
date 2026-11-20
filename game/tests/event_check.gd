@@ -46,9 +46,9 @@ func _run() -> void:
 	Save.event_add(500)
 	_check(Save.event_points() == 0, "im Test werden Punkte gutgeschrieben")
 	Save.test_mode = false
-	Save.event_add(340)
+	Save.event_add(840)
 	Save.test_mode = true
-	_check(Save.event_points() == 340 and Save.event_stage() == 3, "340 Punkte ergeben nicht Stufe 3")
+	_check(Save.event_points() == 840 and Save.event_stage() == 3, "840 Punkte ergeben nicht Stufe 3")
 	_check(Save.event_state(2) == "ready" and Save.event_state(3) == "lock", "Zustände der Stufen falsch")
 	_check(Save.event_ready() == 3, "drei Stufen sollten bereitliegen")
 	var gold := Save.gold()
@@ -59,10 +59,16 @@ func _run() -> void:
 	_check(Save.event_ready() == 2, "nach dem Abholen sollten zwei Stufen bereitliegen")
 	# Truhe auf Stufe 5: Booster-Teile wie die Silbertruhe im Shop
 	Save.test_mode = false
-	Save.event_add(160)
+	Save.event_add(410)
 	Save.test_mode = true
 	var c := Save.event_claim(4)
 	_check(str(c.get("type", "")) == "parts" and int(c["amount"]) >= MetaData.SILVER_CHEST_PARTS[0] and int(c["amount"]) <= MetaData.SILVER_CHEST_PARTS[1], "Stufe 5 gibt keine Booster-Teile")
+	# Abstimmung (20.11.2026): fünf Runden am Tag reichen nicht ganz für die Truhe, an manchen Tagen zehn schon
+	var per_round := int(MetaData.EVENT_POINTS["win"]) + int(MetaData.EVENT_POINTS["foe_cap"]) / 2 + int(MetaData.EVENT_POINTS["boss"]) / 5
+	var per_day := 3 * int(MetaData.EVENT_POINTS["mission"])
+	var full := MetaData.EVENT_STEP * MetaData.EVENT_REWARDS.size()
+	_check(7 * (5 * per_round + per_day) < full, "Truhe schon mit 5 Runden am Tag erreichbar")
+	_check(5 * (5 * per_round + per_day) + 2 * (10 * per_round + per_day) >= full * 0.9, "Truhe auch mit 10 Runden an zwei Tagen kaum erreichbar")
 	# Höchstens zehn Stufen
 	Save.test_mode = false
 	Save.event_add(5000)

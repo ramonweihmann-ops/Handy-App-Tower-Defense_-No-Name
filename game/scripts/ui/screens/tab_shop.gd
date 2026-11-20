@@ -119,7 +119,7 @@ func _build_page() -> void:
 			v.place("stufe" if k == 0 else "stufe_%d" % k, ec, true)
 			_event_cards.append(ec)
 		_event_bar = EventBar.new()
-		v.place("balken", _event_bar)   # unter dem Text „340 / 400“
+		v.place("balken", _event_bar)   # unter dem Text „840 / 1.000“
 	_scroll = clampf(debug_scroll, 0.0, _max_scroll())
 	_fit_page()
 
@@ -248,16 +248,17 @@ func bind() -> void:
 			v.set_text("Bis zu 30 Booster-Teile", "Bis zu %d Booster-Teile" % MetaData.GOLD_CHEST_PARTS[1])
 		"event":
 			v.set_text("Endet in 3 T · 14 Std", "Endet in " + event_left())
+			# Beispielwerte im Mockup: 840 Punkte, Stufe 3 erreicht
 			var pts := Save.event_points()
 			var stage := Save.event_stage()
 			var top := MetaData.EVENT_REWARDS.size()
 			if stage >= top:
-				v.set_text("noch 60 bis Stufe 4", "Alle Stufen erreicht!")
-				v.set_text("340 / 400", "%s / %s" % [num(pts), num(top * MetaData.EVENT_STEP)])
+				v.set_text("noch 160 bis Stufe 4", "Alle Stufen erreicht!")
+				v.set_text("840 / 1.000", "%s / %s" % [num(pts), num(top * MetaData.EVENT_STEP)])
 			else:
 				var goal := (stage + 1) * MetaData.EVENT_STEP
-				v.set_text("noch 60 bis Stufe 4", "noch %d bis Stufe %d" % [goal - pts, stage + 1])
-				v.set_text("340 / 400", "%s / %s" % [num(pts), num(goal)])
+				v.set_text("noch 160 bis Stufe 4", "noch %s bis Stufe %d" % [num(goal - pts), stage + 1])
+				v.set_text("840 / 1.000", "%s / %s" % [num(pts), num(goal)])
 			if is_instance_valid(_event_bar):
 				_event_bar.ratio = 1.0 if stage >= top else float(pts) / float((stage + 1) * MetaData.EVENT_STEP)
 				_event_bar.queue_redraw()
@@ -783,7 +784,7 @@ class EventCard:
 			draw_circle(dot, 4.5 * q, Color("#ff3b30"))
 		else:
 			_lock(Vector2(size.x - 11.5 * q, 12.5 * q), 13 * q, Color("#7a3a00") if fin else Color("#ffd34d"))
-			var pts := str((k + 1) * MetaData.EVENT_STEP)
+			var pts := MockScreen.num((k + 1) * MetaData.EVENT_STEP)
 			var f2 := MockFonts.font("Nunito", 800)
 			var fs2 := maxi(1, roundi(9.5 * q))
 			var w := f2.get_string_size(pts, HORIZONTAL_ALIGNMENT_LEFT, -1, fs2).x
@@ -792,7 +793,7 @@ class EventCard:
 			_drop(Vector2(x0 + w + 6 * q, size.y - 9 * q), 9 * q)
 
 
-## Füllung des Punktebalkens (grün, links rund); Text „340 / 400“ steht darüber im Mockup
+## Füllung des Punktebalkens (grün, links rund); Text „840 / 1.000“ steht darüber im Mockup
 class EventBar:
 	extends Control
 	var ratio := 0.0
@@ -801,8 +802,8 @@ class EventBar:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	func _draw() -> void:
-		# Live-Rechteck ist die Füllung bei 85 %: volle Breite daraus zurückrechnen
-		var full := size.x / 0.85
+		# Live-Rechteck ist die Füllung bei 84 % (Mockup): volle Breite daraus zurückrechnen
+		var full := size.x / 0.84
 		var w := clampf(ratio, 0.0, 1.0) * full
 		if w <= 0.5:
 			return
