@@ -1,0 +1,75 @@
+{
+  "dateien": {
+    "tal_funkenherz.png": {
+      "groesse_px": [
+        256,
+        256
+      ],
+      "modus": "RGBA",
+      "motivbereich_px": [
+        31,
+        22,
+        224,
+        234
+      ],
+      "sha256": "9a91d782b7217544cd4073f303d211a6e725e68e23b204478e9362fa862c8e80"
+    },
+    "tal_werkzeugkiste.png": {
+      "groesse_px": [
+        256,
+        256
+      ],
+      "modus": "RGBA",
+      "motivbereich_px": [
+        26,
+        22,
+        230,
+        234
+      ],
+      "sha256": "a80c8e062a88d85b054019c1e70590bd25c9d6c970da382e8d84075f3f628ad1"
+    },
+    "tal_bollwerk.png": {
+      "groesse_px": [
+        256,
+        256
+      ],
+      "modus": "RGBA",
+      "motivbereich_px": [
+        43,
+        22,
+        213,
+        234
+      ],
+      "sha256": "2c5546c00ba58d00c4e473da99647be8003b47709af7edf683fc13174efc9fe7"
+    },
+    "tal_schwerefeld.png": {
+      "groesse_px": [
+        256,
+        256
+      ],
+      "modus": "RGBA",
+      "motivbereich_px": [
+        29,
+        22,
+        227,
+        234
+      ],
+      "sha256": "ed1ee9e513ddc1a4bc63baa98129e2829d4b892a94354a2d44e7bf2ee74b963d"
+    },
+    "tal_munitionslager.png": {
+      "groesse_px": [
+        256,
+        256
+      ],
+      "modus": "RGBA",
+      "motivbereich_px": [
+        25,
+        27,
+        229,
+        222
+      ],
+      "sha256": "cc986dce7376d10d0f13a174a856c4cf80f4750d6e0a5838652118ffa2da966f"
+    }
+  },
+  "godot_einbautest": "Noch durch Claude durchzuführen"
+}
