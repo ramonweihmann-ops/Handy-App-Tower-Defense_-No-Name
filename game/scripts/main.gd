@@ -69,6 +69,8 @@ var _boost_override: Array[String] = []
 ## Nur für Tests mit Fenster: Menübild speichern (--menushot=pfad.png[,reiter[,lager-voll|held:<id>|bau:<id>[:leer]|unterreiter]]) und beenden.
 var _menu_shot := ""
 var _squad := ""
+## Labor: fester Startchampion im automatischen Test (--start=iska); weitere Champions kommen wie sonst über Karten
+var _start_hero := ""
 ## Balance-Labor: Talente fest auf eine Stufe setzen (--talente=funkenherz:5,bollwerk:0 oder --talente=neu:5 für die vier
 ## Talente von Fünkchen, Pip, Rollo und Nova), nach dem Profil
 var _talent_override := ""
@@ -370,6 +372,8 @@ func _parse_args() -> void:
 		elif arg.begins_with("--squad="):
 			# nur mit --profile: feste Heldenauswahl für Prüfbilder, z. B. --squad=iska,fritzi
 			_squad = arg.get_slice("=", 1)
+		elif arg.begins_with("--start="):
+			_start_hero = arg.get_slice("=", 1)
 		elif arg.begins_with("--menushot="):
 			_menu_shot = arg.get_slice("=", 1)
 		elif arg.begins_with("--shot="):
@@ -960,7 +964,7 @@ func _start(n: int, hard_mode: bool, multi: bool, found: MpMatch = null) -> void
 		return
 	if _autotest:
 		_set_screen(null)
-		_on_hero_picked(options[0])
+		_on_hero_picked(_start_hero if _start_hero != "" else options[0])
 		return
 	_show_hero_picker(options)
 
