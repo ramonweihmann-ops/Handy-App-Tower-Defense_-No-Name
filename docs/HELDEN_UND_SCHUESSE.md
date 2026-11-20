@@ -189,3 +189,22 @@ Erste Labormessung (19.11.2026, `scripts/talent-lab.py`, je Variante dieselben L
 Im Profil „durchschnitt“ gewinnt in diesen Leveln jede Variante, die Unterschiede zeigen sich nur am Schild. Für knappe
 Kämpfe (Profil „anfaenger“) sind alle vier zusammen auf Stufe 5 ein großer Schritt; das sind aber auch 20 Sterne, so
 viel wie vier andere Talente auf Stufe 5. Einzelwerte stimmen wir nach dem Spieltest ab.
+
+## Trefferanimationen Brocken, Rollo, Nova (Explosionen_v2, 20.11.2026)
+
+ChatGPT-Bildfolgen aus `Vorlage_Raw/Explosionen_v2/`, vom Nutzer im Vergleich auf Eisbrücke und Raumdock freigegeben.
+Übernahme mit `tools/effekte/import_explosionen_v2.py` (Blätter unverändert, verlustfreies WebP). Nur die Einschläge
+sind ersetzt; Mündungen, Geschosse und Abschussbewegungen bleiben.
+
+| Champion | Effekt | Aufruf | Größe im Spiel |
+|---|---|---|---|
+| Brocken | `brocken_explosion` | `Battle.explode()` (auch Iskas Leuchtspur, Luftangriff, Explosiver Kettenblitz) | Radius × 1,55, 1,4–3,9 m (Rakete: 3,4 m) |
+| Rollo | `rollo_einschlag` | `Projectile.play_impact()` | 2,75 m |
+| Nova | `nova_einschlag` | `Battle.gravity_well()`, einmaliger Impuls | Radius × 1,9, 1,6–3,8 m (Feld 1,6: 3,05 m) |
+
+- Einmal mit 24 fps (`tempo` 1.0 statt bisher 1.15 / 1.5 / 0.7), volle Deckkraft (`deckend`), ungedreht zur Kamera,
+  kein zusätzliches Ausblenden (`ausblenden_s` 0). Werte stehen in der JSON, `FxSprite.area_opts()` liest sie.
+- Maß aus der Vorschau: Brücke auf Höhe der Gegner etwa 300 px = gut 9 m, also etwa 32 px je Meter.
+- Andere ungerichtete Treffer (Voltas Blitz) unverändert; Schaden, Radius, Sog und Dauer des Schwerkraftfelds unverändert.
+- Geprüft im Spiel mit `--shot-show` (Level 14 Eisbrücke, Level 5 Raumdock), einzeln und alle drei gleichzeitig
+  (`--testkarte=14,3,brocken+rollo+nova,god`).

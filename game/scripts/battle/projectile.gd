@@ -178,7 +178,9 @@ func _make_tracer(col: Color) -> void:
 static func play_impact(battle_: Node, style_: String, at: Vector3, dir: Vector3, target_) -> void:
 	var ei := FxSprite.info(style_ + "_einschlag")
 	if not bool(ei.get("gerichtet", false)):
-		FxSprite.play(battle_, style_ + "_einschlag", at, {"speed": 1.5})
+		# ungerichtet zur Kamera; Tempo und Ausblenden aus der JSON, wenn angegeben (Rollo, Explosionen_v2: 24 fps,
+		# kein zusätzliches Ausblenden), sonst wie bisher (Volta: 1,5-fach)
+		FxSprite.play(battle_, style_ + "_einschlag", at, {"speed": float(ei.get("tempo", 1.5)), "fade": float(ei.get("ausblenden_s", 0.12))})
 		return
 	var eo := {"dir": dir, "speed": float(ei.get("tempo", 1.0))}
 	if ei.has("freie_mitte") and is_instance_valid(target_) and target_ is Enemy:

@@ -110,6 +110,18 @@ static func _make(name: String, opts: Dictionary) -> FxSprite:
 	return s
 
 
+## Flächentreffer (Brocken-Explosion, Novas Schwerkraftimpuls; Vorlage_Raw/Explosionen_v2): Abspielwerte aus der JSON.
+## Kachel = Radius × „kachel_je_radius“ (Meter), begrenzt auf „kachel_min_m“…„kachel_max_m“, damit große Radien die
+## Gegner nicht zudecken; „tempo“ und „ausblenden_s“ wie freigegeben. Ohne diese Angaben (alte Bildfolgen) gelten die
+## übergebenen Ersatzwerte. Spielwerte (Schaden, Radius) sind davon nicht betroffen.
+static func area_opts(name: String, radius: float, fallback_width: float, fallback_speed: float) -> Dictionary:
+	var d := info(name)
+	if not d.has("kachel_je_radius"):
+		return {"width": fallback_width, "speed": fallback_speed}
+	var tile := clampf(radius * float(d["kachel_je_radius"]), float(d.get("kachel_min_m", 0.5)), float(d.get("kachel_max_m", 10.0)))
+	return {"width": tile / SCALE, "speed": float(d.get("tempo", 1.0)), "fade": float(d.get("ausblenden_s", 0.12))}
+
+
 ## Einmal abspielen an pos (Weltkoordinaten)
 static func play(parent: Node, name: String, pos: Vector3, opts := {}) -> FxSprite:
 	var s := _make(name, opts)

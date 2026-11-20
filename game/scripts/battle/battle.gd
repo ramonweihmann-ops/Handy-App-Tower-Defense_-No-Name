@@ -915,9 +915,9 @@ func gravity_well(center: Vector3, radius: float, dmg: float, crit: bool, ammo_t
 			e.pull_to(center, pull)
 			e.apply_slow(slow, slow_t)
 	if FxSprite.has("nova_einschlag"):
-		# Wirbel nach innen; „tempo“ in der JSON (Schusseffekte_nova_v1) streckt ihn auf die Dauer des Felds
-		FxSprite.play(self, "nova_einschlag", center + Vector3(0, 0.3, 0), {"width": maxf(1.6, radius * 2.0),
-			"speed": float(FxSprite.info("nova_einschlag").get("tempo", 1.0))})
+		# Einmaliger Schwerkraftimpuls (Explosionen_v2, 24 fps); Dauer, Sog und Bremsen des Felds bleiben unverändert
+		FxSprite.play(self, "nova_einschlag", center + Vector3(0, 0.3, 0), FxSprite.area_opts("nova_einschlag", radius,
+			maxf(1.6, radius * 2.0), float(FxSprite.info("nova_einschlag").get("tempo", 1.0))))
 	else:
 		Fx.flash(self, center + Vector3(0, 0.6, 0), Color(0.6, 0.35, 1.0), radius * 0.9, 0.35)
 
@@ -977,7 +977,9 @@ func explode(pos: Vector3, radius: float, dmg: float, crit: bool, ammo_type: Str
 		col = Color(1.0, 0.6, 0.2)
 	Sfx.play("boom", 0.12, -3.0)
 	if FxSprite.has("brocken_explosion"):
-		FxSprite.play(self, "brocken_explosion", pos + Vector3(0, 0.5, 0), {"width": maxf(2.5, radius * 1.45), "speed": 1.15})
+		# Freigegebene Explosion (Explosionen_v2): einmal mit 24 fps, volle Deckkraft, Größe begrenzt (FxSprite.area_opts);
+		# gilt auch für Iskas Leuchtspur, den Luftangriff und den Explosiven Kettenblitz (kleinere Radien, kompakter)
+		FxSprite.play(self, "brocken_explosion", pos + Vector3(0, 0.5, 0), FxSprite.area_opts("brocken_explosion", radius, maxf(2.5, radius * 1.45), 1.15))
 	else:
 		Fx.flash(self, pos, col, radius, 0.28)
 		Fx.burst(self, pos, col, 14, 6.0, 0.12, 0.5)

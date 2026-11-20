@@ -1,1 +1,1 @@
-{"frames": 16, "cols": 4, "rows": 4, "fps": 24, "loop": false, "anker": [0.5, 0.5], "groesse_m": 2.5, "frame_px": 256}
+{"frames": 12, "cols": 4, "rows": 3, "fps": 24, "loop": false, "anker": [0.5, 0.5], "frame_px": 256, "deckend": true, "groesse_m": 2.5, "gerichtet": false, "tempo": 1.0, "ausblenden_s": 0.0, "quelle": "Vorlage_Raw/Explosionen_v2/brocken", "kachel_je_radius": 1.55, "kachel_min_m": 1.4, "kachel_max_m": 3.9}
