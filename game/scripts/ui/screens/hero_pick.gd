@@ -161,7 +161,12 @@ class Card:
 				th = tw2 * _tex.get_height() / float(_tex.get_width())
 			draw_texture_rect(_tex, Rect2(Vector2(56 - tw2 * 0.5, 152 - th) * k, Vector2(tw2, th) * k), false)
 		# Name, Beruf, Beschreibung
-		_text(str(d["name"]), 56, 158.5, "Fredoka", 700, 21, Color("#ffd34d"), Color("#7a4a00"), 2.0)
+		# Name immer ganz in der Karte: lange Namen wie „Käpt'n Margot“ werden kleiner, bleiben aber mittig auf der Zeile
+		var name := str(d["name"])
+		var npx := 21.0
+		while npx > 12.0 and _tw(name, "Fredoka", 700, npx) > CARD_W - 10:
+			npx -= 0.5
+		_text(name, 56, 158.5 + (21.0 - npx) * 0.55, "Fredoka", 700, npx, Color("#ffd34d"), Color("#7a4a00"), 2.0)
 		var role := str(d["role"])
 		var rpx := 11.0
 		while rpx > 9.0 and _tw(role, "Nunito", 700, rpx) > CARD_W - 6:
