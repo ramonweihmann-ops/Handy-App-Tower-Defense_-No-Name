@@ -1,8 +1,21 @@
-# Kartensystem im Kampf – neuer Vorschlag (Stand 16.11.2026, im Balance-Labor)
+# Kartensystem im Kampf – neuer Vorschlag (Stand 19.11.2026)
 
 Nach jeder geschafften Welle wählt man eine Karte. Vorschlag des Nutzers vom 14.11.2026, Entscheidungen vom
-16.11.2026. Im Spiel nur mit dem Labor-Schalter `--karten-neu` aktiv (`game/scripts/battle/card_rules.gd`),
-einzelne Teile mit `--karten-neu=held5,plaetze,meister,symbiose`.
+16.11.2026 (`game/scripts/battle/card_rules.gd`).
+
+- **Im Spiel (seit 0.10.31):** Meisterfähigkeit (Regel 3), Mockup „Karten-Meister“ freigegeben am 19.11.2026.
+- **Nur im Labor:** die anderen Teile mit `--karten-neu=held5,plaetze,symbiose`; `--karten-alt` schaltet auch die
+  Meisterfähigkeit aus (Vergleich wie vor 0.10.31).
+- Kartenwahl (`game/scripts/ui/card_pick.gd`) wie im Mockup: im Detailfeld „Stufe 2 → 3“ mit Plakette „★ MEISTER“,
+  die Meister-Stufe grün mit goldenem Ring, darunter die Zusatzzeile in Gold (`CardRules.meister_line`, für die
+  Spezialfähigkeit je Champion eigener Text in `CardRules.MEISTER_SPECIAL`). „Plätze 2/3“ zeichnet die Kartenwahl nur
+  mit der Platzgrenze (`plaetze`).
+- Prüfbild: `--autotest --level=12 --squad=fritzi --cardshot=bild.png,fritzi:special@2+fritzi:ult+machine:tank,0`
+  (`@N` setzt die Fähigkeit vorher auf Stufe N).
+- Labor 19.11.2026 (Level 25/30/35/40, je 3 Seeds, durchschnitt und anfaenger): mit und ohne Meisterfähigkeit
+  (`LAB_ARGS=--karten-alt`) genau gleiche Ergebnisse. Bei rund 13 Karten je Kampf auf drei Champions verteilt bringt
+  der automatische Spieler kaum eine Waffenfähigkeit auf Stufe 3; wer gezielt dreimal dieselbe Karte nimmt, bekommt
+  den Zusatz. Die Obergrenze 3 (bisher Schaden und Feuerrate bis 5, Kritisch bis 4) wird im Labor nicht erreicht.
 
 ## Regeln
 
@@ -74,8 +87,9 @@ Bosse 35–55 %, `scripts/balance-lab.py`). Der Wunsch „bis Level 30 entspannt
 ## Offen
 
 - Grundkurve: „bis Level 30 entspannt“ (Vorschlag an den Nutzer)
-- Mockup der neuen Karten (Meisterfähigkeit, Symbiose, belegte Plätze), danach Einbau ins Spiel und ins Tutorial
-  (dort wählt man bisher nach Welle 1 einen Helden)
+- Mockup „Karten-Symbiose“ wartet auf Freigabe; danach Symbiosen ins Spiel und die sieben Motive (Prompt 4)
+- Platzgrenze („Plätze 2/3“ im Mockup „Karten-Meister“): Frage an den Nutzer, ob sie mit ins Spiel soll
+- „Neue Champions erst ab Welle 5“: noch nicht entschieden (Tutorial wählt nach Welle 1 einen Helden)
 
 ## Kampfkarten der Champions (freigegeben 17.11.2026)
 

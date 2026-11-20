@@ -19,7 +19,10 @@ const EASE_TO_WAVE := 8
 static var SOLO_HP := 0.55
 static var DUO_HP := 0.8
 
-static var on := {}
+## Meisterfähigkeit ist seit 0.10.31 im normalen Spiel an (Mockup „Karten-Meister“ freigegeben am 19.11.2026);
+## --karten-alt schaltet alles aus (Vergleich im Labor), --karten-neu schaltet Teile dazu
+const LIVE := ["meister"]
+static var on := {"meister": true}
 
 
 static func has(part: String) -> bool:
@@ -27,9 +30,13 @@ static func has(part: String) -> bool:
 
 
 static func enable(spec: String) -> void:
-	on.clear()
 	for p in (PARTS if spec == "" else Array(spec.split(","))):
 		on[str(p)] = true
+
+
+## Labor: ohne die neuen Regeln (wie vor 0.10.31)
+static func disable_all() -> void:
+	on.clear()
 
 
 ## Faktor für das Gegnerleben (1.0 = kein Ausgleich)
@@ -48,6 +55,29 @@ const MEISTER := {
 	"crit": ["Volltreffer", "Kritische Treffer machen dreifachen statt doppelten Schaden."],
 	"special": ["Meister", "Die Spezialfähigkeit wirkt, als hätte sie zwei Stufen mehr."],
 }
+## Zusatz der Meister-Spezialfähigkeit je Waffenfamilie (zwei Stufen mehr, Wirkung wie auf der Karte), Mockup „Karten-Meister“
+const MEISTER_SPECIAL := {
+	"revolver": "der letzte Schuss im Magazin feuert noch einmal 4 Kugeln mehr.",
+	"mg": "die Kugeln treffen noch 2 Gegner mehr.",
+	"rocket": "noch einmal +50 % Explosionsradius.",
+	"tesla": "der Blitz springt noch 2 Gegner weiter.",
+	"cryo": "der Frost springt auf noch 2 Gegner mehr über.",
+	"shotgun": "noch 2 Kugeln mehr pro Schuss.",
+	"sniper": "die Kugel durchschlägt noch 2 Gegner mehr.",
+	"flamer": "noch einmal +40 % Flammenbereich.",
+	"beam": "der Atem durchschlägt noch 2 Gegner mehr.",
+	"drone": "repariert noch einmal doppelt so viel Mauer je Schuss.",
+	"cannon": "stößt noch einmal 50 % weiter zurück.",
+	"gravity": "noch einmal +40 % Schwerkraftfeld.",
+}
+
+
+## Zusatzzeile der Meisterfähigkeit auf der Karte (gold im Detailfeld)
+static func meister_line(mod: String, family: String) -> String:
+	if mod == "special":
+		return "Meisterfähigkeit: " + str(MEISTER_SPECIAL.get(family, MEISTER["special"][1]))
+	var m: Array = MEISTER[mod]
+	return "Meisterfähigkeit %s: %s" % [m[0], m[1]]
 
 ## Symbiosen: zwei Waffenfamilien, beide Spezialfähigkeiten mindestens Stufe 1
 const SYMBIOSES := {

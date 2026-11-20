@@ -27,6 +27,7 @@ Bitte nacheinander abschicken, jeweils erst den nächsten, wenn der vorige gelie
 | S5 | Fritzis Flammenstrahl (gemalt, Gegner bleiben sichtbar) | `CHATGPT_PROMPTS.md`, Prompt S5 | keine | **v4 im Spiel seit 0.10.27** (ersetzt Claudes Flammenzungen) |
 | L1 | Neues App-Logo auf Basis des Ladebildschirms (drei Varianten) | `CHATGPT_PROMPTS.md`, Prompt L1 | keine | Variante B geliefert (App_Logo_v2), eingebaut in 0.10.29 mit einfarbigem Android-Symbol (`tools/app_symbol.py`) |
 | T1 | Talent-Symbole Funkenherz, Werkzeugkiste, Bollwerk, Schwerefeld (gemalt) | `CHATGPT_PROMPTS.md`, Prompt T1 | keine | bereit zum Abschicken (19.11.2026); bis dahin vorläufige Symbole im Spiel |
+| M1 | Meister-Abzeichen (aus Prompt 4 vorgezogen) | `CHATGPT_PROMPTS.md`, Prompt M1 | keine | bereit zum Abschicken (Mockup „Karten-Meister“ freigegeben 19.11.2026) |
 
 ## Gemerkt für später (noch kein Auftrag)
 

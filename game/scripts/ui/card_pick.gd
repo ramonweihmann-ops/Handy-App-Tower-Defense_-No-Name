@@ -107,6 +107,7 @@ func face(c: Dictionary) -> Dictionary:
 	var f := {"title": str(c.get("title", "")), "short": str(c.get("title", "")), "hero": "", "new": false,
 		"stars": int(c.get("stars", 0)), "max": int(c.get("max", 1)), "emblem": str(c.get("emblem", "")),
 		"text": " ".join(str(c.get("desc", "")).split("\n")),
+		"meister": str(c.get("meister", "")), "slots": int(c.get("slots", -1)),
 		"image": _first([KARTEN_DIR + key.replace(":", "_") + ".webp", IMAGES.get(key, "")])}
 	match kind:
 		"add_hero":
@@ -270,18 +271,38 @@ func _draw_panel(c: Dictionary) -> void:
 		var sf := _font("Nunito", 800, 11)
 		var sx := x + dw + 8
 		var a := "Stufe %d" % f["stars"]
-		var b := "%d von %d" % [int(f["stars"]) + 1, f["max"]]
+		var b := "%d" % (int(f["stars"]) + 1) if f["meister"] != "" else "%d von %d" % [int(f["stars"]) + 1, f["max"]]
 		sx = _text_left(sf, a, sx, row_y, 11, TEXT_SIDE)
 		_arrow(Vector2(sx + 3, row_y + 8.5), 9, TEXT_SIDE)
-		_text_left(sf, b, sx + 15, row_y, 11, TEXT_SIDE)
+		sx = _text_left(sf, b, sx + 15, row_y, 11, TEXT_SIDE)
+		if f["meister"] != "":
+			# Plakette: goldener Rand, Stern und MEISTER in Gold
+			var mw := _symbol_label_width("MEISTER", sf, 11) + 16
+			var mr := Rect2(sx + 6, row_y - 0.5, mw, 18)
+			_round_border(mr, 8, 1.5, GOLD)
+			_label_with_symbol("MEISTER", "star", mr.get_center(), 11, 0.0, GOLD, false)
 	if hero_name != "":
 		var cf := _font("Nunito", 800, 12, 0.04)
 		var champ: Array = CATS["champion"]
 		var w := _symbol_label_width(champ[0], cf, 12)
 		_label_with_symbol(champ[0], champ[2], Vector2(x + w * 0.5, o.y + 88 + 8.5), 12, 0.04, champ[1], false)
 		_text_left(_font("Nunito", 800, 12), hero_name, x + w + 6, o.y + 88, 12, TEXT)
-	# Wirkung
-	_effect_text(str(f["text"]), Rect2(o.x + 14, o.y + 128, inner_w - 28, 56))
+		if int(f["slots"]) >= 0:
+			# „Plätze 2/3“ mit drei Kästchen, rechtsbündig (Platzgrenze, CardRules „plaetze“)
+			var pf := _font("Nunito", 800, 11)
+			var right := PANEL.end.x - 2.5 - 10.0
+			var bx := right - 3 * 10.0
+			for k in 3:
+				var br := Rect2(bx + k * 10.0 + 2.0, o.y + 88 + 4.5, 8, 8)
+				if k < int(f["slots"]):
+					_fill_round(br, 2, null, CATS["waffe"][1])
+				else:
+					_round_border(br, 2, 1.5, CATS["waffe"][1])
+			var label := "Plätze %d/%d" % [int(f["slots"]), CardRules.SLOTS]
+			var lw := pf.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, _fs(11)).x / s
+			_text_left(pf, label, bx - lw, o.y + 88 + 1.0, 11, TEXT_SIDE)
+	# Wirkung, bei der Meisterfähigkeit darunter die Zusatzzeile in Gold
+	_effect_text(str(f["text"]), Rect2(o.x + 14, o.y + 128, inner_w - 28, 56), str(f["meister"]))
 
 
 func _draw_ok() -> void:
@@ -356,23 +377,30 @@ func _dots(f: Dictionary, at: Vector2, centered: bool) -> float:
 	for i in n:
 		var col := GOLD if i < int(f["stars"]) else (GREEN if i == int(f["stars"]) else DOT_OFF)
 		var dx := x + (i * 12.0 if centered else 1.5 + i * 12.0)
+		if f.get("meister", "") != "" and i == int(f["stars"]):
+			_fill_round(Rect2(dx - 1.5, at.y - 6.0, 12, 12), 4.5, null, GOLD)
 		_fill_round(Rect2(dx, at.y - 4.5, 9, 9), 3, null, col)
 	return w
 
 
-func _effect_text(txt: String, box: Rect2) -> void:
+func _effect_text(txt: String, box: Rect2, extra := "") -> void:
 	var size_pt := 13.5
 	var lines: Array = []
+	var gold: Array = []
 	while true:
 		lines = _lines(_font("Nunito", 700, size_pt), txt, box.size.x, size_pt)
-		if lines.size() * size_pt * 1.35 <= box.size.y + 1.0 or size_pt <= 12.0:
+		gold = _lines(_font("Nunito", 700, size_pt), extra, box.size.x, size_pt) if extra != "" else []
+		if (lines.size() + gold.size()) * size_pt * 1.35 <= box.size.y + 1.0 or size_pt <= 11.0:
 			break
 		size_pt -= 0.5
 	var lh := size_pt * 1.35
-	var y := box.position.y + (box.size.y - lines.size() * lh) * 0.5
+	var y := box.position.y + (box.size.y - (lines.size() + gold.size()) * lh) * 0.5
 	var font := _font("Nunito", 700, size_pt)
 	for ln in lines:
 		_text_left(font, ln, box.position.x, y, size_pt, TEXT, 1.35)
+		y += lh
+	for ln in gold:
+		_text_left(font, ln, box.position.x, y, size_pt, GOLD, 1.35)
 		y += lh
 
 

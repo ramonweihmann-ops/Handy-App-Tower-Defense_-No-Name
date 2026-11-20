@@ -291,6 +291,8 @@ func _parse_args() -> void:
 			Battle.fx_test = "bilder"
 		elif arg == "--fx-bisher":
 			Battle.fx_test = "bisher"
+		elif arg == "--karten-alt":
+			CardRules.disable_all()   # Labor: Kartenregeln wie vor 0.10.31 (ohne Meisterfähigkeit)
 		elif arg == "--karten-neu" or arg.begins_with("--karten-neu="):
 			# Neues Kartensystem im Balance-Labor (CardRules), optional nur einzelne Teile
 			CardRules.enable(arg.get_slice("=", 1) if arg.contains("=") else "")
@@ -1010,19 +1012,26 @@ func _show_card_shot() -> void:
 	var want := parts[1] if parts.size() > 1 else "plasma"
 	var cards: Array = []
 	if want.contains("+"):
-		# feste Auswahl über Schlüssel, z. B. gate:ice+plasma:mag+station:repair (Held: :damage für Held 1)
+		# feste Auswahl über Schlüssel, z. B. gate:ice+plasma:mag+station:repair (Held: :damage für Held 1);
+		# mit @N steht die Fähigkeit vorher schon auf Stufe N, z. B. fritzi:special@2 (Meisterfähigkeit im Bild)
+		var keys: Array = []
 		for k in want.split("+"):
 			# Heldenkarte eines Helden, der nicht im Kampf ist: Held dazuholen
 			var hid := k.get_slice(":", 0)
 			if GameData.HEROES.has(hid) and not battle.has_hero(hid) and battle.heroes.size() < Battle.MAX_HEROES:
 				battle.add_hero(hid)
+			if k.contains("@"):
+				for h in battle.heroes:
+					if h.id == hid:
+						h.mods[k.get_slice("@", 0).get_slice(":", 1)] = int(k.get_slice("@", 1))
+			keys.append(k.get_slice("@", 0))
 		var pool: Array = _machine_cards() + [_card_repair()]
 		for h in battle.heroes:
 			pool.append_array(_hero_cards(h))
 		for id in GameData.HERO_IDS:
 			if not battle.has_hero(id):
 				pool.append(_card_add_hero(id))
-		for k in want.split("+"):
+		for k in keys:
 			for c in pool:
 				var ck := str(c["key"])
 				if ck == k or (k.begins_with(":") and ck.ends_with(k) and ck.begins_with(battle.heroes[0].id)):
@@ -1204,11 +1213,9 @@ func _hero_cards(h: Hero) -> Array:
 		ult_desc = "%s stärker, länger und schneller wieder bereit." % ult[0]
 	if CardRules.has("meister"):
 		# Waffenfähigkeiten höchstens Stufe 3, die dritte Stufe macht sie zur Meisterfähigkeit
+		# (Zusatzzeile steht in der Karte unter „meister“, die Kartenwahl zeigt sie gold)
 		for s in stats:
 			s[3] = CardRules.MEISTER_LEVEL
-			if int(h.mods[s[0]]) == CardRules.MEISTER_LEVEL - 1:
-				var m: Array = CardRules.MEISTER[s[0]]
-				s[2] = "%s\nMeisterfähigkeit: %s" % [s[2], m[1]]
 	if CardRules.has("plaetze"):
 		# höchstens 3 verschiedene Waffenfähigkeiten je Champion
 		var taken: Array = CardRules.WEAPON_MODS.filter(func(m: String) -> bool: return int(h.mods[m]) > 0)
@@ -1230,6 +1237,10 @@ func _hero_cards(h: Hero) -> Array:
 			"weight": (1.5 if h.ult_level() == 0 else 0.9) if mod == "ult" else (1.2 if mod == "special" else 1.0),
 			"apply": _apply_hero_mod.bind(h, mod),
 		})
+		if CardRules.has("meister") and mod in CardRules.WEAPON_MODS and int(h.mods[mod]) == CardRules.MEISTER_LEVEL - 1:
+			list[-1]["meister"] = CardRules.meister_line(mod, h.family())
+		if CardRules.has("plaetze") and mod in CardRules.WEAPON_MODS:
+			list[-1]["slots"] = CardRules.WEAPON_MODS.filter(func(m: String) -> bool: return int(h.mods[m]) > 0).size()
 	return list
 
 

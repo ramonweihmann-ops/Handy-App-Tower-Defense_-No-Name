@@ -1117,3 +1117,38 @@ BITTE LIEFERN in Vorlage_Raw/Talente_v2/ auf GitHub (Branch claude/amazing-hypat
 
 Nur die eingebaute Bildgenerierung im bestehenden Konto verwenden, keine weiteren kostenpflichtigen Dienste.
 ~~~~
+
+## Prompt M1: Meister-Abzeichen (Teil von Prompt 4, vorgezogen)
+
+**Kosten:** keine Kosten · **Abschicken:** jetzt; Mockup „Karten-Meister“ am 19.11.2026 freigegeben. Die sieben
+Symbiose-Motive aus Prompt 4 folgen erst nach Freigabe des Mockups „Karten-Symbiose“.
+
+~~~~text
+Bitte für mein Handyspiel (Tower Defense, Comic-Stil) ein Meister-Abzeichen malen. Es erscheint auf den Karten, die
+man nach jeder Welle wählt, sobald eine Waffenfähigkeit Stufe 3 erreicht und damit zur Meisterfähigkeit wird: klein
+in der Ecke des Kärtchens (etwa 20 × 20 Punkte) und im Detailfeld neben „MEISTER“ (etwa 24 × 24 Punkte).
+
+STILVORLAGE: wie die vorhandenen Kartenmotive im Repository Handy-App-Tower-Defense_-No-Name, Branch
+claude/amazing-hypatia-yl59v4, Ordner Vorlage_Raw/Kartenmotive_v2/ (zum Beispiel tesla_special.png). Kräftige
+Comic-Umrisse, satte Farben, leichte Glanzlichter.
+
+MOTIV
+- meister_abzeichen.png – goldenes Abzeichen: Stern in einem Lorbeerkranz mit kleiner Krone, glänzend, sehr
+  einfach und klar. Gold passend zum Spiel: #ffd367 mit dunklerem Rand #a8641a.
+
+FORMAT
+- 512 × 512 Pixel, PNG mit durchsichtigem Hintergrund (RGBA), Motiv mittig, etwa 8 % Rand frei
+- keine Schrift, keine Zahlen, kein Hintergrund
+- muss auch mit 20 Punkten Breite sofort als goldener Stern erkennbar sein: wenige, große Formen
+
+ZUSÄTZLICH
+- uebersicht.png: das Abzeichen in 20, 24 und 48 px auf dunklem Kartengrund (#231a44)
+
+BITTE LIEFERN in Vorlage_Raw/Kartenmotive_v3/ auf GitHub (Branch claude/amazing-hypatia-yl59v4):
+1. meister_abzeichen.png
+2. uebersicht.png
+3. LIESMICH_CLAUDE.md: Motiv und Farben
+4. BILDANWEISUNG.txt: der verwendete Bildprompt
+
+Nur die eingebaute Bildgenerierung im bestehenden Konto verwenden, keine weiteren kostenpflichtigen Dienste.
+~~~~
