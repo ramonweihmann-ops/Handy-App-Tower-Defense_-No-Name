@@ -1078,7 +1078,7 @@ Nur die eingebaute Bildgenerierung und Bildbearbeitung im bestehenden Konto verw
 
 ## Prompt T1: Talent-Symbole für Fünkchen, Pip, Rollo und Nova (gemalt, wie die acht vorhandenen)
 
-**Kosten:** keine Kosten · **Abschicken:** jederzeit; bis zur Lieferung zeigt das Spiel vorläufige Symbole (tools/talent_symbole.js)
+**Kosten:** keine Kosten · **Erledigt:** geliefert als `Vorlage_Raw/Talente_v3/` (mit neuem Munitionslager), im Spiel seit 0.10.32
 
 ~~~~text
 Bitte für mein Handyspiel (Tower Defense, Comic-Stil) vier neue Talent-Symbole malen. Sie erscheinen auf der Seite

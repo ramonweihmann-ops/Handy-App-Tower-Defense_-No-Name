@@ -165,7 +165,8 @@ Champion nicht dabei ist.
 
 - Werte: `MetaData.TALENTS`, Boni: `Save.battle_bonus()`.
 - Testkonto „alles frei“: fehlende Talente setzt das Spiel beim Laden auf Stufe 5, so sind die neuen sofort testbar.
-- Symbole: vorläufig aus den Formen des Mockups (`tools/talent_symbole.js`), gemalte Fassung über Prompt T1.
+- Symbole: gemalt von ChatGPT (`Vorlage_Raw/Talente_v3/`, seit 0.10.32), dazu ein neues Munitionslager; ganze Kachel
+  256 × 256 mit Rand und eingemaltem Plus, auf der Talente-Seite als 44-Punkte-Feld (verlustfreies WebP).
 - Balance-Labor: `--talente=neu:5` (alle vier) oder `--talente=bollwerk:5,schwerefeld:0` setzt Stufen nach dem Profil;
   `scripts/talent-lab.py` vergleicht die Varianten. Die Profile verteilen ihre Talente reihum auf jetzt 12 statt 8
   Talente, wie beim echten Ziehen.
