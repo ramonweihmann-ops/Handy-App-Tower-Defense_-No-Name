@@ -299,6 +299,18 @@ func _parse_args() -> void:
 			Battle.fx_test = "bilder"
 		elif arg == "--fx-bisher":
 			Battle.fx_test = "bisher"
+		elif arg == "--wellen-neu" or arg.begins_with("--wellen-neu="):
+			# Labor: kürzere Level, z. B. --wellen-neu=w7/7/7/7/9,p6,hp0.9,bhp0.85
+			GameData.short_waves = true
+			for part in (arg.get_slice("=", 1).split(",") if "=" in arg else PackedStringArray()):
+				if part.begins_with("w"):
+					GameData.SW_WAVES = Array(part.substr(1).split("/")).map(func(x: String) -> int: return int(x))
+				elif part.begins_with("bhp"):
+					GameData.SW_BOSS_HP = float(part.substr(3))
+				elif part.begins_with("hp"):
+					GameData.SW_HP = float(part.substr(2))
+				elif part.begins_with("p"):
+					GameData.SW_PAUSE = float(part.substr(1))
 		elif arg == "--karten-alt":
 			CardRules.disable_all()   # Labor: Kartenregeln wie vor 0.10.31 (ohne Meisterfähigkeit)
 		elif arg == "--karten-neu" or arg.begins_with("--karten-neu="):

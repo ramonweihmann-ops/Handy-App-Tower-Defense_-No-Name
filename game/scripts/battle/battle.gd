@@ -346,7 +346,7 @@ func _update_spawning(delta: float) -> void:
 	_wave_timer += delta
 	if test_wave > 0:
 		# Testkarte: dieselbe Welle immer wieder, kein Sieg und keine Kartenwahl
-		if enemies.size() <= 2 or _wave_timer > 10.0:
+		if enemies.size() <= 2 or _wave_timer > GameData.wave_pause():
 			test_rounds += 1
 			_spawn_queue.assign(_plan[wave - 1])
 			_spawn_timer = 0.6
@@ -354,7 +354,7 @@ func _update_spawning(delta: float) -> void:
 			test_round.emit(test_rounds + 1)
 		return
 	if wave < total_waves:
-		if enemies.size() <= 2 or _wave_timer > 10.0:
+		if enemies.size() <= 2 or _wave_timer > GameData.wave_pause():
 			_next_wave()
 	elif enemies.is_empty():
 		running = false

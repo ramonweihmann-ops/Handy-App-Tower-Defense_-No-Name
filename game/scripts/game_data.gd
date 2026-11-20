@@ -442,7 +442,42 @@ static func enemy_name(kind: String, level: int, plural := false) -> String:
 
 
 static func waves_in_level(level: int) -> int:
+	if short_waves:
+		return mini(int(SW_WAVES[(level - 1) % LEVELS_PER_WORLD]), classic_waves(level))
+	return classic_waves(level)
+
+
+## Wellen im bisherigen Ablauf (6–13 je Level)
+static func classic_waves(level: int) -> int:
 	return 5 + (level - 1) % LEVELS_PER_WORLD + 1 + mini(world_of(level), 3)
+
+
+## Kürzere Level (Labor 20.11.2026, --wellen-neu): weniger Wellen, die Steigerung bleibt dieselbe. Die
+## Zwischenwellen werden ausgedünnt, die letzte Welle bleibt die große Schlusswelle (mit dem Boss im Boss-Level).
+static var short_waves := false
+## Wellen je Level in der Welt: Level 1–4 der Welt, Boss-Level (nie mehr als bisher, Welt 1 steigt langsam an)
+static var SW_WAVES: Array = [7, 7, 7, 7, 9]
+## Höchstens so viele Sekunden bis zur nächsten Welle, wenn noch Gegner übrig sind (bisher 10)
+static var SW_PAUSE := 6.0
+## Ausgleich für das Gegnerleben in normalen Leveln und in Boss-Leveln (weniger Karten je Kampf)
+static var SW_HP := 1.0
+static var SW_BOSS_HP := 1.0
+
+
+## Welle im bisherigen Ablauf, deren Gegner und Leben diese Welle bekommt
+static func source_wave(level: int, wave: int) -> int:
+	if not short_waves:
+		return wave
+	var n := waves_in_level(level)
+	var old := classic_waves(level)
+	if n <= 1 or n >= old:
+		return wave
+	return 1 + roundi(float(wave - 1) * float(old - 1) / float(n - 1))
+
+
+## Längste Wartezeit bis zur nächsten Welle, solange noch mehr als zwei Gegner unterwegs sind
+static func wave_pause() -> float:
+	return SW_PAUSE if short_waves else 10.0
 
 
 ## Grundleben der Gegner in diesem Level (1 = Level 1). easy = false: ohne die entspannten Level 21–30
@@ -491,7 +526,10 @@ static func dps_mult(level: int, easy := true) -> float:
 
 static func hp_mult(level: int, wave: int) -> float:
 	var per_wave := WAVE_GROWTH_EASY if level >= PHASE2_FROM and level <= EASY_TO else 0.04
-	return level_hp(level) * (1.0 + per_wave * (wave - 1))
+	var hp := level_hp(level) * (1.0 + per_wave * (source_wave(level, wave) - 1))
+	if short_waves:
+		hp *= SW_BOSS_HP if is_boss_level(level) else SW_HP
+	return hp
 
 
 ## Zusätzlicher Lebensfaktor für den Boss dieses Levels.
@@ -500,12 +538,13 @@ static func boss_hp(level: int) -> float:
 
 
 ## Stellt die Gegner einer Welle zusammen (Art nach Welt, Menge nach Level in der Welt).
-static func wave_spawns(level: int, wave: int) -> Array[String]:
+static func wave_spawns(level: int, wave_: int) -> Array[String]:
 	var list: Array[String] = []
 	var kinds: Array = world_kinds(level)
 	var lw := (level - 1) % LEVELS_PER_WORLD + 1
 	var extra := mini(world_of(level), 2)
-	var total := waves_in_level(level)
+	var wave := source_wave(level, wave_)
+	var total := classic_waves(level)
 	var light := 2 + int(wave * 0.7) + lw + extra
 	var mid := 0
 	if wave >= 2:
