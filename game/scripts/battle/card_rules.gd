@@ -19,10 +19,11 @@ const EASE_TO_WAVE := 8
 static var SOLO_HP := 0.55
 static var DUO_HP := 0.8
 
-## Meisterfähigkeit ist seit 0.10.31 im normalen Spiel an (Mockup „Karten-Meister“ freigegeben am 19.11.2026);
-## --karten-alt schaltet alles aus (Vergleich im Labor), --karten-neu schaltet Teile dazu
-const LIVE := ["meister"]
-static var on := {"meister": true}
+## Im normalen Spiel an: Meisterfähigkeit seit 0.10.31 (Mockup „Karten-Meister“ freigegeben am 19.11.2026),
+## Platzgrenze seit 0.10.35 (freigegeben am 20.11.2026); --karten-alt schaltet alles aus (Vergleich im Labor),
+## --karten-neu schaltet Teile dazu
+const LIVE := ["meister", "plaetze"]
+static var on := {"meister": true, "plaetze": true}
 
 
 static func has(part: String) -> bool:
