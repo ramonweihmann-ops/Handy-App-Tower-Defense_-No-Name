@@ -122,7 +122,7 @@ func refresh_top() -> void:
 ## Rote Punkte an den Reitern unten, auf jedem Bildschirm gleich: Dort wartet etwas (abholen, aufwerten, ziehen)
 static func nav_badges() -> Dictionary:
 	return {
-		"#shop": Save.shop_free_ready(),
+		"#shop": Save.shop_free_ready() or Save.event_ready() > 0,   # auch: Stufe im Wochen-Event abholbereit
 		"#helden": Save.any_hero_ready(),
 		"#kampf": not Save.pass_claimable().is_empty() or mission_ready() or Save.daily_ready("daily_date") \
 			or Save.daily_ready("wheel_date"),

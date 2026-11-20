@@ -923,6 +923,7 @@ func claim_mission(id: String) -> bool:
 	if m["claimed"].has(id) or int(m["progress"].get(id, 0)) < int(d["goal"]):
 		return false
 	m["claimed"][id] = true
+	event_add(int(MetaData.EVENT_POINTS["mission"]))   # Wöchentliches Event: +30 je Mission
 	add_pass_points(int(d["points"]))
 	return true
 
@@ -1034,6 +1035,73 @@ func daily_ready(key: String) -> bool:
 func mark_daily(key: String) -> void:
 	data[key] = today()
 	save_game()
+
+
+# --- Wöchentliches Event ------------------------------------------------------------
+
+## Stand der Event-Woche: {week, points, claimed}; mit einer neuen Woche beginnt alles von vorn
+func event() -> Dictionary:
+	var week := MetaData.event_week(Time.get_unix_time_from_system())
+	var e = data.get("event")
+	if not e is Dictionary or int(e.get("week", -1)) != week:
+		e = {"week": week, "points": 0, "claimed": []}
+		data["event"] = e
+	return e
+
+
+func event_theme() -> Dictionary:
+	return MetaData.event_theme(int(event()["week"]))
+
+
+func event_points() -> int:
+	return int(event()["points"])
+
+
+## Erreichte Stufen (0–10)
+func event_stage() -> int:
+	return mini(MetaData.EVENT_REWARDS.size(), event_points() / MetaData.EVENT_STEP)
+
+
+## Zustand einer Stufe (0-basiert): done (abgeholt), ready (erreicht), lock
+func event_state(k: int) -> String:
+	if event()["claimed"].has(k):
+		return "done"
+	return "ready" if k < event_stage() else "lock"
+
+
+## Erreichte, noch nicht abgeholte Stufen (roter Punkt am Shop und am Reiter Event)
+func event_ready() -> int:
+	var n := 0
+	for k in event_stage():
+		if not event()["claimed"].has(k):
+			n += 1
+	return n
+
+
+func event_add(points: int) -> void:
+	if test_mode or points <= 0:
+		return
+	var e := event()
+	e["points"] = int(e["points"]) + points
+
+
+## Stufe k abholen; gibt den Gewinn zurück ({type, amount}; Truhen: Booster-Teile) oder {}
+func event_claim(k: int) -> Dictionary:
+	if event_state(k) != "ready":
+		return {}
+	var r: Dictionary = MetaData.EVENT_REWARDS[k].duplicate()
+	match str(r["type"]):
+		"silver_chest":
+			r = {"type": "parts", "amount": randi_range(MetaData.SILVER_CHEST_PARTS[0], MetaData.SILVER_CHEST_PARTS[1])}
+			add_booster_parts(int(r["amount"]))
+		"gold_chest":
+			r = {"type": "parts", "amount": randi_range(MetaData.GOLD_CHEST_PARTS[0], MetaData.GOLD_CHEST_PARTS[1])}
+			add_booster_parts(int(r["amount"]))
+		_:
+			add(str(r["type"]), int(r["amount"]))
+	event()["claimed"].append(k)
+	save_game()
+	return r
 
 
 # --- Multiplayer: Pokale, Liga, letzte Kämpfe, Saison -----------------------------

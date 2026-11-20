@@ -1,7 +1,8 @@
 extends MockScreen
 ## Shop nach den freigegebenen Mockups „Shop · Angebote / Truhen / Aufladen (neu)“ und „Shop“ (Main-c4lv).
 ## Der Rahmen (Kopfleiste, Reiter, Menü) kommt aus ui_mock/shop, der Inhalt jedes Reiters ist eine lange
-## Seite (ui_mock/shop_<reiter>), die zwischen Kopfleiste und Reitern scrollt. Event bleibt eine Seite.
+## Seite (ui_mock/shop_<reiter>), die zwischen Kopfleiste und Reitern scrollt. Event: wöchentliches Event
+## (Mockup „Shop · Event“, ui_mock/shop_event mit einer Fassung je Wochenthema, Spiellogik Save.event_*).
 ##
 ## Mit echter Spiellogik: Tagesangebote (Heldenkarten für drei eigene Helden, jeden Tag neu, das erste
 ## gratis), Gratis-Truhe und Heldentruhe, Energie, Gold-Shop (zwei Gratis-Pakete am Tag, dann Gold gegen
@@ -21,6 +22,8 @@ var _page_view: MockView
 var _clip: Control
 var _chest: TextureRect
 var _cards: Array = []     # Tagesangebote: [Karte, Balken] je Angebot
+var _event_cards: Array = []   # Wöchentliches Event: zehn Belohnungskarten
+var _event_bar: EventBar
 var _t := 0.0
 var _scroll := 0.0
 var _vel := 0.0
@@ -86,11 +89,14 @@ func _build_page() -> void:
 	_page_view = null
 	_chest = null
 	_cards.clear()
+	_event_cards.clear()
+	_event_bar = null
 	_scroll = 0.0
 	_vel = 0.0
-	if _clip == null or page == "event":
+	if _clip == null:
 		return
-	var v := MockView.new("shop_" + page)
+	# Event: die Fassung des aktuellen Wochenthemas (Banner, Boss, Texte)
+	var v := MockView.new("shop_" + page, str(Save.event_theme()["id"]) if page == "event" else "main")
 	_clip.add_child(v)
 	# MockView füllt sonst seinen Platz aus; hier bestimmt die Seite selbst ihre Höhe
 	v.set_anchors_preset(Control.PRESET_TOP_LEFT)
@@ -105,6 +111,15 @@ func _build_page() -> void:
 			v.place("dcard" + ("" if k == 0 else "_%d" % k), card, true)
 			v.place("dbar" + ("" if k == 0 else "_%d" % k), bar, true)
 			_cards.append([card, bar])
+	elif page == "event":
+		for k in MetaData.EVENT_REWARDS.size():
+			var ec := EventCard.new()
+			ec.tab = self
+			ec.k = k
+			v.place("stufe" if k == 0 else "stufe_%d" % k, ec, true)
+			_event_cards.append(ec)
+		_event_bar = EventBar.new()
+		v.place("balken", _event_bar)   # unter dem Text „340 / 400“
 	_scroll = clampf(debug_scroll, 0.0, _max_scroll())
 	_fit_page()
 
@@ -187,7 +202,7 @@ func bind() -> void:
 	var chest := Save.daily_ready("shop_chest_date")
 	var chests_free := chest or Save.daily_ready("shop_silver_date")
 	var gold := Save.daily_ready("shop_free_date") or Save.daily_ready("shop_gold_date")
-	for pair in [["ANGEBOTE", free_offer], ["TRUHEN", chests_free], ["AUFLADEN", gold]]:
+	for pair in [["ANGEBOTE", free_offer], ["TRUHEN", chests_free], ["AUFLADEN", gold], ["EVENT", Save.event_ready() > 0]]:
 		var tab := _tab_button(pair[0])
 		if tab:
 			tab.badge = bool(pair[1])
@@ -231,6 +246,23 @@ func bind() -> void:
 			_pdim(v, "#goldtruhe", Save.gems() < MetaData.GOLD_CHEST_COST)
 			v.set_text("Bis zu 6 Booster-Teile", "Bis zu %d Booster-Teile" % MetaData.SILVER_CHEST_PARTS[1])
 			v.set_text("Bis zu 30 Booster-Teile", "Bis zu %d Booster-Teile" % MetaData.GOLD_CHEST_PARTS[1])
+		"event":
+			v.set_text("Endet in 3 T · 14 Std", "Endet in " + event_left())
+			var pts := Save.event_points()
+			var stage := Save.event_stage()
+			var top := MetaData.EVENT_REWARDS.size()
+			if stage >= top:
+				v.set_text("noch 60 bis Stufe 4", "Alle Stufen erreicht!")
+				v.set_text("340 / 400", "%s / %s" % [num(pts), num(top * MetaData.EVENT_STEP)])
+			else:
+				var goal := (stage + 1) * MetaData.EVENT_STEP
+				v.set_text("noch 60 bis Stufe 4", "noch %d bis Stufe %d" % [goal - pts, stage + 1])
+				v.set_text("340 / 400", "%s / %s" % [num(pts), num(goal)])
+			if is_instance_valid(_event_bar):
+				_event_bar.ratio = 1.0 if stage >= top else float(pts) / float((stage + 1) * MetaData.EVENT_STEP)
+				_event_bar.queue_redraw()
+			for ec in _event_cards:
+				(ec as EventCard).setup(Save.event_state(ec.k))
 		"aufladen":
 			v.set_text("Sofort wieder voll: 30/30", "Sofort wieder voll: %d/%d" % [Save.energy_max(), Save.energy_max()])
 			v.set_text("20", str(MetaData.SHOP_ENERGY_COST))
@@ -254,6 +286,39 @@ func bind() -> void:
 				else:
 					v.set_text(gold_price[k], num(int(gp["gems"])))
 					_pdim(v, "#gold%d" % k, Save.gems() < int(gp["gems"]))
+
+
+## Restzeit der Event-Woche, z. B. „3 T · 14 Std“ (am letzten Tag „5 Std · 20 Min“)
+static func event_left() -> String:
+	var now := Time.get_unix_time_from_system()
+	var end := (MetaData.event_week(now) + 1) * 604800.0 - 3.0 * 86400.0
+	var left := maxi(0, int(end - now))
+	var days := left / 86400
+	var hours := (left % 86400) / 3600
+	if days > 0:
+		return "%d T · %d Std" % [days, hours]
+	return "%d Std · %d Min" % [hours, (left % 3600) / 60]
+
+
+## Belohnung der Stufe k abholen (Event-Karte angetippt)
+func claim_event(k: int) -> void:
+	match Save.event_state(k):
+		"done":
+			menu.toast("Schon abgeholt")
+			return
+		"lock":
+			var need := (k + 1) * MetaData.EVENT_STEP - Save.event_points()
+			menu.toast("Noch %d Event-Punkte bis Stufe %d" % [need, k + 1])
+			return
+	var r := Save.event_claim(k)
+	if r.is_empty():
+		return
+	Sfx.play("win")
+	if str(r["type"]) == "parts":
+		menu.celebrate("check", "+%d Booster-Teile" % int(r["amount"]), Color(1.0, 0.65, 0.25))
+	else:
+		menu.reward_success([r], "Wochen-Event · Stufe %d" % (k + 1))
+	refresh()
 
 
 static func bought_all(daily: Dictionary) -> bool:
@@ -571,3 +636,186 @@ class DailyBar:
 		var txt := "%d/%d" % [have, need]
 		var tw := f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
 		draw_string(f, Vector2(r.get_center().x - tw * 0.5, r.get_center().y + fs * 0.36), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color.WHITE)
+
+
+## Belohnungskarte des Wochen-Events (Mockup „Shop · Event“, 66 × 86): Nummer oben, Symbol, Menge;
+## abgeholt blass mit Haken, erreicht grün mit „Holen“, sonst mit Schloss und Punkten. Die zehnte ist die Event-Truhe.
+class EventCard:
+	extends Control
+	var tab: Node
+	var k := 0
+	var state := "lock"
+	var _tex: Texture2D
+	var _press := Vector2.INF
+
+	const ICONS := {"gold": "res://ui/icons/gold.webp", "gems": "res://ui/icons/gems.webp", "cards": "res://ui/icons/cards.webp",
+		"stars": "res://ui/icons/stars.webp", "silver_chest": "res://ui/event/truhe_silber.webp", "gold_chest": "res://ui/event/truhe_gold.webp"}
+
+	func _ready() -> void:
+		mouse_filter = Control.MOUSE_FILTER_STOP
+		var r: Dictionary = MetaData.EVENT_REWARDS[k]
+		var path: String = ICONS.get(str(r["type"]), "")
+		_tex = load(path) if path != "" and ResourceLoader.exists(path) else null
+
+	func setup(st: String) -> void:
+		state = st
+		queue_redraw()
+
+	## Antippen ohne Wischen holt die Belohnung (die Seite scrollt beim Wischen)
+	func _gui_input(e: InputEvent) -> void:
+		if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT:
+			if e.pressed:
+				_press = e.global_position
+			elif _press != Vector2.INF and e.global_position.distance_to(_press) < 10.0 * maxf(1.0, size.x / 66.0):
+				_press = Vector2.INF
+				tab.claim_event(k)
+
+	func _final() -> bool:
+		return k == MetaData.EVENT_REWARDS.size() - 1
+
+	func _box(r: Rect2, col: Color, rad: float, border := Color(0, 0, 0, 0), bw := 0.0, shadow := Color(0, 0, 0, 0), sh_off := Vector2.ZERO) -> void:
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = col
+		sb.set_corner_radius_all(roundi(rad))
+		if bw > 0.0:
+			sb.border_color = border
+			sb.set_border_width_all(maxi(1, roundi(bw)))
+		if shadow.a > 0.0:
+			sb.shadow_color = shadow
+			sb.shadow_offset = sh_off
+		sb.anti_aliasing = true
+		draw_style_box(sb, r)
+
+	func _grad_box(r: Rect2, a: Color, b: Color, rad: float, border: Color, bw: float, k_: float) -> void:
+		# Farbverlauf von oben nach unten: Schatten, dann Streifen im Verlauf, darüber der Rahmen
+		_box(Rect2(r.position + Vector2(0, 4) * k_, r.size), Color(0, 0, 0, 0.3), rad)
+		var n := 12
+		for i in n:
+			var y0 := r.position.y + r.size.y * i / n
+			var h := r.size.y / n + 1.0
+			var sb := StyleBoxFlat.new()
+			sb.bg_color = a.lerp(b, (i + 0.5) / n)
+			var top := i == 0
+			var bot := i == n - 1
+			sb.corner_radius_top_left = roundi(rad) if top else 0
+			sb.corner_radius_top_right = roundi(rad) if top else 0
+			sb.corner_radius_bottom_left = roundi(rad) if bot else 0
+			sb.corner_radius_bottom_right = roundi(rad) if bot else 0
+			sb.anti_aliasing = true
+			draw_style_box(sb, Rect2(r.position.x, y0, r.size.x, h if not bot else r.end.y - y0))
+		var fr := StyleBoxFlat.new()
+		fr.draw_center = false
+		fr.border_color = border
+		fr.set_border_width_all(maxi(1, roundi(bw)))
+		fr.set_corner_radius_all(roundi(rad))
+		fr.anti_aliasing = true
+		draw_style_box(fr, r)
+
+	func _text(t: String, cx: float, top: float, fam: String, weight: int, px: float, col: Color) -> void:
+		var f := MockFonts.font(fam, weight)
+		var fs := maxi(1, roundi(px))
+		var w := f.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		draw_string(f, Vector2(cx - w * 0.5, top + f.get_ascent(fs)), t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, col)
+
+	func _drop(c: Vector2, sz: float) -> void:
+		var pts := PackedVector2Array()
+		for i in 21:
+			var a := PI * i / 20.0
+			pts.append(c + Vector2(cos(a + PI) * 0.5, sin(a) * 0.5 + 0.1) * sz)
+		pts.append(c + Vector2(0, -0.55) * sz)
+		draw_colored_polygon(pts, Color("#7dff8a"))
+		draw_polyline(pts + PackedVector2Array([pts[0]]), Color("#1f7a3a"), maxf(1.0, sz * 0.1), true)
+
+	func _lock(c: Vector2, sz: float, col: Color) -> void:
+		draw_rect(Rect2(c.x - sz * 0.29, c.y - sz * 0.04, sz * 0.58, sz * 0.42), col)
+		draw_arc(c + Vector2(0, -0.08 * sz), sz * 0.18, PI, TAU, 12, col, maxf(1.0, sz * 0.11), true)
+
+	func _draw() -> void:
+		var q := size.x / 66.0
+		var r := Rect2(Vector2.ZERO, size)
+		var fin := _final()
+		var done := state == "done"
+		var ready := state == "ready"
+		# Karte
+		var a := Color("#4a3a9a")
+		var b := Color("#2e2470")
+		var border := Color(1, 1, 1, 0.22)
+		if fin:
+			a = Color("#ffe27a")
+			b = Color("#ff9f1c")
+			border = Color("#fff3b0")
+		elif ready:
+			a = Color("#5fd36a")
+			b = Color("#2f9a3f")
+			border = Color("#7dff8a")
+		_grad_box(r, a, b, 12 * q, border, 2 * q, q)
+		var fade := 0.55 if done else 1.0
+		# Symbol und Menge
+		var rw: Dictionary = MetaData.EVENT_REWARDS[k]
+		if _tex:
+			var isz := 36.0 * q
+			var ts := _tex.get_size()
+			var f := minf(isz / ts.x, isz / ts.y)
+			var dsz := ts * f
+			draw_texture_rect(_tex, Rect2(Vector2(size.x * 0.5, 16 * q + isz * 0.5) - dsz * 0.5, dsz), false, Color(1, 1, 1, fade))
+		if fin:
+			_text("Event-Truhe", size.x * 0.5, 54 * q, "Fredoka", 700, 11 * q, Color(Color("#5a2a00"), fade))
+		else:
+			_text("×%d" % int(rw.get("amount", 1)), size.x * 0.5, 52 * q, "Fredoka", 700, 14 * q, Color(Color("#fff7ea"), fade))
+		# Nummer oben auf der Kante
+		var badge_col := Color("#ff9f1c") if fin else (Color("#3fbf3a") if ready or done else Color("#5a4ab0"))
+		var br := Rect2(size.x * 0.5 - 11 * q, -9 * q, 22 * q, 18 * q)
+		_box(br, badge_col, 9 * q, Color.WHITE, 2 * q)
+		_text(str(k + 1), br.get_center().x, br.position.y + 2.5 * q, "Fredoka", 700, 11 * q, Color.WHITE)
+		if done:
+			var c := Vector2(size.x - 13 * q, 15 * q)
+			draw_circle(c, 9 * q, Color.WHITE)
+			draw_circle(c, 7.5 * q, Color("#3fbf3a"))
+			draw_polyline(PackedVector2Array([c + Vector2(-3.5, 0) * q, c + Vector2(-1, 2.5) * q, c + Vector2(3.5, -2.5) * q]), Color.WHITE, 2 * q, true)
+		elif ready:
+			# „Holen“ unten über der Kante, mit rotem Punkt
+			var hr := Rect2(5 * q, size.y - 10 * q, size.x - 10 * q, 20 * q)
+			_box(Rect2(hr.position + Vector2(0, 2) * q, hr.size), Color("#b8640e"), 8 * q)
+			_grad_box(hr, Color("#ffe27a"), Color("#ff9f1c"), 8 * q, Color(0, 0, 0, 0), 0.0, 0.0)
+			_text("Holen", hr.get_center().x, hr.position.y + 2.5 * q, "Fredoka", 700, 12 * q, Color("#5a2a00"))
+			var dot := Vector2(hr.end.x - 1 * q, hr.position.y + 0 * q)
+			draw_circle(dot, 6 * q, Color.WHITE)
+			draw_circle(dot, 4.5 * q, Color("#ff3b30"))
+		else:
+			_lock(Vector2(size.x - 11.5 * q, 12.5 * q), 13 * q, Color("#7a3a00") if fin else Color("#ffd34d"))
+			var pts := str((k + 1) * MetaData.EVENT_STEP)
+			var f2 := MockFonts.font("Nunito", 800)
+			var fs2 := maxi(1, roundi(9.5 * q))
+			var w := f2.get_string_size(pts, HORIZONTAL_ALIGNMENT_LEFT, -1, fs2).x
+			var x0 := size.x * 0.5 - (w + 11 * q) * 0.5
+			draw_string(f2, Vector2(x0, size.y - 4 * q - f2.get_descent(fs2)), pts, HORIZONTAL_ALIGNMENT_LEFT, -1, fs2, Color("#7a3a00") if fin else Color("#cfc8f0"))
+			_drop(Vector2(x0 + w + 6 * q, size.y - 9 * q), 9 * q)
+
+
+## Füllung des Punktebalkens (grün, links rund); Text „340 / 400“ steht darüber im Mockup
+class EventBar:
+	extends Control
+	var ratio := 0.0
+
+	func _ready() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _draw() -> void:
+		# Live-Rechteck ist die Füllung bei 85 %: volle Breite daraus zurückrechnen
+		var full := size.x / 0.85
+		var w := clampf(ratio, 0.0, 1.0) * full
+		if w <= 0.5:
+			return
+		var h := size.y
+		var n := 16
+		for i in n:
+			var x0 := w * i / n
+			var sb := StyleBoxFlat.new()
+			sb.bg_color = Color("#3fbf3a").lerp(Color("#b6ff8a"), (i + 0.5) / n)
+			var rad := roundi(h * 0.5)
+			sb.corner_radius_top_left = rad if i == 0 else 0
+			sb.corner_radius_bottom_left = rad if i == 0 else 0
+			sb.corner_radius_top_right = rad if i == n - 1 else 0
+			sb.corner_radius_bottom_right = rad if i == n - 1 else 0
+			sb.anti_aliasing = true
+			draw_style_box(sb, Rect2(x0, 0, w / n + (0.0 if i == n - 1 else 1.0), h))

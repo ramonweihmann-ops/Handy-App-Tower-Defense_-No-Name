@@ -1,0 +1,20 @@
+{
+ "board": "Shop-Event-Neu.dc.html",
+ "out": "out/shop_event",
+ "h": 946,
+ "lossy_alpha": true,
+ "script": "shop_event.js",
+ "states": [
+  {"name": "schleimflut", "eval": "m2gEvent.theme('schleimflut')"},
+  {"name": "frostwoche", "eval": "m2gEvent.theme('frostwoche')"},
+  {"name": "zombienacht", "eval": "m2gEvent.theme('zombienacht')"},
+  {"name": "lavawoche", "eval": "m2gEvent.theme('lavawoche')"}
+ ],
+ "only": [
+  "#dc-root > div > div[style*=\"top: 64px;\"]"
+ ],
+ "live": [
+  {"sel": "div[aria-label^=\"Stufe \"]", "id": "stufe"},
+  {"sel": "div[style*=\"width: 85%\"]", "id": "balken"}
+ ]
+}

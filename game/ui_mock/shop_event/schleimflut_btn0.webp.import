@@ -2,22 +2,22 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bepbcoa5pdons"
-path="res://.godot/imported/event_bg.webp-7bab1a94eb292f6ba1f598d3d9c057ea.ctex"
+uid="uid://7kcdy831htd8"
+path="res://.godot/imported/schleimflut_btn0.webp-cddbf519aa973d0d6c7d21222ceafeaa.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui_mock/shop/event_bg.webp"
-dest_files=["res://.godot/imported/event_bg.webp-7bab1a94eb292f6ba1f598d3d9c057ea.ctex"]
+source_file="res://ui_mock/shop_event/schleimflut_btn0.webp"
+dest_files=["res://.godot/imported/schleimflut_btn0.webp-cddbf519aa973d0d6c7d21222ceafeaa.ctex"]
 
 [params]
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.82
+compress/lossy_quality=0.9
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

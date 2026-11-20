@@ -206,6 +206,50 @@ static func pass_reward(level: int, premium: bool) -> Dictionary:
 	return {"type": type, "amount": amount}
 
 
+# --- Wöchentliches Event (Mockup „Shop · Event“, freigegeben 20.11.2026) ------------------
+## Jede Woche (Montag 0 Uhr UTC) ein anderes Thema, reihum. „foes“ steht in der Punkteliste, „desc“ im Banner.
+## Thema-Gegner: nach Gegnerart (kinds), nach Stärke (tiers) oder alle, die beim Besiegen verlangsamt sind (slowed).
+const EVENT_THEMES := [
+	{"id": "schleimflut", "title": "Schleimflut", "foes": "Schleim-Gegner", "kinds": ["schleimling", "schleimmutter"],
+		"desc": "Besiege Schleim-Gegner, fülle die Leiste und hol dir die Event-Truhe!"},
+	{"id": "frostwoche", "title": "Frostwoche", "foes": "Verlangsamte Gegner", "slowed": true,
+		"desc": "Besiege verlangsamte Gegner, fülle die Leiste und hol dir die Event-Truhe!"},
+	{"id": "zombienacht", "title": "Zombienacht", "foes": "Zombie-Gegner", "kinds": ["krabbler", "zombie", "brecher", "koloss"],
+		"desc": "Besiege Zombie-Gegner, fülle die Leiste und hol dir die Event-Truhe!"},
+	{"id": "lavawoche", "title": "Lavawoche", "foes": "Starke Gegner", "tiers": ["stark"],
+		"desc": "Besiege starke Gegner, fülle die Leiste und hol dir die Event-Truhe!"},
+]
+## Punkte je Stufe der Belohnungsleiste (zehn Stufen, die letzte ist die Event-Truhe)
+const EVENT_STEP := 100
+const EVENT_POINTS := {"win": 20, "foe": 1, "boss": 50, "mission": 30}
+const EVENT_REWARDS := [
+	{"type": "gold", "amount": 300}, {"type": "gems", "amount": 10}, {"type": "cards", "amount": 5},
+	{"type": "stars", "amount": 1}, {"type": "silver_chest"}, {"type": "gold", "amount": 600},
+	{"type": "gems", "amount": 20}, {"type": "cards", "amount": 10}, {"type": "stars", "amount": 2},
+	{"type": "gold_chest"},
+]
+
+
+## Nummer der Event-Woche (wechselt montags um 0 Uhr UTC; der 1.1.1970 war ein Donnerstag)
+static func event_week(unix: float) -> int:
+	return int(floor((unix + 3.0 * 86400.0) / 604800.0))
+
+
+static func event_theme(week: int) -> Dictionary:
+	return EVENT_THEMES[posmod(week, EVENT_THEMES.size())]
+
+
+## Zählt dieser besiegte Gegner für das Thema der Woche?
+static func event_counts(theme: Dictionary, kind: String, tier: String, slowed: bool) -> bool:
+	if bool(theme.get("slowed", false)):
+		return slowed
+	if theme.has("kinds"):
+		return kind in theme["kinds"]
+	if theme.has("tiers"):
+		return tier in theme["tiers"]
+	return false
+
+
 # --- Glücksrad -------------------------------------------------------------
 
 const WHEEL := [

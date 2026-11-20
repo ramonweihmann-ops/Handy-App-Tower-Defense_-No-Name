@@ -262,6 +262,10 @@ func _parse_args() -> void:
 			var pp: Node = load("res://tests/perf_probe.gd").new()
 			pp.set("main", self)
 			add_child.call_deferred(pp)
+		elif arg == "--eventcheck":
+			var ec: Node = load("res://tests/event_check.gd").new()
+			ec.set("main", self)
+			add_child.call_deferred(ec)
 		elif arg == "--ultcheck":
 			var uc: Node = load("res://tests/ult_check.gd").new()
 			uc.set("main", self)
@@ -993,6 +997,12 @@ func _on_enemy_killed(e: Enemy, gained: int) -> void:
 		Save.track("kills")
 		if e.is_boss():
 			Save.track("boss")
+		if not mp:
+			# Wöchentliches Event: Gegner des Wochenthemas +1, Boss +50 (Siege +20 bei der Belohnung)
+			if MetaData.event_counts(Save.event_theme(), e.kind, str(e.data.get("tier", "")), e.is_slowed()):
+				Save.event_add(int(MetaData.EVENT_POINTS["foe"]))
+			if e.is_boss():
+				Save.event_add(int(MetaData.EVENT_POINTS["boss"]))
 	_xp_carry += gained * (1.0 + float(bonus.get("xp", 0.0)))
 	var whole := int(floor(_xp_carry))
 	_xp_carry -= whole
@@ -1692,6 +1702,7 @@ func _grant_rewards(won: bool) -> Dictionary:
 		Save.data["stars"] = Save.stars() + stars
 		out["stars"] = stars
 		Save.track("wins")
+		Save.event_add(int(MetaData.EVENT_POINTS["win"]))   # Wöchentliches Event: gewonnenes Level
 		var pass_pts := MetaData.PASS_WIN_POINTS + int(round(float(bonus.get("pass_bonus", 0.0))))
 		Save.add_pass_points(pass_pts)
 		out["pass"] = pass_pts

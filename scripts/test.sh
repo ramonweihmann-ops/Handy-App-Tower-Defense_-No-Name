@@ -21,6 +21,10 @@ echo "== Multiplayer: Wertung und Computergegner =="
 out=$("$GODOT" --headless --path game --script tests/mp_fairness.gd 2>&1)
 echo "$out" | grep -E "MPCHECK"
 if grep -qE "SCRIPT ERROR|ERROR:|MPCHECK FEHLER" <<< "$out"; then echo "$out" | grep -E "ERROR|FEHLER" | head -5; fail=1; fi
+echo "== Wöchentliches Event =="
+out=$("$GODOT" --headless --path game -- --eventcheck 2>&1)
+echo "$out" | grep -E "EVENTCHECK"
+if grep -qE "SCRIPT ERROR|ERROR:|EVENTCHECK FEHLER" <<< "$out" || ! grep -q "EVENTCHECK ok" <<< "$out"; then echo "$out" | grep -E "ERROR|FEHLER" | head -5; fail=1; fi
 echo "== Multiplayer-Kampf (Station 5, Seed 1) =="
 out=$("$GODOT" --headless --fixed-fps 60 --path game -- --autotest --mp --level=5 --seed=1 --pull 2>&1)
 echo "$out" | grep -E "MPTEST" | sed 's/ curve=.*//'
