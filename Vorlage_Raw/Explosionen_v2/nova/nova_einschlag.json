@@ -1,0 +1,20 @@
+{
+  "frames": 12,
+  "cols": 4,
+  "rows": 3,
+  "fps": 24,
+  "loop": false,
+  "anker": [
+    0.5,
+    0.5
+  ],
+  "frame_px": 256,
+  "deckend": true,
+  "groesse_m": 2.0,
+  "status": "Visuell vom Nutzer freigegeben",
+  "hinweis": "Einmal mit 24 fps abspielen. Weltgröße im Spiel abstimmen; keine alte Trefferanimation parallel.",
+  "ziel_effekt": "nova_einschlag",
+  "gerichtet": false,
+  "tempo": 1.0,
+  "vorschau_kachelgroesse_px": 98
+}

@@ -1,0 +1,52 @@
+{
+  "freigabe": "Nutzerfreigabe der Vergleichsanimationen",
+  "bilder_unveraendert": true,
+  "godot_test": "Einbautest durch Claude ausstehend",
+  "effekte": {
+    "brocken": {
+      "datei": "brocken/brocken_einschlag_sheet.png",
+      "sha256": "bea6c93a8625db4a007197970c1c07f4a08cbe92885aaa76dcbcafb3c1ec523c",
+      "bildgroesse_px": [
+        1024,
+        768
+      ],
+      "kachelgroesse_px": [
+        256,
+        256
+      ],
+      "bilder": 12,
+      "rgba": true,
+      "ziel_effekt": "brocken_explosion"
+    },
+    "rollo": {
+      "datei": "rollo/rollo_einschlag_sheet.png",
+      "sha256": "84708d04a055a0432f35412b34d0db6ae737869ebded1c824435d98a17e49a56",
+      "bildgroesse_px": [
+        1024,
+        768
+      ],
+      "kachelgroesse_px": [
+        256,
+        256
+      ],
+      "bilder": 12,
+      "rgba": true,
+      "ziel_effekt": "rollo_einschlag"
+    },
+    "nova": {
+      "datei": "nova/nova_einschlag_sheet.png",
+      "sha256": "c41f01a491e2788abe6811cdde9b05b96f54a1ec0b4bb65589cd600b06dc367a",
+      "bildgroesse_px": [
+        1024,
+        768
+      ],
+      "kachelgroesse_px": [
+        256,
+        256
+      ],
+      "bilder": 12,
+      "rgba": true,
+      "ziel_effekt": "nova_einschlag"
+    }
+  }
+}
