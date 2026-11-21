@@ -307,6 +307,8 @@ func _parse_args() -> void:
 			for part in (arg.get_slice("=", 1).split(",") if "=" in arg else PackedStringArray()):
 				if part.begins_with("w"):
 					GameData.SW_WAVES = Array(part.substr(1).split("/")).map(func(x: String) -> int: return int(x))
+				elif part.begins_with("bu"):
+					GameData.SW_BOSS_UNIT = float(part.substr(2))
 				elif part.begins_with("bhp"):
 					GameData.SW_BOSS_HP = float(part.substr(3))
 				elif part.begins_with("hp"):

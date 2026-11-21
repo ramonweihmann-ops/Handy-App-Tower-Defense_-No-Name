@@ -465,6 +465,8 @@ static var SW_PAUSE := 6.0
 ## mit diesen Werten bleibt die Siegquote wie vorher (Labor 21.11.2026, 600 Kämpfe)
 static var SW_HP := 0.8
 static var SW_BOSS_HP := 0.75
+## Der Boss selbst zusätzlich: vor ihm hat man weniger Karten gewählt als früher (7 statt 13)
+static var SW_BOSS_UNIT := 0.8
 
 
 ## Welle im bisherigen Ablauf, deren Gegner und Leben diese Welle bekommt

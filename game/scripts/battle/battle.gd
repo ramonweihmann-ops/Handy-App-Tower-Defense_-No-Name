@@ -428,6 +428,8 @@ func spawn_enemy(kind: String, pos := Vector3.INF) -> Enemy:
 		hp *= CardRules.team_easing(level, wave, heroes.size())
 	if GameData.ENEMIES[kind]["tier"] == "boss":
 		hp *= GameData.boss_hp(level) * (MpData.BOSS_HP * MpData.boss_tune(level) if mode == "mp" else 1.0)
+		if mode != "mp" and GameData.short_waves:
+			hp *= GameData.SW_BOSS_UNIT
 	e.setup(kind, self, hp)
 	enemies.append(e)
 	if pos.z < spawn_z() + 3.0:
