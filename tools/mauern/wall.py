@@ -1,5 +1,5 @@
 # Mauer für das Kampffeld in Blender bauen und aus der Spielkamera rendern.
-# Aufruf: WALLSTYLE=streng blender -b -P wall.py -- <feld> <ausgabe.png> [samples]   (ohne WALLSTYLE: Comic-Entwurf, nur Raumstation)
+# Aufruf: blender -b -P wall.py -- <planet> <ausgabe.png> [samples]
 import bpy, bmesh, math, sys, random, os
 from mathutils import Vector
 
@@ -408,7 +408,15 @@ def glare(threshold=1.0, size=7):
 
 ls.collection = nolines
 KIT_DIR = os.path.dirname(os.path.abspath(__file__))
-if STYLE == "streng":
+if STYLE == "detail":
+    r.engine = 'CYCLES'
+    scene.cycles.device = 'CPU'
+    scene.cycles.samples = SAMPLES
+    scene.cycles.use_denoising = False
+    r.use_freestyle = False
+    exec(open(os.path.join(KIT_DIR, "detail_kit.py")).read())
+    exec(open(os.path.join(KIT_DIR, "planet_%s_detail.py" % PLANET)).read())
+elif STYLE == "streng":
     # wie die gemalten Schlachtfelder: Cycles, keine Umrisse, Leuchten über den Compositor
     r.engine = 'CYCLES'
     scene.cycles.device = 'CPU'
