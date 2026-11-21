@@ -299,6 +299,8 @@ func _parse_args() -> void:
 			Battle.fx_test = "bilder"
 		elif arg == "--fx-bisher":
 			Battle.fx_test = "bisher"
+		elif arg == "--wellen-alt":
+			GameData.short_waves = false   # Labor: bisheriger Wellenablauf (bis 0.10.40)
 		elif arg == "--wellen-neu" or arg.begins_with("--wellen-neu="):
 			# Labor: kürzere Level, z. B. --wellen-neu=w7/7/7/7/9,p6,hp0.9,bhp0.85
 			GameData.short_waves = true

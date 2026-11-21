@@ -452,16 +452,19 @@ static func classic_waves(level: int) -> int:
 	return 5 + (level - 1) % LEVELS_PER_WORLD + 1 + mini(world_of(level), 3)
 
 
-## Kürzere Level (Labor 20.11.2026, --wellen-neu): weniger Wellen, die Steigerung bleibt dieselbe. Die
+## Kürzere Level (seit 0.10.41, Labor 20./21.11.2026): weniger Wellen, die Steigerung bleibt dieselbe. Die
 ## Zwischenwellen werden ausgedünnt, die letzte Welle bleibt die große Schlusswelle (mit dem Boss im Boss-Level).
-static var short_waves := false
+## Ziel bei x2: normale Level im Schnitt etwa 2:30, Boss-Level etwa 3:00, keines mehr als 20 % darüber.
+## Labor: --wellen-alt = bisheriger Ablauf (6–13 Wellen, 10 s), --wellen-neu=w9/9/8/8/7,p6,hp0.8,bhp0.75 zum Abstimmen.
+static var short_waves := true
 ## Wellen je Level in der Welt: Level 1–4 der Welt, Boss-Level (nie mehr als bisher, Welt 1 steigt langsam an)
-static var SW_WAVES: Array = [7, 7, 7, 7, 9]
+static var SW_WAVES: Array = [9, 9, 8, 8, 7]
 ## Höchstens so viele Sekunden bis zur nächsten Welle, wenn noch Gegner übrig sind (bisher 10)
 static var SW_PAUSE := 6.0
-## Ausgleich für das Gegnerleben in normalen Leveln und in Boss-Leveln (weniger Karten je Kampf)
-static var SW_HP := 1.0
-static var SW_BOSS_HP := 1.0
+## Ausgleich für das Gegnerleben in normalen Leveln und in Boss-Leveln: weniger Wellen heißt weniger Karten je Kampf,
+## mit diesen Werten bleibt die Siegquote wie vorher (Labor 21.11.2026, 600 Kämpfe)
+static var SW_HP := 0.8
+static var SW_BOSS_HP := 0.75
 
 
 ## Welle im bisherigen Ablauf, deren Gegner und Leben diese Welle bekommt

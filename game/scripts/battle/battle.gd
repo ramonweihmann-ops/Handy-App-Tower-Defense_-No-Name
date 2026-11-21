@@ -544,7 +544,7 @@ func booster_air_strike(power: float) -> void:
 			spots.append(e.global_position)
 	while spots.size() < 5:
 		spots.append(Vector3(randf_range(-3.5, 3.5), 0, randf_range(-20.0, -4.0) * z_scale))
-	var dmg := 140.0 * power * GameData.hp_mult(level, maxi(wave, 1))
+	var dmg := 140.0 * power * (MpData.hp_mult(level, maxi(wave, 1)) if mode == "mp" else GameData.hp_mult(level, maxi(wave, 1)))
 	# Abwurfzeitpunkte sind in allen Effekt-Stilen gleich (der Stil ist reine Optik)
 	var sprites := FxSprite.has("luftangriff_raumjaeger")
 	var end_z := spawn_z() - 4.0

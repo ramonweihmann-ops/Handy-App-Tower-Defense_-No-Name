@@ -138,7 +138,10 @@ Schuss- und Nachlade-Bewegungen. Für den Piloten nehmen wir kostenlose CC0-Mode
 
 ### Aufbau
 
-- **Level:** mehrere Wellen, am Ende Sieg oder Niederlage
+- **Level:** mehrere Wellen, am Ende Sieg oder Niederlage. Seit 0.10.41 kürzer (Wunsch 20.11.2026): 9, 9, 8, 8 Wellen
+  in den Leveln 1–4 einer Welt, 7 im Boss-Level (Welt 1 steigt von 6 an). Die letzte Welle ist die große Schlusswelle,
+  im Boss-Level mit dem Boss. Die nächste Welle kommt spätestens 6 Sekunden nach der vorigen. Ziel bei x2: normale Level
+  im Schnitt etwa 2:30, Boss-Level etwa 3:00, keines mehr als 20 % darüber (`GameData.SW_*`, Labor `--wellen-alt`).
 - Alle **5 Level** kommt ein neues **Motiv**. Level 5, 10, 15 … sind Boss-Level.
 - **Stärkestufen** pro Motiv:
   - leicht: schnell, schwach, in Gruppen
