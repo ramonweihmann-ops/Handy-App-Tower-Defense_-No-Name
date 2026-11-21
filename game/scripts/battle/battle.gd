@@ -354,7 +354,7 @@ func _update_spawning(delta: float) -> void:
 			test_round.emit(test_rounds + 1)
 		return
 	if wave < total_waves:
-		if enemies.size() <= 2 or _wave_timer > GameData.wave_pause():
+		if enemies.size() <= 2 or _wave_timer > GameData.wave_pause(wave + 1 == total_waves):
 			_next_wave()
 	elif enemies.is_empty():
 		running = false

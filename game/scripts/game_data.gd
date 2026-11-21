@@ -478,9 +478,11 @@ static func source_wave(level: int, wave: int) -> int:
 	return 1 + roundi(float(wave - 1) * float(old - 1) / float(n - 1))
 
 
-## Längste Wartezeit bis zur nächsten Welle, solange noch mehr als zwei Gegner unterwegs sind
-static func wave_pause() -> float:
-	return SW_PAUSE if short_waves else 10.0
+## Längste Wartezeit bis zur nächsten Welle, solange noch mehr als zwei Gegner unterwegs sind. Vor der Schlusswelle
+## bleibt es bei 10 s: sonst trifft sie auf die Reste der Welle davor (Labor 21.11.2026: verlorene Boss-Level fielen
+## alle in der Schlusswelle).
+static func wave_pause(before_final := false) -> float:
+	return 10.0 if before_final or not short_waves else SW_PAUSE
 
 
 ## Grundleben der Gegner in diesem Level (1 = Level 1). easy = false: ohne die entspannten Level 21–30
