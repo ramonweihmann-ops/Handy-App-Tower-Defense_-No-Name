@@ -467,6 +467,8 @@ static var SW_HP := 0.8
 static var SW_BOSS_HP := 0.75
 ## Der Boss selbst zusätzlich: vor ihm hat man weniger Karten gewählt als früher (7 statt 13)
 static var SW_BOSS_UNIT := 0.8
+## Feinabstimmung einzelner Level mit den kürzeren Wellen (zusätzlich zu BOSS_TUNE), Labor 21.11.2026
+static var SW_TUNE := {35: 0.85}
 
 
 ## Welle im bisherigen Ablauf, deren Gegner und Leben diese Welle bekommt
@@ -535,7 +537,7 @@ static func hp_mult(level: int, wave: int) -> float:
 	var per_wave := WAVE_GROWTH_EASY if level >= PHASE2_FROM and level <= EASY_TO else 0.04
 	var hp := level_hp(level) * (1.0 + per_wave * (source_wave(level, wave) - 1))
 	if short_waves:
-		hp *= SW_BOSS_HP if is_boss_level(level) else SW_HP
+		hp *= (SW_BOSS_HP if is_boss_level(level) else SW_HP) * float(SW_TUNE.get(level, 1.0))
 	return hp
 
 
