@@ -116,3 +116,40 @@ def segments():
         x1 = e[i + 1] - (0.42 if i < len(e) - 2 else 0.0)
         out.append((x0, x1))
     return out
+
+def shadow_catcher():
+    """Boden als Schattenfänger: weicher Schatten und Kontaktschatten der Mauer fallen auf Brücke und Plattform"""
+    bpy.ops.mesh.primitive_plane_add(size=1, location=(0, -1.0, 0.0))
+    g = bpy.context.active_object
+    g.scale = (16, 8, 1)
+    g.is_shadow_catcher = True
+    return g
+
+def glow_comp(tint=(1.0, 0.3, 0.08), threshold=0.85, size=8, alpha_gain=0.9, mix_strength=1.0):
+    """Leuchten wie gemalt: Schein der hellen Teile, eingefärbt, auch über den Rand der Mauer hinaus (Deckkraft)"""
+    scene.use_nodes = True
+    nt = scene.node_tree
+    for n in list(nt.nodes):
+        nt.nodes.remove(n)
+    L = nt.links.new
+    rl = nt.nodes.new("CompositorNodeRLayers")
+    gl = nt.nodes.new("CompositorNodeGlare"); gl.glare_type = 'FOG_GLOW'; gl.quality = 'HIGH'
+    gl.threshold = threshold; gl.size = size; gl.mix = 1.0
+    L(rl.outputs["Image"], gl.inputs["Image"])
+    tn = nt.nodes.new("CompositorNodeMixRGB"); tn.blend_type = 'MULTIPLY'; tn.inputs[0].default_value = 1.0
+    tn.inputs[2].default_value = (*tint, 1)
+    L(gl.outputs["Image"], tn.inputs[1])
+    st = nt.nodes.new("CompositorNodeMixRGB"); st.blend_type = 'MULTIPLY'; st.inputs[0].default_value = 1.0
+    st.inputs[2].default_value = (mix_strength, mix_strength, mix_strength, 1)
+    L(tn.outputs["Image"], st.inputs[1])
+    add = nt.nodes.new("CompositorNodeMixRGB"); add.blend_type = 'ADD'; add.inputs[0].default_value = 1.0
+    L(rl.outputs["Image"], add.inputs[1]); L(st.outputs["Image"], add.inputs[2])
+    bw = nt.nodes.new("CompositorNodeRGBToBW"); L(st.outputs["Image"], bw.inputs[0])
+    gain = nt.nodes.new("CompositorNodeMath"); gain.operation = 'MULTIPLY'; gain.inputs[1].default_value = alpha_gain
+    L(bw.outputs[0], gain.inputs[0])
+    mx = nt.nodes.new("CompositorNodeMath"); mx.operation = 'MAXIMUM'; mx.use_clamp = True
+    L(rl.outputs["Alpha"], mx.inputs[0]); L(gain.outputs[0], mx.inputs[1])
+    sa = nt.nodes.new("CompositorNodeSetAlpha"); sa.mode = 'REPLACE_ALPHA'
+    L(add.outputs["Image"], sa.inputs["Image"]); L(mx.outputs[0], sa.inputs["Alpha"])
+    comp = nt.nodes.new("CompositorNodeComposite")
+    L(sa.outputs["Image"], comp.inputs["Image"])
