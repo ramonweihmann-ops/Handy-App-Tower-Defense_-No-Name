@@ -34,6 +34,10 @@ var _placed := {}      # Live-Kennung -> Control
 var _live_info := {}   # Live-Kennung -> Daten aus dem Export (Bild, Drehung)
 ## Höhe des Mockups in Punkten: 844, bei langen Seiten zum Scrollen mehr (layout.json „size“)
 var page_h := H
+## Streifen oben, der frei bleibt (Selfie-Kamera im Handy-Bildschirm), in Bildschirmpunkten; setzt main.gd
+static var safe_top := 0.0
+## Größte Breite je Text (Mockup-Punkte): längere Werte werden kleiner geschrieben (Zahlen in der Kopfleiste)
+var _fit_w := {}
 
 static var _layouts := {}
 
@@ -139,8 +143,11 @@ func show_state(state_name: String) -> void:
 func _layout() -> void:
 	if size.x <= 0.0 or size.y <= 0.0:
 		return
-	s = minf(size.x / W, size.y / page_h)
-	off = Vector2((size.x - W * s) * 0.5, (size.y - page_h * s) * 0.5)
+	# Kamera-Aussparung oben freihalten (nur Bildschirme, die oben am Rand beginnen)
+	var top := safe_top if global_position.y < 1.0 else 0.0
+	var avail_h := maxf(1.0, size.y - top)
+	s = minf(size.x / W, avail_h / page_h)
+	off = Vector2((size.x - W * s) * 0.5, top + (avail_h - page_h * s) * 0.5)
 	if overlay != "" and data.has("rect"):
 		var br: Array = data["rect"]
 		_bg.position = to_screen(Vector2(br[0], br[1]))
@@ -187,6 +194,15 @@ func set_text(key: Variant, value: String) -> void:
 	if i < 0:
 		return
 	_overrides[i] = value
+	_redraw_texts()
+
+
+## Text höchstens max_w Mockup-Punkte breit zeichnen (sonst kleiner), z. B. Gold vor dem Plus-Knopf
+func fit_text(key: Variant, max_w: float) -> void:
+	var i := _find_text(key)
+	if i < 0:
+		return
+	_fit_w[i] = max_w
 	_redraw_texts()
 
 
@@ -272,6 +288,11 @@ func draw_text(ci: CanvasItem, t: Dictionary, origin: Vector2) -> void:
 		var r: Array = ln["rect"]
 		var txt := str(ln["text"])
 		var rect := Rect2(origin + Vector2(r[0], r[1]) * s, Vector2(r[2], r[3]) * s)
+		var fs0 := fs
+		if _fit_w.has(i):
+			var max_px := float(_fit_w[i]) * s
+			while fs > 6 and font.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > max_px:
+				fs -= 1
 		var asc := font.get_ascent(fs)
 		var desc := font.get_descent(fs)
 		var base_y := rect.position.y + (rect.size.y - (asc + desc)) * 0.5 + asc
@@ -295,6 +316,7 @@ func draw_text(ci: CanvasItem, t: Dictionary, origin: Vector2) -> void:
 			else:
 				ci.draw_string(font, p + d[1] * s, txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, sc)
 		ci.draw_string(font, p, txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, col)
+		fs = fs0
 	if absf(rot) > 0.1:
 		ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 

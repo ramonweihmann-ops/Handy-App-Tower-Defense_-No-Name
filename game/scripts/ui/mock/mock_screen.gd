@@ -33,7 +33,39 @@ func _ready() -> void:
 	super()
 	button_pressed.connect(_on_pressed)
 	_use_shared_nav()
+	_fit_top()
 	refresh()
+
+
+## Zahlen der Kopfleiste nicht in den Plus-Knopf (oder den nächsten Wert) laufen lassen: höchstens so breit,
+## wie bis zum nächsten Element rechts in derselben Zeile Platz ist
+func _fit_top() -> void:
+	for k in top_texts:
+		var i := _find_text(top_texts[k])
+		if i < 0:
+			continue
+		var r: Array = []
+		for t in data.get("texts", []):
+			if int(t["i"]) == i and not (t["lines"] as Array).is_empty():
+				r = t["lines"][0]["rect"]
+		if r.is_empty():
+			continue
+		var x0 := float(r[0])
+		var cy := float(r[1]) + float(r[3]) * 0.5
+		var limit := W
+		for t in data.get("texts", []):
+			if int(t["i"]) == i or (t["lines"] as Array).is_empty():
+				continue
+			var o: Array = t["lines"][0]["rect"]
+			if float(o[0]) > x0 + 4.0 and absf(float(o[1]) + float(o[3]) * 0.5 - cy) < 12.0:
+				# ein „+“ sitzt mittig auf einem runden Knopf (etwa 26 Punkte breit): bis zu dessen linkem Rand
+				var left := float(o[0]) + float(o[2]) * 0.5 - 13.0 if str(t["text"]).strip_edges() == "+" else float(o[0])
+				limit = minf(limit, left)
+		for b in buttons():
+			var br: Array = b.info["rect"]
+			if float(br[0]) > x0 + 4.0 and float(br[1]) < cy and float(br[1]) + float(br[3]) > cy:
+				limit = minf(limit, float(br[0]))
+		fit_text(i, limit - x0 - 3.0)
 
 
 ## Eigene Reiterleiste des Mockups ausblenden und die einheitliche darüberlegen (nicht im Kampf-Bildschirm,
@@ -79,6 +111,7 @@ func show_state(state_name: String) -> void:
 	super(state_name)
 	if is_node_ready():
 		_use_shared_nav()
+		_fit_top()
 
 
 func _process(delta: float) -> void:
@@ -90,6 +123,7 @@ func _process(delta: float) -> void:
 
 ## Alles neu anzeigen (nach Kauf, Wechsel usw.)
 func refresh() -> void:
+	_fit_top()
 	refresh_top()
 	bind()
 	# bind() darf die Knöpfe ein- und ausblenden; die alte Reiterleiste bleibt trotzdem verborgen
@@ -111,11 +145,11 @@ func refresh_top() -> void:
 	if top_texts.has("energy"):
 		set_text(top_texts["energy"], "%d/%d" % [Save.energy(), Save.energy_max()])
 	if top_texts.has("gold"):
-		set_text(top_texts["gold"], num(Save.gold()))
+		set_text(top_texts["gold"], num_short(Save.gold()))
 	if top_texts.has("gems"):
-		set_text(top_texts["gems"], num(Save.gems()))
+		set_text(top_texts["gems"], num_short(Save.gems()))
 	if top_texts.has("stars"):
-		set_text(top_texts["stars"], num(Save.stars()))
+		set_text(top_texts["stars"], num_short(Save.stars()))
 	if top_texts.has("level"):
 		set_text(top_texts["level"], str(Save.max_level()))
 	var want := nav_badges()
@@ -154,6 +188,15 @@ static func mission_ready() -> bool:
 		if not m["claimed"].has(id) and int(m["progress"].get(id, 0)) >= int(d["goal"]):
 			return true
 	return false
+
+
+## Kurz für die Kopfleiste: bis 99.999 voll, dann „123K“, ab einer Million „1,23M“
+static func num_short(n: int) -> String:
+	if absi(n) < 100000:
+		return num(n)
+	if absi(n) < 1000000:
+		return "%dK" % (n / 1000)
+	return ("%.2fM" % (n / 1000000.0)).replace(".", ",")
 
 
 ## Zahl mit Tausenderpunkt wie im Mockup („4.573“)

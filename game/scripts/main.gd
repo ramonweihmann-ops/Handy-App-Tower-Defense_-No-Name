@@ -69,6 +69,9 @@ var _boost_override: Array[String] = []
 ## Nur für Tests mit Fenster: Menübild speichern (--menushot=pfad.png[,reiter[,lager-voll|held:<id>|bau:<id>[:leer]|unterreiter]]) und beenden.
 var _menu_shot := ""
 var _squad := ""
+## Labor: Kamera-Aussparung nachstellen (--kamera=26 = 26 Mockup-Punkte oben frei) und Goldstand fürs Bild (--gold=16684)
+var _cam_test := -1.0
+var _test_gold := -1
 ## Labor: fester Startchampion im automatischen Test (--start=iska); weitere Champions kommen wie sonst über Karten
 var _start_hero := ""
 ## Balance-Labor: Talente fest auf eine Stufe setzen (--talente=funkenherz:5,bollwerk:0 oder --talente=neu:5 für die vier
@@ -123,6 +126,8 @@ func _ready() -> void:
 				Save.data["squad"] = Array(_squad.split(","))
 		if _talent_override != "":
 			_apply_talent_override()
+	if _test_gold >= 0:
+		Save.data["gold"] = _test_gold
 	_build_layout()
 	# Geführter Einstieg; in Prüfbildern nur mit --tut
 	Tutorial.enabled = not _autotest and (_tut_shot or (_menu_shot == "" and _pick_shot == "" and _shot_path == ""))
@@ -315,6 +320,10 @@ func _parse_args() -> void:
 					GameData.SW_HP = float(part.substr(2))
 				elif part.begins_with("p"):
 					GameData.SW_PAUSE = float(part.substr(1))
+		elif arg.begins_with("--kamera="):
+			_cam_test = float(arg.get_slice("=", 1))
+		elif arg.begins_with("--gold="):
+			_test_gold = int(arg.get_slice("=", 1))
 		elif arg.begins_with("--mauer="):
 			BattleHud.wall_test = arg.get_slice("=", 1)   # Labor: Mauerbild von außerhalb zeigen
 		elif arg == "--karten-alt":
@@ -524,8 +533,12 @@ func _fit_world() -> void:
 		return
 	var hs := _world_holder.size
 	var on := battle != null and battle.field != ""
-	var sc := minf(hs.x / MockView.W, hs.y / MockView.H)
-	var frame := Rect2((hs - Vector2(MockView.W, MockView.H) * sc) * 0.5, Vector2(MockView.W, MockView.H) * sc)
+	# wie MockView._layout: Kamera-Aussparung oben freihalten, darunter mittig
+	var top := MockView.safe_top
+	var avail := Vector2(hs.x, maxf(1.0, hs.y - top))
+	var sc := minf(avail.x / MockView.W, avail.y / MockView.H)
+	var frame := Rect2(Vector2((hs.x - MockView.W * sc) * 0.5, top + (avail.y - MockView.H * sc) * 0.5),
+		Vector2(MockView.W, MockView.H) * sc)
 	if not on:
 		frame = Rect2(Vector2.ZERO, hs)
 	_world_container.set_anchors_preset(Control.PRESET_TOP_LEFT)
@@ -549,7 +562,23 @@ func _set_field(id: String) -> void:
 	_fit_world()
 
 
+## Selfie-Kamera (Display-Aussparung) oben: so viel Platz lassen die Bildschirme frei (MockView.safe_top)
+func _update_safe_top() -> void:
+	var vp := get_viewport().get_visible_rect().size
+	var top := 0.0
+	if _cam_test >= 0.0:
+		top = _cam_test * vp.y / MockView.H   # Labor: --kamera=<Mockup-Punkte>
+	elif OS.has_feature("mobile"):
+		var win := Vector2(DisplayServer.window_get_size())
+		var k := vp.y / maxf(1.0, win.y)
+		for r in DisplayServer.get_display_cutouts():
+			if r.position.y < win.y * 0.2:
+				top = maxf(top, r.end.y * k + 3.0)
+	MockView.safe_top = top
+
+
 func _fit_column() -> void:
+	_update_safe_top()
 	var vp := get_viewport().get_visible_rect().size
 	var w := minf(vp.x, vp.y * MAX_ASPECT)
 	_column.anchor_left = 0.5
