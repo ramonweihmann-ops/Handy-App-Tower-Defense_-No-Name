@@ -521,7 +521,7 @@ if "portholes" in P:
             sphere("BNiete", (x + 0.15 * math.cos(a_), FR - 0.14, 1.15 + 0.15 * math.sin(a_)), 0.018, brass)
         light_only(sphere("BLichtP%d" % i, (x, FR - 0.3, 1.15), 0.05, lamp_glow), lamp_glow)
 if "rope" in P:
-    rope = pm("Tau", (0.72, 0.6, 0.42), rough=0.85)
+    rope = pm("Tau", C.get("rope", (0.72, 0.6, 0.42)), rough=0.85)
     for i in range(len(edges) - 1):
         x0 = edges[i] + 0.4; x1 = edges[i + 1] - 0.4
         tube("Tau%d" % i, [(x0, FR - 0.24, 1.3), ((x0 + x1) / 2, FR - 0.3, 1.17), (x1, FR - 0.24, 1.3)], 0.04, rope)
@@ -531,11 +531,31 @@ if "hazard" in P:
         x0 = edges[i] + (0.4 if i > 0 else 0.0); x1 = edges[i + 1] - (0.4 if i < len(edges) - 2 else 0.0)
         box("Warn%d" % i, ((x0 + x1) / 2, FR - 0.095, 0.32), (x1 - x0 - 0.05, 0.02, 0.05), warn, bevel=0.0)
 if "rods" in P:
-    rodm = pm("Stab", (0.55, 0.57, 0.62), metal_=0.9, rough=0.3)
-    tipm = pm("Funke", C["light"], emit=C["light"], strength=6.0)
+    # Blitzableiter wie die Lampenmasten am Brückengeländer (Kommentar 22.11.: dicker, mehr Detail, nicht zu auffällig):
+    # Sockel mit Warnring, Mast mit drei Isolatorscheiben, Lampengehäuse mit gelbem Licht, kurze Fangspitze
+    rodm = plate("Mast", C.get("rod", (0.5, 0.53, 0.58)), metal=0.9, rough=0.3, bump=0.1, scratches=0.3, edge_wear=0.3)
+    insul = pm("Isolator", (0.2, 0.22, 0.26), rough=0.18)
+    warn_r = stripes("WarnRing", (0.95, 0.7, 0.1), (0.05, 0.05, 0.06), scale=10.0)
+    lampm = pm("MastLampe", C["light"], emit=C["light"], strength=5.0)
+    mast_glow = glowm("MastLicht", LIGHT, C.get("mast_power", 12.0))
     for i, x in enumerate(MODS):
-        cyl("Stab%d" % i, (x + 0.22, -0.13, TOP_Z + 0.3), 0.022, 0.6, rodm, verts=8)
-        sphere("Spitze%d" % i, (x + 0.22, -0.13, TOP_Z + 0.62), 0.045, tipm)
+        y0 = -0.13
+        z0 = TOP_Z
+        cyl("MSockel%d" % i, (x, y0, z0 + 0.03), 0.11, 0.06, metal, verts=8, bevel=0.01)
+        cyl("MWarn%d" % i, (x, y0, z0 + 0.08), 0.085, 0.04, warn_r, verts=24)
+        cyl("MFuss%d" % i, (x, y0, z0 + 0.12), 0.06, 0.04, metal2, verts=16, bevel=0.006)
+        cyl("Mast%d" % i, (x, y0, z0 + 0.32), 0.038, 0.4, rodm, verts=12)
+        for k, dz in enumerate((0.2, 0.25, 0.3)):
+            cyl("MIso%d_%d" % (i, k), (x, y0, z0 + dz), 0.06 - k * 0.006, 0.022, insul, verts=20, bevel=0.006)
+        cyl("MGehaeuse%d" % i, (x, y0, z0 + 0.53), 0.05, 0.03, metal2, verts=16, bevel=0.005)
+        see_through(cyl("MGlas%d" % i, (x, y0, z0 + 0.575), 0.038, 0.06, lampm, verts=16))
+        for a_ in range(4):
+            ang = a_ * math.pi / 2
+            box("MSteg%d" % i, (x + 0.042 * math.cos(ang), y0 + 0.042 * math.sin(ang), z0 + 0.575), (0.012, 0.012, 0.07), metal2, bevel=0.0)
+        bpy.ops.mesh.primitive_cone_add(vertices=16, radius1=0.055, radius2=0.012, depth=0.05, location=(x, y0, z0 + 0.63))
+        c_ = bpy.context.active_object; c_.data.materials.append(metal2); bpy.ops.object.shade_smooth()
+        cyl("MSpitze%d" % i, (x, y0, z0 + 0.71), 0.008, 0.12, rodm, verts=8)
+        light_only(sphere("MLicht%d" % i, (x, -0.45, z0 + 0.6), 0.03, mast_glow), mast_glow)
 if "pipe" in P:
     copper = pm("Kupfer", (0.72, 0.4, 0.22), metal_=0.9, rough=0.35)
     cyl("Rohr", (0, FR - 0.32, 0.36), 0.075, HALF * 2, copper, rot=(0, 90, 0), verts=16)
@@ -579,5 +599,5 @@ world.node_tree.nodes["Background"].inputs[1].default_value = C.get("ambient_str
 light('SUN', "Sonne", (0, -5, 8), (55, 0, -40), C.get("sun", 2.2), L_(C.get("sun_color", (0.95, 0.95, 1.0))))
 light('AREA', "Rand", (0, 3.0, 3.5), (-60, 0, 0), C.get("rim", 160), LIGHT, size=12)
 shadow_catcher()
-tint = L_(C["light"])
+tint = L_(C.get("glow_tint", C["light"]))  # Schein einfärben; neutral, wenn warme und kalte Lichter gemischt sind
 glow_comp(tint=tint, threshold=C.get("glow_threshold", 0.7), size=9, alpha_gain=0.9, mix_strength=C.get("glow_mix", 2.0))
