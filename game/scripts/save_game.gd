@@ -85,6 +85,10 @@ func load_game() -> void:
 			# Spielstände von vor dem Tutorial: diese Spieler kennen das Spiel schon
 			if not stored.has("tut"):
 				data["tut"] = {"done": true}
+			# Leistungsstufe neu gezählt (0.10.44: geringere Auflösung erst zuletzt): einmal zurück auf volle Grafik
+			if not stored.has("perf_v2"):
+				data["perf_level"] = 0
+				data["perf_v2"] = true
 			# Konto „alles frei“: später dazugekommene Talente (z. B. die der vier neueren Champions) gleich voll
 			if account == "voll":
 				for id in MetaData.TALENTS.keys():

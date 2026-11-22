@@ -71,6 +71,10 @@ var _menu_shot := ""
 var _squad := ""
 ## Labor: Kamera-Aussparung nachstellen (--kamera=26 = 26 Mockup-Punkte oben frei) und Goldstand fürs Bild (--gold=16684)
 var _cam_test := -1.0
+## Labor: Kampf mit festem Tempo (--tempo=2) und dauerhaft entladenem Energiekern (--dauerboost) für Prüfbilder
+var _test_tempo := 0
+var _test_boost := false
+var _test_perf := -1
 var _test_gold := -1
 ## Labor: fester Startchampion im automatischen Test (--start=iska); weitere Champions kommen wie sonst über Karten
 var _start_hero := ""
@@ -128,6 +132,8 @@ func _ready() -> void:
 			_apply_talent_override()
 	if _test_gold >= 0:
 		Save.data["gold"] = _test_gold
+	if _test_perf >= 0:
+		Save.data["perf_level"] = _test_perf
 	_build_layout()
 	# Geführter Einstieg; in Prüfbildern nur mit --tut
 	Tutorial.enabled = not _autotest and (_tut_shot or (_menu_shot == "" and _pick_shot == "" and _shot_path == ""))
@@ -320,6 +326,12 @@ func _parse_args() -> void:
 					GameData.SW_HP = float(part.substr(2))
 				elif part.begins_with("p"):
 					GameData.SW_PAUSE = float(part.substr(1))
+		elif arg.begins_with("--tempo="):
+			_test_tempo = int(arg.get_slice("=", 1))
+		elif arg.begins_with("--leistung="):
+			_test_perf = int(arg.get_slice("=", 1))   # Labor: Grafikstufe der Leistungsanpassung nachstellen
+		elif arg == "--dauerboost":
+			_test_boost = true
 		elif arg.begins_with("--kamera="):
 			_cam_test = float(arg.get_slice("=", 1))
 		elif arg.begins_with("--gold="):
@@ -1038,9 +1050,12 @@ func _on_hero_picked(id: String) -> void:
 		_mp_curve.clear()
 		_apply_speed(1)
 	if _autotest:
-		_apply_speed(1)
+		tempo = clampi(_test_tempo, 1, 3) if _test_tempo > 0 else 1
+		_apply_speed(tempo)
 	battle.start()
 	plasma.active = true
+	if _test_boost:
+		battle.overdrive(9999.0)
 
 
 # --- Erfahrung und Karten ---------------------------------------------------

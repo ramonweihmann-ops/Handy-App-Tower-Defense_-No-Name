@@ -182,18 +182,19 @@ func set_field(id: String) -> void:
 
 ## Grafikstufe: „sparsam“ (Einstellungen) ohne Leuchten und Schatten; dazu die automatische Stufe
 ## (Save „perf_level“, main.gd senkt sie, wenn das Gerät im Kampf nicht mitkommt):
-## 1 = 3D-Szene in 75 % Auflösung, 2 = dazu ohne Leuchten, 3 = dazu ohne Schatten.
+## 1 = ohne Schatten, 2 = dazu ohne Leuchten, 3 = dazu 3D-Szene in 85 % Auflösung. Die geringere Auflösung kommt
+## zuletzt: Dünne Strahlen (Fünkchens Atem) zerfallen sonst in Blöcke (vorher Stufe 1 mit 75 %, Rückmeldung 22.11.2026).
 func apply_quality() -> void:
 	var high: bool = Save.data.get("quality", "hoch") == "hoch"
 	var lvl := int(Save.data.get("perf_level", 0))
 	if _env:
 		_env.glow_enabled = high and lvl < 2
 	if _sun:
-		_sun.shadow_enabled = high and lvl < 3
+		_sun.shadow_enabled = high and lvl < 1
 	var vp := get_viewport()
 	if vp and vp != get_tree().root:
 		vp.scaling_3d_mode = Viewport.SCALING_3D_MODE_BILINEAR
-		vp.scaling_3d_scale = 0.75 if lvl >= 1 else 1.0
+		vp.scaling_3d_scale = 0.85 if lvl >= 3 else 1.0
 	for o in _islands:
 		o.visible = high and field == ""
 

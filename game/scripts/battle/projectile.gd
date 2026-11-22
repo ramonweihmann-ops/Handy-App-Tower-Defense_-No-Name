@@ -36,6 +36,13 @@ var _last_target := Vector3.ZERO
 var _s := 0.0
 var _length := 1.0
 var _arc := 0.0
+## Gemalte Geschosse mit Spitze vorn (Iskas Kristall, Leuchtspuren): Der Schweif wächst erst mit der Flugstrecke,
+## sonst liegt er direkt nach dem Schuss über Waffe und Champion (Rückmeldung 22.11.2026). Der Schweif ist auf dem
+## Bildschirm nicht verkürzt, die Flugstrecke in die Tiefe schon: daher etwa die Hälfte der Strecke.
+const GROW_MIN := 0.12
+const GROW_RATE := 0.5
+var _sprite_len := 0.0
+var _sprite_w := 0.0
 
 
 func launch(battle_: Battle, kind_: String, from: Vector3, target_: Enemy, dmg_: float, crit_: bool,
@@ -69,8 +76,10 @@ func launch(battle_: Battle, kind_: String, from: Vector3, target_: Enemy, dmg_:
 			# Rakete (Schusseffekte_brocken_v2): gemalt statt 3D, Spitze vorn an der Geschossposition, dreht sich über
 			# set_dir entlang der flachen Raketenbahn (_rocket_lift); die Explosion kommt weiter aus battle.explode
 			# kurzer Streifen am Geschoss, Spitze vorn (Anker an der Spitze)
+			_sprite_w = float(gi.get("feste_hoehe_m", 1.0)) / FxSprite.SCALE
+			_sprite_len = float(gi.get("groesse_m", 1.0))
 			_sprite = FxSprite.attach(self, gname, {"dir": _last_target - from, "stretch": false,
-				"width": float(gi.get("feste_hoehe_m", 1.0)) / FxSprite.SCALE, "length": float(gi.get("groesse_m", 1.0)),
+				"width": _sprite_w, "length": _sprite_len * GROW_MIN,
 				"frames": int(gi.get("schleife_bilder", gi.get("frames", 1)))})
 			return
 	if style in TRACER_STYLES and FxSprite.enabled:
@@ -142,6 +151,9 @@ func _process(delta: float) -> void:
 		look_at(global_position + dir, Vector3.UP)
 		if _sprite:
 			_sprite.set_dir(dir)
+			if _sprite_len > 0.0:
+				var l := clampf(_s * _length * GROW_RATE, _sprite_len * GROW_MIN, _sprite_len)
+				_sprite.set_instance_shader_parameter("size", Vector2(_sprite_w, l))
 	global_position = pos
 	if _tracer:
 		# Spur wächst aus der Mündung heraus und bleibt dann gleich lang
