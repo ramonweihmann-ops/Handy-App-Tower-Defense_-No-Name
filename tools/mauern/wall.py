@@ -412,6 +412,9 @@ if STYLE == "detail":
     r.engine = 'CYCLES'
     scene.cycles.device = 'CPU'
     scene.cycles.samples = SAMPLES
+    scene.cycles.use_adaptive_sampling = True
+    scene.cycles.adaptive_threshold = 0.008
+    scene.cycles.sample_clamp_indirect = 2.0
     scene.cycles.use_denoising = False
     r.use_freestyle = False
     exec(open(os.path.join(KIT_DIR, "detail_kit.py")).read())
