@@ -43,13 +43,13 @@ func _use_shared_nav() -> void:
 		return
 	var own := false
 	var top := 999.0
-	for b in buttons():
-		var href := str(b.info.get("href", ""))
-		if TAB_OF.has(href) and float((b.info["rect"] as Array)[1]) > 700.0:
-			b.visible = false
-			own = true
-			if href != "#kampf":
-				top = minf(top, float((b.info["rect"] as Array)[1]))
+	for b in _nav_buttons():
+		var r: Array = b.info["rect"]
+		b.visible = false
+		own = true
+		var mid := float(r[0]) + float(r[2]) * 0.5
+		if str(b.info.get("href", "")) != "#kampf" and not (mid > 150.0 and mid < 240.0):   # nicht der erhöhte Kampf-Knopf
+			top = minf(top, float(r[1]))
 	if not own or _nav_bar:
 		return
 	_nav_bar = NavBar.new()
@@ -57,6 +57,21 @@ func _use_shared_nav() -> void:
 	# eigene Leiste beginnt höher als die einheitliche (Helden, Upgrades): Rand darüber verdecken
 	_nav_bar.cover_from = 762.0 if top < 788.0 else 0.0
 	place_at(_nav_bar, Rect2(0, NAV_TOP, W, H - NAV_TOP), true)
+
+
+## Knöpfe der eigenen Reiterleiste im Mockup: mit Reiter-Ziel (#shop …) unten, sonst eine Reihe aus mindestens vier
+## Knöpfen ganz unten, die auf andere Zeichenflächen zeigen (ältere Mockups wie „Held aufleveln“)
+func _nav_buttons() -> Array:
+	var tabs := []
+	var row := []
+	for b in buttons():
+		var href := str(b.info.get("href", ""))
+		var r: Array = b.info["rect"]
+		if TAB_OF.has(href) and float(r[1]) > 700.0:
+			tabs.append(b)
+		elif float(r[1]) >= 775.0 and float(r[3]) <= 70.0 and href.ends_with(".dc.html"):
+			row.append(b)
+	return tabs if not tabs.is_empty() or row.size() < 4 else row
 
 
 ## Ein anderer Zustand legt die Knöpfe neu an: die eigene Reiterleiste wieder ausblenden
@@ -219,5 +234,7 @@ class NavBar:
 				if (NAV_HITS[href] as Rect2).has_point(m):
 					accept_event()
 					Sfx.play("click")
-					screen.menu.show_tab(TAB_OF[href])
+					var mm: MainMenu = screen.menu
+					mm.close_all_boards()   # in einem Fenster (z. B. „Held aufleveln“): Fenster zu, dann der Reiter
+					mm.show_tab(TAB_OF[href])
 					return

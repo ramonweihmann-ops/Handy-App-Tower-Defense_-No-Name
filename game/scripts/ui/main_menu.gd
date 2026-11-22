@@ -496,6 +496,12 @@ func _covers(b: Control) -> bool:
 	return false
 
 
+## Alle darüber geöffneten Fenster schließen (Tippen auf die Reiterleiste in einem Fenster)
+func close_all_boards() -> void:
+	for b in _boards.duplicate():
+		close_board(b)
+
+
 func close_board(screen: Control) -> void:
 	_boards.erase(screen)
 	if is_instance_valid(screen):
