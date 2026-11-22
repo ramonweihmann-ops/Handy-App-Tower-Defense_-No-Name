@@ -420,6 +420,8 @@ if STYLE == "form":
     exec(open(os.path.join(KIT_DIR, "detail_kit.py")).read())
     exec(open(os.path.join(KIT_DIR, "planet_%s_form.py" % PLANET)).read())
     exec(open(os.path.join(KIT_DIR, "form_kit.py")).read())
+    if os.path.exists(os.path.join(KIT_DIR, "planet_%s_extra.py" % PLANET)):
+        exec(open(os.path.join(KIT_DIR, "planet_%s_extra.py" % PLANET)).read())
 elif STYLE == "detail":
     r.engine = 'CYCLES'
     scene.cycles.device = 'CPU'
