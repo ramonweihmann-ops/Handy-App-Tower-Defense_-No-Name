@@ -6,8 +6,22 @@ Nach jeder geschafften Welle wählt man eine Karte. Vorschlag des Nutzers vom 14
 - **Im Spiel:** Meisterfähigkeit (Regel 3) seit 0.10.31, Mockup „Karten-Meister“ freigegeben am 19.11.2026;
   Platzgrenze (Regel 2) seit 0.10.35, freigegeben am 20.11.2026; Symbiosen (Regel 4) seit 0.10.37, Mockup
   „Karten-Symbiose“ freigegeben am 20.11.2026.
-- **Nur im Labor:** „Neue Champions erst ab Welle 5“ mit `--karten-neu=held5`; `--karten-alt` schaltet alle neuen
-  Regeln aus (Vergleich wie vor 0.10.31).
+- **Im Spiel seit 0.10.46** (Wunsch 22.11.2026: „das muss kommen, sehr wichtig“): „Neue Champions erst ab Welle 5“,
+  ab Level 2 (im ersten Kampf mit dem Tutorial kommt der zweite Champion weiter nach Welle 1), nicht im Mehrspieler.
+  `--karten-alt` schaltet alle neuen Regeln aus (Vergleich wie vor 0.10.31).
+- Labor 22.11.2026 mit den kurzen Wellen (9/9/8/8/7), je 4 Seeds, Siegquote anfaenger / durchschnitt / zahlend:
+
+  | Level | bisher | ab Welle 5 |
+  |---|---|---|
+  | 2–18 | 100 / 100 / 100 | 100 / 100 / 100 |
+  | 20 | 100 / 100 / 100 | 75 / 100 / 100 |
+  | 25, 30 | 100 / 100 / 100 | 75 / 100 / 100 |
+  | 35 | 0 / 75 / 100 | 0 / 100 / 100 |
+  | 40 | 0 / 75 / 75 | 0 / 75 / 100 |
+  | 45 | 0 / 75 / 100 | 0 / 75 / 100 |
+  | 50 | 0 / 75 / 100 | 25 / 75 / 100 |
+
+  Mit dem Ausgleich (bis Welle 8: allein −45 %, zu zweit −20 % Gegnerleben, ab Level 21) liegt die Regel gleichauf.
 - Symbiose-Karte wie im Mockup: Kärtchen mit beiden Spezialmotiven, Kurztitel (`CardRules.SYMBIOSE_SHORT`) und beiden
   Namen in Mint; Detailfeld mit beiden Porträts, Plakette „∞ SYMBIOSE“ (Zeichen als Linie gezeichnet) und „EINMALIG“.
   Liegt ein eigenes Motiv `game/ui/karten/sym_<id>.webp` vor (Prompt 4), ersetzt es das Motivpaar.
@@ -101,7 +115,7 @@ Bosse 35–55 %, `scripts/balance-lab.py`). Der Wunsch „bis Level 30 entspannt
 
 - Grundkurve: „bis Level 30 entspannt“ (Vorschlag an den Nutzer)
 - Sieben Symbiose-Motive von ChatGPT (Prompt 4)
-- „Neue Champions erst ab Welle 5“: noch nicht entschieden (Tutorial wählt nach Welle 1 einen Helden)
+- ~~„Neue Champions erst ab Welle 5“~~: entschieden 22.11.2026, im Spiel seit 0.10.46 (Tutorial-Kampf ausgenommen)
 
 ## Kampfkarten der Champions (freigegeben 17.11.2026)
 

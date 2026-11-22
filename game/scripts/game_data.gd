@@ -225,10 +225,10 @@ const WORLDS := [
 	{"name": "Zombie-Kolonie", "kinds": ["krabbler", "zombie", "brecher", "koloss"],
 		"c1": Color(0.35, 0.85, 0.2), "c2": Color(0.95, 0.85, 0.2), "rim": Color(0.5, 1.0, 0.3)},
 	{"name": "Frostmond", "kinds": ["schleimling", "tentakler", "panzerkaefer", "schleimmutter"],
-		"prefix": "Frost-", "tint": Color(0.6, 0.85, 1.25),
+		"prefix": "Frost-", "tint": Color(0.6, 0.85, 1.25), "boss_looks": {"schleimmutter": "frost_schleimmutter"},
 		"c1": Color(0.3, 0.6, 1.0), "c2": Color(0.85, 0.95, 1.0), "rim": Color(0.6, 0.85, 1.0)},
 	{"name": "Lava-Kolonie", "kinds": ["krabbler", "zombie", "brecher", "koloss"],
-		"prefix": "Lava-", "tint": Color(1.3, 0.65, 0.45),
+		"prefix": "Lava-", "tint": Color(1.3, 0.65, 0.45), "boss_looks": {"koloss": "lava_koloss"},
 		"c1": Color(1.0, 0.35, 0.1), "c2": Color(1.0, 0.8, 0.2), "rim": Color(1.0, 0.5, 0.2)},
 	{"name": "Giftsumpf", "kinds": ["schleimling", "zombie", "panzerkaefer", "schleimmutter"],
 		"prefix": "Gift-", "tint": Color(0.75, 1.25, 0.5),
@@ -422,6 +422,18 @@ static func world_tint(level: int, kind := "") -> Color:
 	if kind != "" and bool(ENEMIES.get(kind, {}).get("own_look", false)):
 		return Color(1, 1, 1)
 	return WORLDS[world_of(level)].get("tint", Color(1, 1, 1))
+
+
+## Bosse je Welt (Wunsch 22.11.2026): eigene Aufsätze statt nur Färbung, gebaut mit tools/bosse/boss_aufsatz.py.
+## Noch nicht freigegeben: nur mit dem Labor-Schalter --boss-neu (Prüfbilder), danach BOSS_LOOKS_LIVE = true.
+const BOSS_LOOKS_LIVE := false
+static var test_boss_looks := false
+
+
+static func boss_look(level: int, kind: String) -> String:
+	if not (BOSS_LOOKS_LIVE or test_boss_looks):
+		return ""
+	return str(WORLDS[world_of(level)].get("boss_looks", {}).get(kind, ""))
 
 
 ## Gegnerarten der Welt dieses Levels (leicht, mittel, stark, Boss). Mit dem Prüf-Schalter --neue-monster

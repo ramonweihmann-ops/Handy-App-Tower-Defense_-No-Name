@@ -6,6 +6,7 @@ extends Node3D
 const VIS_SCALE := 1.45
 
 var kind := ""
+var look := ""   # Boss je Welt (GameData.boss_look), leer = Grundmodell
 var data: Dictionary
 var battle: Battle
 var hp := 1.0
@@ -240,7 +241,7 @@ func _update_effects(delta: float) -> void:
 
 func _animate(_delta: float, moving: bool) -> void:
 	if _model:
-		var d: Dictionary = Models.enemy(kind)
+		var d: Dictionary = Models.enemy(kind, look)
 		_play(String(d["attack"]) if attacking else String(d["walk"]))
 		if _anim:
 			if d.has("stride") and moving and not attacking:
@@ -457,7 +458,7 @@ func _build_visual() -> void:
 
 ## Fertiges Modell statt einfacher Formen. Zombies bekommen grünliche Haut.
 func _build_model() -> void:
-	var d: Dictionary = Models.enemy(kind)
+	var d: Dictionary = Models.enemy(kind, look)
 	_model = Models.make(String(d["file"]), float(d["height"]), false)
 	_half_w = Models.half_width(String(d["file"]), float(d["height"])) * VIS_SCALE
 	keep_on_bridge()

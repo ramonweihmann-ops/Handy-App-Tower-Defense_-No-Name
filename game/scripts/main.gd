@@ -351,6 +351,8 @@ func _parse_args() -> void:
 			_talent_override = arg.get_slice("=", 1)
 		elif arg.begins_with("--faehigkeiten="):
 			Hero.test_skills = int(arg.get_slice("=", 1))   # alle Kampfkarten der Champions auf diese Stufe (Test)
+		elif arg == "--boss-neu":
+			GameData.test_boss_looks = true   # Bosse je Welt (noch nicht freigegeben) für Prüfbilder
 		elif arg == "--neue-monster":
 			Models.test_new = true   # noch nicht freigegebene Gegnermodelle zeigen (Prüfbilder)
 		elif arg == "--mp":
@@ -1210,7 +1212,8 @@ func _on_card_picked(card: Dictionary) -> void:
 
 func _roll_cards(n: int) -> Array:
 	var pool: Array = []
-	var heroes_ok := not CardRules.has("held5") or _card_wave >= CardRules.HERO_FROM_WAVE
+	var heroes_ok := not CardRules.has("held5") or _card_wave >= CardRules.HERO_FROM_WAVE \
+		or battle.mode == "mp" or battle.level < CardRules.HELD5_FROM_LEVEL
 	if battle.heroes.size() < Battle.MAX_HEROES and heroes_ok:
 		for id in Save.squad():
 			if not battle.has_hero(id):

@@ -76,11 +76,16 @@ const ENEMIES_NEU := {}
 static var test_new := false
 
 
-## Daten eines Gegnermodells (mit dem Test-Schalter die neuen, noch nicht freigegebenen)
-static func enemy(kind: String) -> Dictionary:
+## Daten eines Gegnermodells (mit dem Test-Schalter die neuen, noch nicht freigegebenen). look: Boss je Welt
+## (tools/bosse/boss_aufsatz.py, Datei enemies_v2/bosse/<look>.glb): gleiche Animationen, eigene Aufsätze.
+static func enemy(kind: String, look := "") -> Dictionary:
 	if test_new and ENEMIES_NEU.has(kind):
 		return ENEMIES_NEU[kind]
-	return ENEMIES.get(kind, {})
+	var d: Dictionary = ENEMIES.get(kind, {})
+	if look != "" and not d.is_empty() and ResourceLoader.exists("res://models/enemies_v2/bosse/%s.glb" % look):
+		d = d.duplicate()
+		d["file"] = "enemies_v2/bosse/" + look
+	return d
 
 
 static var _scenes := {}

@@ -21,9 +21,13 @@ static var DUO_HP := 0.8
 
 ## Im normalen Spiel an: Meisterfähigkeit seit 0.10.31 (Mockup „Karten-Meister“ freigegeben am 19.11.2026),
 ## Platzgrenze seit 0.10.35 (freigegeben am 20.11.2026), Symbiosen seit 0.10.37 (Mockup „Karten-Symbiose“ freigegeben
-## am 20.11.2026); --karten-alt schaltet alles aus (Vergleich im Labor), --karten-neu schaltet Teile dazu
-const LIVE := ["meister", "plaetze", "symbiose"]
-static var on := {"meister": true, "plaetze": true, "symbiose": true}
+## am 20.11.2026), neue Champions erst ab Welle 5 seit 0.10.46 (Wunsch 22.11.2026, Labor mit den kurzen Wellen gleich
+## wie vorher); --karten-alt schaltet alles aus (Vergleich im Labor), --karten-neu schaltet Teile dazu
+const LIVE := ["meister", "plaetze", "symbiose", "held5"]
+static var on := {"meister": true, "plaetze": true, "symbiose": true, "held5": true}
+## held5 gilt ab diesem Level: Im ersten Kampf (Tutorial) kommt der zweite Champion weiter schon nach Welle 1,
+## damit man das Dazuholen gleich lernt. Im Mehrspieler gilt held5 nicht (dort nicht abgestimmt).
+const HELD5_FROM_LEVEL := 2
 
 
 static func has(part: String) -> bool:
