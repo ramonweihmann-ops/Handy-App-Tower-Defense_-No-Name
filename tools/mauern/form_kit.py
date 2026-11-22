@@ -14,7 +14,7 @@ def ramp_colors(cr, cols, positions=(0.15, 0.42, 0.68, 0.92)):
         x = e.new(p); x.color = (*L_(c), 1)
 
 def plate(name, base, metal=0.0, rough=0.75, bump=0.8, scratches=0.0, veins=None, var=1.0,
-          cracks=None, corner=0.0, heat_bottom=0.0, glow=None, strength=1.6):
+          cracks=None, corner=0.0, heat_bottom=0.0, glow=None, strength=1.6, dust=None, edge_wear=0.0, streaks=0.0, blotches=0.0):
     """Oberfläche mit Flecken, Narben, Kratzern/Maserung, dunklen Ecken und Leuchten in Rissen, Ecken und von unten.
     cracks = (Dichte, Breite, Maske 0..1; Maske 1 = keine), glow = vier Leuchtfarben (dunkel → Kern)"""
     m = bpy.data.materials.new(name)
@@ -57,6 +57,31 @@ def plate(name, base, metal=0.0, rough=0.75, bump=0.8, scratches=0.0, veins=None
         Ln(sr.outputs["Result"], mx.inputs["Factor"]); Ln(col, mx.inputs[6])
         mx.inputs[7].default_value = (min(1, b[0] * 2.2 + 0.08), min(1, b[1] * 2.2 + 0.08), min(1, b[2] * 2.2 + 0.08), 1)
         col = mx.outputs[2]
+    if streaks > 0:
+        # senkrechte Schmutzschlieren (wie die gemalten Flecken an der Brücke)
+        sm = nt.nodes.new("ShaderNodeMapping"); sm.inputs["Scale"].default_value = (9.0, 9.0, 0.9)
+        Ln(geo.outputs["Position"], sm.inputs["Vector"])
+        st = nt.nodes.new("ShaderNodeTexNoise"); st.inputs["Scale"].default_value = 2.5; st.inputs["Detail"].default_value = 4.0
+        Ln(sm.outputs["Vector"], st.inputs["Vector"])
+        sr2 = nt.nodes.new("ShaderNodeMapRange"); sr2.inputs["From Min"].default_value = 0.52; sr2.inputs["From Max"].default_value = 0.72
+        sr2.inputs["To Max"].default_value = streaks
+        Ln(st.outputs["Fac"], sr2.inputs["Value"])
+        smx = nt.nodes.new("ShaderNodeMix"); smx.data_type = 'RGBA'
+        Ln(sr2.outputs["Result"], smx.inputs["Factor"]); Ln(col, smx.inputs[6])
+        smx.inputs[7].default_value = (b[0] * 0.5, b[1] * 0.45, b[2] * 0.4, 1)
+        col = smx.outputs[2]
+    if blotches > 0:
+        # größere dunkle Flecken (gemalter Schmutz wie an der Brücke)
+        bl = nt.nodes.new("ShaderNodeTexNoise"); bl.inputs["Scale"].default_value = 1.6; bl.inputs["Detail"].default_value = 3.0
+        bl.inputs["Roughness"].default_value = 0.6
+        Ln(geo.outputs["Position"], bl.inputs["Vector"])
+        br = nt.nodes.new("ShaderNodeMapRange"); br.inputs["From Min"].default_value = 0.5; br.inputs["From Max"].default_value = 0.66
+        br.inputs["To Max"].default_value = blotches
+        Ln(bl.outputs["Fac"], br.inputs["Value"])
+        bmx = nt.nodes.new("ShaderNodeMix"); bmx.data_type = 'RGBA'
+        Ln(br.outputs["Result"], bmx.inputs["Factor"]); Ln(col, bmx.inputs[6])
+        bmx.inputs[7].default_value = (b[0] * 0.55, b[1] * 0.45, b[2] * 0.38, 1)
+        col = bmx.outputs[2]
     # dunkle Ecken (Schmutz)
     ao = nt.nodes.new("ShaderNodeAmbientOcclusion"); ao.inputs["Distance"].default_value = 0.14; ao.samples = 16
     ad = nt.nodes.new("ShaderNodeMapRange"); ad.inputs["From Min"].default_value = 0.35; ad.inputs["From Max"].default_value = 1.0
@@ -64,7 +89,30 @@ def plate(name, base, metal=0.0, rough=0.75, bump=0.8, scratches=0.0, veins=None
     Ln(ao.outputs["AO"], ad.inputs["Value"])
     md = nt.nodes.new("ShaderNodeMix"); md.data_type = 'RGBA'
     Ln(ad.outputs["Result"], md.inputs["Factor"]); Ln(col, md.inputs[6]); md.inputs[7].default_value = (b[0] * 0.15, b[1] * 0.15, b[2] * 0.18, 1)
-    Ln(md.outputs[2], p.inputs["Base Color"])
+    col = md.outputs[2]
+    if dust:
+        # Staub/Sand sammelt sich in Ecken und Fugen (hell statt dunkel), fleckig
+        dn = nt.nodes.new("ShaderNodeTexNoise"); dn.inputs["Scale"].default_value = 9.0; dn.inputs["Detail"].default_value = 6.0
+        Ln(geo.outputs["Position"], dn.inputs["Vector"])
+        da = nt.nodes.new("ShaderNodeMapRange"); da.inputs["From Min"].default_value = 0.45; da.inputs["From Max"].default_value = 0.95
+        da.inputs["To Min"].default_value = 0.85; da.inputs["To Max"].default_value = 0.0
+        Ln(ao.outputs["AO"], da.inputs["Value"])
+        dm = nt.nodes.new("ShaderNodeMath"); dm.operation = 'MULTIPLY'
+        Ln(da.outputs["Result"], dm.inputs[0]); Ln(dn.outputs["Fac"], dm.inputs[1])
+        dmx = nt.nodes.new("ShaderNodeMix"); dmx.data_type = 'RGBA'
+        Ln(dm.outputs[0], dmx.inputs["Factor"]); Ln(col, dmx.inputs[6]); dmx.inputs[7].default_value = (*L_(dust), 1)
+        col = dmx.outputs[2]
+    if edge_wear > 0:
+        # abgeriebene, helle Kanten (nur Cycles: Spitzheit der Geometrie)
+        pt = nt.nodes.new("ShaderNodeNewGeometry")
+        pr = nt.nodes.new("ShaderNodeMapRange"); pr.inputs["From Min"].default_value = 0.52; pr.inputs["From Max"].default_value = 0.6
+        pr.inputs["To Max"].default_value = edge_wear
+        Ln(pt.outputs["Pointiness"], pr.inputs["Value"])
+        emx = nt.nodes.new("ShaderNodeMix"); emx.data_type = 'RGBA'
+        Ln(pr.outputs["Result"], emx.inputs["Factor"]); Ln(col, emx.inputs[6])
+        emx.inputs[7].default_value = (min(1, b[0] * 1.9 + 0.05), min(1, b[1] * 1.9 + 0.05), min(1, b[2] * 1.9 + 0.05), 1)
+        col = emx.outputs[2]
+    Ln(col, p.inputs["Base Color"])
     bn = nt.nodes.new("ShaderNodeTexNoise"); bn.inputs["Scale"].default_value = 30.0; bn.inputs["Detail"].default_value = 10.0
     Ln(geo.outputs["Position"], bn.inputs["Vector"])
     bp = nt.nodes.new("ShaderNodeBump"); bp.inputs["Strength"].default_value = bump; bp.inputs["Distance"].default_value = 0.02
@@ -265,33 +313,202 @@ TOP_Z = 1.51
 edges = [-HALF] + MODS + [HALF]
 if "crystals" in P:
     cc = C.get("crystal", C["light"])
-    cm = pm("Kristall", cc, rough=0.25, emit=cc, strength=C.get("crystal_glow", 1.2))
+    # Kristalle wie an den Brücken: facettierte, glasige Körper mit leuchtendem Kern, in einer Metallfassung mit Krallen
+    outer = bpy.data.materials.new("KristallHuelle"); outer.use_nodes = True
+    po = outer.node_tree.nodes["Principled BSDF"]
+    ccl = L_(cc)
+    po.inputs["Base Color"].default_value = (*ccl, 1)
+    po.inputs["Roughness"].default_value = 0.1
+    po.inputs["Transmission Weight"].default_value = 0.35
+    po.inputs["IOR"].default_value = 1.5
+    po.inputs["Emission Color"].default_value = (*ccl, 1)
+    po.inputs["Emission Strength"].default_value = C.get("crystal_glow", 1.2) * 0.22
+    core_m = pm("KristallKern", cc, emit=tuple(min(1.0, v * 0.6 + 0.4) for v in cc), strength=C.get("crystal_glow", 1.2) * 3.0)
+    socket_m = plate("Fassung", C.get("socket", C["metal2"]), metal=0.85, rough=0.3, bump=0.1, scratches=0.25, edge_wear=0.4)
+    prong_m = metal2
+
+    def crystal_mesh(name, h, r, tip):
+        me = bpy.data.meshes.new(name)
+        bm = _bm.new()
+        lo = [bm.verts.new((r * 0.8 * math.cos(k * math.pi / 3), r * 0.8 * math.sin(k * math.pi / 3), 0.0)) for k in range(6)]
+        hi = [bm.verts.new((r * math.cos(k * math.pi / 3 + 0.08), r * math.sin(k * math.pi / 3 + 0.08), h)) for k in range(6)]
+        top = bm.verts.new((r * 0.12, -r * 0.08, h + tip))
+        bm.faces.new(list(reversed(lo)))
+        for k in range(6):
+            j = (k + 1) % 6
+            bm.faces.new([lo[k], lo[j], hi[j], hi[k]])
+            bm.faces.new([hi[k], hi[j], top])
+        _bm.ops.recalc_face_normals(bm, faces=bm.faces)
+        bm.to_mesh(me); bm.free()
+        o = bpy.data.objects.new(name, me); scene.collection.objects.link(o)
+        bv = o.modifiers.new("Bevel", 'BEVEL'); bv.width = 0.006; bv.segments = 1; bv.limit_method = 'ANGLE'
+        return o
+
+    def crystal(name, loc, h, r, rx, ry, core=True):
+        o = crystal_mesh(name, h, r, r * 1.7)
+        o.data.materials.append(outer)
+        o.location = loc; o.rotation_euler = (math.radians(rx), math.radians(ry), random.uniform(0, 1))
+        if core:
+            c = crystal_mesh(name + "Kern", h * 0.8, r * 0.45, r * 0.9)
+            c.data.materials.append(core_m)
+            c.location = loc; c.rotation_euler = o.rotation_euler
+            see_through(c)
+        return o
+
     for i, x in enumerate(MODS):
+        y0 = -0.13
+        z0 = TOP_Z
+        # Fassung: Sockel, Ring mit Leuchtfuge, vier Krallen
+        cyl("KSockel%d" % i, (x, y0, z0 + 0.04), 0.19, 0.08, socket_m, verts=8, bevel=0.012)
+        cyl("KRing%d" % i, (x, y0, z0 + 0.1), 0.15, 0.04, prong_m, verts=16, bevel=0.006)
+        see_through(cyl("KFuge%d" % i, (x, y0, z0 + 0.085), 0.155, 0.01, core_m, verts=24))
+        for a in range(4):
+            ang = a * math.pi / 2 + math.pi / 4
+            pr = box("KKralle%d_%d" % (i, a), (x + 0.13 * math.cos(ang), y0 + 0.13 * math.sin(ang), z0 + 0.2), (0.035, 0.035, 0.22), prong_m, bevel=0.008)
+            pr.rotation_euler = (math.sin(ang) * 0.3, -math.cos(ang) * 0.3, ang)
+        # Gruppe: großer Kristall, vier kleinere, Splitter
+        crystal("KHaupt%d" % i, (x, y0, z0 + 0.1), random.uniform(0.52, 0.6), 0.11, random.uniform(-6, 6), random.uniform(-6, 6))
+        for k, (dx, dy, rx, ry, hh, rr) in enumerate([(-0.1, 0.05, -10, -22, 0.3, 0.06), (0.1, -0.04, 8, 24, 0.27, 0.055),
+                                                     (0.03, 0.1, 26, 6, 0.22, 0.05), (-0.05, -0.09, -24, -8, 0.18, 0.045)]):
+            crystal("KNeben%d_%d" % (i, k), (x + dx, y0 + dy, z0 + 0.1), hh * random.uniform(0.9, 1.15), rr, rx, ry, core=k < 2)
         for k in range(3):
-            h = random.uniform(0.26, 0.46) * (1.25 if k == 0 else 1.0)
-            dx = [0.0, -0.16, 0.15][k]; dy = [0.0, 0.12, -0.08][k]; tilt = [0, -16, 18][k]
-            r_ = 0.085 if k == 0 else 0.065
-            bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=r_, depth=h, location=(x + dx, -0.13 + dy, TOP_Z + h / 2))
-            body = bpy.context.active_object
-            bpy.ops.mesh.primitive_cone_add(vertices=6, radius1=r_, radius2=0.0, depth=0.13, location=(x + dx, -0.13 + dy, TOP_Z + h + 0.065))
-            tip = bpy.context.active_object
-            for o in (body, tip):
-                o.data.materials.append(cm); o.rotation_euler = (0, math.radians(tilt), 0)
-            tip.location.x += math.sin(math.radians(tilt)) * (h / 2 + 0.065)
-            tip.location.z -= (1 - math.cos(math.radians(tilt))) * (h / 2 + 0.065)
-        light_only(sphere("KLicht%d" % i, (x, -0.35, TOP_Z + 0.25), 0.06, lamp_glow), lamp_glow)
+            sx = random.choice((-1, 1))
+            crystal("KSplitter%d_%d" % (i, k), (x + sx * random.uniform(0.22, 0.34), y0 + random.uniform(-0.25, 0.2), z0 + 0.0),
+                    random.uniform(0.07, 0.12), 0.025, random.uniform(-30, 30), random.uniform(-30, 30), core=False)
+        light_only(sphere("KLicht%d" % i, (x, -0.35, TOP_Z + 0.3), 0.06, lamp_glow), lamp_glow)
 if "vines" in P:
-    vine = pm("Ranke", (0.16, 0.3, 0.08), rough=0.6)
-    leaf = pm("Blatt", (0.28, 0.52, 0.14), rough=0.5)
+    # Ranken wie an den Brückenpfeilern: zwei ineinander gedrehte Stränge und ein dünner, dazu spitze Blätter.
+    # Eine durchgehende Ranke läuft oben über alle Deckel und Erhöhungen (Kommentar 22.11.), dazu Girlanden vorn.
+    from mathutils import Vector, Matrix
+    vine_a = plate("RankeA", C.get("vine_a", (0.2, 0.36, 0.1)), rough=0.6, bump=0.6, var=0.8)
+    vine_b = plate("RankeB", C.get("vine_b", (0.34, 0.52, 0.15)), rough=0.55, bump=0.6, var=0.8)
+    vine_c = plate("RankeC", C.get("vine_c", (0.5, 0.6, 0.22)), rough=0.5, bump=0.4, var=0.6)
+    leaf_ms = [plate("Blatt%d" % k, c, rough=0.45, bump=0.3, var=0.7) for k, c in enumerate(C.get("leaves", [(0.3, 0.56, 0.12), (0.42, 0.66, 0.16), (0.22, 0.44, 0.1)]))]
+    bud = pm("Knospe", C["light"], emit=C["light"], strength=4.0)
+    bud_glow = glowm("KnospenLicht", LIGHT, C.get("bud_power", 25.0))
+
+    def leaf_mesh():
+        me = bpy.data.meshes.new("Blatt")
+        bm = _bm.new()
+        v = [bm.verts.new(p_) for p_ in [(0, 0, 0), (0.42, 0.34, -0.06), (0.45, 0, 0.05), (0.42, -0.34, -0.06), (1.0, 0, -0.04),
+                                         (0.75, 0.2, -0.02), (0.75, -0.2, -0.02), (0.18, 0.2, -0.03), (0.18, -0.2, -0.03)]]
+        for f in [(0, 7, 2), (7, 1, 2), (1, 5, 2), (5, 4, 2), (0, 2, 8), (8, 2, 3), (3, 2, 6), (6, 2, 4)]:
+            bm.faces.new([v[i] for i in f])
+        _bm.ops.recalc_face_normals(bm, faces=bm.faces)
+        bm.to_mesh(me); bm.free()
+        for pl in me.polygons:
+            pl.use_smooth = True
+        return me
+    LEAF = leaf_mesh()
+
+    def catmull(pts, step=0.02):
+        pts = [Vector(p_) for p_ in pts]
+        ext = [pts[0] * 2 - pts[1]] + pts + [pts[-1] * 2 - pts[-2]]
+        out = []
+        for i in range(1, len(ext) - 2):
+            p0, p1, p2, p3 = ext[i - 1], ext[i], ext[i + 1], ext[i + 2]
+            n = max(2, int((p2 - p1).length / step))
+            for k in range(n):
+                t = k / n
+                out.append(0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t + (-p0 + 3 * p1 - 3 * p2 + p3) * t ** 3))
+        out.append(pts[-1])
+        return out
+
+    def frames(path):
+        res = []
+        for i, p_ in enumerate(path):
+            t = (path[min(i + 1, len(path) - 1)] - path[max(i - 1, 0)]).normalized()
+            up = Vector((0, 0, 1)) if abs(t.z) < 0.92 else Vector((0, -1, 0))
+            n1 = t.cross(up).normalized()
+            n2 = t.cross(n1).normalized()
+            res.append((p_, t, n1, n2))
+        return res
+
+    def poly(name, pts, radius, material, wobble=0.15):
+        cu = bpy.data.curves.new(name, 'CURVE'); cu.dimensions = '3D'; cu.bevel_depth = radius; cu.bevel_resolution = 3
+        sp = cu.splines.new('POLY'); sp.points.add(len(pts) - 1)
+        for k, (pt, p_) in enumerate(zip(sp.points, pts)):
+            pt.co = (p_.x, p_.y, p_.z, 1)
+            pt.radius = 1.0 + wobble * math.sin(k * 0.37) * math.sin(k * 0.11)
+        sp.use_smooth = True
+        o = bpy.data.objects.new(name, cu); scene.collection.objects.link(o); o.data.materials.append(material)
+        return o
+
+    def twisted(name, ctrl, r=0.032, helix=0.03, turn=0.34, leaf_every=0.085, leaf_size=(0.17, 0.08), thin=True, end_leaves=True):
+        path = catmull(ctrl)
+        fr = frames(path)
+        dist = 0.0
+        A, Bs, Cs = [], [], []
+        for i, (p_, t, n1, n2) in enumerate(fr):
+            if i:
+                dist += (p_ - fr[i - 1][0]).length
+            ph = dist / turn * 2 * math.pi
+            A.append(p_ + (n1 * math.cos(ph) + n2 * math.sin(ph)) * helix)
+            Bs.append(p_ - (n1 * math.cos(ph) + n2 * math.sin(ph)) * helix)
+            ph2 = dist / (turn * 1.7) * 2 * math.pi + 1.0
+            Cs.append(p_ + (n1 * math.cos(ph2) + n2 * math.sin(ph2)) * (helix + r * 1.1))
+        poly(name + "A", A, r, vine_a)
+        poly(name + "B", Bs, r * 0.92, vine_b)
+        if thin:
+            poly(name + "C", Cs, r * 0.42, vine_c, wobble=0.3)
+        # Blätter abwechselnd nach vorn/oben und zur Seite, damit man sie von schräg oben sieht
+        acc = 0.0
+        side = 1
+        for i in range(1, len(fr)):
+            acc += (fr[i][0] - fr[i - 1][0]).length
+            if acc < leaf_every * random.uniform(0.7, 1.3):
+                continue
+            acc = 0.0
+            p_, t, n1, n2 = fr[i]
+            a = random.uniform(-0.9, 1.5)
+            d = (n1 * math.cos(a) - n2 * math.sin(a)) + t * (side * random.uniform(0.2, 0.7))
+            d.normalize()
+            side = -side
+            upv = -n2 if abs(d.dot(-n2)) < 0.95 else n1
+            yv = upv.cross(d).normalized()
+            zv = d.cross(yv).normalized()
+            s_ = leaf_size[0] * random.uniform(0.75, 1.25)
+            ob = bpy.data.objects.new("Blatt", LEAF); scene.collection.objects.link(ob)
+            m3 = Matrix((d, yv, zv)).transposed()
+            rot = Matrix.Rotation(random.uniform(-0.5, 0.5), 3, 'X')
+            wy = leaf_size[1] / 0.34 * s_ / leaf_size[0]
+            ob.matrix_world = Matrix.Translation(p_ + d * (helix + r)) @ (m3 @ rot).to_4x4() @ Matrix.Diagonal((s_, wy, s_, 1))
+            ob.material_slots[0].link = 'OBJECT'
+            ob.material_slots[0].material = random.choice(leaf_ms)
+        return fr
+
+    if not LEAF.materials:
+        LEAF.materials.append(leaf_ms[0])
+    # oben: über alle Deckel – zwischen den Erhöhungen auf der Deckplatte, seitlich an der Erhöhung hinauf, quer über
+    # ihre Oberseite und auf der anderen Seite wieder hinab
+    ctrl = [(-HALF - 0.1, -0.42, 1.23)]
+    for j, x in enumerate(MODS):
+        xm = (x - 1.8 / 2) if j else (x - 0.75)
+        ctrl += [(xm - 0.2, -0.44 + random.uniform(-0.04, 0.04), 1.235), (xm + 0.2, -0.4 + random.uniform(-0.04, 0.04), 1.23)]
+        sw = random.choice((-1, 1))
+        ctrl += [(x - 0.56, -0.38, 1.27), (x - 0.53, -0.3, 1.42), (x - 0.4, -0.22, 1.555),
+                 (x - 0.14, -0.12 + sw * 0.08, 1.585), (x + 0.12, -0.18 - sw * 0.08, 1.585), (x + 0.4, -0.3, 1.555),
+                 (x + 0.53, -0.36, 1.42), (x + 0.56, -0.42, 1.27)]
+    ctrl += [(HALF - 0.45, -0.43, 1.23), (HALF + 0.1, -0.42, 1.23)]
+    top_fr = twisted("RankeOben", ctrl, r=0.04, helix=0.036, turn=0.4, leaf_every=0.13, leaf_size=(0.22, 0.1))
+    # Knospen mit grünem Leuchten oben auf den Erhöhungen (Licht wie an den Brückenpfeilern)
+    last = -9.0
+    for p_, t, n1, n2 in top_fr:
+        if p_.z > 1.55 and (p_ - Vector((last, 0, 0))).x > 0.3:
+            last = p_.x
+            sphere("Knospe", p_ + n1 * random.choice((-1, 1)) * 0.075 - n2 * 0.03, 0.024, bud)
+    for j, x in enumerate(MODS):
+        light_only(sphere("KnLicht%d" % j, (x, -0.8, 1.75), 0.05, bud_glow), bud_glow)
+    # vorn: Girlanden zwischen den Erhöhungen und je eine Ranke, die die Erhöhung hinaufklettert und oben einmündet
     for i in range(len(edges) - 1):
         x0 = edges[i] + 0.4; x1 = edges[i + 1] - 0.4
-        tube("Ranke%d" % i, [(x0, FR - 0.22, 1.2), ((x0 + x1) / 2, FR - 0.26, 0.92 + random.uniform(-0.06, 0.04)), (x1, FR - 0.22, 1.2)], 0.03, vine)
-        for k in range(6):
-            t = (k + 0.5) / 6
-            l_ = sphere("Blatt", (x0 + (x1 - x0) * t, FR - 0.28, 1.2 - 0.28 * math.sin(t * math.pi) + random.uniform(-0.04, 0.04)), 0.07, leaf)
-            l_.scale = (1.4, 0.35, 0.8); l_.rotation_euler = (0, random.uniform(-0.8, 0.8), 0)
+        mid = (x0 + x1) / 2
+        twisted("Girlande%d" % i, [(x0, FR - 0.2, 1.22), (x0 + 0.2, FR - 0.25, 1.05), (mid, FR - 0.27, 0.95 + random.uniform(-0.04, 0.03)),
+                                   (x1 - 0.2, FR - 0.25, 1.05), (x1, FR - 0.2, 1.22)], r=0.02, helix=0.02, turn=0.26, leaf_every=0.16,
+                leaf_size=(0.15, 0.07), thin=False)
     for i, x in enumerate(MODS):
-        tube("PRanke%d" % i, [(x - 0.42, FR - 0.08, 0.3), (x - 0.4, FR - 0.14, 0.8), (x + 0.1, FR - 0.14, 1.3), (x + 0.42, FR - 0.08, 1.5)], 0.028, vine)
+        twisted("PRanke%d" % i, [(x - 0.42, FR - 0.1, 0.3), (x - 0.4, FR - 0.16, 0.62), (x - 0.1, FR - 0.17, 1.0), (x + 0.3, FR - 0.15, 1.32),
+                                 (x + 0.53, -0.46, 1.42)], r=0.022, helix=0.022, turn=0.28, leaf_every=0.14, leaf_size=(0.13, 0.06), thin=False)
 if "portholes" in P:
     brass = pm("Messing", (0.85, 0.62, 0.3), metal_=0.9, rough=0.25)
     glass = pm("Bullauge", C.get("porthole", (1.0, 0.78, 0.45)), emit=C.get("porthole", (1.0, 0.78, 0.45)), strength=2.0)
