@@ -353,6 +353,9 @@ func _parse_args() -> void:
 			_talent_override = arg.get_slice("=", 1)
 		elif arg.begins_with("--faehigkeiten="):
 			Hero.test_skills = int(arg.get_slice("=", 1))   # alle Kampfkarten der Champions auf diese Stufe (Test)
+		elif arg == "--boss-vorschau":
+			GameData.test_boss_looks = true   # Boss je Welt gleich nah an der Mauer (Prüfbilder)
+			Battle.test_boss_preview = true
 		elif arg == "--boss-neu":
 			GameData.test_boss_looks = true   # Bosse je Welt (noch nicht freigegeben) für Prüfbilder
 		elif arg == "--neue-monster":

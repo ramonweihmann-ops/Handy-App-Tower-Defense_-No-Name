@@ -476,6 +476,203 @@ def wurmloch(arm, body):
         attach(give(torus("EnergieRing%s" % side, (s * 0.95, -0.34, 0.62), 0.12, 0.012, rot=(60, 0, s * 30)), ring), arm, "mixamorig:%sHand" % side)
     skin_cracks(body, (1.0, 0.35, 0.8), 40, 0.0025, strength=1.6, ch=1, seed=31)
 
+# ---------------------------------------------------------------- eigene Körper (Wunsch 23.11.2026: je Welt ein eigener Boss)
+
+def lathe(name, profile, segs=48, hem=None):
+    """Drehkörper aus einem Profil [(z, r), …] von oben nach unten; hem(a) verschiebt die unterste Reihe (Saum)"""
+    bm = bmesh.new()
+    rings = []
+    for i, (z, r) in enumerate(profile):
+        if r <= 1e-4:
+            rings.append([bm.verts.new((0, 0, z))])
+            continue
+        ring = []
+        for k in range(segs):
+            a = k * 2 * math.pi / segs
+            zz, rr = z, r
+            if hem is not None and i == len(profile) - 1:
+                dz, dr = hem(a)
+                zz += dz; rr += dr
+            ring.append(bm.verts.new((rr * math.cos(a), rr * math.sin(a), zz)))
+        rings.append(ring)
+    n = len(rings)
+    uv = bm.loops.layers.uv.new("UVMap")
+    for i, (a_, b_) in enumerate(zip(rings, rings[1:])):
+        if len(a_) == 1:
+            fs = [(bm.faces.new([a_[0], b_[k], b_[(k + 1) % len(b_)]]), [(0, k), (1, k), (1, k + 1)]) for k in range(len(b_))]
+        elif len(b_) == 1:
+            fs = [(bm.faces.new([a_[k], b_[0], a_[(k + 1) % len(a_)]]), [(0, k), (1, k), (0, k + 1)]) for k in range(len(a_))]
+        else:
+            fs = [(bm.faces.new([a_[k], b_[k], b_[(k + 1) % len(b_)], a_[(k + 1) % len(a_)]]), [(0, k), (1, k), (1, k + 1), (0, k + 1)])
+                  for k in range(len(a_))]
+        for f, coords in fs:
+            for loop, (di, k) in zip(f.loops, coords):
+                loop[uv].uv = (k / segs, 1 - (i + di) / (n - 1))
+    return finish(name, bm)
+
+def skin_to(o, arm, weights):
+    """Eigenen Körper an das Skelett binden: weights(z) -> {Knochen: Gewicht}"""
+    o.parent = arm
+    o.matrix_parent_inverse = arm.matrix_world.inverted()
+    md = o.modifiers.new("Skelett", 'ARMATURE'); md.object = arm
+    groups = {}
+    for v in o.data.vertices:
+        for bone, w in weights(v.co).items():
+            if bone not in groups:
+                groups[bone] = o.vertex_groups.new(name=bone)
+            if w > 0:
+                groups[bone].add([v.index], w, 'REPLACE')
+    return o
+
+def remove_body(body):
+    bpy.data.objects.remove(body, do_unlink=True)
+
+def smooth01(t):
+    t = max(0.0, min(1.0, t))
+    return t * t * (3 - 2 * t)
+
+@variante("nebel_geist", "schleimmutter")
+def nebelgeist(arm, body):
+    """Nebelfelder (Welt 8): Nebelgeist – schwebendes Gespenst mit gewelltem Saum, kleinen Armen, glühenden Augen,
+    offenem Maul, einer Nebellocke oben und Nebelkugeln auf einem Ring um den Kopf. Eigene Figur, kein Nachbau."""
+    ghost = look("Geist", (0.93, 0.92, 1.0), rough=0.45, emit=(0.72, 0.68, 1.0), strength=0.45, alpha=0.9)
+    ghost_shade = look("GeistSchatten", (0.7, 0.66, 0.92), rough=0.5, emit=(0.55, 0.5, 0.9), strength=0.3)
+    dark = look("Maul", (0.08, 0.04, 0.16), rough=0.6, emit=(0.35, 0.1, 0.6), strength=0.6)
+    eye = look("Auge", (0.75, 0.95, 1.0), rough=0.2, emit=(0.55, 0.9, 1.0), strength=4.0)
+    pupil = look("Pupille", (0.1, 0.02, 0.2), rough=0.3)
+    fog = look("Nebel", (0.88, 0.92, 1.0), rough=0.3, emit=(0.7, 0.8, 1.0), strength=0.9, alpha=0.6)
+    prof = [(0.98, 0.0), (0.96, 0.09), (0.93, 0.16), (0.88, 0.22), (0.82, 0.28), (0.7, 0.335), (0.56, 0.35), (0.42, 0.345),
+            (0.32, 0.35), (0.25, 0.365), (0.19, 0.385), (0.14, 0.405), (0.1, 0.42)]
+    hem = lambda a: (-0.12 * (0.5 + 0.5 * math.cos(7 * a + 0.3)) ** 1.5, 0.025 * math.cos(7 * a + 0.3))
+    g = lathe("Geistkoerper", prof, segs=64, hem=hem)
+    # Boden des Saums: nach innen gewölbt, damit er von unten hohl wirkt
+    inner = lathe("Saumboden", [(0.08, 0.41), (0.15, 0.3), (0.2, 0.0)], segs=64)
+    # Textur: oben weiß, nach unten lavendel bis violett, mit hellen Nebelschlieren
+    H_, W_ = 512, 512
+    v = np.linspace(0, 1, H_)[:, None] * np.ones((1, W_))   # Bildzeile 0 ist unten (v = 0)
+    wisp = fbm(H_, W_, 6, 77)
+    grad = np.clip((v - 0.25) / 0.6, 0, 1)
+    top = np.array((0.97, 0.96, 1.0)); bot = np.array((0.62, 0.52, 0.92))
+    col = bot * (1 - grad[..., None]) + top * grad[..., None]
+    col = np.clip(col + ((wisp - 0.5) * 0.25)[..., None] * np.array((0.6, 0.6, 0.8)), 0, 1)
+    arr = np.ones((H_, W_, 4), dtype=np.float32); arr[..., :3] = col
+    gimg = new_image("Geist_Farbe", arr)
+    nt = ghost.node_tree
+    ti = nt.nodes.new("ShaderNodeTexImage"); ti.image = gimg
+    nt.links.new(ti.outputs["Color"], nt.nodes["Principled BSDF"].inputs["Base Color"])
+    for o in (g, inner):
+        give(o, ghost)
+    for o in (g, inner):
+        skin_to(o, arm, lambda c: {"Top": smooth01((c.z - 0.3) / 0.45), "Body": 1 - smooth01((c.z - 0.3) / 0.45)})
+    # Gesicht (am Kopfknochen): schräge Augen, offenes Maul
+    for s in (-1, 1):
+        sock = sphere("Augenhoehle%d" % s, (0, 0, 0), 0.085, (1.0, 0.35, 1.25)); sock.location = (s * 0.13, -0.3, 0.64)
+        sock.rotation_euler = (0, math.radians(s * 22), 0)
+        attach(give(sock, dark), arm, "Top")
+        e = sphere("Auge%d" % s, (0, 0, 0), 0.06, (1.0, 0.5, 1.2)); e.location = (s * 0.13, -0.325, 0.64)
+        e.rotation_euler = (0, math.radians(s * 22), 0)
+        attach(give(e, eye), arm, "Top")
+        attach(give(sphere("Pupille%d" % s, (s * 0.12, -0.355, 0.62), 0.022), pupil), arm, "Top")
+        brow = tube("Braue%d" % s, [(s * 0.22, -0.28, 0.76), (s * 0.13, -0.315, 0.73), (s * 0.05, -0.325, 0.69)], [0.02, 0.026, 0.018])
+        attach(give(brow, ghost_shade), arm, "Top")
+    mouth = sphere("Maul", (0, 0, 0), 0.1, (1.25, 0.35, 0.8)); mouth.location = (0, -0.33, 0.43)
+    attach(give(mouth, dark), arm, "Top")
+    for s in (-1, 1):
+        attach(give(tube("Zahn%d" % s, [(s * 0.06, -0.355, 0.49), (s * 0.055, -0.36, 0.455), (s * 0.05, -0.36, 0.43)], [0.016, 0.01, 0.0]), ghost), arm, "Top")
+    # Arme mit Fäustlingshänden
+    for s in (-1, 1):
+        armt = tube("Arm%d" % s, [(s * 0.3, -0.02, 0.44), (s * 0.44, -0.1, 0.5), (s * 0.53, -0.2, 0.62)], [0.07, 0.06, 0.055])
+        attach(give(armt, ghost), arm, "Body")
+        attach(give(sphere("Hand%d" % s, (s * 0.55, -0.23, 0.66), 0.075, (1, 1, 1.1)), ghost), arm, "Body")
+        for k, (dx, dz) in enumerate(((0.05, 0.06), (0.0, 0.085), (-0.05, 0.06))):
+            attach(give(sphere("Finger%d_%d" % (s, k), (s * 0.55 + dx * s, -0.26, 0.66 + dz), 0.026), ghost), arm, "Body")
+    # Nebellocke oben, Nebelring mit Kugeln
+    pts = []; radii = []
+    for k in range(16):
+        t = k / 15
+        a = t * 2.3 * 2 * math.pi
+        pts.append((0.13 * (1 - t) * math.cos(a), 0.13 * (1 - t) * math.sin(a), 0.93 + t * 0.3))
+        radii.append(0.075 * (1 - t) + 0.004)
+    radii[-1] = 0.0
+    attach(give(tube("Locke", pts, radii), ghost), arm, "Top")
+    # Nebelring über dem Kopf, vorn etwas höher (läuft nicht vor den Augen durch)
+    tilt = math.radians(-14)
+    t_ = torus("Nebelring", (0.0, 0.04, 0.95), 0.4, 0.016, rot=(-14, 0, 0))
+    attach(give(t_, fog), arm, "Top")
+    for i in range(6):
+        a = i * math.pi / 3 + 0.4
+        attach(give(sphere("Nebelkugel%d" % i, (0.4 * math.cos(a), 0.04 + 0.4 * math.sin(a) * math.cos(tilt),
+                                               0.95 + 0.4 * math.sin(a) * math.sin(tilt)), 0.045 + 0.015 * (i % 2)), fog), arm, "Top")
+    remove_body(body)
+
+def mask_purple(px):
+    return np.clip((np.minimum(px[..., 0], px[..., 2]) - px[..., 1] - 0.08) / 0.12, 0, 1)
+
+def mask_white(px):
+    return np.clip((np.min(px[..., :3], axis=-1) - 0.62) / 0.15, 0, 1)
+
+def skin_lines(body, color, cells, width, ch=1, seed=41, strength=0.55):
+    """feine dunkle Falten auf der Haut (z. B. Nashornhaut)"""
+    m, tex, img, px = body_texture(body)
+    h, w = px.shape[:2]
+    edge = voronoi_edges(h, w, cells, seed, warp=0.03)
+    k = (np.clip(1 - edge / width, 0, 1) * mask_color(px, ch, 0.0, 0.1))[..., None]
+    base = px.copy(); base[..., :3] = base[..., :3] * (1 - k * strength) + np.array(color, dtype=np.float32) * (k * strength)
+    tex.image = new_image(body.name + "_Farbe", base)
+
+@variante("nashorn_krieger", "koloss")
+def nashorn(arm, body):
+    """Sternenwüste (Welt 7): Nashorn-Krieger – aufrecht gehendes Nashorn mit großem Horn, grauer Faltenhaut,
+    Lederrüstung, Sandstein-Schulterpanzern mit Messing und Bronzekragen"""
+    hide = look("Nashornhaut", (0.6, 0.58, 0.56), rough=0.75)
+    hide_dark = look("NashornhautDunkel", (0.45, 0.43, 0.42), rough=0.8)
+    ivory = look("Horn", (0.93, 0.86, 0.7), rough=0.35)
+    dark = look("Nuester", (0.1, 0.08, 0.08), rough=0.6)
+    eye_w = look("Augenweiss", (1.0, 0.95, 0.75), rough=0.3, emit=(1.0, 0.8, 0.3), strength=0.6)
+    stone = look("Sandstein", (0.86, 0.68, 0.42), rough=0.85)
+    stone2 = look("Sandstein2", (0.75, 0.56, 0.33), rough=0.85)
+    brass = look("Messing", (0.9, 0.66, 0.3), rough=0.3, metal=0.9)
+    # Kopf: Schädel umschließt den Zombiekopf, Schnauze nach vorn, großes und kleines Horn, Ohren, Augen
+    skull = sphere("Schaedel", (0, 0, 0), 0.34, (1.0, 1.12, 0.92)); skull.location = (0, 0.0, 1.47)
+    attach(give(skull, hide), arm, "mixamorig:Head")
+    snout = sphere("Schnauze", (0, 0, 0), 0.25, (0.88, 1.25, 0.78)); snout.location = (0, -0.36, 1.35)
+    attach(give(snout, hide), arm, "mixamorig:Head")
+    jaw = sphere("Unterkiefer", (0, 0, 0), 0.2, (0.85, 1.15, 0.5)); jaw.location = (0, -0.33, 1.24)
+    attach(give(jaw, hide_dark), arm, "mixamorig:Head")
+    for k, (y, r) in enumerate(((-0.2, 0.23), (-0.27, 0.215))):
+        fold = torus("Falte%d" % k, (0, y, 1.35), r, 0.018, rot=(90, 0, 0)); fold.scale = (0.9, 1.0, 0.75)
+        attach(give(fold, hide_dark), arm, "mixamorig:Head")
+    attach(give(horn("GrossesHorn", (0.0, -0.5, 1.46), (0.0, -0.66, 1.62), (0.0, -0.6, 1.93), 0.11, n=14), ivory), arm, "mixamorig:Head")
+    attach(give(horn("KleinesHorn", (0.0, -0.3, 1.62), (0.0, -0.38, 1.72), (0.0, -0.34, 1.82), 0.06, n=9), ivory), arm, "mixamorig:Head")
+    for s in (-1, 1):
+        ear = horn("Ohr%d" % s, (s * 0.2, 0.08, 1.72), (s * 0.3, 0.1, 1.82), (s * 0.34, 0.12, 1.92), 0.06, n=8)
+        ear.scale = (1.0, 0.45, 1.0)
+        attach(give(ear, hide_dark), arm, "mixamorig:Head")
+        attach(give(sphere("Auge%d" % s, (s * 0.21, -0.27, 1.53), 0.045), eye_w), arm, "mixamorig:Head")
+        attach(give(sphere("Pupille%d" % s, (s * 0.215, -0.305, 1.53), 0.022), dark), arm, "mixamorig:Head")
+        brow = tube("Braue%d" % s, [(s * 0.3, -0.24, 1.6), (s * 0.2, -0.3, 1.58), (s * 0.12, -0.31, 1.55)], [0.035, 0.04, 0.03])
+        attach(give(brow, hide_dark), arm, "mixamorig:Head")
+        attach(give(sphere("Nuester%d" % s, (s * 0.08, -0.62, 1.33), 0.03, (1, 0.6, 0.7)), dark), arm, "mixamorig:Head")
+        # Schulterpanzer wie beim Sand-Koloss
+        side = "Left" if s > 0 else "Right"
+        c = (s * 0.56, 0.06, 1.3)
+        dome = sphere("Panzer%s" % side, (0, 0, 0), 0.24, (1.0, 1.08, 0.5)); dome.location = c; dome.rotation_euler = (0, math.radians(-s * 22), 0)
+        attach(give(dome, stone), arm, "mixamorig:%sArm" % side)
+        t = torus("Band%s" % side, (c[0], c[1], c[2] - 0.01), 0.225, 0.02, rot=(0, -s * 22, 0)); t.scale = (1.0, 1.08, 1.0)
+        attach(give(t, brass), arm, "mixamorig:%sArm" % side)
+        for a in range(8):
+            ang = a * math.pi / 4
+            attach(give(sphere("Niete%s%d" % (side, a), (c[0] + 0.215 * math.cos(ang), c[1] + 0.225 * math.sin(ang), c[2] + 0.04), 0.022), brass),
+                   arm, "mixamorig:%sArm" % side)
+        # Armschienen aus Messing
+        fore = "mixamorig:%sForeArm" % side
+        attach(give(torus("Schiene%s" % side, (s * 0.8, -0.1, 0.8), 0.13, 0.03, rot=(0, 40 * s, 0)), brass), arm, fore)
+    # Haut grau mit Falten, Anzug wird Lederrüstung, Kragen und Gürtel Bronze (Falten zuerst, solange die Haut grün ist)
+    skin_lines(body, (0.3, 0.28, 0.27), 55, 0.004, ch=1)
+    recolor(body, lambda px: mask_color(px, 1, 0.03, 0.1), (0.62, 0.6, 0.58))
+    recolor(body, mask_purple, (0.55, 0.36, 0.2))
+    recolor(body, mask_white, (0.82, 0.6, 0.32))
+
 # ---------------------------------------------------------------- Ablauf
 
 basis, build = VARIANTEN[VAR]

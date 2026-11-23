@@ -85,7 +85,14 @@ static func enemy(kind: String, look := "") -> Dictionary:
 	if look != "" and not d.is_empty() and ResourceLoader.exists("res://models/enemies_v2/bosse/%s.glb" % look):
 		d = d.duplicate()
 		d["file"] = "enemies_v2/bosse/" + look
+		d.merge(BOSS_LOOK_DATA.get(look, {}), true)
 	return d
+
+
+## Abweichende Maße der Bosse mit eigenem Körper (Höhe, Schweben)
+const BOSS_LOOK_DATA := {
+	"nebel_geist": {"height": 2.1, "lift": 0.3},
+}
 
 
 static var _scenes := {}

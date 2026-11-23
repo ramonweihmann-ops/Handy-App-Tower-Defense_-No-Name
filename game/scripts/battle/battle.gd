@@ -143,6 +143,9 @@ func _apply_world() -> void:
 
 ## Grafikstufe aus den Einstellungen: Hoch = Leuchten, Schatten und Stations-Inseln,
 ## Sparsam = ohne (spart Rechenzeit auf älteren Handys).
+static var test_boss_preview := false
+
+
 func spawn_z() -> float:
 	return SPAWN_Z * z_scale
 
@@ -273,6 +276,11 @@ func start() -> void:
 		# Testkarte: gleich mit der gewählten Welle beginnen (Leben der Gegner wie in dieser Welle)
 		wave = clampi(test_wave, 1, total_waves) - 1
 	_next_wave()
+	if test_boss_preview:
+		# Labor (--boss-vorschau): Boss der Welt gleich nah an der Mauer, sehr zäh, für Prüfbilder
+		var e := spawn_enemy(str(GameData.world_kinds(level)[3]), Vector3(0, 0, spawn_z() * 0.3))
+		e.hp *= 50.0
+		e.max_hp *= 50.0
 
 
 ## joined: per Karte im Kampf dazugerufen (nicht der erste Held).
