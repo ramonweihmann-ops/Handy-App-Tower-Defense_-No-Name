@@ -620,28 +620,17 @@ def skin_lines(body, color, cells, width, ch=1, seed=41, strength=0.55):
     base = px.copy(); base[..., :3] = base[..., :3] * (1 - k * strength) + np.array(color, dtype=np.float32) * (k * strength)
     tex.image = new_image(body.name + "_Farbe", base)
 
-def reshape_arms(arm, body, upper=(1.15, 0.85), fore=(0.72, 0.72), hand=0.8, upper_dir=(0.33, 0.0, -0.94),
-                 fore_dir=(0.1, -0.22, -0.97)):
-    """Arme des Koloss umformen (Wunsch 23.11.: Unterarm nicht dicker als Oberarm, kürzere Arme, natürlicher Winkel).
-    upper/fore = (Dicke, Länge) absolut, hand = Größe absolut, *_dir = Richtung im Skelettraum (Z oben, -Y vorn) für die
-    linke Seite. Die Haltung wird in die Ruhelage übernommen, die Animationen bleiben gleich."""
-    from mathutils import Vector, Matrix
+def reshape_arms(arm, body, upper=(1.15, 0.9), fore=(0.72, 0.8), hand=0.78):
+    """Arme des Koloss umformen (Kommentare 23.11.: Unterarm nicht dicker als Oberarm, kürzere Arme).
+    upper/fore = (Dicke, Länge) absolut, hand = Größe absolut. Nur Dicke und Länge ändern sich; die Ausrichtung der
+    Knochen bleibt wie im Original, sonst biegt die Laufanimation den Unterarm nach hinten (Meldung 23.11.)."""
     saved = arm.animation_data.action if arm.animation_data else None
     if arm.animation_data:
         arm.animation_data.action = None
     arm.data.pose_position = 'POSE'
     for pb in arm.pose.bones:
         pb.location = (0, 0, 0); pb.rotation_quaternion = (1, 0, 0, 0); pb.rotation_euler = (0, 0, 0); pb.scale = (1, 1, 1)
-    bpy.context.view_layer.update()
-    for side, sx in (("Left", 1), ("Right", -1)):
-        for bname, d in (("mixamorig:%sArm" % side, upper_dir), ("mixamorig:%sForeArm" % side, fore_dir)):
-            pb = arm.pose.bones[bname]
-            M = pb.matrix.copy()
-            cur = (pb.tail - pb.head).normalized()
-            des = Vector((d[0] * sx, d[1], d[2])).normalized()
-            R = cur.rotation_difference(des).to_matrix().to_4x4()
-            pb.matrix = Matrix.Translation(M.translation) @ R @ Matrix.Translation(-M.translation) @ M
-            bpy.context.view_layer.update()
+    for side in ("Left", "Right"):
         ub = arm.pose.bones["mixamorig:%sArm" % side]
         fb = arm.pose.bones["mixamorig:%sForeArm" % side]
         hb = arm.pose.bones["mixamorig:%sHand" % side]
@@ -668,7 +657,7 @@ def bone_mid(arm, name, t=0.5):
 def nashorn(arm, body):
     """Sternenwüste (Welt 7): Nashorn-Krieger – aufrecht gehendes Nashorn mit großem Horn, grauer Faltenhaut,
     Lederrüstung, Sandstein-Schulterpanzern mit Messing und Bronzekragen; kürzere Arme, Unterarm schlanker als Oberarm"""
-    reshape_arms(arm, body, upper=(1.2, 0.95), fore=(0.8, 0.82), hand=0.85, upper_dir=(0.5, 0.0, -0.87), fore_dir=(0.18, -0.18, -0.97))
+    reshape_arms(arm, body)
     hide = look("Nashornhaut", (0.6, 0.58, 0.56), rough=0.75)
     hide_dark = look("NashornhautDunkel", (0.45, 0.43, 0.42), rough=0.8)
     ivory = look("Horn", (0.93, 0.86, 0.7), rough=0.35)
