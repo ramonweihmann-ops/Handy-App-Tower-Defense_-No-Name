@@ -464,7 +464,7 @@ class FillBands:
 			bands.append(Rect2(Vector2.ZERO, size))
 		else:
 			if inner.position.y > 0.5:
-				bands.append(Rect2(0, 0, size.x, inner.position.y + 1.0))
+				_draw_top(ts, inner.position.y + 1.0)
 			if inner.end.y < size.y - 0.5:
 				bands.append(Rect2(0, inner.end.y - 1.0, size.x, size.y - inner.end.y + 1.0))
 			if inner.position.x > 0.5:
@@ -473,6 +473,18 @@ class FillBands:
 				bands.append(Rect2(inner.end.x - 1.0, inner.position.y, size.x - inner.end.x + 1.0, inner.size.y))
 		for b in bands:
 			draw_texture_rect_region(texture, b, Rect2((b.position - cover.position) / k, b.size / k))
+
+	## Streifen über dem Mockup (Kamera-Aussparung, MockView.safe_top): die oberste Bildzeile nach oben verlängern,
+	## damit der Hintergrund dort einfach weiterläuft. Nicht das Bild selbst, sonst stünde die Kopfleiste des
+	## Bildes noch einmal verschwommen dahinter (Meldung 23.11.2026). Ohne die Abdunklung der übrigen Ränder.
+	func _draw_top(ts: Vector2, h: float) -> void:
+		var undim := Color(1.0 / modulate.r, 1.0 / modulate.g, 1.0 / modulate.b, 1.0)
+		var y := 1.0
+		draw_texture_rect_region(texture, Rect2(inner.position.x, 0, inner.size.x, h), Rect2(0, y, ts.x, 1), undim)
+		if inner.position.x > 0.5:
+			draw_texture_rect_region(texture, Rect2(0, 0, inner.position.x + 1.0, h), Rect2(0, y, 1, 1), undim)
+		if inner.end.x < size.x - 0.5:
+			draw_texture_rect_region(texture, Rect2(inner.end.x - 1.0, 0, size.x - inner.end.x + 1.0, h), Rect2(ts.x - 1, y, 1, 1), undim)
 
 
 ## Durchsichtiger Hintergrund, der nur in einigen Streifen Inhalt hat (Kopf- und Reiterleiste):

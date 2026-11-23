@@ -91,6 +91,8 @@ var _world_container: SubViewportContainer
 ## Gemaltes Schlachtfeld hinter dem Kampf; _field_fill füllt Ränder bei anderem Seitenverhältnis
 var _field_bg: TextureRect
 var _field_fill: TextureRect
+var _field_top: Control   # Streifen über dem Schlachtfeld (Kamera-Aussparung): oberer Bildrand gespiegelt
+var _field_frame := Rect2()
 var _menu_shot_t := 0
 ## Testkarte (nur Entwickler, Spielmodi): {"level", "wave", "heroes", "god"}; leer = normaler Kampf
 var test_run := {}
@@ -452,6 +454,11 @@ func _build_layout() -> void:
 	_field_fill.modulate = Color(0.45, 0.42, 0.6)
 	_field_fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	world_holder.add_child(_field_fill)
+	_field_top = Control.new()
+	_field_top.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_field_top.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_field_top.draw.connect(_draw_field_top)
+	world_holder.add_child(_field_top)
 	_field_bg = TextureRect.new()
 	_field_bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_field_bg.stretch_mode = TextureRect.STRETCH_SCALE
@@ -562,8 +569,32 @@ func _fit_world() -> void:
 	_field_bg.size = frame.size
 	_field_bg.visible = on
 	_field_fill.visible = on
+	_field_frame = frame
+	_field_top.visible = on
+	_field_top.queue_redraw()
 	if hud:
 		hud.world_frame = frame
+
+
+## Über dem Schlachtfeld (Kamera-Aussparung) den oberen Bildrand gespiegelt fortsetzen: Kante an Kante ohne Sprung,
+## statt das abgedunkelte Bild noch einmal dahinter zu zeigen (Meldung 23.11.2026)
+func _draw_field_top() -> void:
+	var tex := _field_bg.texture
+	if tex == null or _field_frame.position.y <= 0.5 or _field_frame.size.x <= 0.0:
+		return
+	var h := _field_frame.position.y + 1.0
+	var ts := tex.get_size()
+	var src_h := minf(h * ts.x / _field_frame.size.x, ts.y)
+	_field_top.draw_set_transform(Vector2(0, h), 0.0, Vector2(1, -1))
+	_field_top.draw_texture_rect_region(tex, Rect2(_field_frame.position.x, 0, _field_frame.size.x, h), Rect2(0, 0, ts.x, src_h))
+	_field_top.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	# nach oben dunkler werden lassen, damit die Spiegelung nicht auffällt (wie Nachthimmel am Rand)
+	var x0 := _field_frame.position.x
+	var x1 := _field_frame.end.x
+	var dark := Color(0.02, 0.02, 0.07, 0.85)
+	var clear := Color(0.02, 0.02, 0.07, 0.0)
+	_field_top.draw_polygon(PackedVector2Array([Vector2(x0, 0), Vector2(x1, 0), Vector2(x1, h), Vector2(x0, h)]),
+		PackedColorArray([dark, dark, clear, clear]))
 
 
 func _set_field(id: String) -> void:
