@@ -620,10 +620,55 @@ def skin_lines(body, color, cells, width, ch=1, seed=41, strength=0.55):
     base = px.copy(); base[..., :3] = base[..., :3] * (1 - k * strength) + np.array(color, dtype=np.float32) * (k * strength)
     tex.image = new_image(body.name + "_Farbe", base)
 
+def reshape_arms(arm, body, upper=(1.15, 0.85), fore=(0.72, 0.72), hand=0.8, upper_dir=(0.33, 0.0, -0.94),
+                 fore_dir=(0.1, -0.22, -0.97)):
+    """Arme des Koloss umformen (Wunsch 23.11.: Unterarm nicht dicker als Oberarm, kürzere Arme, natürlicher Winkel).
+    upper/fore = (Dicke, Länge) absolut, hand = Größe absolut, *_dir = Richtung im Skelettraum (Z oben, -Y vorn) für die
+    linke Seite. Die Haltung wird in die Ruhelage übernommen, die Animationen bleiben gleich."""
+    from mathutils import Vector, Matrix
+    saved = arm.animation_data.action if arm.animation_data else None
+    if arm.animation_data:
+        arm.animation_data.action = None
+    arm.data.pose_position = 'POSE'
+    for pb in arm.pose.bones:
+        pb.location = (0, 0, 0); pb.rotation_quaternion = (1, 0, 0, 0); pb.rotation_euler = (0, 0, 0); pb.scale = (1, 1, 1)
+    bpy.context.view_layer.update()
+    for side, sx in (("Left", 1), ("Right", -1)):
+        for bname, d in (("mixamorig:%sArm" % side, upper_dir), ("mixamorig:%sForeArm" % side, fore_dir)):
+            pb = arm.pose.bones[bname]
+            M = pb.matrix.copy()
+            cur = (pb.tail - pb.head).normalized()
+            des = Vector((d[0] * sx, d[1], d[2])).normalized()
+            R = cur.rotation_difference(des).to_matrix().to_4x4()
+            pb.matrix = Matrix.Translation(M.translation) @ R @ Matrix.Translation(-M.translation) @ M
+            bpy.context.view_layer.update()
+        ub = arm.pose.bones["mixamorig:%sArm" % side]
+        fb = arm.pose.bones["mixamorig:%sForeArm" % side]
+        hb = arm.pose.bones["mixamorig:%sHand" % side]
+        ub.scale = (upper[0], upper[1], upper[0])
+        fb.scale = (fore[0] / upper[0], fore[1] / upper[1], fore[0] / upper[0])   # Skalierung erbt vom Oberarm
+        hb.scale = (hand / fore[0], hand / fore[1], hand / fore[0])
+    bpy.context.view_layer.update()
+    mod = next(m for m in body.modifiers if m.type == 'ARMATURE')
+    bpy.ops.object.select_all(action='DESELECT'); body.select_set(True); bpy.context.view_layer.objects.active = body
+    bpy.ops.object.modifier_apply(modifier=mod.name)
+    bpy.ops.object.select_all(action='DESELECT'); arm.select_set(True); bpy.context.view_layer.objects.active = arm
+    bpy.ops.object.mode_set(mode='POSE'); bpy.ops.pose.armature_apply(selected=False); bpy.ops.object.mode_set(mode='OBJECT')
+    md = body.modifiers.new("Armature", 'ARMATURE'); md.object = arm
+    if saved:
+        arm.animation_data.action = saved
+    arm.data.pose_position = 'REST'
+    bpy.context.view_layer.update()
+
+def bone_mid(arm, name, t=0.5):
+    b = arm.data.bones[name]
+    return arm.matrix_world @ (b.head_local.lerp(b.tail_local, t))
+
 @variante("nashorn_krieger", "koloss")
 def nashorn(arm, body):
     """Sternenwüste (Welt 7): Nashorn-Krieger – aufrecht gehendes Nashorn mit großem Horn, grauer Faltenhaut,
-    Lederrüstung, Sandstein-Schulterpanzern mit Messing und Bronzekragen"""
+    Lederrüstung, Sandstein-Schulterpanzern mit Messing und Bronzekragen; kürzere Arme, Unterarm schlanker als Oberarm"""
+    reshape_arms(arm, body, upper=(1.2, 0.95), fore=(0.8, 0.82), hand=0.85, upper_dir=(0.5, 0.0, -0.87), fore_dir=(0.18, -0.18, -0.97))
     hide = look("Nashornhaut", (0.6, 0.58, 0.56), rough=0.75)
     hide_dark = look("NashornhautDunkel", (0.45, 0.43, 0.42), rough=0.8)
     ivory = look("Horn", (0.93, 0.86, 0.7), rough=0.35)
@@ -666,7 +711,8 @@ def nashorn(arm, body):
                    arm, "mixamorig:%sArm" % side)
         # Armschienen aus Messing
         fore = "mixamorig:%sForeArm" % side
-        attach(give(torus("Schiene%s" % side, (s * 0.8, -0.1, 0.8), 0.13, 0.03, rot=(0, 40 * s, 0)), brass), arm, fore)
+        fm = bone_mid(arm, fore, 0.45)
+        attach(give(torus("Schiene%s" % side, tuple(fm), 0.1, 0.022, rot=(0, 0, 0)), brass), arm, fore)
     # Haut grau mit Falten, Anzug wird Lederrüstung, Kragen und Gürtel Bronze (Falten zuerst, solange die Haut grün ist)
     skin_lines(body, (0.3, 0.28, 0.27), 55, 0.004, ch=1)
     recolor(body, lambda px: mask_color(px, 1, 0.03, 0.1), (0.62, 0.6, 0.58))
