@@ -649,6 +649,58 @@ def reshape_arms(arm, body, upper=(1.15, 0.9), fore=(0.72, 0.8), hand=0.78):
     arm.data.pose_position = 'REST'
     bpy.context.view_layer.update()
 
+def fix_elbows(arm, extra=12.0, lo=24.0, hi=85.0, inward=28.0):
+    """Ellenbogen in allen Aktionen nur nach vorn (und etwas nach innen) beugen (Kommentar 23.11.: „überdehnt“).
+    Die Koloss-Animationen strecken den Unterarm beim Angriff über die Gerade hinaus und knicken ihn beim Laufen
+    seitlich nach außen; von der Spielkamera schräg oben wirkt das wie ein verkehrt herum gebogener Ellenbogen.
+    Je Bild bleibt der Oberarm, wie er ist; der Unterarm wird in die Beugeebene gelegt: Scharnier quer zum Körper,
+    um `inward` Grad nach innen gedreht (Hände vor den Bauch statt nach außen). Beugewinkel = bisheriger Winkel
+    + `extra`, begrenzt auf lo…hi Grad; die Drehung des Unterarms um die eigene Achse bleibt erhalten."""
+    from mathutils import Matrix
+    sc = bpy.context.scene
+    ad = arm.animation_data
+    saved = ad.action
+    arm.data.pose_position = 'POSE'
+    bi = math.radians(inward)
+    acts = [a for a in bpy.data.actions if any('mixamorig:LeftForeArm' in fc.data_path for fc in a.fcurves)]
+    for act in acts:
+        ad.action = act
+        a, b = int(act.frame_range[0]), int(act.frame_range[1])
+        new = {"Left": [], "Right": []}
+        for f in range(a, b + 1):
+            sc.frame_set(f)
+            lat = arm.pose.bones["mixamorig:Spine2"].matrix.col[0].to_3d().normalized()   # zur linken Körperseite
+            for side in ("Left", "Right"):
+                ub = arm.pose.bones["mixamorig:%sArm" % side]
+                fb = arm.pose.bones["mixamorig:%sForeArm" % side]
+                u = (ub.tail - ub.head).normalized(); v = (fb.tail - fb.head).normalized()
+                n = u.cross(lat).normalized()                                   # Beugen nach vorn
+                inn = -lat if side == "Left" else lat
+                m = (inn - u * inn.dot(u)).normalized()                         # nach innen, senkrecht zum Oberarm
+                k = n * math.cos(bi) + m * math.sin(bi); k = (k - u * k.dot(u)).normalized()
+                phi = math.radians(min(hi, max(lo, math.degrees(u.angle(v)) + extra)))
+                t = (u * math.cos(phi) + k * math.sin(phi)).normalized()
+                R = v.rotation_difference(t).to_matrix().to_4x4()
+                head = fb.matrix.translation.copy()
+                M = Matrix.Translation(head) @ R @ Matrix.Translation(-head) @ fb.matrix
+                q = arm.convert_space(pose_bone=fb, matrix=M, from_space='POSE', to_space='LOCAL').to_quaternion()
+                if new[side] and new[side][-1][1].dot(q) < 0:
+                    q.negate()
+                new[side].append((f, q))
+        for side, keys in new.items():
+            path = 'pose.bones["mixamorig:%sForeArm"].rotation_quaternion' % side
+            for fc in [fc for fc in act.fcurves if fc.data_path == path]:
+                act.fcurves.remove(fc)
+            for i in range(4):
+                fc = act.fcurves.new(path, index=i, action_group="mixamorig:%sForeArm" % side)
+                fc.keyframe_points.add(len(keys))
+                for kp, (f, q) in zip(fc.keyframe_points, keys):
+                    kp.co = (f, q[i]); kp.interpolation = 'LINEAR'
+                fc.update()
+    ad.action = saved
+    arm.data.pose_position = 'REST'
+    bpy.context.view_layer.update()
+
 def bone_mid(arm, name, t=0.5):
     b = arm.data.bones[name]
     return arm.matrix_world @ (b.head_local.lerp(b.tail_local, t))
@@ -658,6 +710,7 @@ def nashorn(arm, body):
     """Sternenwüste (Welt 7): Nashorn-Krieger – aufrecht gehendes Nashorn mit großem Horn, grauer Faltenhaut,
     Lederrüstung, Sandstein-Schulterpanzern mit Messing und Bronzekragen; kürzere Arme, Unterarm schlanker als Oberarm"""
     reshape_arms(arm, body)
+    fix_elbows(arm)
     hide = look("Nashornhaut", (0.6, 0.58, 0.56), rough=0.75)
     hide_dark = look("NashornhautDunkel", (0.45, 0.43, 0.42), rough=0.8)
     ivory = look("Horn", (0.93, 0.86, 0.7), rough=0.35)
