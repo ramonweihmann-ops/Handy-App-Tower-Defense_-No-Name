@@ -1458,6 +1458,17 @@ def schleimmutter_krone(arm, body):
     attach(give(puddle, look("Pfuetze", (0.16, 0.78, 0.74), rough=0.05, emit=(0.06, 0.45, 0.42), strength=0.3)), arm, "Body")
     speckles(body, "teal", (0.65, 1.0, 0.95), 0.22, 30, seed=7)
 
+def dampen_scale(arm, bones, factor):
+    """Quetschen und Strecken der Bewegungen abschwächen (Skalierungsschlüssel näher an 1): factor 0 = gar nicht, 1 = wie bisher"""
+    for act in bpy.data.actions:
+        for fc in act.fcurves:
+            if any(fc.data_path == 'pose.bones["%s"].scale' % b for b in bones):
+                for kp in fc.keyframe_points:
+                    for attr in ("co", "handle_left", "handle_right"):
+                        v = getattr(kp, attr)
+                        setattr(kp, attr, (v[0], 1.0 + (v[1] - 1.0) * factor))
+                fc.update()
+
 @variante("gift_kroete", "schleimmutter")
 def gift_kroete(arm, body):
     """Giftsumpf (Welt 5): Giftkröte – breite, gedrungene Kröte mit großen gelben Augen und Schlitzpupillen, breitem
@@ -1473,13 +1484,14 @@ def gift_kroete(arm, body):
     toxic = look("Gifttropfen", (0.6, 1.0, 0.3), rough=0.1, emit=(0.5, 1.0, 0.2), strength=1.8)
     stalk = look("Stiel", (0.9, 0.86, 0.75), rough=0.6)
     cap = look("Pilzhut", (0.7, 0.25, 0.85), rough=0.45, emit=(0.6, 0.15, 0.8), strength=0.5)
-    prof = [(0.5, 0.0), (0.49, 0.1), (0.46, 0.2), (0.41, 0.29), (0.34, 0.37), (0.26, 0.42), (0.18, 0.445), (0.11, 0.44),
-            (0.06, 0.41), (0.025, 0.34), (0.005, 0.22), (0.0, 0.0)]
+    hz = 1.3   # höher und schmaler als zuerst (Kommentar 24.11.: wirkte im Spiel breitgedrückt)
+    prof = [(z * hz, r) for z, r in ((0.5, 0.0), (0.49, 0.1), (0.46, 0.2), (0.41, 0.29), (0.34, 0.37), (0.26, 0.42), (0.18, 0.445), (0.11, 0.44),
+                                     (0.06, 0.41), (0.025, 0.34), (0.005, 0.22), (0.0, 0.0))]
     g = lathe("Kroete", prof, segs=64)
     for v in g.data.vertices:
-        v.co.x *= 1.12; v.co.y *= 0.92
-        if v.co.y < 0:                                   # Kopf vorn etwas flacher und breiter
-            v.co.z *= 1.0 - 0.12 * min(1.0, -v.co.y / 0.4) * max(0.0, (v.co.z - 0.2) / 0.3)
+        v.co.x *= 1.0; v.co.y *= 0.95
+        if v.co.y < 0:                                   # Kopf vorn etwas flacher
+            v.co.z *= 1.0 - 0.1 * min(1.0, -v.co.y / 0.4) * max(0.0, (v.co.z - 0.2 * hz) / (0.3 * hz))
     # Haut: oben oliv mit violetten Flecken, unten heller Bauch (Bildzeile 0 = unten)
     H_, W_ = 1024, 1024
     vv = np.linspace(0, 1, H_)[:, None] * np.ones((1, W_))
@@ -1505,14 +1517,14 @@ def gift_kroete(arm, body):
         a = rnd.uniform(-2.6, 2.6) + math.pi / 2       # vor allem hinten und oben
         el = rnd.uniform(0.25, 1.2)
         d = Vector((math.cos(a) * math.cos(el), math.sin(a) * math.cos(el), math.sin(el)))
-        p, n = surface(g, Vector((0, 0, 0.2)) + d * 2.0, -d)
-        if p is None or p.z < 0.15:
+        p, n = surface(g, Vector((0, 0, 0.2 * hz)) + d * 2.0, -d)
+        if p is None or p.z < 0.15 * hz:
             continue
         warts.append(give(sphere("Warze%d" % i, tuple(p), rnd.uniform(0.018, 0.04), (1, 1, 0.7)), wart))
     # Augen: Wülste, gelbe Augäpfel, waagerechte Schlitzpupillen
     face = []
     for s_ in (-1, 1):
-        p, n = surface(g, (s_ * 0.18, -2.0, 0.42), (0, 1, 0))
+        p, n = surface(g, (s_ * 0.17, -2.0, 0.42 * hz), (0, 1, 0))
         c = p + Vector((0, 0.03, 0.04))
         face.append(give(sphere("Augenwulst%d" % s_, tuple(c), 0.1, (1, 0.95, 0.9)), skin_flat))
         face.append(give(sphere("Augapfel%d" % s_, tuple(c + Vector((0, -0.045, 0.03))), 0.075), eye))
@@ -1520,7 +1532,7 @@ def gift_kroete(arm, body):
         face.append(give(tube("Lid%d" % s_, [tuple(c + Vector((-0.08, -0.05, 0.06))), tuple(c + Vector((0, -0.075, 0.085))), tuple(c + Vector((0.08, -0.05, 0.06)))],
                               [0.025, 0.03, 0.025]), skin_flat))
     # breites Maul vorn, mit Gifttropfen in den Mundwinkeln
-    hits = on_surface(g, (0, 0, 0.25), [(math.sin(a), -math.cos(a), 0.12 * (abs(a) / 1.05) ** 2 - 0.05) for a in [math.radians(t) for t in range(-60, 65, 8)]], lift=0.004)
+    hits = on_surface(g, (0, 0, 0.25 * hz), [(math.sin(a), -math.cos(a), 0.12 * (abs(a) / 1.05) ** 2 - 0.05) for a in [math.radians(t) for t in range(-60, 65, 8)]], lift=0.004)
     face.append(give(tube("Maul", [tuple(p) for p, n in hits], [0.012] + [0.022] * (len(hits) - 2) + [0.012], segs=8), mouth_m))
     face.append(give(tube("Lippe", [tuple(p + n * 0.012 + Vector((0, 0, 0.022))) for p, n in hits[1:-1]], [0.016] * (len(hits) - 2), segs=8), skin_flat))
     for s_, (p, n) in ((-1, hits[0]), (1, hits[-1])):
@@ -1533,7 +1545,7 @@ def gift_kroete(arm, body):
         cap_ = sphere("PilzHut%d" % i, (0, 0, 0), r, (1, 1, 0.55)); cap_.location = p + n * h
         face.append(give(cap_, cap))
     attach(join_parts(warts + face, "Kroete_Kopf"), arm, "Top")
-    skin_to(g, arm, lambda c: {"Top": smooth01((c.z - 0.12) / 0.3), "Body": 1 - smooth01((c.z - 0.12) / 0.3)})
+    skin_to(g, arm, lambda c: {"Top": smooth01((c.z - 0.12 * hz) / (0.3 * hz)), "Body": 1 - smooth01((c.z - 0.12 * hz) / (0.3 * hz))})
     # Beine (Kommentare 24.11.: Füße sauber am Körper, Pfoten rundum plastisch, keine flache Scheibe unter den Zehen):
     # Vorderbeine aus dem Körper heraus, Ballen mit vier Zehen und Haftballen; Hinterbeine mit Schenkel, der im Körper
     # steckt, Unterschenkel und langem Fuß mit vier Zehen
@@ -1552,24 +1564,26 @@ def gift_kroete(arm, body):
         return out
 
     for s_ in (-1, 1):
-        sh, shn = surface(g, (s_ * 1.5, -0.2, 0.22), (-s_, 0, 0))
-        wrist = Vector((s_ * 0.46, -0.36, 0.04))
-        elbow = Vector((s_ * 0.47, -0.27, 0.13))
+        sh, shn = surface(g, (s_ * 1.5, -0.2, 0.24), (-s_, 0, 0))
+        wrist = Vector((s_ * 0.42, -0.36, 0.04))
+        elbow = Vector((s_ * 0.44, -0.27, 0.14))
         legs.append(give(tube("Vorderbein%d" % s_, [tuple(sh - shn * 0.05), tuple(elbow), tuple(wrist + Vector((0, 0, 0.02)))],
                               [0.075, 0.06, 0.05], segs=12), skin_flat))
         legs.append(give(sphere("Handballen%d" % s_, tuple(wrist), 0.055, (1.1, 1.15, 0.6)), skin_flat))
         legs += toes("Vorne%d" % s_, s_, wrist, 4, 0.11, 0.021, 80)
-        hp, hn = surface(g, (s_ * 1.5, 0.12, 0.18), (-s_, 0, 0))
+        hp, hn = surface(g, (s_ * 1.5, 0.12, 0.2), (-s_, 0, 0))
         thigh = sphere("Schenkel%d" % s_, (0, 0, 0), 1.0, (0.14, 0.22, 0.12))
         thigh.location = hp + Vector((s_ * 0.03, -0.02, -0.02)); thigh.rotation_euler = (math.radians(-12), 0, math.radians(s_ * 12))
         legs.append(give(thigh, skin_flat))
         knee = hp + Vector((s_ * 0.08, -0.17, -0.08))
-        ankle = Vector((s_ * 0.55, -0.12, 0.035))
+        ankle = Vector((s_ * 0.5, -0.12, 0.035))
         legs.append(give(tube("Unterschenkel%d" % s_, [tuple(hp + Vector((s_ * 0.06, -0.08, -0.04))), tuple(knee), tuple(ankle + Vector((0, 0, 0.02)))],
                               [0.07, 0.055, 0.045], segs=12), skin_flat))
         legs.append(give(sphere("Ferse%d" % s_, tuple(ankle), 0.05, (1.0, 1.2, 0.6)), skin_flat))
         legs += toes("Hinten%d" % s_, s_, ankle, 4, 0.15, 0.022, 70, fwd=-0.15)
     attach(join_parts(legs, "Kroete_Beine"), arm, "Body")
+    # die Schleim-Bewegung drückt den Körper bis auf 72 % Höhe zusammen: bei der Kröte nur leicht (Kommentar 24.11.: wirkt breitgezogen)
+    dampen_scale(arm, ("Body", "Top"), 0.2)
     remove_body(body)
 
 def tendril(name, start, direction, length, r0, curl=1.0, seed=0, n=12):
