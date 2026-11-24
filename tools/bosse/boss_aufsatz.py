@@ -356,7 +356,7 @@ def smooth01(t):
 def nebelgeist(arm, body):
     """Nebelfelder (Welt 8): Nebelgeist – schwebendes Gespenst mit gewelltem Saum, kleinen Armen, glühenden Augen,
     offenem Maul, einer Nebellocke oben und Nebelkugeln auf einem Ring um den Kopf. Eigene Figur, kein Nachbau."""
-    ghost = look("Geist", (0.93, 0.92, 1.0), rough=0.45, emit=(0.72, 0.68, 1.0), strength=0.45, alpha=0.9)
+    ghost = look("Geist", (0.93, 0.92, 1.0), rough=0.45, emit=(0.72, 0.68, 1.0), strength=0.45)   # undurchsichtig: keine sichtbaren Ebenen beim Springen (Kommentar 24.11.)
     ghost_shade = look("GeistSchatten", (0.7, 0.66, 0.92), rough=0.5, emit=(0.55, 0.5, 0.9), strength=0.3)
     dark = look("Maul", (0.08, 0.04, 0.16), rough=0.6, emit=(0.35, 0.1, 0.6), strength=0.6)
     eye = look("Auge", (0.75, 0.95, 1.0), rough=0.2, emit=(0.55, 0.9, 1.0), strength=4.0)
@@ -1033,12 +1033,43 @@ def block_at(name, c, semi, mat, seed=0, flat=False, subdiv=2):
             pl.use_smooth = False
     return give(o, mat)
 
-def golem_body(arm, body, rock_m, rock2_m, joint_m, flat=False, subdiv=2, fist_m=None, nail_m=None):
+def lengthen_legs(arm, factor):
+    """Beine länger (Kommentar 24.11. zum Kristallriesen): Ober- und Unterschenkel um factor verlängert, das ganze
+    Skelett so weit angehoben, dass die Füße wieder auf dem Boden stehen. Richtungen und Drehungen der Knochen bleiben,
+    damit alle Bewegungen weiter passen. Nur für Bosse ohne Hautkörper (Golems)."""
+    bpy.ops.object.select_all(action='DESELECT'); arm.select_set(True); bpy.context.view_layer.objects.active = arm
+    bpy.ops.object.mode_set(mode='EDIT')
+    eb = arm.data.edit_bones
+    up_ = eb["mixamorig:LeftUpLeg"]; lo_ = eb["mixamorig:LeftLeg"]
+    dz = (factor - 1) * ((up_.head.z - up_.tail.z) + (lo_.head.z - lo_.tail.z))
+    for b in eb:
+        b.use_connect = False
+    for b in eb:
+        b.head.z += dz; b.tail.z += dz
+    for side in ("Left", "Right"):
+        up_, lo_ = eb["mixamorig:%sUpLeg" % side], eb["mixamorig:%sLeg" % side]
+        old_ankle = lo_.tail.copy()
+        up_.tail = up_.head + (up_.tail - up_.head) * factor
+        d = lo_.tail - lo_.head
+        lo_.head = up_.tail.copy(); lo_.tail = lo_.head + d * factor
+        shift = lo_.tail - old_ankle
+        for b in eb:
+            if b.name.startswith("mixamorig:%s" % side) and any(k in b.name for k in ("Foot", "Toe")):
+                b.head += shift; b.tail += shift
+        for b in eb:                                          # Zusatzknochen am Fuß (Bone_005 u. a.) mitnehmen
+            if b.parent is not None and b.parent.name == "mixamorig:%sFoot" % side and not b.name.startswith("mixamorig:"):
+                b.head += shift; b.tail += shift
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.context.view_layer.update()
+
+def golem_body(arm, body, rock_m, rock2_m, joint_m, flat=False, subdiv=2, fist_m=None, nail_m=None, legs=1.0):
     """Körper aus Blöcken am Koloss-Skelett (Magma-Golem, Kristallriese): Becken, Bauch, Brust, Schulterblöcke,
     Ober- und Unterarme (Unterarm schlanker), Fäuste, Beine, Füße, leuchtende Gelenke. Arme wie beim Nashorn-Krieger
     (kürzer, Ellenbogen nur nach vorn, Hände mit Daumen innen). Teile je Knochen zu einem Objekt verbunden.
-    Liefert ein Wörterbuch mit Lagen (Brust, Kopf, Schultern) für die Aufsätze."""
+    Liefert ein Wörterbuch mit Lagen (Brust, Kopf, Schultern) für die Aufsätze. legs > 1: längere Beine."""
     reshape_arms(arm, body)
+    if legs != 1.0:
+        lengthen_legs(arm, legs)
     fix_elbows(arm)
     W = lambda bone, t=0.0: arm.matrix_world @ (arm.data.bones[bone].head_local.lerp(arm.data.bones[bone].tail_local, t))
     B = lambda n: "mixamorig:" + n
@@ -1130,7 +1161,7 @@ def kristall_riese(arm, body):
     cr2 = look("Riesenkristall2", (0.85, 0.3, 0.75), rough=0.1, emit=(0.75, 0.2, 0.65), strength=0.3)
     cr3 = look("Riesenkristall3", (0.34, 0.2, 0.7), rough=0.12, emit=(0.28, 0.12, 0.6), strength=0.35)
     energy = look("Kristallkern", (0.5, 0.95, 1.0), rough=0.2, emit=(0.3, 0.85, 1.0), strength=2.5)
-    g = golem_body(arm, body, cr, cr3, energy, flat=True, subdiv=1, fist_m=cr3, nail_m=cr2)
+    g = golem_body(arm, body, cr, cr3, energy, flat=True, subdiv=1, fist_m=cr3, nail_m=cr2, legs=1.6)
     H = "mixamorig:Head"
     hc = g["head"] + Vector((0, -0.08, 0.26))
     head_parts = [block_at("Kopf", hc, (0.24, 0.22, 0.24), cr2, 51, True, 1), block_at("Kiefer", hc + Vector((0, -0.07, -0.15)), (0.2, 0.16, 0.09), cr3, 52, True, 1)]
@@ -1257,15 +1288,17 @@ def gift_kroete(arm, body):
         if v.co.y < 0:                                   # Kopf vorn etwas flacher und breiter
             v.co.z *= 1.0 - 0.12 * min(1.0, -v.co.y / 0.4) * max(0.0, (v.co.z - 0.2) / 0.3)
     # Haut: oben oliv mit violetten Flecken, unten heller Bauch (Bildzeile 0 = unten)
-    H_, W_ = 512, 512
+    H_, W_ = 1024, 1024
     vv = np.linspace(0, 1, H_)[:, None] * np.ones((1, W_))
     spots = fbm(H_, W_, 9, 91)
     grad = np.clip((vv - 0.42) / 0.16, 0, 1)
     top = np.array((0.38, 0.52, 0.16)); bot = np.array((0.84, 0.86, 0.5))
     col = bot * (1 - grad[..., None]) + top * grad[..., None]
-    k = (np.clip((spots - 0.58) * 8, 0, 1) * grad)[..., None]
-    col = col * (1 - k) + np.array((0.45, 0.2, 0.5)) * k
+    k = (np.clip((spots - 0.58) * 45, 0, 1) * grad)[..., None]          # Flecken mit klarer Kante (Kommentar 24.11.)
+    ring = (np.clip(1 - np.abs(spots - 0.575) * 70, 0, 1) * grad)[..., None]   # dunkle Umrandung
     col = np.clip(col + ((fbm(H_, W_, 40, 92, 2) - 0.5) * 0.12)[..., None], 0, 1)
+    col = col * (1 - k) + np.array((0.5, 0.17, 0.6)) * k
+    col = col * (1 - ring * 0.55) + np.array((0.16, 0.08, 0.18)) * (ring * 0.55)
     arr = np.ones((H_, W_, 4), dtype=np.float32); arr[..., :3] = col
     nt = skin.node_tree
     ti = nt.nodes.new("ShaderNodeTexImage"); ti.image = new_image("Kroete_Farbe", arr)
@@ -1445,12 +1478,17 @@ def kristall_kaefer(arm, body):
     hb = arm.data.bones["Head"]
     h0 = arm.matrix_world @ hb.head_local; h1 = arm.matrix_world @ hb.tail_local
     hp = []
-    p, n = surface(body, (h0.x, h0.y - 0.08, 2.0), (0, 0, -1))
-    hp.append(give(crystal("Horn", tuple(p - Vector((0, 0, 0.02))), 0.2, 0.05, (-55, 0, 0)), cr))
-    hp.append(give(crystal("Horn2", tuple(p + Vector((0, 0.04, -0.02))), 0.12, 0.035, (-30, 0, 30)), cr2))
+    # Horn: Fuß steckt in der Stirn, zeigt nach vorn oben (Kommentar 24.11.: direkt am Kopf, ohne Abstand)
+    p, n = surface(body, (0.0, -1.5, h0.z + 0.08), (0, 1, 0))
+    hp.append(give(crystal("Horn", tuple(p - n * 0.035), 0.2, 0.05, (35, 0, 0)), cr))
+    p2, n2 = surface(body, (0.06, -1.5, h0.z + 0.12), (0, 1, 0))
+    hp.append(give(crystal("Horn2", tuple(p2 - n2 * 0.03), 0.11, 0.032, (25, 0, -25)), cr2))
+    # Zangen: wachsen seitlich aus dem Maul, krümmen sich nach vorn innen
     for s_ in (-1, 1):
-        hp.append(give(horn("Zange%d" % s_, (h1.x + s_ * 0.06, h1.y + 0.04, h1.z + 0.0), (h1.x + s_ * 0.11, h1.y - 0.06, h1.z - 0.01),
-                            (h1.x + s_ * 0.03, h1.y - 0.13, h1.z - 0.02), 0.03, n=8), cr3))
+        q, m = surface(body, (s_ * 0.075, -1.5, h0.z - 0.04), (0, 1, 0))
+        root = q - m * 0.02
+        hp.append(give(horn("Zange%d" % s_, tuple(root), tuple(root + Vector((s_ * 0.05, -0.07, -0.005))),
+                            tuple(root + Vector((-s_ * 0.03, -0.13, -0.015))), 0.03, n=9), cr3))
     attach(join_parts(hp, "Kristallkopf"), arm, "Head")
     # Kristallspitzen an den Beinenden
     for b in [b.name for b in arm.data.bones if b.name.endswith("_Lo")]:

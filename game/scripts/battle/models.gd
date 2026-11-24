@@ -97,7 +97,7 @@ const BOSS_LOOK_DATA := {
 	"kristall_kaefer": {"height": 2.4, "stride": 0.23},
 	"nebel_geist": {"height": 2.1, "lift": 0.3},
 	"schatten_wesen": {"height": 3.2},
-	"kristall_riese": {"height": 3.2},
+	"kristall_riese": {"height": 3.5},
 }
 
 
