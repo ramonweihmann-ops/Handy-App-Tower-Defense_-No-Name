@@ -701,80 +701,135 @@ def fix_elbows(arm, extra=12.0, lo=24.0, hi=85.0, inward=28.0):
     arm.data.pose_position = 'REST'
     bpy.context.view_layer.update()
 
-def fix_hands(arm, psi=35.0, share=0.5, smooth=2):
-    """Hände so drehen, dass der Daumen nach vorn-innen zeigt (Kommentar 24.11.: „Daumen steht nach außen“).
-    Je Bild: Richtung kleiner Finger → Daumen quer zum Unterarm messen; Ziel ist die Beugeseite des Unterarms,
-    um `psi` Grad nach innen gedreht (Handrücken nach außen, Daumen zum Körper). Die nötige Drehung um die
-    Unterarmachse wird über ±`smooth` Bilder geglättet und zu `share` auf den Unterarm, der Rest auf die Hand
-    verteilt, damit weder Ellenbogen noch Handgelenk sichtbar verdreht werden. Nach fix_elbows aufrufen."""
-    from mathutils import Matrix, Quaternion
+def join_parts(objs, name):
+    """Mehrere Teile zu einem Objekt verbinden (Materialien bleiben je Fläche erhalten)"""
+    bpy.ops.object.select_all(action='DESELECT')
+    for o in objs:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = objs[0]
+    bpy.ops.object.join()
+    o = bpy.context.view_layer.objects.active; o.name = name
+    return o
+
+def place_in_bone(o, arm, bone):
+    """Teil, das im Ruherahmen eines Knochens gebaut ist (Ursprung = Knochenkopf, Y entlang des Knochens), an seinen
+    Platz setzen und an den Knochen hängen"""
+    o.matrix_world = arm.matrix_world @ arm.data.bones[bone].matrix_local @ o.matrix_world
+    return attach(o, arm, bone)
+
+def new_hands(arm, body, skin, nail, leather, metal, psi=30.0, flex=10.0, size=1.0):
+    """Hände ganz neu (Kommentar 24.11.: „Daumen nach außen gebrochen, Hände von vorn neu“).
+    Die Hände des Koloss (fünf Fingerknochen, verdrehte Fingerbewegungen) werden aus dem Körper entfernt und durch
+    eigene, starre Nashorn-Hände ersetzt: Handballen, drei dicke Finger mit Hufnägeln, Daumen auf der Innenseite,
+    Lederstulpe mit Metallrand am Handgelenk (deckt den Schnitt ab).
+    Die Hand ist im Rahmen des Handknochens gebaut: Finger entlang +Y, Daumen auf der +X-Seite, Handfläche links
+    nach -Z, rechts nach +Z (Spiegelbild). Ihre Haltung wird in jedem Bild jeder Aktion neu gesetzt:
+    Hand in Verlängerung des Unterarms, `flex` Grad zur Handfläche gebeugt; Daumen zur Beugeseite des Unterarms,
+    um `psi` Grad zum Körper gedreht. Hängende Arme: Handflächen zu den Oberschenkeln, Daumen vorn-innen."""
+    from mathutils import Matrix
+    gn = {g.index: g.name for g in body.vertex_groups}
+    # 1) alte Hände aus dem Körper schneiden; Reste am Handgelenk folgen nur noch dem Unterarm
+    kill = []
+    for side in ("Left", "Right"):
+        fore = body.vertex_groups["mixamorig:%sForeArm" % side]
+        for v in body.data.vertices:
+            hw = sum(g.weight for g in v.groups if gn[g.group].startswith("mixamorig:%sHand" % side))
+            if hw > 0.5:
+                kill.append(v.index)
+            elif hw > 0:
+                fw = sum(g.weight for g in v.groups if gn[g.group] == "mixamorig:%sForeArm" % side)
+                fore.add([v.index], fw + hw, 'REPLACE')
+                for g in list(v.groups):
+                    if gn[g.group].startswith("mixamorig:%sHand" % side):
+                        body.vertex_groups[g.group].remove([v.index])
+    bm = bmesh.new(); bm.from_mesh(body.data); bm.verts.ensure_lookup_table()
+    bmesh.ops.delete(bm, geom=[bm.verts[i] for i in kill], context='VERTS')
+    bm.to_mesh(body.data); bm.free(); body.data.update()
+    # 2) neue Hände und Stulpen
+    k = size
+    for side, zs in (("Left", 1.0), ("Right", -1.0)):
+        def P(x, y, z):
+            return (x * k, y * k, z * k * zs)
+        parts = [give(sphere("Handballen" + side, P(0.0, 0.085, 0.0), 0.1 * k, (1.0, 0.95, 0.62)), skin),
+                 give(sphere("Handruecken" + side, P(-0.005, 0.1, 0.022), 0.085 * k, (1.0, 0.9, 0.55)), skin)]
+        for i, x in enumerate((-0.058, -0.002, 0.05)):
+            pts = [P(x, 0.13, 0.0), P(x * 1.06, 0.195, -0.012), P(x * 1.12, 0.245, -0.045), P(x * 1.14, 0.262, -0.075)]
+            parts.append(give(tube("Finger%s%d" % (side, i), pts, [0.037 * k, 0.035 * k, 0.031 * k, 0.026 * k]), skin))
+            parts.append(give(sphere("Kuppe%s%d" % (side, i), pts[-1], 0.026 * k), skin))
+            parts.append(give(sphere("Nagel%s%d" % (side, i), P(x * 1.14, 0.27, -0.072), 0.028 * k, (1.0, 0.8, 0.85)), nail))
+        pts = [P(0.07, 0.055, -0.012), P(0.104, 0.11, -0.038), P(0.112, 0.155, -0.065)]
+        parts.append(give(tube("Daumen" + side, pts, [0.04 * k, 0.035 * k, 0.029 * k]), skin))
+        parts.append(give(sphere("DaumenKuppe" + side, pts[-1], 0.029 * k), skin))
+        parts.append(give(sphere("DaumenNagel" + side, P(0.116, 0.163, -0.063), 0.03 * k, (0.9, 0.8, 0.85)), nail))
+        hand = join_parts(parts, "Hand" + side)
+        place_in_bone(hand, arm, "mixamorig:%sHand" % side)
+        # Stulpe im Rahmen des Unterarms, Mitte und Weite aus dem Körper gemessen
+        fname = "mixamorig:%sForeArm" % side
+        fb = arm.data.bones[fname]; L = fb.length
+        Minv = (arm.matrix_world @ fb.matrix_local).inverted()
+        fi = body.vertex_groups[fname].index
+        pts_local = []
+        for v in body.data.vertices:
+            if any(g.group == fi and g.weight > 0.5 for g in v.groups):
+                q = Minv @ (body.matrix_world @ v.co)
+                if L - 0.12 < q.y < L + 0.02:
+                    pts_local.append(q)
+        cx = sum(q.x for q in pts_local) / len(pts_local); cz = sum(q.z for q in pts_local) / len(pts_local)
+
+        def ring_r(y0, y1):
+            rr = sorted(math.hypot(q.x - cx, q.z - cz) for q in pts_local if y0 < q.y < y1)
+            return rr[int(len(rr) * 0.95)] + 0.008
+        r_top, r_bot = ring_r(L - 0.12, L - 0.06), ring_r(L - 0.05, L + 0.02)
+        r = max(r_bot, r_top * 0.9)
+        cuff = give(tube("Stulpe" + side, [(cx, L - 0.095, cz), (cx, L - 0.05, cz), (cx, L - 0.005, cz), (cx, L + 0.02, cz)],
+                         [max(r_top, r), (max(r_top, r) + r) / 2 + 0.004, r * 1.02, r]), leather)
+        place_in_bone(cuff, arm, fname)
+        rim = give(torus("StulpenRand" + side, (cx, L + 0.018, cz), r * 1.0, 0.014, rot=(90, 0, 0)), metal)
+        place_in_bone(rim, arm, fname)
+        rim2 = give(torus("StulpenRandOben" + side, (cx, L - 0.093, cz), max(r_top, r), 0.012, rot=(90, 0, 0)), metal)
+        place_in_bone(rim2, arm, fname)
+    # 3) Haltung der Hände in allen Aktionen setzen
     sc = bpy.context.scene
     ad = arm.animation_data
     saved = ad.action
     arm.data.pose_position = 'POSE'
-    P = arm.pose.bones
-    ps = math.radians(psi)
+    PB = arm.pose.bones
+    ps, fl = math.radians(psi), math.radians(flex)
 
     def perp(x, a):
         return (x - a * x.dot(a)).normalized()
 
-    def quat_keys(act, path):
-        fcs = sorted([fc for fc in act.fcurves if fc.data_path == path], key=lambda fc: fc.array_index)
-        return fcs if len(fcs) == 4 else None
-
-    acts = [a for a in bpy.data.actions if any('mixamorig:LeftHand"' in fc.data_path for fc in a.fcurves)]
-    for act in acts:
+    for act in [a for a in bpy.data.actions if any('mixamorig:LeftHand"' in fc.data_path for fc in a.fcurves)]:
         ad.action = act
         a, b = int(act.frame_range[0]), int(act.frame_range[1])
-        frames = list(range(a, b + 1))
-        for side in ("Left", "Right"):
-            fore, hand = "mixamorig:%sForeArm" % side, "mixamorig:%sHand" % side
-            # 1) nötige Drehung je Bild messen
-            alpha = []
-            for f in frames:
-                sc.frame_set(f)
-                lat = P["mixamorig:Spine2"].matrix.col[0].to_3d().normalized()
+        keys = {"Left": [], "Right": []}
+        for f in range(a, b + 1):
+            sc.frame_set(f)
+            lat = PB["mixamorig:Spine2"].matrix.col[0].to_3d().normalized()
+            for side in ("Left", "Right"):
                 inn = -lat if side == "Left" else lat
-                u = (P["mixamorig:%sArm" % side].tail - P["mixamorig:%sArm" % side].head).normalized()
-                t = (P[fore].tail - P[fore].head).normalized()
-                w = perp(P["mixamorig:%sHandThumb2" % side].head - P["mixamorig:%sHandPinky1" % side].head, t)
-                d = perp(u.cross(lat), t)
-                m = perp(inn, t); m = perp(m - d * m.dot(d), t)
-                goal = (d * math.cos(ps) + m * math.sin(ps)).normalized()
-                alpha.append(math.atan2(w.cross(goal).dot(t), w.dot(goal)))
-            for i in range(1, len(alpha)):                      # ohne Sprünge über ±180°
-                while alpha[i] - alpha[i - 1] > math.pi: alpha[i] -= 2 * math.pi
-                while alpha[i] - alpha[i - 1] < -math.pi: alpha[i] += 2 * math.pi
-            al = [sum(alpha[max(0, i - smooth):i + smooth + 1]) / len(alpha[max(0, i - smooth):i + smooth + 1]) for i in range(len(alpha))]
-            # 2) Unterarm um die eigene Achse drehen (lokale Y-Achse = Knochenachse)
-            fcs = quat_keys(act, 'pose.bones["%s"].rotation_quaternion' % fore)
-            idx = {f: i for i, f in enumerate(frames)}
-            for k in range(len(fcs[0].keyframe_points)):
-                f = int(round(fcs[0].keyframe_points[k].co[0]))
-                if f not in idx: continue
-                q = Quaternion([fcs[i].keyframe_points[k].co[1] for i in range(4)])
-                q = q @ Quaternion((0, 1, 0), al[idx[f]] * share)
-                for i in range(4): fcs[i].keyframe_points[k].co[1] = q[i]
-            for fc in fcs: fc.update()
-            # 3) Rest der Drehung an der Hand, um die Unterarmachse durch das Handgelenk
-            keys = []
-            for f in frames:
-                sc.frame_set(f)
-                hb = P[hand]
-                t = (P[fore].tail - P[fore].head).normalized()
-                R = Quaternion(t, al[idx[f]] * (1 - share)).to_matrix().to_4x4()
-                head = hb.matrix.translation.copy()
-                M = Matrix.Translation(head) @ R @ Matrix.Translation(-head) @ hb.matrix
+                u = (PB["mixamorig:%sArm" % side].tail - PB["mixamorig:%sArm" % side].head).normalized()
+                fb = PB["mixamorig:%sForeArm" % side]; t = (fb.tail - fb.head).normalized()
+                d = perp(u.cross(lat), t)                                   # Beugeseite des Unterarms
+                m = perp(inn, t); m = perp(m - d * m.dot(d), t)             # zum Körper
+                x = (d * math.cos(ps) + m * math.sin(ps)).normalized()      # Daumenseite
+                palm = -x.cross(t) if side == "Left" else x.cross(t)
+                y = (t * math.cos(fl) + palm * math.sin(fl)).normalized()
+                x = perp(x, y); z = x.cross(y)
+                hb = PB["mixamorig:%sHand" % side]
+                M = Matrix((x, y, z)).transposed().to_4x4(); M.translation = hb.matrix.translation
                 q = arm.convert_space(pose_bone=hb, matrix=M, from_space='POSE', to_space='LOCAL').to_quaternion()
-                if keys and keys[-1][1].dot(q) < 0: q.negate()
-                keys.append((f, q))
-            path = 'pose.bones["%s"].rotation_quaternion' % hand
+                if keys[side] and keys[side][-1][1].dot(q) < 0:
+                    q.negate()
+                keys[side].append((f, q))
+        for side, kk in keys.items():
+            path = 'pose.bones["mixamorig:%sHand"].rotation_quaternion' % side
             for fc in [fc for fc in act.fcurves if fc.data_path == path]:
                 act.fcurves.remove(fc)
             for i in range(4):
-                fc = act.fcurves.new(path, index=i, action_group=hand)
-                fc.keyframe_points.add(len(keys))
-                for kp, (f, q) in zip(fc.keyframe_points, keys):
+                fc = act.fcurves.new(path, index=i, action_group="mixamorig:%sHand" % side)
+                fc.keyframe_points.add(len(kk))
+                for kp, (f, q) in zip(fc.keyframe_points, kk):
                     kp.co = (f, q[i]); kp.interpolation = 'LINEAR'
                 fc.update()
     ad.action = saved
@@ -791,7 +846,6 @@ def nashorn(arm, body):
     Lederrüstung, Sandstein-Schulterpanzern mit Messing und Bronzekragen; kürzere Arme, Unterarm schlanker als Oberarm"""
     reshape_arms(arm, body)
     fix_elbows(arm)
-    fix_hands(arm)
     hide = look("Nashornhaut", (0.6, 0.58, 0.56), rough=0.75)
     hide_dark = look("NashornhautDunkel", (0.45, 0.43, 0.42), rough=0.8)
     ivory = look("Horn", (0.93, 0.86, 0.7), rough=0.35)
@@ -800,6 +854,9 @@ def nashorn(arm, body):
     stone = look("Sandstein", (0.86, 0.68, 0.42), rough=0.85)
     stone2 = look("Sandstein2", (0.75, 0.56, 0.33), rough=0.85)
     brass = look("Messing", (0.9, 0.66, 0.3), rough=0.3, metal=0.9)
+    hoof = look("Hufnagel", (0.3, 0.27, 0.25), rough=0.45)
+    leather = look("Lederstulpe", (0.46, 0.3, 0.17), rough=0.8)
+    new_hands(arm, body, hide, hoof, leather, brass, size=1.25)
     # Kopf: Schädel umschließt den Zombiekopf, Schnauze nach vorn, großes und kleines Horn, Ohren, Augen
     skull = sphere("Schaedel", (0, 0, 0), 0.34, (1.0, 1.12, 0.92)); skull.location = (0, 0.0, 1.47)
     attach(give(skull, hide), arm, "mixamorig:Head")
