@@ -701,6 +701,86 @@ def fix_elbows(arm, extra=12.0, lo=24.0, hi=85.0, inward=28.0):
     arm.data.pose_position = 'REST'
     bpy.context.view_layer.update()
 
+def fix_hands(arm, psi=35.0, share=0.5, smooth=2):
+    """Hände so drehen, dass der Daumen nach vorn-innen zeigt (Kommentar 24.11.: „Daumen steht nach außen“).
+    Je Bild: Richtung kleiner Finger → Daumen quer zum Unterarm messen; Ziel ist die Beugeseite des Unterarms,
+    um `psi` Grad nach innen gedreht (Handrücken nach außen, Daumen zum Körper). Die nötige Drehung um die
+    Unterarmachse wird über ±`smooth` Bilder geglättet und zu `share` auf den Unterarm, der Rest auf die Hand
+    verteilt, damit weder Ellenbogen noch Handgelenk sichtbar verdreht werden. Nach fix_elbows aufrufen."""
+    from mathutils import Matrix, Quaternion
+    sc = bpy.context.scene
+    ad = arm.animation_data
+    saved = ad.action
+    arm.data.pose_position = 'POSE'
+    P = arm.pose.bones
+    ps = math.radians(psi)
+
+    def perp(x, a):
+        return (x - a * x.dot(a)).normalized()
+
+    def quat_keys(act, path):
+        fcs = sorted([fc for fc in act.fcurves if fc.data_path == path], key=lambda fc: fc.array_index)
+        return fcs if len(fcs) == 4 else None
+
+    acts = [a for a in bpy.data.actions if any('mixamorig:LeftHand"' in fc.data_path for fc in a.fcurves)]
+    for act in acts:
+        ad.action = act
+        a, b = int(act.frame_range[0]), int(act.frame_range[1])
+        frames = list(range(a, b + 1))
+        for side in ("Left", "Right"):
+            fore, hand = "mixamorig:%sForeArm" % side, "mixamorig:%sHand" % side
+            # 1) nötige Drehung je Bild messen
+            alpha = []
+            for f in frames:
+                sc.frame_set(f)
+                lat = P["mixamorig:Spine2"].matrix.col[0].to_3d().normalized()
+                inn = -lat if side == "Left" else lat
+                u = (P["mixamorig:%sArm" % side].tail - P["mixamorig:%sArm" % side].head).normalized()
+                t = (P[fore].tail - P[fore].head).normalized()
+                w = perp(P["mixamorig:%sHandThumb2" % side].head - P["mixamorig:%sHandPinky1" % side].head, t)
+                d = perp(u.cross(lat), t)
+                m = perp(inn, t); m = perp(m - d * m.dot(d), t)
+                goal = (d * math.cos(ps) + m * math.sin(ps)).normalized()
+                alpha.append(math.atan2(w.cross(goal).dot(t), w.dot(goal)))
+            for i in range(1, len(alpha)):                      # ohne Sprünge über ±180°
+                while alpha[i] - alpha[i - 1] > math.pi: alpha[i] -= 2 * math.pi
+                while alpha[i] - alpha[i - 1] < -math.pi: alpha[i] += 2 * math.pi
+            al = [sum(alpha[max(0, i - smooth):i + smooth + 1]) / len(alpha[max(0, i - smooth):i + smooth + 1]) for i in range(len(alpha))]
+            # 2) Unterarm um die eigene Achse drehen (lokale Y-Achse = Knochenachse)
+            fcs = quat_keys(act, 'pose.bones["%s"].rotation_quaternion' % fore)
+            idx = {f: i for i, f in enumerate(frames)}
+            for k in range(len(fcs[0].keyframe_points)):
+                f = int(round(fcs[0].keyframe_points[k].co[0]))
+                if f not in idx: continue
+                q = Quaternion([fcs[i].keyframe_points[k].co[1] for i in range(4)])
+                q = q @ Quaternion((0, 1, 0), al[idx[f]] * share)
+                for i in range(4): fcs[i].keyframe_points[k].co[1] = q[i]
+            for fc in fcs: fc.update()
+            # 3) Rest der Drehung an der Hand, um die Unterarmachse durch das Handgelenk
+            keys = []
+            for f in frames:
+                sc.frame_set(f)
+                hb = P[hand]
+                t = (P[fore].tail - P[fore].head).normalized()
+                R = Quaternion(t, al[idx[f]] * (1 - share)).to_matrix().to_4x4()
+                head = hb.matrix.translation.copy()
+                M = Matrix.Translation(head) @ R @ Matrix.Translation(-head) @ hb.matrix
+                q = arm.convert_space(pose_bone=hb, matrix=M, from_space='POSE', to_space='LOCAL').to_quaternion()
+                if keys and keys[-1][1].dot(q) < 0: q.negate()
+                keys.append((f, q))
+            path = 'pose.bones["%s"].rotation_quaternion' % hand
+            for fc in [fc for fc in act.fcurves if fc.data_path == path]:
+                act.fcurves.remove(fc)
+            for i in range(4):
+                fc = act.fcurves.new(path, index=i, action_group=hand)
+                fc.keyframe_points.add(len(keys))
+                for kp, (f, q) in zip(fc.keyframe_points, keys):
+                    kp.co = (f, q[i]); kp.interpolation = 'LINEAR'
+                fc.update()
+    ad.action = saved
+    arm.data.pose_position = 'REST'
+    bpy.context.view_layer.update()
+
 def bone_mid(arm, name, t=0.5):
     b = arm.data.bones[name]
     return arm.matrix_world @ (b.head_local.lerp(b.tail_local, t))
@@ -711,6 +791,7 @@ def nashorn(arm, body):
     Lederrüstung, Sandstein-Schulterpanzern mit Messing und Bronzekragen; kürzere Arme, Unterarm schlanker als Oberarm"""
     reshape_arms(arm, body)
     fix_elbows(arm)
+    fix_hands(arm)
     hide = look("Nashornhaut", (0.6, 0.58, 0.56), rough=0.75)
     hide_dark = look("NashornhautDunkel", (0.45, 0.43, 0.42), rough=0.8)
     ivory = look("Horn", (0.93, 0.86, 0.7), rough=0.35)
