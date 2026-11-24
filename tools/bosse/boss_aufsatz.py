@@ -1077,13 +1077,24 @@ def golem_face(skull, jaw, hc, m, crystal_teeth=False):
         # schmale Braue knapp über der Augenhöhle, innen tiefer (böse), verdeckt das Auge nicht (Kommentar 24.11.)
         brow = chunk_between("Braue%d" % s_, p + Vector((s_ * 0.1, -0.004, 0.082)), p + Vector((-s_ * 0.04, -0.01, 0.05)), 0.022, m["brow"], seed=60 + s_, flat=True, subdiv=1, depth=0.75)
         parts.append(brow)
+        # Riss (Kommentar 24.11.: realistischer): gezackte, dünner werdende Linie mit kleinem Abzweig
+        rnd = random.Random(80 + s_)
         crack = []
-        for t in [k / 5 for k in range(6)]:
-            q, qn = surface(skull, (s_ * (0.11 + 0.05 * t), -2.0, hc.z - 0.015 - 0.11 * t), (0, 1, 0))
+        for k in range(10):
+            t = k / 9
+            q, qn = surface(skull, (s_ * (0.1 + 0.055 * t) + rnd.uniform(-0.011, 0.011), -2.0, hc.z - 0.012 - 0.12 * t), (0, 1, 0))
             if q is not None:
-                crack.append(tuple(q + qn * 0.003))
-        if len(crack) > 2:
-            parts.append(give(tube("Riss%d" % s_, crack, [0.009] * (len(crack) - 1) + [0.0], segs=6), m["crack"]))
+                crack.append((q + qn * 0.0015, t))
+        if len(crack) > 3:
+            parts.append(give(tube("Riss%d" % s_, [tuple(c) for c, t in crack], [0.0065 * (1 - t) + 0.0022 for c, t in crack[:-1]] + [0.0], segs=6), m["crack"]))
+            b0 = crack[4][0]
+            br = []
+            for k in range(4):
+                q, qn = surface(skull, (b0.x + s_ * (0.012 + 0.014 * k), -2.0, b0.z - 0.01 * k + rnd.uniform(-0.004, 0.004)), (0, 1, 0))
+                if q is not None:
+                    br.append(tuple(q + qn * 0.0015))
+            if len(br) > 2:
+                parts.append(give(tube("RissAst%d" % s_, br, [0.0035] * (len(br) - 1) + [0.0], segs=6), m["crack"]))
     # Zähne genau am Rand der Maulöffnung (Kommentar 24.11.: sauber im Mundraum): Rand je Zahn ausmessen – Strahlen
     # von vorn, oberhalb/unterhalb der Maulmitte; wo der Strahl nicht mehr ins Maulinnere trifft, liegt der Rand
     from mathutils.bvhtree import BVHTree
@@ -1117,13 +1128,15 @@ def golem_face(skull, jaw, hc, m, crystal_teeth=False):
             continue
         gap = t.z - b_.z
         L = gap * (0.4 if i in (0, 3) else 0.33)
-        parts.append(shard("Oberzahn%d" % i, t + Vector((0, 0.014, 0.004)), (x * 0.3, 0.12, -1), L, 0.016, m["tooth"]))
+        parts.append(shard("Oberzahn%d" % i, t + Vector((0, 0.012, 0.006)), (x * 0.3, -0.22, -1), L, 0.022, m["tooth"]))
     for i, x in enumerate((-0.06, 0.0, 0.06)):
         t, b_ = rim(x, 1), rim(x, -1)
         if t is None or b_ is None:
             continue
         gap = t.z - b_.z
-        parts.append(shard("Unterzahn%d" % i, b_ + Vector((0, 0.014, -0.004)), (x * 0.3, 0.12, 1), gap * 0.28, 0.014, m["tooth"]))
+        parts.append(shard("Unterzahn%d" % i, b_ + Vector((0, 0.012, -0.006)), (x * 0.3, -0.22, 1), gap * 0.3, 0.019, m["tooth"]))
+    if "throat" in m:
+        parts.append(give(sphere("Rachen", tuple(pm + Vector((0, 0.06, 0.0))), 0.05, (1.6, 0.6, 0.7)), m["throat"]))
     return parts
 
 def lengthen_legs(arm, factor):
@@ -1301,8 +1314,11 @@ def magma_golem(arm, body):
     jaw = block_at("Kiefer", hc + Vector((0, -0.07, -0.15)), (0.22, 0.17, 0.1), basalt2, 32, True)
     socket = look("Augenhoehle", (0.1, 0.05, 0.04), rough=0.6, emit=(0.6, 0.12, 0.02), strength=0.6)
     core = look("Glutkern", (1.0, 0.95, 0.7), rough=0.3, emit=(1.0, 0.92, 0.6), strength=9.0)
-    head_parts = [skull, jaw] + golem_face(skull, jaw, hc, {"socket": socket, "eye": glut_hell, "core": core, "mouth": glut, "tooth": basalt2,
-                                                           "brow": basalt, "crack": glut})
+    mouth_in = look("Maulinneres", (0.45, 0.1, 0.03), rough=0.6, emit=(0.85, 0.22, 0.03), strength=1.3)
+    tooth = look("Steinzahn", (0.62, 0.56, 0.5), rough=0.55)
+    crack_m = look("Glutriss", (1.0, 0.5, 0.1), rough=0.5, emit=(1.0, 0.45, 0.06), strength=2.2)
+    head_parts = [skull, jaw] + golem_face(skull, jaw, hc, {"socket": socket, "eye": glut_hell, "core": core, "mouth": mouth_in, "tooth": tooth,
+                                                           "brow": basalt, "crack": crack_m, "throat": glut_hell})
     for s in (-1, 1):
         head_parts.append(give(horn("Kopfhorn%d" % s, tuple(hc + Vector((s * 0.15, -0.02, 0.12))), tuple(hc + Vector((s * 0.3, -0.04, 0.2))),
                                     tuple(hc + Vector((s * 0.32, -0.12, 0.36))), 0.07, n=9, glow_from=6), basalt, glut))
@@ -1336,8 +1352,9 @@ def kristall_riese(arm, body):
     socket = look("KristallHoehle", (0.14, 0.06, 0.3), rough=0.2, emit=(0.25, 0.06, 0.5), strength=0.6)
     core = look("Lichtkern", (0.95, 1.0, 1.0), rough=0.2, emit=(0.85, 1.0, 1.0), strength=8.0)
     tooth = look("Kristallzahn", (0.92, 0.85, 1.0), rough=0.1, emit=(0.6, 0.5, 0.9), strength=0.4)
-    head_parts = [skull, jaw] + golem_face(skull, jaw, hc, {"socket": socket, "eye": energy, "core": core, "mouth": energy, "tooth": tooth,
-                                                           "brow": cr, "crack": energy}, crystal_teeth=True)
+    mouth_in = look("KristallMaul", (0.12, 0.3, 0.45), rough=0.3, emit=(0.15, 0.55, 0.8), strength=1.2)
+    head_parts = [skull, jaw] + golem_face(skull, jaw, hc, {"socket": socket, "eye": energy, "core": core, "mouth": mouth_in, "tooth": tooth,
+                                                           "brow": cr, "crack": energy, "throat": core}, crystal_teeth=True)
     # Krone (Kommentare 24.11.: aggressiver, mehr verziert, am Kopf verankert): lange, nach hinten gezogene Kristalle,
     # davor ein Diadem aus kleinen Splittern rund um die Stirn mit leuchtendem Stirnjuwel in einer Fassung;
     # Wangen- und Kinnsplitter
@@ -1406,7 +1423,7 @@ def schleimmutter_krone(arm, body):
     """Schleim-Welt (Welt 1): Schleimmutter mit mehr Details – goldenes Krönchen mit Edelsteinen um die drei Perlen,
     glänzende Schleimtropfen an der Kappe, Bläschen im Schleim, zwei Schleimkinder auf ihr, glänzende Schleimpfütze"""
     slime = look("SchleimGlanz", (0.2, 0.9, 0.84), rough=0.06, emit=(0.08, 0.55, 0.5), strength=0.35, alpha=0.88)
-    bubble = look("Blaeschen", (0.75, 1.0, 0.97), rough=0.03, emit=(0.4, 0.9, 0.85), strength=0.4, alpha=0.55)
+    bubble = look("Blaeschen", (0.7, 1.0, 0.96), rough=0.03, emit=(0.35, 0.85, 0.8), strength=0.35)
     gold = look("Gold", (1.0, 0.78, 0.3), rough=0.25, metal=0.9)
     gem = look("Edelstein", (0.7, 0.3, 1.0), rough=0.1, emit=(0.6, 0.2, 1.0), strength=1.2)
     white = look("Weiss", (1.0, 1.0, 1.0), rough=0.3)
@@ -1428,11 +1445,13 @@ def schleimmutter_krone(arm, body):
     # Schleimtropfen unter der Kappe, jeweils mit Tropfen am Ende
     rim = lambda x: (x, -0.33 + abs(x) * 0.3 + x * x * 0.6, 0.28 - abs(x) * 0.12)
     drips = []
-    for i, x in enumerate((-0.36, -0.25, -0.13, 0.0, 0.12, 0.24, 0.34)):
+    # nur seitlich, nicht über dem Gesicht, undurchsichtig und rundlich (Kommentar 24.11.: sahen aus wie Striche)
+    drip_m = look("SchleimTropfen", (0.2, 0.9, 0.84), rough=0.08, emit=(0.08, 0.55, 0.5), strength=0.35)
+    for i, x in enumerate((-0.37, -0.3, 0.3, 0.37)):
         _, y, z = rim(x)
-        L = (0.07, 0.12, 0.08, 0.14, 0.09, 0.11, 0.06)[i]
-        drips.append(give(tube("Tropfen%d" % i, [(x, y + 0.03, z + 0.03), (x, y - 0.004, z - L * 0.5), (x, y - 0.01, z - L)], [0.03, 0.016, 0.014]), slime))
-        drips.append(give(sphere("TropfenEnde%d" % i, (x, y - 0.012, z - L - 0.014), 0.025, (1, 1, 1.15)), slime))
+        L = (0.08, 0.12, 0.11, 0.07)[i]
+        drips.append(give(tube("Tropfen%d" % i, [(x, y + 0.03, z + 0.03), (x, y - 0.002, z - L * 0.5), (x, y - 0.006, z - L)], [0.034, 0.024, 0.022], segs=16), drip_m))
+        drips.append(give(sphere("TropfenEnde%d" % i, (x, y - 0.008, z - L - 0.016), 0.03, (1, 1, 1.15)), drip_m))
     attach(join_parts(drips, "Schleimtropfen"), arm, "Top")
     # Bläschen im Schleim der Kappe
     rnd = random.Random(17)
