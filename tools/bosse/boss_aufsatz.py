@@ -1166,6 +1166,302 @@ def kristall_riese(arm, body):
             kn.append(give(c, cr))
         place_in_bone(join_parts(kn, "Riese_Knoechel" + side), arm, "mixamorig:%sHand" % side)
 
+def googly_eyes(name, center, normal, r, white, black, spread=0.6):
+    """zwei kleine Augen auf einer Kugeloberfläche (für Schleimkinder)"""
+    n = Vector(normal).normalized()
+    side = n.cross(Vector((0, 0, 1))).normalized() if abs(n.z) < 0.9 else Vector((1, 0, 0))
+    parts = []
+    for s in (-1, 1):
+        c = Vector(center) + side * s * r * spread + Vector((0, 0, r * 0.25))
+        parts.append(give(sphere("%sAuge%d" % (name, s), tuple(c + n * r * 0.8), r * 0.32), white))
+        parts.append(give(sphere("%sPupille%d" % (name, s), tuple(c + n * r * 1.05), r * 0.16), black))
+    return parts
+
+@variante("schleimmutter_krone", "schleimmutter")
+def schleimmutter_krone(arm, body):
+    """Schleim-Welt (Welt 1): Schleimmutter mit mehr Details – goldenes Krönchen mit Edelsteinen um die drei Perlen,
+    glänzende Schleimtropfen an der Kappe, Bläschen im Schleim, zwei Schleimkinder auf ihr, glänzende Schleimpfütze"""
+    slime = look("SchleimGlanz", (0.2, 0.9, 0.84), rough=0.06, emit=(0.08, 0.55, 0.5), strength=0.35, alpha=0.88)
+    bubble = look("Blaeschen", (0.75, 1.0, 0.97), rough=0.03, emit=(0.4, 0.9, 0.85), strength=0.4, alpha=0.55)
+    gold = look("Gold", (1.0, 0.78, 0.3), rough=0.25, metal=0.9)
+    gem = look("Edelstein", (0.7, 0.3, 1.0), rough=0.1, emit=(0.6, 0.2, 1.0), strength=1.2)
+    white = look("Weiss", (1.0, 1.0, 1.0), rough=0.3)
+    black = look("Schwarz", (0.05, 0.05, 0.08), rough=0.3)
+    baby = look("Schleimkind", (0.55, 0.3, 1.0), rough=0.1, emit=(0.4, 0.15, 0.8), strength=0.4)
+    # Krönchen: Goldband über die Basis der drei Perlen, Fassungen, Edelsteine dazwischen
+    band = []
+    for x, y in ((-0.3, -0.1), (-0.19, -0.15), (-0.1, -0.18), (-0.02, -0.19), (0.07, -0.19), (0.155, -0.17), (0.27, -0.1)):
+        p, n = surface(body, (x, y, 1.5), (0, 0, -1))
+        band.append(tuple(p + n * 0.012))
+    parts = [give(tube("Kronband", band, [0.02] * len(band), segs=10), gold)]
+    for i, (c, rr) in enumerate((((-0.191, -0.158, 0.41), 0.075), ((-0.022, -0.188, 0.44), 0.09), ((0.155, -0.178, 0.41), 0.08))):
+        parts.append(give(torus("Fassung%d" % i, c, rr, 0.016, rot=(0, 0, 0)), gold))
+    for i, x in enumerate((-0.105, 0.065)):
+        p, n = surface(body, (x, -0.19, 1.5), (0, 0, -1))
+        parts.append(give(crystal("Stein%d" % i, tuple(p + n * 0.01), 0.05, 0.03, (0, 0, 0)), gem))
+        parts.append(give(torus("SteinFassung%d" % i, tuple(p + n * 0.012), 0.032, 0.008, rot=(0, 0, 0)), gold))
+    attach(join_parts(parts, "Kroenchen"), arm, "Top")
+    # Schleimtropfen unter der Kappe, jeweils mit Tropfen am Ende
+    rim = lambda x: (x, -0.33 + abs(x) * 0.3 + x * x * 0.6, 0.28 - abs(x) * 0.12)
+    drips = []
+    for i, x in enumerate((-0.36, -0.25, -0.13, 0.0, 0.12, 0.24, 0.34)):
+        _, y, z = rim(x)
+        L = (0.07, 0.12, 0.08, 0.14, 0.09, 0.11, 0.06)[i]
+        drips.append(give(tube("Tropfen%d" % i, [(x, y + 0.03, z + 0.03), (x, y - 0.004, z - L * 0.5), (x, y - 0.01, z - L)], [0.03, 0.016, 0.014]), slime))
+        drips.append(give(sphere("TropfenEnde%d" % i, (x, y - 0.012, z - L - 0.014), 0.025, (1, 1, 1.15)), slime))
+    attach(join_parts(drips, "Schleimtropfen"), arm, "Top")
+    # Bläschen im Schleim der Kappe
+    rnd = random.Random(17)
+    bub = []
+    for i in range(16):
+        x, y = rnd.uniform(-0.36, 0.36), rnd.uniform(-0.05, 0.3)
+        p, n = surface(body, (x, y, 1.5), (0, 0, -1))
+        if p is None or p.z < 0.2:
+            continue
+        bub.append(give(sphere("Blase%d" % i, tuple(p + n * 0.005), rnd.uniform(0.018, 0.04)), bubble))
+    attach(join_parts(bub, "Blaeschen"), arm, "Top")
+    # zwei Schleimkinder: eins oben links auf der Kappe, eins seitlich rechts
+    for i, (x, y, r, bone) in enumerate(((-0.3, 0.12, 0.075, "Top"), (0.36, 0.02, 0.065, "Body"))):
+        p, n = surface(body, (x * 3, y, 0.3) if bone == "Body" else (x, y, 1.5), (-1, 0, 0) if bone == "Body" else (0, 0, -1))
+        c = p + n * r * 0.6
+        kid = [give(sphere("Kind%d" % i, tuple(c), r, (1, 1, 0.8)), baby)]
+        kid += googly_eyes("Kind%d" % i, c, Vector((0.25 if i == 0 else 0.4, -1, 0.1)), r, white, black)
+        attach(join_parts(kid, "Schleimkind%d" % i), arm, bone)
+    # glänzende Pfütze am Boden
+    hem = lambda a: (0.0, 0.05 * math.cos(5 * a + 0.4) + 0.03 * math.cos(9 * a))
+    puddle = lathe("Pfuetze", [(0.022, 0.0), (0.02, 0.4), (0.012, 0.52), (0.0, 0.58)], segs=64, hem=hem)
+    puddle.scale = (1.0, 0.85, 1.0)
+    attach(give(puddle, look("Pfuetze", (0.16, 0.78, 0.74), rough=0.05, emit=(0.06, 0.45, 0.42), strength=0.3)), arm, "Body")
+    speckles(body, "teal", (0.65, 1.0, 0.95), 0.22, 30, seed=7)
+
+@variante("gift_kroete", "schleimmutter")
+def gift_kroete(arm, body):
+    """Giftsumpf (Welt 5): Giftkröte – breite, gedrungene Kröte mit großen gelben Augen und Schlitzpupillen, breitem
+    Maul mit Gifttropfen, olivgrüner Haut mit violetten Flecken und hellem Bauch, giftgrün leuchtenden Warzen, Giftpilzen
+    auf dem Rücken, Vorderbeinen mit Schwimmfüßen und dicken Hinterbeinen. Eigene Figur auf dem Skelett der Schleimmutter."""
+    skin = look("Kroetenhaut", (1.0, 1.0, 1.0), rough=0.55)
+    skin_flat = look("Kroetenbein", (0.42, 0.55, 0.2), rough=0.6)
+    belly = look("Bauch", (0.78, 0.82, 0.45), rough=0.6)
+    wart = look("Giftwarze", (0.55, 1.0, 0.25), rough=0.25, emit=(0.45, 1.0, 0.15), strength=1.6)
+    eye = look("Kroetenauge", (1.0, 0.8, 0.15), rough=0.15, emit=(0.9, 0.6, 0.05), strength=0.8)
+    black = look("Pupille", (0.04, 0.03, 0.03), rough=0.3)
+    mouth_m = look("Maulspalt", (0.18, 0.05, 0.12), rough=0.5)
+    toxic = look("Gifttropfen", (0.6, 1.0, 0.3), rough=0.1, emit=(0.5, 1.0, 0.2), strength=1.8)
+    stalk = look("Stiel", (0.9, 0.86, 0.75), rough=0.6)
+    cap = look("Pilzhut", (0.7, 0.25, 0.85), rough=0.45, emit=(0.6, 0.15, 0.8), strength=0.5)
+    prof = [(0.5, 0.0), (0.49, 0.1), (0.46, 0.2), (0.41, 0.29), (0.34, 0.37), (0.26, 0.42), (0.18, 0.445), (0.11, 0.44),
+            (0.06, 0.41), (0.025, 0.34), (0.005, 0.22), (0.0, 0.0)]
+    g = lathe("Kroete", prof, segs=64)
+    for v in g.data.vertices:
+        v.co.x *= 1.12; v.co.y *= 0.92
+        if v.co.y < 0:                                   # Kopf vorn etwas flacher und breiter
+            v.co.z *= 1.0 - 0.12 * min(1.0, -v.co.y / 0.4) * max(0.0, (v.co.z - 0.2) / 0.3)
+    # Haut: oben oliv mit violetten Flecken, unten heller Bauch (Bildzeile 0 = unten)
+    H_, W_ = 512, 512
+    vv = np.linspace(0, 1, H_)[:, None] * np.ones((1, W_))
+    spots = fbm(H_, W_, 9, 91)
+    grad = np.clip((vv - 0.42) / 0.16, 0, 1)
+    top = np.array((0.38, 0.52, 0.16)); bot = np.array((0.84, 0.86, 0.5))
+    col = bot * (1 - grad[..., None]) + top * grad[..., None]
+    k = (np.clip((spots - 0.58) * 8, 0, 1) * grad)[..., None]
+    col = col * (1 - k) + np.array((0.45, 0.2, 0.5)) * k
+    col = np.clip(col + ((fbm(H_, W_, 40, 92, 2) - 0.5) * 0.12)[..., None], 0, 1)
+    arr = np.ones((H_, W_, 4), dtype=np.float32); arr[..., :3] = col
+    nt = skin.node_tree
+    ti = nt.nodes.new("ShaderNodeTexImage"); ti.image = new_image("Kroete_Farbe", arr)
+    nt.links.new(ti.outputs["Color"], nt.nodes["Principled BSDF"].inputs["Base Color"])
+    give(g, skin)
+    bpy.context.view_layer.update()
+    # Warzen auf dem Rücken
+    rnd = random.Random(23)
+    warts = []
+    for i in range(30):
+        a = rnd.uniform(-2.6, 2.6) + math.pi / 2       # vor allem hinten und oben
+        el = rnd.uniform(0.25, 1.2)
+        d = Vector((math.cos(a) * math.cos(el), math.sin(a) * math.cos(el), math.sin(el)))
+        p, n = surface(g, Vector((0, 0, 0.2)) + d * 2.0, -d)
+        if p is None or p.z < 0.15:
+            continue
+        warts.append(give(sphere("Warze%d" % i, tuple(p), rnd.uniform(0.018, 0.04), (1, 1, 0.7)), wart))
+    # Augen: Wülste, gelbe Augäpfel, waagerechte Schlitzpupillen
+    face = []
+    for s_ in (-1, 1):
+        p, n = surface(g, (s_ * 0.18, -2.0, 0.42), (0, 1, 0))
+        c = p + Vector((0, 0.03, 0.04))
+        face.append(give(sphere("Augenwulst%d" % s_, tuple(c), 0.1, (1, 0.95, 0.9)), skin_flat))
+        face.append(give(sphere("Augapfel%d" % s_, tuple(c + Vector((0, -0.045, 0.03))), 0.075), eye))
+        face.append(give(sphere("Schlitz%d" % s_, tuple(c + Vector((0, -0.115, 0.035))), 0.03, (1.5, 0.35, 0.45)), black))
+        face.append(give(tube("Lid%d" % s_, [tuple(c + Vector((-0.08, -0.05, 0.06))), tuple(c + Vector((0, -0.075, 0.085))), tuple(c + Vector((0.08, -0.05, 0.06)))],
+                              [0.025, 0.03, 0.025]), skin_flat))
+    # breites Maul vorn, mit Gifttropfen in den Mundwinkeln
+    hits = on_surface(g, (0, 0, 0.25), [(math.sin(a), -math.cos(a), 0.12 * (abs(a) / 1.05) ** 2 - 0.05) for a in [math.radians(t) for t in range(-60, 65, 8)]], lift=0.004)
+    face.append(give(tube("Maul", [tuple(p) for p, n in hits], [0.012] + [0.022] * (len(hits) - 2) + [0.012], segs=8), mouth_m))
+    face.append(give(tube("Lippe", [tuple(p + n * 0.012 + Vector((0, 0, 0.022))) for p, n in hits[1:-1]], [0.016] * (len(hits) - 2), segs=8), skin_flat))
+    for s_, (p, n) in ((-1, hits[0]), (1, hits[-1])):
+        face.append(give(tube("Giftfaden%d" % s_, [tuple(p), tuple(p + Vector((0, -0.01, -0.06))), tuple(p + Vector((0, -0.012, -0.1)))], [0.016, 0.01, 0.012]), toxic))
+        face.append(give(sphere("Gifttropfen%d" % s_, tuple(p + Vector((0, -0.012, -0.115))), 0.02, (1, 1, 1.2)), toxic))
+    # Giftpilze auf dem Rücken
+    for i, (x, y, h, r) in enumerate(((-0.12, 0.2, 0.12, 0.06), (0.14, 0.24, 0.1, 0.05), (0.02, 0.32, 0.08, 0.04))):
+        p, n = surface(g, (x, y, 2.0), (0, 0, -1))
+        face.append(give(tube("PilzStiel%d" % i, [tuple(p - n * 0.01), tuple(p + n * h * 0.5), tuple(p + n * h)], [r * 0.3, r * 0.26, r * 0.24]), stalk))
+        cap_ = sphere("PilzHut%d" % i, (0, 0, 0), r, (1, 1, 0.55)); cap_.location = p + n * h
+        face.append(give(cap_, cap))
+    attach(join_parts(warts + face, "Kroete_Kopf"), arm, "Top")
+    skin_to(g, arm, lambda c: {"Top": smooth01((c.z - 0.12) / 0.3), "Body": 1 - smooth01((c.z - 0.12) / 0.3)})
+    # Beine: vorn mit Schwimmfüßen, hinten dicke, angewinkelte Schenkel
+    legs = []
+    for s_ in (-1, 1):
+        legs.append(give(tube("Vorderbein%d" % s_, [(s_ * 0.33, -0.2, 0.2), (s_ * 0.42, -0.28, 0.1), (s_ * 0.44, -0.33, 0.03)], [0.07, 0.055, 0.045]), skin_flat))
+        for k, a in enumerate((-35, 0, 35)):
+            r_ = math.radians(a)
+            legs.append(give(sphere("Zeh%d_%d" % (s_, k), (s_ * 0.44 + math.sin(r_) * 0.07, -0.33 - math.cos(r_) * 0.07, 0.018), 0.032, (1, 1.3, 0.5)), skin_flat))
+        legs.append(give(sphere("Schwimmhaut%d" % s_, (s_ * 0.44, -0.37, 0.012), 0.08, (1.1, 0.8, 0.12)), belly))
+        legs.append(give(sphere("Schenkel%d" % s_, (s_ * 0.43, 0.14, 0.13), 0.15, (0.85, 1.35, 0.75)), skin_flat))
+        legs.append(give(sphere("Hinterfuss%d" % s_, (s_ * 0.5, -0.04, 0.025), 0.07, (0.9, 1.6, 0.4)), skin_flat))
+    attach(join_parts(legs, "Kroete_Beine"), arm, "Body")
+    remove_body(body)
+
+def tendril(name, start, direction, length, r0, curl=1.0, seed=0, n=12):
+    """Schattenranke: von start in Richtung direction, dünner werdend und am Ende eingerollt"""
+    rnd = random.Random(seed)
+    d = Vector(direction).normalized()
+    side = d.cross(Vector((0, 0, 1)))
+    if side.length < 0.1:
+        side = d.cross(Vector((1, 0, 0)))
+    side.normalize(); up = side.cross(d).normalized()
+    pts, radii = [], []
+    p = Vector(start); h = d.copy()
+    step = length / (n - 1)
+    for i in range(n):
+        t = i / (n - 1)
+        pts.append(tuple(p)); radii.append(r0 * (1 - t) ** 0.9 + 0.004)
+        ang = curl * (0.15 + 0.5 * t * t) + rnd.uniform(-0.05, 0.05)
+        h = (h * math.cos(ang) + up * math.sin(ang)).normalized()
+        up = side.cross(h).normalized()
+        p = p + h * step
+    radii[-1] = 0.0
+    return tube(name, pts, radii, segs=10)
+
+@variante("schatten_wesen", "koloss")
+def schatten_wesen(arm, body):
+    """Schattenreich (Welt 9): Schattenwesen – mächtige Gestalt aus glänzend schwarzem Schatten-Schleim mit violett
+    glimmenden Adern, eigener Kopf mit drei leuchtenden Augen und gezacktem, violett glühendem Maul, Schattenranken aus
+    Rücken, Kopf und Armen, violetten Kristalldornen auf Schultern und Rücken, Klauenhänden. Eigene Figur, kein Nachbau."""
+    black = look("Schatten", (0.07, 0.06, 0.1), rough=0.18, metal=0.1)
+    black2 = look("Schatten2", (0.12, 0.09, 0.18), rough=0.2, metal=0.1)
+    glow = look("Schattenglut", (0.8, 0.4, 1.0), rough=0.3, emit=(0.72, 0.3, 1.0), strength=3.5)
+    eye = look("Schattenauge", (0.95, 0.85, 1.0), rough=0.2, emit=(0.85, 0.65, 1.0), strength=5.0)
+    thorn = look("Dorn", (0.55, 0.25, 0.85), rough=0.15, emit=(0.5, 0.2, 0.85), strength=1.4)
+    fang = look("Schattenzahn", (0.92, 0.9, 1.0), rough=0.3)
+    koloss_arms(arm, body, black, thorn, black2, cuff_style="binde", fingers=4, claws=True)
+    # Körper: schwarz glänzend, violett glimmende Adern
+    m, tex, img, px = body_texture(body)
+    h, w = px.shape[:2]
+    lum = (0.3 * px[..., 0] + 0.6 * px[..., 1] + 0.1 * px[..., 2])[..., None]
+    sheen = fbm(h, w, 6, 71)[..., None]
+    base = px.copy(); base[..., :3] = np.array((0.05, 0.04, 0.08)) + lum * 0.08 + sheen * np.array((0.07, 0.03, 0.12))
+    tex.image = new_image(body.name + "_Farbe", base)
+    edge = voronoi_edges(h, w, 40, 72, warp=0.03)
+    k = np.clip(1 - edge / 0.003, 0, 1) ** 1.5 * (fbm(h, w, 5, 73) > 0.45)
+    em = np.zeros((h, w, 4), dtype=np.float32); em[..., :3] = k[..., None] * np.array((0.7, 0.3, 1.0)); em[..., 3] = 1
+    set_emission(body, em, 2.0)
+    p_ = next(n for n in m.node_tree.nodes if n.type == 'BSDF_PRINCIPLED'); p_.inputs["Roughness"].default_value = 0.22
+    # eigener Kopf
+    c0, half = cut_head(body)
+    H = "mixamorig:Head"
+    R = max(half.x, half.z) * 0.95
+    hc = c0 + Vector((0, -0.02, -0.02))
+    parts = [give(sphere("Kopf", tuple(hc), R, (1.0, 1.05, 0.95)), black)]
+    fy = hc.y - R * 1.02
+    F = lambda x, dy, z: tuple(Vector((hc.x + x, fy + dy, hc.z + z)))
+    for s_ in (-1, 1):
+        e = sphere("Auge%d" % s_, (0, 0, 0), 0.075, (1.5, 0.45, 0.75)); e.location = F(s_ * 0.13, 0.05, 0.06); e.rotation_euler = (0, math.radians(s_ * -24), 0)
+        parts.append(give(e, eye))
+    parts.append(give(sphere("Stirnauge", F(0, 0.04, 0.2), 0.045, (1.0, 0.45, 1.3)), eye))
+    mouth = sphere("Maul", (0, 0, 0), 0.15, (1.5, 0.35, 0.5)); mouth.location = F(0, 0.06, -0.16)
+    parts.append(give(mouth, glow))
+    for i, x in enumerate((-0.16, -0.095, -0.03, 0.035, 0.1, 0.165)):
+        top = i % 2 == 0
+        z0 = -0.1 if top else -0.23
+        parts.append(give(tube("Zahn%d" % i, [F(x, 0.02, z0), F(x, -0.005, z0 + (-0.035 if top else 0.035)), F(x * 1.02, -0.01, z0 + (-0.065 if top else 0.065))],
+                               [0.024, 0.014, 0.0]), fang))
+    for i, (dx, dz, dy, L, cu) in enumerate(((-0.18, 0.25, 0.25, 0.42, 1.1), (0.0, 0.32, 0.28, 0.5, 1.2), (0.18, 0.25, 0.25, 0.42, 1.1))):
+        parts.append(give(tendril("Kopfranke%d" % i, tuple(hc + Vector((dx, 0.05, dz))), (dx * 1.5, 1.0, 0.6), L, 0.06, cu, seed=i), black2))
+    attach(join_parts(parts, "Schatten_Kopf"), arm, H)
+    # Ranken und Dornen am Rücken
+    sp = arm.matrix_world @ arm.data.bones["mixamorig:Spine2"].head_local
+    back = []
+    for i, (x, z, dx, dz, L) in enumerate(((-0.25, 0.25, -0.9, 0.5, 0.75), (0.25, 0.25, 0.9, 0.5, 0.75), (-0.18, 0.0, -0.8, -0.1, 0.6),
+                                           (0.18, 0.0, 0.8, -0.1, 0.6))):
+        p, n = surface(body, (sp.x + x, sp.y + 1.5, sp.z + z), (0, -1, 0))
+        if p is not None:
+            back.append(give(tendril("Rueckenranke%d" % i, tuple(p - n * 0.03), (dx, 1.0, dz), L, 0.075, 0.9, seed=10 + i), black2))
+    for k, (x, z, h_, r, tx, ty) in enumerate(((0.0, 0.32, 0.3, 0.07, -35, 0), (-0.14, 0.18, 0.22, 0.055, -40, -20), (0.14, 0.18, 0.22, 0.055, -40, 20),
+                                               (0.0, 0.05, 0.2, 0.05, -50, 0))):
+        p, n = surface(body, (sp.x + x, sp.y + 1.5, sp.z + z), (0, -1, 0))
+        if p is not None:
+            back.append(give(crystal("Rueckendorn%d" % k, tuple(p - n * 0.03), h_, r, (tx, ty, 0)), thorn))
+    attach(join_parts(back, "Schatten_Ruecken"), arm, "mixamorig:Spine2")
+    for s_, side in ((1, "Left"), (-1, "Right")):
+        a0 = arm.matrix_world @ arm.data.bones["mixamorig:%sArm" % side].head_local
+        sh = []
+        for k, (dx, dy, h_, r, tx, ty) in enumerate(((0.04, 0.0, 0.28, 0.065, 0, 30), (0.13, 0.1, 0.2, 0.05, -15, 55), (-0.03, -0.1, 0.18, 0.045, 25, 18))):
+            sh.append(give(crystal("Schulterdorn%s%d" % (side, k), (a0.x + s_ * dx, a0.y + dy, a0.z + 0.13), h_, r, (tx, s_ * ty, 0)), thorn))
+        attach(join_parts(sh, "Schatten_Schulter" + side), arm, "mixamorig:%sArm" % side)
+        fb = arm.data.bones["mixamorig:%sForeArm" % side]
+        f0 = arm.matrix_world @ fb.head_local.lerp(fb.tail_local, 0.35)
+        o = tendril("Armranke" + side, tuple(f0 + Vector((s_ * 0.1, 0.05, 0.0))), (s_ * 1.0, 0.6, 0.3), 0.32, 0.04, 1.0, seed=30 + s_)
+        attach(give(o, black2), arm, "mixamorig:%sForeArm" % side)
+
+@variante("kristall_kaefer", "panzerkaefer")
+def kristall_kaefer(arm, body):
+    """Kristallhöhlen (Welt 6): Kristallkäfer – großer Käfer auf sechs Beinen, dessen Panzer aus Kristallgruppen wächst:
+    dunkelvioletter Panzer mit pink leuchtenden Kristalladern, großes Kristallhorn auf dem Kopf, Kristallzangen,
+    Kristallspitzen an den Beinen, dunkler Körper. Eigene Figur auf dem Skelett des Panzerkäfers."""
+    cr = look("Kristall", (1.0, 0.6, 0.95), rough=0.1, emit=(0.95, 0.4, 0.9), strength=0.9)
+    cr2 = look("Kristall2", (0.75, 0.5, 1.0), rough=0.1, emit=(0.6, 0.35, 1.0), strength=1.1)
+    cr3 = look("Kristall3", (0.55, 0.95, 1.0), rough=0.1, emit=(0.35, 0.9, 1.0), strength=1.3)
+    # Panzer (türkis) dunkelviolett mit leuchtenden Adern, Körper (rot) dunkel schiefer
+    skin_cracks(body, (1.0, 0.45, 0.95), 30, 0.004, strength=2.2, ch="teal", seed=61)
+    recolor(body, lambda px: mask_color(px, "teal"), (0.32, 0.16, 0.48))
+    recolor(body, lambda px: mask_color(px, 0, 0.08), (0.3, 0.27, 0.38))
+    # Kristallgruppen auf dem Panzer
+    rnd = random.Random(5)
+    shell = []
+    spots = [(0.0, 0.02, 0.2, 0.06), (-0.12, 0.08, 0.15, 0.05), (0.12, 0.06, 0.16, 0.05), (-0.2, -0.04, 0.12, 0.04), (0.2, -0.06, 0.12, 0.04),
+             (-0.06, -0.1, 0.13, 0.045), (0.07, -0.12, 0.11, 0.04), (0.0, 0.18, 0.12, 0.045), (-0.16, 0.2, 0.09, 0.035), (0.16, 0.2, 0.09, 0.035),
+             (-0.26, 0.1, 0.08, 0.03), (0.27, 0.1, 0.08, 0.03)]
+    for i, (x, y, h, r) in enumerate(spots):
+        p, n = surface(body, (x, y, 2.0), (0, 0, -1))
+        if p is None or p.z < 0.2:
+            continue
+        for j in range(3 if h > 0.1 else 2):
+            tilt = (rnd.uniform(-25, 25) + math.degrees(-n.y) * 0.8, rnd.uniform(-25, 25) + math.degrees(n.x) * 0.8, rnd.uniform(0, 60))
+            off = Vector((rnd.uniform(-0.025, 0.025), rnd.uniform(-0.025, 0.025), 0))
+            shell.append(give(crystal("Panzerkristall%d_%d" % (i, j), tuple(p + off - n * 0.02), h * (1.0 if j == 0 else 0.65), r * (1.0 if j == 0 else 0.7), tilt),
+                              (cr, cr2, cr3)[(i + j) % 3]))
+    attach(join_parts(shell, "Kristallpanzer"), arm, "Body")
+    # Kopf: großes Kristallhorn nach vorn oben, Kristallzangen
+    hb = arm.data.bones["Head"]
+    h0 = arm.matrix_world @ hb.head_local; h1 = arm.matrix_world @ hb.tail_local
+    hp = []
+    p, n = surface(body, (h0.x, h0.y - 0.08, 2.0), (0, 0, -1))
+    hp.append(give(crystal("Horn", tuple(p - Vector((0, 0, 0.02))), 0.2, 0.05, (-55, 0, 0)), cr))
+    hp.append(give(crystal("Horn2", tuple(p + Vector((0, 0.04, -0.02))), 0.12, 0.035, (-30, 0, 30)), cr2))
+    for s_ in (-1, 1):
+        hp.append(give(horn("Zange%d" % s_, (h1.x + s_ * 0.06, h1.y + 0.04, h1.z + 0.0), (h1.x + s_ * 0.11, h1.y - 0.06, h1.z - 0.01),
+                            (h1.x + s_ * 0.03, h1.y - 0.13, h1.z - 0.02), 0.03, n=8), cr3))
+    attach(join_parts(hp, "Kristallkopf"), arm, "Head")
+    # Kristallspitzen an den Beinenden
+    for b in [b.name for b in arm.data.bones if b.name.endswith("_Lo")]:
+        bb = arm.data.bones[b]
+        t0 = arm.matrix_world @ bb.head_local; t1 = arm.matrix_world @ bb.tail_local
+        d = (t1 - t0).normalized()
+        o = tube("Spitze" + b, [tuple(t0.lerp(t1, 0.55)), tuple(t1), tuple(t1 + d * 0.04)], [0.028, 0.022, 0.0], segs=6)
+        for pl in o.data.polygons:
+            pl.use_smooth = False
+        attach(give(o, cr2), arm, b)
+
 # ---------------------------------------------------------------- Ablauf
 
 basis, build = VARIANTEN[VAR]
