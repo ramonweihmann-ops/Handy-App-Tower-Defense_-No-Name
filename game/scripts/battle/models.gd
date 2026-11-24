@@ -94,6 +94,7 @@ const BOSS_LOOK_DATA := {
 	"schleimmutter_krone": {"height": 1.6},
 	"frost_yeti": {"height": 2.7, "stride": 0.58},
 	"gift_kroete": {"height": 1.5},
+	"magma_golem": {"height": 3.3},
 	"kristall_kaefer": {"height": 2.4, "stride": 0.23},
 	"nebel_geist": {"height": 2.1, "lift": 0.3},
 	"schatten_wesen": {"height": 3.2},

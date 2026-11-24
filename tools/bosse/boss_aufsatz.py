@@ -1125,7 +1125,7 @@ def magma_golem(arm, body):
     basalt2 = look("Basalt2", (0.33, 0.27, 0.24), rough=0.8)
     glut = look("Glut", (1.0, 0.42, 0.08), rough=0.5, emit=(1.0, 0.38, 0.05), strength=3.5)
     glut_hell = look("GlutHell", (1.0, 0.75, 0.25), rough=0.4, emit=(1.0, 0.65, 0.15), strength=5.0)
-    g = golem_body(arm, body, basalt, basalt2, glut, flat=True)
+    g = golem_body(arm, body, basalt, basalt2, glut, flat=True, legs=1.6)   # längere Beine wie beim Kristallriesen (Wunsch 24.11.)
     H = "mixamorig:Head"
     hc = g["head"] + Vector((0, -0.08, 0.24))
     head_parts = [block_at("Kopf", hc, (0.25, 0.23, 0.22), basalt, 31, True), block_at("Kiefer", hc + Vector((0, -0.08, -0.14)), (0.22, 0.16, 0.1), basalt2, 32, True),
