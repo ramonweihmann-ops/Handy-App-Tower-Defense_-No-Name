@@ -1418,10 +1418,75 @@ def googly_eyes(name, center, normal, r, white, black, spread=0.6):
         parts.append(give(sphere("%sPupille%d" % (name, s), tuple(c + n * r * 1.05), r * 0.16), black))
     return parts
 
+def front_texels(body, x0, x1, z0, z1, n=320):
+    """Texel der Körpertextur, die man von vorn im Bereich x0..x1 / z0..z1 sieht: Liste (x, z, tx, ty)"""
+    from mathutils.bvhtree import BVHTree
+    from mathutils.geometry import barycentric_transform
+    bpy.context.view_layer.update()
+    me = body.data
+    m, tex, img, px = body_texture(body)
+    w, h = img.size
+    bvh = BVHTree.FromObject(body, bpy.context.evaluated_depsgraph_get())
+    uvl = me.uv_layers.active.data
+    inv = body.matrix_world.inverted()
+    out = []
+    for i in range(n):
+        z = z0 + (z1 - z0) * i / (n - 1)
+        for j in range(n):
+            x = x0 + (x1 - x0) * j / (n - 1)
+            loc, nor, idx, d = bvh.ray_cast(inv @ Vector((x, -2.0, z)), (inv.to_3x3() @ Vector((0, 1, 0))).normalized())
+            if loc is None:
+                continue
+            poly = me.polygons[idx]
+            li = poly.loop_indices[:3]
+            vs = [me.vertices[me.loops[k].vertex_index].co for k in li]
+            uv = barycentric_transform(loc, vs[0], vs[1], vs[2], uvl[li[0]].uv.to_3d(), uvl[li[1]].uv.to_3d(), uvl[li[2]].uv.to_3d())
+            out.append((x, z, min(w - 1, max(0, int(uv.x * w))), min(h - 1, max(0, int(uv.y * h)))))
+    return out
+
+def fix_slime_eye(body):
+    """Verrauschte Pupille im rechten Auge der Schleimmutter (Fehler in der Textur des Grundmodells, Kommentar 24.11.)
+    sauber nachmalen: dunkle Pupille als Ellipse aus den dunklen Stellen, Glanzpunkt oben rechts wie im anderen Auge"""
+    m, tex, img, px = body_texture(body)
+    lum = lambda c: 0.3 * c[0] + 0.6 * c[1] + 0.1 * c[2]
+    ref = front_texels(body, 0.05, 0.17, 0.13, 0.24, n=120)
+    dark_ref = [px[ty, tx, :3] for x, z, tx, ty in ref if lum(px[ty, tx]) < 0.2]
+    pupil_col = np.median(np.array(dark_ref), axis=0) if dark_ref else np.array((0.08, 0.05, 0.12), dtype=np.float32)
+    pts = front_texels(body, -0.13, 0.0, 0.12, 0.25)
+    sat = lambda c: max(c[0], c[1], c[2]) - min(c[0], c[1], c[2])
+    white = np.array([(x, z) for x, z, tx, ty in pts if lum(px[ty, tx]) > 0.7 and sat(px[ty, tx]) < 0.15])
+    lo, hi = white.min(0), white.max(0)                 # Augapfel (weiß) begrenzt die Suche, Braue (violett) fällt raus
+    dark = np.array([(x, z) for x, z, tx, ty in pts if lum(px[ty, tx]) < 0.3 and sat(px[ty, tx]) < 0.18
+                     and lo[0] <= x <= hi[0] and lo[1] <= z <= hi[1]])
+    c = dark.mean(0); cov = np.cov((dark - c).T)
+    ev, evec = np.linalg.eigh(cov); radii = 2.3 * np.sqrt(ev)
+    white_col = np.median(np.array([px[ty, tx, :3] for x, z, tx, ty in pts if lum(px[ty, tx]) > 0.7 and sat(px[ty, tx]) < 0.15]), axis=0)
+    hl = c + np.array((0.32, 0.38)) * radii.max()
+    base = px.copy()
+    h_, w_ = base.shape[:2]
+    for x, z, tx, ty in pts:
+        q = evec.T @ (np.array((x, z)) - c)
+        r = math.sqrt((q[0] / radii[0]) ** 2 + (q[1] / radii[1]) ** 2)
+        col = None
+        if r < 1.0:
+            k = 1.0 if r < 0.88 else (1.0 - r) / 0.12
+            col = base[ty, tx, :3] * (1 - k) + pupil_col * k
+            if math.hypot(x - hl[0], z - hl[1]) < radii.max() * 0.22:
+                col = np.array((0.97, 0.97, 0.97), dtype=np.float32)
+        elif lo[0] <= x <= hi[0] and lo[1] <= z <= hi[1] and sat(px[ty, tx]) < 0.15 and 0.25 < lum(px[ty, tx]) < 0.72:
+            col = white_col                                   # graue Sprenkel im Augenweiß
+        if col is not None:
+            for dy in (-1, 0, 1):                             # Nachbartexel mit (gegen Ausfransen beim Verkleinern)
+                for dx in (-1, 0, 1):
+                    yy, xx = ty + dy, tx + dx
+                    if 0 <= yy < h_ and 0 <= xx < w_ and (dx == 0 and dy == 0 or sat(px[yy, xx]) < 0.18):
+                        base[yy, xx, :3] = col
+    tex.image = new_image(body.name + "_Farbe", base)
+
 @variante("schleimmutter_krone", "schleimmutter")
 def schleimmutter_krone(arm, body):
     """Schleim-Welt (Welt 1): Schleimmutter mit mehr Details – goldenes Krönchen mit Edelsteinen um die drei Perlen,
-    glänzende Schleimtropfen an der Kappe, Bläschen im Schleim, zwei Schleimkinder auf ihr, glänzende Schleimpfütze"""
+    Bläschen im Schleim, zwei Schleimkinder auf ihr, glänzende Schleimpfütze"""
     slime = look("SchleimGlanz", (0.2, 0.9, 0.84), rough=0.06, emit=(0.08, 0.55, 0.5), strength=0.35, alpha=0.88)
     bubble = look("Blaeschen", (0.7, 1.0, 0.96), rough=0.03, emit=(0.35, 0.85, 0.8), strength=0.35)
     gold = look("Gold", (1.0, 0.78, 0.3), rough=0.25, metal=0.9)
@@ -1429,6 +1494,7 @@ def schleimmutter_krone(arm, body):
     white = look("Weiss", (1.0, 1.0, 1.0), rough=0.3)
     black = look("Schwarz", (0.05, 0.05, 0.08), rough=0.3)
     baby = look("Schleimkind", (0.55, 0.3, 1.0), rough=0.1, emit=(0.4, 0.15, 0.8), strength=0.4)
+    fix_slime_eye(body)
     # Krönchen: Goldband über die Basis der drei Perlen, Fassungen, Edelsteine dazwischen
     band = []
     for x, y in ((-0.3, -0.1), (-0.19, -0.15), (-0.1, -0.18), (-0.02, -0.19), (0.07, -0.19), (0.155, -0.17), (0.27, -0.1)):
@@ -1442,17 +1508,7 @@ def schleimmutter_krone(arm, body):
         parts.append(give(crystal("Stein%d" % i, tuple(p + n * 0.01), 0.05, 0.03, (0, 0, 0)), gem))
         parts.append(give(torus("SteinFassung%d" % i, tuple(p + n * 0.012), 0.032, 0.008, rot=(0, 0, 0)), gold))
     attach(join_parts(parts, "Kroenchen"), arm, "Top")
-    # Schleimtropfen unter der Kappe, jeweils mit Tropfen am Ende
-    rim = lambda x: (x, -0.33 + abs(x) * 0.3 + x * x * 0.6, 0.28 - abs(x) * 0.12)
-    drips = []
-    # nur seitlich, nicht über dem Gesicht, undurchsichtig und rundlich (Kommentar 24.11.: sahen aus wie Striche)
-    drip_m = look("SchleimTropfen", (0.2, 0.9, 0.84), rough=0.08, emit=(0.08, 0.55, 0.5), strength=0.35)
-    for i, x in enumerate((-0.37, -0.3, 0.3, 0.37)):
-        _, y, z = rim(x)
-        L = (0.08, 0.12, 0.11, 0.07)[i]
-        drips.append(give(tube("Tropfen%d" % i, [(x, y + 0.03, z + 0.03), (x, y - 0.002, z - L * 0.5), (x, y - 0.006, z - L)], [0.034, 0.024, 0.022], segs=16), drip_m))
-        drips.append(give(sphere("TropfenEnde%d" % i, (x, y - 0.008, z - L - 0.016), 0.03, (1, 1, 1.15)), drip_m))
-    attach(join_parts(drips, "Schleimtropfen"), arm, "Top")
+    # keine zusätzlichen Tropfen: frei hängend wirkten sie wie Stäbe und Striche (Kommentar 24.11.), die Kappe hat eigene Tropfenformen
     # Bläschen im Schleim der Kappe
     rnd = random.Random(17)
     bub = []
@@ -1475,7 +1531,8 @@ def schleimmutter_krone(arm, body):
     puddle = lathe("Pfuetze", [(0.022, 0.0), (0.02, 0.4), (0.012, 0.52), (0.0, 0.58)], segs=64, hem=hem)
     puddle.scale = (1.0, 0.85, 1.0)
     attach(give(puddle, look("Pfuetze", (0.16, 0.78, 0.74), rough=0.05, emit=(0.06, 0.45, 0.42), strength=0.3)), arm, "Body")
-    speckles(body, "teal", (0.65, 1.0, 0.95), 0.22, 30, seed=7)
+    # kein Fleckenmuster auf dem Schleim: die Textur besteht aus vielen kleinen Teilstücken, ein Muster darüber
+    # bricht an jeder Kante ab und wirkt wie Striche (Kommentar 24.11.)
 
 def dampen_scale(arm, bones, factor):
     """Quetschen und Strecken der Bewegungen abschwächen (Skalierungsschlüssel näher an 1): factor 0 = gar nicht, 1 = wie bisher"""
