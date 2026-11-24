@@ -82,17 +82,28 @@ static func enemy(kind: String, look := "") -> Dictionary:
 	if test_new and ENEMIES_NEU.has(kind):
 		return ENEMIES_NEU[kind]
 	var d: Dictionary = ENEMIES.get(kind, {})
-	if look != "" and not d.is_empty() and ResourceLoader.exists("res://models/enemies_v2/bosse/%s.glb" % look):
+	if not d.is_empty() and has_look(look):
 		d = d.duplicate()
 		d["file"] = "enemies_v2/bosse/" + look
 		d.merge(BOSS_LOOK_DATA.get(look, {}), true)
 	return d
 
 
-## Abweichende Maße der Bosse mit eigenem Körper (Höhe, Schweben)
+## Abweichende Maße der Bosse mit eigenem Körper (Höhe, Schweben, Schrittlänge des Grundmodells)
 const BOSS_LOOK_DATA := {
+	"schleimmutter_krone": {"height": 1.6},
+	"frost_yeti": {"height": 2.7, "stride": 0.58},
+	"gift_kroete": {"height": 1.5},
+	"kristall_kaefer": {"height": 2.4, "stride": 0.23},
 	"nebel_geist": {"height": 2.1, "lift": 0.3},
+	"schatten_wesen": {"height": 3.2},
+	"kristall_riese": {"height": 3.2},
 }
+
+
+## Gibt es für diesen Boss ein eigenes Modell? Dann trägt er seine eigenen Farben (keine Weltfärbung).
+static func has_look(look: String) -> bool:
+	return look != "" and ResourceLoader.exists("res://models/enemies_v2/bosse/%s.glb" % look)
 
 
 static var _scenes := {}

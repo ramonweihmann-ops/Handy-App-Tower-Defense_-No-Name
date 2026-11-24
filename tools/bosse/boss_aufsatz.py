@@ -1126,10 +1126,10 @@ def kristall_riese(arm, body):
     """Herz des Wurmlochs (Welt 10): Kristallriese – in Koloss-Form, aber ganz aus facettierten violetten und rosa
     Kristallblöcken: kristalliner Kopf mit Kristallkrone und leuchtenden Augen, leuchtender Kern in der Brust,
     Kristallspitzen an Schultern und Rücken, Kristallfäuste, cyan leuchtende Gelenke. Eigene Figur."""
-    cr = look("Riesenkristall", (0.7, 0.45, 0.98), rough=0.1, emit=(0.5, 0.28, 0.9), strength=0.55)
-    cr2 = look("Riesenkristall2", (0.95, 0.52, 0.88), rough=0.1, emit=(0.8, 0.32, 0.72), strength=0.45)
-    cr3 = look("Riesenkristall3", (0.5, 0.36, 0.85), rough=0.12, emit=(0.35, 0.2, 0.7), strength=0.5)
-    energy = look("Kristallkern", (0.65, 0.97, 1.0), rough=0.2, emit=(0.4, 0.9, 1.0), strength=4.0)
+    cr = look("Riesenkristall", (0.5, 0.26, 0.9), rough=0.1, emit=(0.42, 0.18, 0.85), strength=0.35)
+    cr2 = look("Riesenkristall2", (0.85, 0.3, 0.75), rough=0.1, emit=(0.75, 0.2, 0.65), strength=0.3)
+    cr3 = look("Riesenkristall3", (0.34, 0.2, 0.7), rough=0.12, emit=(0.28, 0.12, 0.6), strength=0.35)
+    energy = look("Kristallkern", (0.5, 0.95, 1.0), rough=0.2, emit=(0.3, 0.85, 1.0), strength=2.5)
     g = golem_body(arm, body, cr, cr3, energy, flat=True, subdiv=1, fist_m=cr3, nail_m=cr2)
     H = "mixamorig:Head"
     hc = g["head"] + Vector((0, -0.08, 0.26))
