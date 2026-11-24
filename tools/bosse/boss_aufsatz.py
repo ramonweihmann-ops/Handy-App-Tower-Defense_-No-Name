@@ -1056,7 +1056,7 @@ def golem_face(skull, jaw, hc, m, crystal_teeth=False):
         p, n = surface(skull, (s_ * 0.095, -2.0, hc.z + 0.035), (0, 1, 0))
         eyes[s_] = (p, n)
         cut = sphere("Augenschnitt%d" % s_, (0, 0, 0), 0.062, (1.35, 1.0, 0.78), segs=(24, 14))
-        cut.location = p - n * 0.012; cut.rotation_euler = (0, math.radians(s_ * 16), 0)
+        cut.location = p - n * 0.012; cut.rotation_euler = (0, math.radians(-s_ * 18), 0)   # innen tiefer: böse (Kommentar 24.11.)
         carve(skull, cut, m["socket"]); bpy.data.objects.remove(cut)
     pm, nm = surface(jaw, (0.0, -2.0, hc.z - 0.135), (0, 1, 0))
     for o in (jaw, skull):
@@ -1064,10 +1064,18 @@ def golem_face(skull, jaw, hc, m, crystal_teeth=False):
         cut.location = pm - nm * 0.022
         carve(o, cut, m["mouth"]); bpy.data.objects.remove(cut)
     for s_, (p, n) in eyes.items():
-        e = sphere("Auge%d" % s_, (0, 0, 0), 0.046, (1.3, 0.55, 0.66)); e.location = p - n * 0.028; e.rotation_euler = (0, math.radians(s_ * 16), 0)
-        parts.append(give(e, m["eye"]))
-        parts.append(give(sphere("Augenkern%d" % s_, tuple(p - n * 0.012 + Vector((-s_ * 0.008, 0, -0.002))), 0.017, (1.2, 0.6, 1.0)), m["core"]))
-        brow = chunk_between("Braue%d" % s_, p + Vector((s_ * 0.1, 0.005, 0.07)), p + Vector((-s_ * 0.035, -0.012, 0.03)), 0.042, m["brow"], seed=60 + s_, flat=True, subdiv=1)
+        e = sphere("Auge%d" % s_, (0, 0, 0), 0.046, (1.3, 0.55, 0.66), segs=(32, 16)); e.location = p - n * 0.028; e.rotation_euler = (0, math.radians(-s_ * 18), 0)
+        give(e, m["eye"])
+        # böser Blick ohne verdeckende Braue (Kommentar 24.11.): Auge oben schräg abgeschnitten, innen tiefer
+        bmc = bmesh.new(); bmesh.ops.create_cube(bmc, size=0.3)
+        lid = finish("Lidschnitt%d" % s_, bmc, smooth=False)
+        rot = Matrix.Rotation(math.radians(-s_ * 26), 4, 'Y')
+        lid.matrix_world = Matrix.Translation(e.location) @ rot @ Matrix.Translation((0, 0, 0.15 + 0.006))
+        carve(e, lid, m["eye"]); bpy.data.objects.remove(lid)
+        parts.append(e)
+        parts.append(give(sphere("Augenkern%d" % s_, tuple(p - n * 0.012 + Vector((-s_ * 0.012, 0, -0.008))), 0.017, (1.2, 0.6, 1.0)), m["core"]))
+        # schmale Braue knapp über der Augenhöhle, innen tiefer (böse), verdeckt das Auge nicht (Kommentar 24.11.)
+        brow = chunk_between("Braue%d" % s_, p + Vector((s_ * 0.1, -0.004, 0.082)), p + Vector((-s_ * 0.04, -0.01, 0.05)), 0.022, m["brow"], seed=60 + s_, flat=True, subdiv=1, depth=0.75)
         parts.append(brow)
         crack = []
         for t in [k / 5 for k in range(6)]:
@@ -1076,25 +1084,46 @@ def golem_face(skull, jaw, hc, m, crystal_teeth=False):
                 crack.append(tuple(q + qn * 0.003))
         if len(crack) > 2:
             parts.append(give(tube("Riss%d" % s_, crack, [0.009] * (len(crack) - 1) + [0.0], segs=6), m["crack"]))
-    top_z, bot_z = pm.z + 0.05, pm.z - 0.05
-    for i, x in enumerate((-0.085, -0.03, 0.03, 0.085)):
-        b = Vector((x, pm.y + 0.012, top_z)); L = 0.042 if i in (0, 3) else 0.032
-        if crystal_teeth:
-            parts.append(give(crystal("Oberzahn%d" % i, tuple(b + Vector((0, 0, 0.01))), L * 0.6, 0.014, (180, 0, 0)), m["tooth"]))
-        else:
-            t_ = tube("Oberzahn%d" % i, [tuple(b + Vector((0, 0, 0.012))), tuple(b + Vector((0, -0.004, -L * 0.5))), tuple(b + Vector((x * 0.05, -0.006, -L)))], [0.018, 0.012, 0.0], segs=6)
-            for pl in t_.data.polygons:
-                pl.use_smooth = False
-            parts.append(give(t_, m["tooth"]))
+    # Zähne genau am Rand der Maulöffnung (Kommentar 24.11.: sauber im Mundraum): Rand je Zahn ausmessen – Strahlen
+    # von vorn, oberhalb/unterhalb der Maulmitte; wo der Strahl nicht mehr ins Maulinnere trifft, liegt der Rand
+    from mathutils.bvhtree import BVHTree
+    bpy.context.view_layer.update()
+    dg = bpy.context.evaluated_depsgraph_get()
+    trees = [(o, BVHTree.FromObject(o, dg)) for o in (skull, jaw)]
+
+    def front_hit(x, z):
+        best = None
+        for o, bvh in trees:
+            mw = o.matrix_world; inv = mw.inverted()
+            loc, nor, idx, dist = bvh.ray_cast(inv @ Vector((x, -2.0, z)), (inv.to_3x3() @ Vector((0, 1, 0))).normalized())
+            if loc is None:
+                continue
+            w = mw @ loc
+            if best is None or w.y < best[0].y:
+                best = (w, o.data.materials[o.data.polygons[idx].material_index].name == m["mouth"].name)
+        return best
+
+    def rim(x, sign):
+        z = pm.z
+        for _ in range(60):
+            z += sign * 0.0025
+            h = front_hit(x, z)
+            if h is None or not h[1]:
+                return Vector((x, h[0].y if h else pm.y, z - sign * 0.0025))
+        return None
+    for i, x in enumerate((-0.09, -0.03, 0.03, 0.09)):
+        t, b_ = rim(x, 1), rim(x, -1)
+        if t is None or b_ is None:
+            continue
+        gap = t.z - b_.z
+        L = gap * (0.4 if i in (0, 3) else 0.33)
+        parts.append(shard("Oberzahn%d" % i, t + Vector((0, 0.014, 0.004)), (x * 0.3, 0.12, -1), L, 0.016, m["tooth"]))
     for i, x in enumerate((-0.06, 0.0, 0.06)):
-        b = Vector((x, pm.y + 0.012, bot_z)); L = 0.03
-        if crystal_teeth:
-            parts.append(give(crystal("Unterzahn%d" % i, tuple(b - Vector((0, 0, 0.01))), L * 0.6, 0.013, (0, 0, 0)), m["tooth"]))
-        else:
-            t_ = tube("Unterzahn%d" % i, [tuple(b - Vector((0, 0, 0.012))), tuple(b + Vector((0, -0.004, L * 0.5))), tuple(b + Vector((0, -0.006, L)))], [0.016, 0.011, 0.0], segs=6)
-            for pl in t_.data.polygons:
-                pl.use_smooth = False
-            parts.append(give(t_, m["tooth"]))
+        t, b_ = rim(x, 1), rim(x, -1)
+        if t is None or b_ is None:
+            continue
+        gap = t.z - b_.z
+        parts.append(shard("Unterzahn%d" % i, b_ + Vector((0, 0.014, -0.004)), (x * 0.3, 0.12, 1), gap * 0.28, 0.014, m["tooth"]))
     return parts
 
 def lengthen_legs(arm, factor):
@@ -1132,6 +1161,17 @@ def shard(name, base, direction, h, r, mat):
     o.location = base
     o.rotation_euler = Vector(direction).normalized().to_track_quat('Z', 'Y').to_euler()
     return give(o, mat)
+
+def shard_on(name, obj, guess, direction, h, r, mat, depth=0.035):
+    """Splitter, dessen Fuß in der Oberfläche von obj steckt (Kommentar 24.11.: Kristalle liegen am Körper an):
+    Strahl von außen entlang direction auf obj, Fuß depth unter der Oberfläche"""
+    d = Vector(direction).normalized()
+    p, n = surface(obj, Vector(guess) + d * 0.8, -d)
+    base = (p - n * depth) if p is not None else Vector(guess)
+    return shard(name, base, d, h, r, mat)
+
+def obj_named(objs, prefix):
+    return next(o for o in objs if o.name.startswith(prefix))
 
 def crystal_joint(name, c, r, axis, glow_m, mats, seed=0, n=5):
     """Gelenk als facettierter Leuchtkristall mit Splittern ringsum, die schräg nach außen stehen (Kommentar 24.11.:
@@ -1175,7 +1215,8 @@ def golem_body(arm, body, rock_m, rock2_m, joint_m, flat=False, subdiv=2, fist_m
     if spiky:
         for k, (x, z, dx, dz, h) in enumerate(((0.34, 0.14, 0.7, 0.9, 0.16), (-0.34, 0.14, -0.7, 0.9, 0.16), (0.42, -0.06, 1.0, 0.3, 0.13),
                                                (-0.42, -0.06, -1.0, 0.3, 0.13), (0.22, -0.2, 0.5, -0.4, 0.11), (-0.22, -0.2, -0.5, -0.4, 0.11))):
-            add("Spine2", shard("BrustSplitter%d" % k, chest + Vector((x, -0.12, z)), (dx, -0.35, dz), h, 0.035, rock_m if k % 2 else rock2_m))
+            blk = obj_named(parts[B("Spine2")], "BrustLinks" if x > 0 else "BrustRechts")
+            add("Spine2", shard_on("BrustSplitter%d" % k, blk, chest + Vector((x * 0.8, -0.05, z)), (dx, -0.35, dz), h, 0.035, rock_m if k % 2 else rock2_m))
     mats = [rock_m, rock2_m]
 
     def joint(bone, name, c, r, axis, squash=(1, 1, 1), seed=0):
@@ -1202,17 +1243,35 @@ def golem_body(arm, body, rock_m, rock2_m, joint_m, flat=False, subdiv=2, fist_m
         add(side + "UpLeg", chunk_between("Oberschenkel" + side, u0 + Vector((s * 0.02, 0, 0.04)), u1, 0.19, rock_m, 20 + s, flat, subdiv, stretch=1.35))
         joint(side + "Leg", "GlutKnie" + side, u1, 0.12, l1 - u1, seed=78 + s)
         add(side + "Leg", chunk_between("Schienbein" + side, u1.lerp(l1, 0.12), l1, 0.165, rock2_m, 22 + s, flat, subdiv, stretch=1.2))
-        add(side + "Foot", block_at("Fuss" + side, ft0.lerp(ft1, 0.55) + Vector((0, 0, 0.03)), (0.17, 0.25, 0.11), rock_m, 24 + s, flat, subdiv))
+        if spiky:
+            # Kristallfuß (Kommentar 24.11.: soll einen Fuß abbilden): flache Sohle, Spann, Ferse, drei Kristallzehen
+            ground = min(ft0.z, ft1.z) - 0.005
+            fwd = Vector((ft1.x - ft0.x, ft1.y - ft0.y, 0)).normalized()
+            lat = Vector((-fwd.y, fwd.x, 0)) * s
+            for nm, c, semi, mat, sd in (("Spann" + side, ft0.lerp(ft1, 0.45) + Vector((0, 0, 0.02)), (0.13, 0.17, 0.085), rock_m, 24 + s),
+                                         ("Ferse" + side, ft0 - fwd * 0.07 + Vector((0, 0, -0.06)), (0.1, 0.09, 0.07), rock2_m, 26 + s),
+                                         ("Sohle" + side, ft0.lerp(ft1, 0.5) + Vector((0, 0, -0.02)), (0.15, 0.23, 0.06), rock2_m, 28 + s)):
+                o = block_at(nm, c, semi, mat, sd, flat, subdiv)
+                for v in o.data.vertices:
+                    v.co.z = max(v.co.z, ground)
+                add(side + "Foot", o)
+            for k, dx in enumerate((-0.065, 0.0, 0.065)):
+                base = ft0.lerp(ft1, 0.62) + lat * dx + Vector((0, 0, -0.03))
+                add(side + "Foot", shard("Zeh%s%d" % (side, k), base, fwd + lat * dx * 2.5 + Vector((0, 0, -0.18)), 0.13 + 0.03 * (k == 1), 0.04, mats[k % 2]))
+            add(side + "Foot", shard("Knoechelsplitter" + side, ft0 + lat * 0.1, lat + Vector((0, 0, 0.5)) - fwd * 0.3, 0.1, 0.03, mats[1]))
+        else:
+            add(side + "Foot", block_at("Fuss" + side, ft0.lerp(ft1, 0.55) + Vector((0, 0, 0.03)), (0.17, 0.25, 0.11), rock_m, 24 + s, flat, subdiv))
         joint(side + "Foot", "GlutKnoechel" + side, ft0, 0.09, ft1 - ft0, seed=80 + s)
         if spiky:
             # Kristallsplitter: Unterarm außen und hinten, Schienbein vorn, Oberschenkel außen (aggressiver, mehr Details)
+            fa = obj_named(parts[B(side + "ForeArm")], "Unterarm" + side)
             for k, t in enumerate((0.3, 0.55, 0.8)):
-                c = f0.lerp(f1, t)
-                add(side + "ForeArm", shard("ArmSplitter%s%d" % (side, k), c + Vector((s * 0.09, 0.05, 0.0)), (s * 0.8, 0.9, 0.35), 0.15 + 0.04 * (k == 1), 0.035, mats[k % 2]))
+                add(side + "ForeArm", shard_on("ArmSplitter%s%d" % (side, k), fa, f0.lerp(f1, t), (s * 0.8, 0.9, 0.35), 0.15 + 0.04 * (k == 1), 0.035, mats[k % 2]))
+            sb = obj_named(parts[B(side + "Leg")], "Schienbein" + side)
             for k, t in enumerate((0.25, 0.6)):
-                c = u1.lerp(l1, t)
-                add(side + "Leg", shard("BeinSplitter%s%d" % (side, k), c + Vector((0, -0.12, 0.0)), (s * 0.2, -0.9, 0.5), 0.14, 0.035, mats[(k + 1) % 2]))
-            add(side + "UpLeg", shard("SchenkelSplitter" + side, u0.lerp(u1, 0.6) + Vector((s * 0.15, 0, 0.02)), (s * 1.0, 0.2, 0.4), 0.15, 0.04, mats[0]))
+                add(side + "Leg", shard_on("BeinSplitter%s%d" % (side, k), sb, u1.lerp(l1, t), (s * 0.2, -0.9, 0.5), 0.14, 0.035, mats[(k + 1) % 2]))
+            th = obj_named(parts[B(side + "UpLeg")], "Oberschenkel" + side)
+            add(side + "UpLeg", shard_on("SchenkelSplitter" + side, th, u0.lerp(u1, 0.6), (s * 1.0, 0.2, 0.4), 0.15, 0.04, mats[0]))
     for bone, objs in parts.items():
         attach(join_parts(objs, "Golem_" + bone.split(":")[1]), arm, bone)
     cut_hands(body)
@@ -1279,38 +1338,55 @@ def kristall_riese(arm, body):
     tooth = look("Kristallzahn", (0.92, 0.85, 1.0), rough=0.1, emit=(0.6, 0.5, 0.9), strength=0.4)
     head_parts = [skull, jaw] + golem_face(skull, jaw, hc, {"socket": socket, "eye": energy, "core": core, "mouth": energy, "tooth": tooth,
                                                            "brow": cr, "crack": energy}, crystal_teeth=True)
-    # Krone: lange, nach hinten gezogene Kristalle; Wangen- und Kinnsplitter (Kommentar 24.11.: aggressiver)
+    # Krone (Kommentare 24.11.: aggressiver, mehr verziert, am Kopf verankert): lange, nach hinten gezogene Kristalle,
+    # davor ein Diadem aus kleinen Splittern rund um die Stirn mit leuchtendem Stirnjuwel in einer Fassung;
+    # Wangen- und Kinnsplitter
     for k, (x, y, h, r, d) in enumerate(((0.0, 0.0, 0.42, 0.075, (0, 0.55, 1)), (-0.11, 0.02, 0.32, 0.06, (-0.35, 0.6, 1)), (0.11, 0.02, 0.32, 0.06, (0.35, 0.6, 1)),
                                          (-0.2, 0.06, 0.24, 0.05, (-0.8, 0.5, 0.8)), (0.2, 0.06, 0.24, 0.05, (0.8, 0.5, 0.8)), (0.0, 0.14, 0.3, 0.055, (0, 1, 0.7)),
                                          (-0.07, 0.12, 0.2, 0.04, (-0.3, 1, 0.6)), (0.07, 0.12, 0.2, 0.04, (0.3, 1, 0.6)))):
-        head_parts.append(shard("Krone%d" % k, hc + Vector((x, y, 0.15)), d, h, r, cr if k % 2 == 0 else cr2))
+        head_parts.append(shard_on("Krone%d" % k, skull, hc + Vector((x, y, 0.1)), d, h, r, cr if k % 2 == 0 else cr2, depth=0.05))
+    for k in range(13):
+        a = math.radians(-150 + k * 25)                       # Bogen über Stirn und Schläfen
+        dvec = Vector((math.sin(a), -math.cos(a), 0.0))
+        g_ = hc + dvec * 0.05 + Vector((0, 0, 0.13 - 0.02 * abs(math.sin(a))))
+        h_ = 0.09 if k % 2 else 0.14
+        if k == 6:
+            h_ = 0.2
+        head_parts.append(shard_on("Diadem%d" % k, skull, g_, dvec * 0.35 + Vector((0, 0, 1)), h_, 0.026 if k % 2 else 0.032, cr2 if k % 2 else cr, depth=0.03))
+    gp, gn = surface(skull, (0, -2.0, hc.z + 0.13), (0, 1, 0))
+    head_parts.append(give(torus("JuwelFassung", tuple(gp + gn * 0.004), 0.038, 0.01, rot=(90, 0, 0)), cr2))
+    gem = block_at("Stirnjuwel", gp + gn * 0.01, (0.03, 0.024, 0.036), energy, 93, True, 1)
+    head_parts.append(gem)
     for s_ in (-1, 1):
-        head_parts.append(shard("Wange%d" % s_, hc + Vector((s_ * 0.2, -0.08, -0.06)), (s_ * 1.0, -0.2, 0.25), 0.16, 0.035, cr))
-        head_parts.append(shard("Wange2%d" % s_, hc + Vector((s_ * 0.19, -0.02, -0.14)), (s_ * 1.0, 0.1, -0.1), 0.12, 0.03, cr2))
-    head_parts.append(shard("Kinn", hc + Vector((0, -0.16, -0.22)), (0, -0.4, -1.0), 0.12, 0.035, cr))
+        head_parts.append(shard_on("Wange%d" % s_, skull, hc + Vector((s_ * 0.15, -0.08, -0.06)), (s_ * 1.0, -0.2, 0.25), 0.16, 0.035, cr))
+        head_parts.append(shard_on("Wange2%d" % s_, skull, hc + Vector((s_ * 0.14, -0.02, -0.14)), (s_ * 1.0, 0.1, -0.1), 0.12, 0.03, cr2))
+    head_parts.append(shard_on("Kinn", jaw, hc + Vector((0, -0.12, -0.2)), (0, -0.4, -1.0), 0.12, 0.035, cr))
     attach(join_parts(head_parts, "Riese_Kopf"), arm, H)
     core = g["chest"] + Vector((0, -0.22, 0.02))
     chest_parts = [block_at("Kern", core, (0.13, 0.1, 0.13), energy, 90, True, 1)]
     for i in range(7):
         a = i * 2 * math.pi / 7 + 0.3
         d = Vector((math.cos(a), -0.55, math.sin(a)))
-        chest_parts.append(shard("KernSplitter%d" % i, core + Vector((math.cos(a) * 0.12, 0.02, math.sin(a) * 0.12)), d, 0.13 + 0.04 * (i % 2), 0.04, cr2 if i % 2 else cr))
-    for k, (x, z, h, r, tx, ty) in enumerate(((0.0, 0.16, 0.48, 0.1, -32, 0), (-0.22, 0.08, 0.36, 0.08, -38, -22), (0.22, 0.08, 0.36, 0.08, -38, 22),
-                                              (-0.12, -0.1, 0.28, 0.065, -50, -12), (0.12, -0.1, 0.28, 0.065, -50, 12))):
-        chest_parts.append(give(crystal("Ruecken%d" % k, tuple(g["chest"] + Vector((x, 0.3, z))), h, r, (tx, ty, 0)), cr if k % 2 == 0 else cr2))
+        chest_parts.append(shard("KernSplitter%d" % i, core + Vector((math.cos(a) * 0.1, 0.04, math.sin(a) * 0.1)), d, 0.13 + 0.04 * (i % 2), 0.04, cr2 if i % 2 else cr))
+    torso = next(o for o in bpy.data.objects if o.name.startswith("Golem_Spine2"))
+    for k, (x, z, h, r, d) in enumerate(((0.0, 0.16, 0.48, 0.1, (0, 0.55, 0.85)), (-0.22, 0.08, 0.36, 0.08, (-0.35, 0.6, 0.75)), (0.22, 0.08, 0.36, 0.08, (0.35, 0.6, 0.75)),
+                                         (-0.12, -0.1, 0.28, 0.065, (-0.2, 0.75, 0.6)), (0.12, -0.1, 0.28, 0.065, (0.2, 0.75, 0.6)))):
+        chest_parts.append(shard_on("Ruecken%d" % k, torso, g["chest"] + Vector((x, 0.15, z)), d, h, r, cr if k % 2 == 0 else cr2, depth=0.05))
     attach(join_parts(chest_parts, "Riese_Brust"), arm, "mixamorig:Spine2")
     for s, side in ((1, "Left"), (-1, "Right")):
         a0 = arm.matrix_world @ arm.data.bones["mixamorig:%sArm" % side].head_local
         sp = []
         for k, (dx, dy, h, r, tx, ty) in enumerate(((0.04, 0.0, 0.44, 0.085, 0, 30), (0.14, 0.1, 0.32, 0.065, -15, 55), (-0.04, -0.1, 0.28, 0.06, 22, 16),
                                                     (0.12, -0.08, 0.24, 0.055, 28, 60), (0.0, 0.14, 0.26, 0.055, -32, 22), (0.18, 0.0, 0.2, 0.05, 0, 75))):
-            sp.append(give(crystal("Schulterkristall%s%d" % (side, k), (a0.x + s * dx, a0.y + dy, a0.z + 0.16), h, r, (tx, s * ty, 0)), cr2 if k % 2 == 0 else cr))
+            up = Vector((0, 0, 1)); d = Matrix.Rotation(math.radians(tx), 3, 'X') @ Matrix.Rotation(math.radians(s * ty), 3, 'Y') @ up
+            sh_obj = next(o for o in bpy.data.objects if o.name.startswith("Golem_%sArm" % side))
+            sp.append(shard_on("Schulterkristall%s%d" % (side, k), sh_obj, Vector((a0.x + s * dx, a0.y + dy, a0.z + 0.1)), d, h, r, cr2 if k % 2 == 0 else cr, depth=0.05))
         attach(join_parts(sp, "Riese_Schulter" + side), arm, "mixamorig:%sArm" % side)
         # Kristallspitzen auf den Fingerknöcheln (Handrücken: links +Z, rechts -Z im Handrahmen)
         zs = 1.0 if side == "Left" else -1.0
         kn = []
         for k, (x, y, h, r) in enumerate(((-0.07, 0.17, 0.11, 0.035), (0.0, 0.19, 0.13, 0.04), (0.07, 0.16, 0.1, 0.033), (0.0, 0.07, 0.09, 0.03))):
-            c = crystal("Knoechel%s%d" % (side, k), (x * 1.5, y * 1.5, 0.07 * zs), h, r, (0 if zs > 0 else 180, 0, 0))
+            c = crystal("Knoechel%s%d" % (side, k), (x * 1.5, y * 1.5, 0.035 * zs), h, r, (0 if zs > 0 else 180, 0, 0))
             kn.append(give(c, cr))
         place_in_bone(join_parts(kn, "Riese_Knoechel" + side), arm, "mixamorig:%sHand" % side)
 
