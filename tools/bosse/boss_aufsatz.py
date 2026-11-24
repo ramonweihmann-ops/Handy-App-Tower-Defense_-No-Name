@@ -80,9 +80,9 @@ def rock(name, loc, size, squash=(1, 1, 0.8), seed=0, subdiv=2):
         v.co += Vector(loc)
     return finish(name, bm)
 
-def sphere(name, loc, r, squash=(1, 1, 1)):
+def sphere(name, loc, r, squash=(1, 1, 1), segs=(20, 12)):
     bm = bmesh.new()
-    bmesh.ops.create_uvsphere(bm, u_segments=20, v_segments=12, radius=r)
+    bmesh.ops.create_uvsphere(bm, u_segments=segs[0], v_segments=segs[1], radius=r)
     for v in bm.verts:
         v.co.x *= squash[0]; v.co.y *= squash[1]; v.co.z *= squash[2]
         v.co += Vector(loc)
@@ -834,7 +834,7 @@ def patch_on(name, body, origin, toward, size, mat, stitch_m, arm, bone, spin=0.
 @variante("zombie_koloss", "koloss")
 def zombie_koloss(arm, body):
     """Zombie-Kolonie (Welt 2): Zombie-Koloss – der bekannte Koloss mit neuen Armen und Händen (Binden an den
-    Handgelenken), genähten Narben am Kopf, Flicken auf dem Anzug, Leuchtpilzen auf der Schulter, giftgrün
+    Handgelenken), genähten Narben am Kopf, Flicken am Bein, Leuchtpilzen auf der Schulter, giftgrün
     leuchtenden Augen und dunklen Flecken auf der Haut"""
     skin = look("ZombieHaut", skin_color(body), rough=0.7)
     nail = look("ZombieNagel", (0.25, 0.2, 0.18), rough=0.5)
@@ -853,8 +853,7 @@ def zombie_koloss(arm, body):
                                           (0.2, -0.35, 0.92), (0.42, -0.2, 0.88)], thread, arm, "mixamorig:Head", r=0.015, stitch=0.038)
     stitched_scar("NarbeWange", body, hc, [(0.75, -0.62, 0.05), (0.7, -0.66, -0.12), (0.62, -0.7, -0.28)], thread, arm, "mixamorig:Head", r=0.012, stitch=0.03, every=1)
     patch_on("BlechKopf", body, hc + Vector((-1.2, -0.3, 0.5)), (1.0, 0.25, -0.42), (0.13, 0.11), tin, rust, arm, "mixamorig:Head", spin=0.4, rivets=True)
-    chest = arm.matrix_world @ arm.data.bones["mixamorig:Spine2"].head_local
-    patch_on("FlickenBrust", body, (chest.x + 0.2, chest.y - 1.5, chest.z - 0.16), (0, 1, 0), (0.2, 0.16), patch, thread, arm, "mixamorig:Spine2", spin=0.25)
+    # Flicken auf der Brust entfernt (Kommentar 24.11.: silberne Plakette weg)
     hip = arm.matrix_world @ arm.data.bones["mixamorig:RightUpLeg"].head_local
     patch_on("FlickenBein", body, (hip.x - 0.02, hip.y - 1.5, hip.z - 0.22), (0, 1, 0), (0.12, 0.11), patch2, thread, arm, "mixamorig:RightUpLeg", spin=-0.35)
     sh = arm.matrix_world @ arm.data.bones["mixamorig:LeftArm"].head_local
@@ -1341,16 +1340,41 @@ def gift_kroete(arm, body):
         face.append(give(cap_, cap))
     attach(join_parts(warts + face, "Kroete_Kopf"), arm, "Top")
     skin_to(g, arm, lambda c: {"Top": smooth01((c.z - 0.12) / 0.3), "Body": 1 - smooth01((c.z - 0.12) / 0.3)})
-    # Beine: vorn mit Schwimmfüßen, hinten dicke, angewinkelte Schenkel
+    # Beine (Kommentare 24.11.: Füße sauber am Körper, Pfoten rundum plastisch, keine flache Scheibe unter den Zehen):
+    # Vorderbeine aus dem Körper heraus, Ballen mit vier Zehen und Haftballen; Hinterbeine mit Schenkel, der im Körper
+    # steckt, Unterschenkel und langem Fuß mit vier Zehen
     legs = []
+
+    def toes(tag, s_, wrist, n, length, r, spread, fwd=0.0):
+        out = []
+        for k in range(n):
+            a_ = math.radians(-spread / 2 + spread * k / (n - 1)) + fwd
+            d = Vector((s_ * math.sin(a_ + 0.35), -math.cos(a_ + 0.35), 0.0)).normalized()
+            p0 = wrist + d * 0.015 + Vector((0, 0, 0.012))
+            p1 = wrist + d * length * 0.55 + Vector((0, 0, 0.03))
+            p2 = wrist + d * length + Vector((0, 0, 0.016))
+            out.append(give(tube("%sZeh%d" % (tag, k), [tuple(p0), tuple(p1), tuple(p2)], [r, r * 0.85, r * 0.75], segs=10), skin_flat))
+            out.append(give(sphere("%sBallen%d" % (tag, k), tuple(p2 + d * 0.006), r * 1.15, (1, 1, 0.8)), belly))
+        return out
+
     for s_ in (-1, 1):
-        legs.append(give(tube("Vorderbein%d" % s_, [(s_ * 0.33, -0.2, 0.2), (s_ * 0.42, -0.28, 0.1), (s_ * 0.44, -0.33, 0.03)], [0.07, 0.055, 0.045]), skin_flat))
-        for k, a in enumerate((-35, 0, 35)):
-            r_ = math.radians(a)
-            legs.append(give(sphere("Zeh%d_%d" % (s_, k), (s_ * 0.44 + math.sin(r_) * 0.07, -0.33 - math.cos(r_) * 0.07, 0.018), 0.032, (1, 1.3, 0.5)), skin_flat))
-        legs.append(give(sphere("Schwimmhaut%d" % s_, (s_ * 0.44, -0.37, 0.012), 0.08, (1.1, 0.8, 0.12)), belly))
-        legs.append(give(sphere("Schenkel%d" % s_, (s_ * 0.43, 0.14, 0.13), 0.15, (0.85, 1.35, 0.75)), skin_flat))
-        legs.append(give(sphere("Hinterfuss%d" % s_, (s_ * 0.5, -0.04, 0.025), 0.07, (0.9, 1.6, 0.4)), skin_flat))
+        sh, shn = surface(g, (s_ * 1.5, -0.2, 0.22), (-s_, 0, 0))
+        wrist = Vector((s_ * 0.46, -0.36, 0.04))
+        elbow = Vector((s_ * 0.47, -0.27, 0.13))
+        legs.append(give(tube("Vorderbein%d" % s_, [tuple(sh - shn * 0.05), tuple(elbow), tuple(wrist + Vector((0, 0, 0.02)))],
+                              [0.075, 0.06, 0.05], segs=12), skin_flat))
+        legs.append(give(sphere("Handballen%d" % s_, tuple(wrist), 0.055, (1.1, 1.15, 0.6)), skin_flat))
+        legs += toes("Vorne%d" % s_, s_, wrist, 4, 0.11, 0.021, 80)
+        hp, hn = surface(g, (s_ * 1.5, 0.12, 0.18), (-s_, 0, 0))
+        thigh = sphere("Schenkel%d" % s_, (0, 0, 0), 1.0, (0.14, 0.22, 0.12))
+        thigh.location = hp + Vector((s_ * 0.03, -0.02, -0.02)); thigh.rotation_euler = (math.radians(-12), 0, math.radians(s_ * 12))
+        legs.append(give(thigh, skin_flat))
+        knee = hp + Vector((s_ * 0.08, -0.17, -0.08))
+        ankle = Vector((s_ * 0.55, -0.12, 0.035))
+        legs.append(give(tube("Unterschenkel%d" % s_, [tuple(hp + Vector((s_ * 0.06, -0.08, -0.04))), tuple(knee), tuple(ankle + Vector((0, 0, 0.02)))],
+                              [0.07, 0.055, 0.045], segs=12), skin_flat))
+        legs.append(give(sphere("Ferse%d" % s_, tuple(ankle), 0.05, (1.0, 1.2, 0.6)), skin_flat))
+        legs += toes("Hinten%d" % s_, s_, ankle, 4, 0.15, 0.022, 70, fwd=-0.15)
     attach(join_parts(legs, "Kroete_Beine"), arm, "Body")
     remove_body(body)
 
@@ -1404,20 +1428,50 @@ def schatten_wesen(arm, body):
     H = "mixamorig:Head"
     R = max(half.x, half.z) * 0.95
     hc = c0 + Vector((0, -0.02, -0.02))
-    parts = [give(sphere("Kopf", tuple(hc), R, (1.0, 1.05, 0.95)), black)]
+    parts = [give(sphere("Kopf", tuple(hc), R, (1.0, 1.05, 0.95), segs=(48, 28)), black)]
     fy = hc.y - R * 1.02
     F = lambda x, dy, z: tuple(Vector((hc.x + x, fy + dy, hc.z + z)))
     for s_ in (-1, 1):
         e = sphere("Auge%d" % s_, (0, 0, 0), 0.075, (1.5, 0.45, 0.75)); e.location = F(s_ * 0.13, 0.05, 0.06); e.rotation_euler = (0, math.radians(s_ * -24), 0)
         parts.append(give(e, eye))
     parts.append(give(sphere("Stirnauge", F(0, 0.04, 0.2), 0.045, (1.0, 0.45, 1.3)), eye))
-    mouth = sphere("Maul", (0, 0, 0), 0.15, (1.5, 0.35, 0.5)); mouth.location = F(0, 0.06, -0.16)
-    parts.append(give(mouth, glow))
-    for i, x in enumerate((-0.16, -0.095, -0.03, 0.035, 0.1, 0.165)):
-        top = i % 2 == 0
-        z0 = -0.1 if top else -0.23
-        parts.append(give(tube("Zahn%d" % i, [F(x, 0.02, z0), F(x, -0.005, z0 + (-0.035 if top else 0.035)), F(x * 1.02, -0.01, z0 + (-0.065 if top else 0.065))],
-                               [0.024, 0.014, 0.0]), fang))
+    # Maul (Kommentar 24.11.: sauber, ohne dass der Kopf in den Mundraum ragt): Fläche folgt der Kopfform knapp über der
+    # Oberfläche, scharfer dunkler Rand, Zähne sitzen auf dem Rand
+    ax = Vector((R, R * 1.05, R * 0.95))
+
+    def on_head(d, lift=0.0):
+        d = Vector(d).normalized()
+        t = 1.0 / math.sqrt((d.x / ax.x) ** 2 + (d.y / ax.y) ** 2 + (d.z / ax.z) ** 2)
+        n = Vector((d.x / ax.x ** 2, d.y / ax.y ** 2, d.z / ax.z ** 2)).normalized()
+        return hc + d * t + n * lift
+    P = on_head((0, -1, -0.28))
+    N = (on_head((0, -1, -0.28), 0.01) - P).normalized()
+    T1 = Vector((1, 0, 0)); T2 = N.cross(T1).normalized()
+    if T2.z < 0:
+        T2 = -T2
+    ma, mb = 0.14, 0.065
+    mpt = lambda u, v, lift: on_head(P + T1 * u + T2 * v - hc, lift)
+    bm = bmesh.new()
+    rings, segs_ = 6, 40
+    centre = bm.verts.new(mpt(0, 0, 0.007))
+    grid = [[bm.verts.new(mpt(ma * f * math.cos(a_), mb * f * math.sin(a_), 0.007)) for a_ in [k * 2 * math.pi / segs_ for k in range(segs_)]]
+            for f in [(i + 1) / rings for i in range(rings)]]
+    for k in range(segs_):
+        bm.faces.new([centre, grid[0][k], grid[0][(k + 1) % segs_]])
+    for i in range(rings - 1):
+        for k in range(segs_):
+            bm.faces.new([grid[i][k], grid[i + 1][k], grid[i + 1][(k + 1) % segs_], grid[i][(k + 1) % segs_]])
+    parts.append(give(finish("Maul", bm), glow))
+    rim = [tuple(mpt(ma * math.cos(a_), mb * math.sin(a_), 0.008)) for a_ in [k * 2 * math.pi / 48 for k in range(49)]]
+    parts.append(give(tube("Maulrand", rim, [0.013] * len(rim), segs=8), black2))
+    for i, u in enumerate((-0.085, 0.0, 0.085)):
+        v0 = mb * math.sqrt(max(0.0, 1 - (u / ma) ** 2))
+        parts.append(give(tube("Oberzahn%d" % i, [tuple(mpt(u, v0 + 0.004, 0.012)), tuple(mpt(u, v0 - 0.022, 0.014)), tuple(mpt(u * 0.96, v0 - 0.048, 0.012))],
+                               [0.021, 0.013, 0.0]), fang))
+    for i, u in enumerate((-0.05, 0.05)):
+        v0 = -mb * math.sqrt(max(0.0, 1 - (u / ma) ** 2))
+        parts.append(give(tube("Unterzahn%d" % i, [tuple(mpt(u, v0 - 0.004, 0.012)), tuple(mpt(u, v0 + 0.02, 0.014)), tuple(mpt(u * 0.96, v0 + 0.042, 0.012))],
+                               [0.019, 0.012, 0.0]), fang))
     for i, (dx, dz, dy, L, cu) in enumerate(((-0.18, 0.25, 0.25, 0.42, 1.1), (0.0, 0.32, 0.28, 0.5, 1.2), (0.18, 0.25, 0.25, 0.42, 1.1))):
         parts.append(give(tendril("Kopfranke%d" % i, tuple(hc + Vector((dx, 0.05, dz))), (dx * 1.5, 1.0, 0.6), L, 0.06, cu, seed=i), black2))
     attach(join_parts(parts, "Schatten_Kopf"), arm, H)
