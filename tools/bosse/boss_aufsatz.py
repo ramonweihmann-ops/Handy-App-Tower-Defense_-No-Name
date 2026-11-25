@@ -1418,6 +1418,207 @@ def googly_eyes(name, center, normal, r, white, black, spread=0.6):
         parts.append(give(sphere("%sPupille%d" % (name, s), tuple(c + n * r * 1.05), r * 0.16), black))
     return parts
 
+def fix_flipped_faces(body):
+    """Verkehrt herum eingesetzte Flächen des Grundmodells umdrehen (Kommentar 24.11.: schwarzes Dreieck auf dem Rücken
+    der Schleimmutter) und die Schattierung neu berechnen lassen: Fläche, deren Richtung gegen alle Nachbarn zeigt,
+    wird gewendet; die mitgelieferten Punktnormalen werden verworfen (glatte Schattierung aus der Form)."""
+    bm = bmesh.new(); bm.from_mesh(body.data)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0002)
+    bad = []
+    for f in bm.faces:
+        nb = [g for e in f.edges for g in e.link_faces if g is not f]
+        if not nb:
+            continue
+        avg = Vector((0, 0, 0))
+        for g in nb:
+            avg += g.normal
+        if avg.length > 0 and f.normal.dot(avg.normalized()) < -0.3:
+            bad.append(f)
+    if bad:
+        bmesh.ops.reverse_faces(bm, faces=bad)
+    bm.to_mesh(body.data); bm.free()
+    me = body.data
+    if me.has_custom_normals:
+        bpy.ops.object.select_all(action='DESELECT'); body.select_set(True); bpy.context.view_layer.objects.active = body
+        bpy.ops.mesh.customdata_custom_splitnormals_clear()
+    for pl in me.polygons:
+        pl.use_smooth = True
+    me.update()
+    return len(bad)
+
+def reproject_texture(body, size=2048, angle=70.0, margin=0.01):
+    """Haut neu abwickeln (Kommentar 24.11.: Streifen auf der Schleimmutter bleiben): Die Textur des Grundmodells besteht
+    aus Hunderten kleiner Stücke; an jeder Naht mischen sich beim Verkleinern und Komprimieren fremde Farben ein und
+    erscheinen als Linien. Neue Abwicklung mit wenigen großen Stücken (Smart UV Project) und Abstand dazwischen; die
+    Farben werden Dreieck für Dreieck aus der alten Textur übertragen (gleiches Dreieck, alte und neue UV), danach
+    werden die Ränder der neuen Stücke aufgefüllt."""
+    from PIL import Image as _Img, ImageDraw as _Draw
+    m, tex, img, old = body_texture(body)
+    oh, ow = old.shape[:2]
+    me = body.data
+    old_uv = me.uv_layers.active
+    old_name = old_uv.name
+    new_uv = me.uv_layers.new(name="NeuUV")
+    me.uv_layers.active = new_uv
+    bpy.ops.object.select_all(action='DESELECT'); body.select_set(True); bpy.context.view_layer.objects.active = body
+    bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.mesh.remove_doubles(threshold=0.0002)        # an den alten Nähten getrennte Punkte wieder verbinden
+    bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.uv.smart_project(angle_limit=math.radians(angle), island_margin=margin)
+    bpy.ops.object.mode_set(mode='OBJECT')
+    ouv = me.uv_layers[old_name].data; nuv = me.uv_layers["NeuUV"].data
+    out = np.zeros((size, size, 4), dtype=np.float32); out[..., 3] = 1
+    filled = np.zeros((size, size), dtype=bool)
+
+    def sample(u, v):                                    # bilinear, u/v in 0..1, Zeile 0 unten
+        x = np.clip(u * ow - 0.5, 0, ow - 1.001); y = np.clip(v * oh - 0.5, 0, oh - 1.001)
+        x0 = x.astype(int); y0 = y.astype(int); fx = (x - x0)[:, None]; fy = (y - y0)[:, None]
+        a = old[y0, x0, :3]; b = old[y0, x0 + 1, :3]; c = old[y0 + 1, x0, :3]; d = old[y0 + 1, x0 + 1, :3]
+        return (a * (1 - fx) + b * fx) * (1 - fy) + (c * (1 - fx) + d * fx) * fy
+    for poly in me.polygons:
+        li = list(poly.loop_indices)
+        for t in range(1, len(li) - 1):                   # in Dreiecke zerlegen
+            tri = (li[0], li[t], li[t + 1])
+            N = np.array([(nuv[k].uv.x * size, nuv[k].uv.y * size) for k in tri])
+            O = np.array([(ouv[k].uv.x, ouv[k].uv.y) for k in tri])
+            x0, y0 = np.floor(N.min(0)).astype(int) - 1; x1, y1 = np.ceil(N.max(0)).astype(int) + 1
+            x0, y0 = max(x0, 0), max(y0, 0); x1, y1 = min(x1, size - 1), min(y1, size - 1)
+            if x1 < x0 or y1 < y0:
+                continue
+            gx, gy = np.meshgrid(np.arange(x0, x1 + 1) + 0.5, np.arange(y0, y1 + 1) + 0.5)
+            P = np.stack([gx.ravel(), gy.ravel()], 1)
+            v0 = N[1] - N[0]; v1 = N[2] - N[0]; d00 = v0 @ v0; d01 = v0 @ v1; d11 = v1 @ v1
+            den = d00 * d11 - d01 * d01
+            if abs(den) < 1e-12:
+                continue
+            v2 = P - N[0]; d20 = v2 @ v0; d21 = v2 @ v1
+            b1 = (d11 * d20 - d01 * d21) / den; b2 = (d00 * d21 - d01 * d20) / den; b0 = 1 - b1 - b2
+            eps = -0.75 / max(1.0, math.sqrt(max(d00, d11)))   # ein halbes Texel über den Rand hinaus mitnehmen
+            ins = (b0 >= eps) & (b1 >= eps) & (b2 >= eps)
+            if not ins.any():
+                continue
+            bb = np.stack([b0[ins], b1[ins], b2[ins]], 1)
+            bb = np.clip(bb, 0, None); bb /= bb.sum(1, keepdims=True)
+            uvo = bb @ O
+            col = sample(uvo[:, 0], uvo[:, 1])
+            px_ = (P[ins] - 0.5).astype(int)
+            out[px_[:, 1], px_[:, 0], :3] = col
+            filled[px_[:, 1], px_[:, 0]] = True
+    for _ in range(12):                                   # Ränder der neuen Stücke auffüllen
+        acc = np.zeros((size, size, 3), dtype=np.float32); cnt = np.zeros((size, size), dtype=np.float32)
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            f = np.roll(filled, (dy, dx), (0, 1)); acc += np.roll(out[..., :3], (dy, dx), (0, 1)) * f[..., None]; cnt += f
+        new = (~filled) & (cnt > 0)
+        out[new, :3] = acc[new] / cnt[new][:, None]; filled |= new
+    me.uv_layers.remove(me.uv_layers[old_name])
+    me.uv_layers.active = me.uv_layers["NeuUV"]
+    me.uv_layers["NeuUV"].active_render = True
+    tex.image = new_image(body.name + "_Farbe", out)
+
+def fill_black_spots(body, keep=lambda c: False, dark=0.09):
+    """Schwarze Fehlstellen in der Textur (z. B. kleines schwarzes Dreieck auf dem Rücken der Schleimmutter) mit der
+    Farbe der Umgebung im selben Dreieck füllen; keep(Mitte) schützt Dreiecke mit echten dunklen Details (Augen, Mund)"""
+    from PIL import Image as _Img, ImageDraw as _Draw
+    m, tex, img, px = body_texture(body)
+    h, w = px.shape[:2]
+    base = px.copy()
+    lumi = 0.3 * px[..., 0] + 0.6 * px[..., 1] + 0.1 * px[..., 2]
+    uvl = body.data.uv_layers.active.data
+    mw = body.matrix_world
+    for poly in body.data.polygons:
+        if keep(mw @ poly.center):
+            continue
+        uv = np.array([(uvl[li].uv.x * w, (1 - uvl[li].uv.y) * h) for li in poly.loop_indices])
+        x0, y0 = np.floor(uv.min(0)).astype(int) - 8; x1, y1 = np.ceil(uv.max(0)).astype(int) + 8
+        x0, y0 = max(x0, 0), max(y0, 0); x1, y1 = min(x1, w - 1), min(y1, h - 1)
+        if x1 <= x0 or y1 <= y0:
+            continue
+        rows = (h - 1) - np.arange(y0, y1 + 1); cols_ = np.arange(x0, x1 + 1)
+        blk_l = lumi[rows[:, None], cols_[None, :]]
+        if not (blk_l < dark).any():
+            continue
+        mk = _Img.new("L", (x1 - x0 + 1, y1 - y0 + 1), 0)
+        _Draw.Draw(mk).polygon([(u - x0, v - y0) for u, v in uv], fill=255)
+        sel = np.array(mk) > 0
+        blk = base[rows[:, None], cols_[None, :], :3]
+        good = sel & (blk_l >= dark)
+        if good.sum() < 3:                                # ganzes Dreieck schwarz: Farbe der Nachbarn im Umfeld nehmen
+            good = blk_l >= dark
+            if good.sum() < 3:
+                continue
+        med = np.median(blk[good], axis=0)
+        bad = (blk_l < dark)
+        blk[bad] = med
+        base[rows[:, None], cols_[None, :], :3] = blk
+    tex.image = new_image(body.name + "_Farbe", base)
+
+def clean_seams(body, keep=lambda c: False, thresh=0.16):
+    """Nahtlinien entfernen (Kommentar 24.11.: Streifen auf der Schleimmutter): Jedes Dreieck der Haut bekommt seine
+    Texel aus der Textur; Texel, die deutlich von der mittleren Farbe des Dreiecks abweichen (fremde Farbe aus einem
+    Nachbarstück oder schwarze Lücke an der Naht), werden durch diese ersetzt. keep(Mitte) schützt Dreiecke mit echten
+    Details (Augen, Mund, Brauen)."""
+    from PIL import Image as _Img, ImageDraw as _Draw
+    m, tex, img, px = body_texture(body)
+    h, w = px.shape[:2]
+    base = px.copy()
+    uvl = body.data.uv_layers.active.data
+    mw = body.matrix_world
+    for poly in body.data.polygons:
+        if keep(mw @ poly.center):
+            continue
+        uv = np.array([(uvl[li].uv.x * w, (1 - uvl[li].uv.y) * h) for li in poly.loop_indices])
+        x0, y0 = np.floor(uv.min(0)).astype(int) - 1; x1, y1 = np.ceil(uv.max(0)).astype(int) + 1
+        x0, y0 = max(x0, 0), max(y0, 0); x1, y1 = min(x1, w - 1), min(y1, h - 1)
+        if x1 <= x0 or y1 <= y0:
+            continue
+        mk = _Img.new("L", (x1 - x0 + 1, y1 - y0 + 1), 0)
+        _Draw.Draw(mk).polygon([(u - x0, v - y0) for u, v in uv], fill=255)
+        sel = np.array(mk) > 0
+        if sel.sum() < 3:
+            continue
+        rows = (h - 1) - (np.arange(y0, y1 + 1))          # Bildzeile 0 ist unten (wie px)
+        blk = px[rows[:, None], np.arange(x0, x1 + 1)[None, :], :3]
+        cols = blk[sel]
+        med = np.median(cols, axis=0)
+        dist = np.abs(cols - med).sum(1)
+        bad = dist > thresh
+        if not bad.any():
+            continue
+        fixed = cols.copy(); fixed[bad] = med
+        out = blk.copy(); out[sel] = fixed
+        base[rows[:, None], np.arange(x0, x1 + 1)[None, :], :3] = out
+    tex.image = new_image(body.name + "_Farbe", base)
+
+def pad_texture(body, grow=12, shrink=1):
+    """Ränder der Texturstücke auffüllen (Kommentar 24.11.: Streifen auf der Schleimmutter): Die Textur des Grundmodells
+    besteht aus vielen kleinen Stücken mit schwarzen Lücken dazwischen. Beim Verkleinern (Mipmaps) mischt sich das
+    Schwarz in die Stückränder, auf dem Modell erscheinen dünne Linien entlang der Nähte. Hier wird bestimmt, welche
+    Pixel zu einem Stück gehören (UV-Dreiecke), die äußerste Randreihe verworfen und jedes Stück um grow Pixel mit
+    seinen eigenen Randfarben nach außen verlängert."""
+    from PIL import Image as _Img, ImageDraw as _Draw
+    m, tex, img, px = body_texture(body)
+    h, w = px.shape[:2]
+    cov = _Img.new("L", (w, h), 0); d = _Draw.Draw(cov)
+    uvl = body.data.uv_layers.active.data
+    for poly in body.data.polygons:
+        pts = [(uvl[li].uv.x * w, (1 - uvl[li].uv.y) * h) for li in poly.loop_indices]
+        d.polygon(pts, fill=255)
+    mask = np.array(cov)[::-1] > 0                       # Bildzeile 0 ist unten (wie px)
+    for _ in range(shrink):                              # verunreinigte Randreihe verwerfen
+        mask = mask & np.roll(mask, 1, 0) & np.roll(mask, -1, 0) & np.roll(mask, 1, 1) & np.roll(mask, -1, 1)
+    col = px[..., :3].copy(); col[~mask] = 0
+    filled = mask.copy()
+    for _ in range(grow + shrink):
+        acc = np.zeros_like(col); cnt = np.zeros(mask.shape, dtype=np.float32)
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)):
+            f = np.roll(filled, (dy, dx), (0, 1)); c = np.roll(col, (dy, dx), (0, 1))
+            acc += c * f[..., None]; cnt += f
+        new = (~filled) & (cnt > 0)
+        col[new] = acc[new] / cnt[new][:, None]
+        filled |= new
+    base = px.copy(); base[..., :3] = np.where(filled[..., None], col, px[..., :3])
+    tex.image = new_image(body.name + "_Farbe", base)
+
 def front_texels(body, x0, x1, z0, z1, n=320):
     """Texel der Körpertextur, die man von vorn im Bereich x0..x1 / z0..z1 sieht: Liste (x, z, tx, ty)"""
     from mathutils.bvhtree import BVHTree
@@ -1452,7 +1653,7 @@ def fix_slime_eye(body):
     ref = front_texels(body, 0.05, 0.17, 0.13, 0.24, n=120)
     dark_ref = [px[ty, tx, :3] for x, z, tx, ty in ref if lum(px[ty, tx]) < 0.2]
     pupil_col = np.median(np.array(dark_ref), axis=0) if dark_ref else np.array((0.08, 0.05, 0.12), dtype=np.float32)
-    pts = front_texels(body, -0.13, 0.0, 0.12, 0.25)
+    pts = front_texels(body, -0.13, 0.0, 0.12, 0.25, n=520)
     sat = lambda c: max(c[0], c[1], c[2]) - min(c[0], c[1], c[2])
     white = np.array([(x, z) for x, z, tx, ty in pts if lum(px[ty, tx]) > 0.7 and sat(px[ty, tx]) < 0.15])
     lo, hi = white.min(0), white.max(0)                 # Augapfel (weiß) begrenzt die Suche, Braue (violett) fällt raus
@@ -1494,7 +1695,11 @@ def schleimmutter_krone(arm, body):
     white = look("Weiss", (1.0, 1.0, 1.0), rough=0.3)
     black = look("Schwarz", (0.05, 0.05, 0.08), rough=0.3)
     baby = look("Schleimkind", (0.55, 0.3, 1.0), rough=0.1, emit=(0.4, 0.15, 0.8), strength=0.4)
-    fix_slime_eye(body)
+    pad_texture(body)            # schwarze Lücken der alten Textur füllen, damit beim Übertragen nichts Schwarzes mitkommt
+    fix_flipped_faces(body)      # verkehrt herum eingesetzte Flächen umdrehen (schwarzes Dreieck auf dem Rücken)
+    reproject_texture(body)      # Haut neu abwickeln: wenige große Stücke statt Hunderter kleiner (keine Nahtlinien)
+    fix_slime_eye(body)          # erst danach das rechte Auge nachmalen (auf der neuen Textur)
+    fill_black_spots(body, keep=lambda c: c.y < -0.15 and -0.2 < c.x < 0.25 and 0.06 < c.z < 0.3)   # Gesicht vorn bleibt
     # Krönchen: Goldband über die Basis der drei Perlen, Fassungen, Edelsteine dazwischen
     band = []
     for x, y in ((-0.3, -0.1), (-0.19, -0.15), (-0.1, -0.18), (-0.02, -0.19), (0.07, -0.19), (0.155, -0.17), (0.27, -0.1)):
