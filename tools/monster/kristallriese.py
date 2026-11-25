@@ -71,7 +71,7 @@ def mirror(p):
 
 # Maul: Öffnung vorn im Gesicht (Mitte, halbe Breite, halbe Höhe oben/unten) und Tiefe; der Hohlraum wird mit einem
 # Schneidekörper aus dem Kopf geschnitten, Zahnfleisch, Zähne und Zunge sitzen darin.
-MOUTH_Z, MOUTH_A, MOUTH_BU, MOUTH_BL = 1.22, 0.245, 0.148, 0.17
+MOUTH_Z, MOUTH_A, MOUTH_BU, MOUTH_BL = 1.245, 0.21, 0.095, 0.095
 MOUTH_FRONT, MOUTH_BACK = -0.52, -0.02
 EYES = [(0.138, 1.458), (-0.138, 1.458)]
 LIP_Y = -0.325
@@ -137,17 +137,17 @@ def body_shape(arm):
         mb_ell(R, (EYES[0][0] * s, -0.31, EYES[0][1]), (0.08, 0.06, 0.05), neg=True)      # tiefe Augenhöhle
         mb_caps(R, (MOUTH_A * 0.97 * s, LIP_Y + 0.09, MOUTH_Z + 0.01), ((MOUTH_A + 0.05) * s, LIP_Y + 0.15, MOUTH_Z - 0.02), 0.02,
                 neg=True)                                         # Mundwinkel nach hinten eingezogen
-    # schmaler Lippenrand oben und unten (nicht in den Mundwinkeln)
+    # volle Comic-Lippen rundum, zu den Mundwinkeln hin dünn (nicht aufgeblasen)
     pts = []
-    for k in range(40):
-        th = k * 2 * math.pi / 40
+    for k in range(48):
+        th = k * 2 * math.pi / 48
         c, s_ = math.cos(th), math.sin(th)
-        x = (MOUTH_A + 0.012) * np.sign(c) * abs(c) ** (2 / 2.6)
-        z = ((MOUTH_BU if s_ > 0 else MOUTH_BL) + 0.012) * np.sign(s_) * abs(s_) ** (2 / 2.6)
+        x = (MOUTH_A + 0.016) * np.sign(c) * abs(c) ** (2 / 2.6)
+        z = ((MOUTH_BU if s_ > 0 else MOUTH_BL) + 0.018) * np.sign(s_) * abs(s_) ** (2 / 2.6)
         pts.append(Vector((x, LIP_Y + 0.09 * (x / MOUTH_A) ** 2, MOUTH_Z + z)))
     for p0, p1 in zip(pts, pts[1:] + pts[:1]):
-        if abs(p0.x) < MOUTH_A * 0.85 and abs(p1.x) < MOUTH_A * 0.85:
-            mb_caps(R, p0, p1, 0.018)
+        q = min(1.0, (abs(p0.x + p1.x) / 2 / MOUTH_A) ** 2)
+        mb_caps(R, p0, p1, 0.034 - 0.016 * q)
     parts = [R]
     for side, s in (("Left", 1), ("Right", -1)):
         A_ = mb_family("Arm" + side)
@@ -456,7 +456,7 @@ def arch_pt(u, top, inset=0.0):
     """Zahnbogen: u -1…1 von Mundwinkel zu Mundwinkel, hinter der Lippe, an den Seiten nach hinten gebogen"""
     x = 0.9 * MOUTH_A * u
     y = LIP_Y + 0.045 + 0.05 * u * u + 0.05 * u ** 4 + inset
-    z = lip_edge(x, top) + (-0.03 if top else 0.014) * (1 - 0.5 * u * u)
+    z = lip_edge(x, top) + (-0.008 if top else 0.008) * (1 - 0.5 * u * u)
     return Vector((x, y, z))
 
 def tooth(name, base, down, along_dir, L, w, t, kind, mats, curve=0.0):
@@ -471,6 +471,9 @@ def tooth(name, base, down, along_dir, L, w, t, kind, mats, curve=0.0):
         if kind == "fang":
             m = (1 - max(s_, 0)) ** 0.85 * (1.0 if s_ > 0.05 else 0.95)
             wx, wy, e = w * m, t * m, 2.0
+        elif kind == "rund":                                        # Comic-Zahn: weißer, runder Block
+            tip = math.sqrt(max(0.0, 1 - ((max(s_, 0.5) - 0.5) / 0.5) ** 2))
+            wx, wy, e = w * (0.92 + 0.08 * math.sin(math.pi * min(max(s_, 0), 1))) * (0.4 + 0.6 * tip), t * (0.4 + 0.6 * tip), 2.4
         elif kind == "schneide":
             m = 0.8 + 0.2 * math.sin(math.pi * min(max(s_, 0), 1) * 0.8)
             tip = math.sqrt(max(0.0, 1 - ((max(s_, 0.78) - 0.78) / 0.22) ** 2))
@@ -505,80 +508,87 @@ def tooth(name, base, down, along_dir, L, w, t, kind, mats, curve=0.0):
     return o
 
 def tongue(arm):
-    m = image_material("Zunge", 512, (0.8, 0.42, 0.58), rough=0.32)
-    bm = bmesh.new(); bm.loops.layers.uv.new("UVMap")
-    bmesh.ops.create_uvsphere(bm, u_segments=40, v_segments=20, radius=1.0, calc_uvs=True)
-    c = Vector((0, -0.105, 1.115)); a, b, h = 0.175, 0.165, 0.065
-    for v in bm.verts:
-        x, y, z = v.co.x * a, v.co.y * b, v.co.z * h
-        if z > 0:
-            z -= 0.024 * math.exp(-(x / 0.03) ** 2) * (0.4 + 0.6 * max(0.0, -v.co.y + 0.3))    # Mittelfurche
-            z += 0.018 * max(0.0, -v.co.y) ** 2                                            # Spitze vorn leicht erhoben
-        v.co = c + Vector((x, y, z))
+    """Große Comic-Zunge, aus dem Maul gestreckt: liegt über der Unterlippe, Spitze hängt nach unten, Mittelfurche"""
+    m = image_material("Zunge", 512, (0.85, 0.42, 0.6), rough=0.3)
+    ctrl = [Vector(c) for c in ((0, -0.08, 1.19), (0, -0.24, 1.205), (0, -0.34, 1.2), (0, -0.39, 1.178), (0, -0.418, 1.142))]
+    N, S = 26, 28
+    cen = []
+    for i in range(N):                                               # Mittellinie (Catmull-Rom durch die Stützpunkte)
+        t = i / (N - 1) * (len(ctrl) - 1); k = min(int(t), len(ctrl) - 2); f = t - k
+        p0, p1, p2, p3 = ctrl[max(k - 1, 0)], ctrl[k], ctrl[k + 1], ctrl[min(k + 2, len(ctrl) - 1)]
+        cen.append(0.5 * ((2 * p1) + (-p0 + p2) * f + (2 * p0 - 5 * p1 + 4 * p2 - p3) * f * f + (-p0 + 3 * p1 - 3 * p2 + p3) * f ** 3))
+    bm = bmesh.new(); uvl = bm.loops.layers.uv.new("UVMap"); rings = []
+    for i, c in enumerate(cen):
+        t = i / (N - 1)
+        tan = (cen[min(i + 1, N - 1)] - cen[max(i - 1, 0)]).normalized()
+        side = Vector((1, 0, 0)); up = tan.cross(side).normalized()
+        if up.z < 0:
+            up = -up
+        end = math.sqrt(max(0.0, 1 - ((max(t, 0.8) - 0.8) / 0.2) ** 2))   # rund geschlossene Spitze
+        a_ = 0.085 * (1 - 0.25 * t * t) * (0.25 + 0.75 * end); h_ = 0.03 * (1 - 0.3 * t) * (0.3 + 0.7 * end)
+        ring = []
+        for k in range(S):
+            th = k * 2 * math.pi / S
+            x = a_ * math.cos(th); z = h_ * math.sin(th)
+            if z > 0:
+                z -= 0.012 * math.exp(-(x / 0.022) ** 2) * (0.3 + 0.7 * min(1.0, t * 2))   # Mittelfurche
+            ring.append(bm.verts.new(c + side * x + up * z))
+        rings.append(ring)
+    for i in range(N - 1):
+        for k in range(S):
+            f = bm.faces.new([rings[i][k], rings[i][(k + 1) % S], rings[i + 1][(k + 1) % S], rings[i + 1][k]])
+            for lp, (ii, kk) in zip(f.loops, ((i, k), (i, k + 1), (i + 1, k + 1), (i + 1, k))):
+                lp[uvl].uv = (kk / S, ii / (N - 1))
+    tip = bm.verts.new(cen[-1] + (cen[-1] - cen[-2]).normalized() * 0.004)
+    for k in range(S):
+        f = bm.faces.new([rings[-1][k], rings[-1][(k + 1) % S], tip])
+        for lp, uv in zip(f.loops, ((k / S, 0.99), ((k + 1) / S, 0.99), (k / S, 1.0))):
+            lp[uvl].uv = uv
     o = finish("Zunge", bm)
     o.data.uv_layers[0].name = "UVMap"
     give(o, m)
     T = texels(o); P = T["P"]
-    groove = np.exp(-(P[..., 0] / 0.016) ** 2) * (P[..., 2] > 1.13)
-    pap = np.clip((noise3(P, 200, 5) - 0.5) / 0.25, 0, 1) * 0.6 + np.clip((noise3(P, 420, 6) - 0.5) / 0.25, 0, 1) * 0.4
-    back = smoothstep(-0.25, -0.02, P[..., 1])
-    col = gradient((0.8, 0.4, 0.6), (0.4, 0.12, 0.27), back * 0.8 + groove * 0.45)
-    col = col * (0.88 + 0.2 * pap[..., None])
+    groove = np.exp(-(P[..., 0] / 0.014) ** 2) * (T["N"][..., 2] > 0.3)
+    pap = np.clip((noise3(P, 180, 5) - 0.5) / 0.25, 0, 1)
+    back = smoothstep(-0.25, -0.05, P[..., 1])
+    col = gradient((0.92, 0.48, 0.66), (0.5, 0.15, 0.32), back * 0.8 + groove * 0.35)
+    col = col * (0.94 + 0.1 * pap[..., None])
     T["out"][..., :3] = np.where(T["cov"][..., None], col, T["out"][..., :3])
     commit(T, pad=False)
     attach(o, arm, "mixamorig:Head")
     return o
 
 def star_mouth(arm, rnd):
-    enamel = look("Zahnschmelz", (0.93, 0.87, 0.74), rough=0.25)
-    neck = look("Zahnhals", (0.8, 0.68, 0.52), rough=0.32)
-    gum = look("Zahnfleisch", (0.84, 0.42, 0.55), rough=0.32)
+    """Comic-Gebiss (Kommentar 25.11.: nicht so realistisch): oben zwei große Fangzähne mit vier runden weißen
+    Schneidezähnen dazwischen, unten zwei kleine Fangzähne an den Seiten, hinten ein paar Backenzähne; Zahnfleisch
+    bleibt hinter den Lippen. Die Zunge hängt vorn über die Unterlippe heraus."""
+    enamel = look("Zahnschmelz", (0.97, 0.95, 0.9), rough=0.3)
+    gum = look("Zahnfleisch", (0.8, 0.38, 0.52), rough=0.35)
     parts = []
     for top in (True, False):
-        pts = [arch_pt(-1.03 + 2.06 * k / 30, top) for k in range(31)]
-        g = give(tube("Zahnfleisch" + ("Oben" if top else "Unten"), [tuple(p_) for p_ in pts],
-                      [0.014] + [0.03] * 29 + [0.014], segs=16), gum)
-        sub = g.modifiers.new("Fein", 'SUBSURF'); sub.levels = 2; apply_mod(g, sub)
-        for v in g.data.vertices:                                     # feine Querrillen wie in der Vorlage
-            v.co += v.normal * (0.0028 * math.sin(v.co.x * 300.0 + v.co.z * 80.0))
-        parts.append(g)
+        pts = [arch_pt(-1.0 + 2.0 * k / 24, top) for k in range(25)]
+        parts.append(give(tube("Zahnfleisch" + ("Oben" if top else "Unten"), [tuple(p_) for p_ in pts],
+                               [0.01] + [0.018] * 23 + [0.01], segs=12), gum))
         if top:   # (u, Art, Länge, Breite)
-            layout = [(0.1, "schneide", 0.058, 0.041), (0.295, "schneide", 0.056, 0.041), (0.49, "schneide", 0.053, 0.039),
-                      (0.67, "fang", 0.13, 0.048), (0.8, "backen", 0.05, 0.041), (0.9, "backen", 0.043, 0.04),
-                      (0.985, "backen", 0.034, 0.036)]
+            layout = [(0.12, "rund", 0.046, 0.044), (0.36, "rund", 0.043, 0.042), (0.6, "fang", 0.088, 0.042),
+                      (0.78, "rund", 0.03, 0.036), (0.92, "rund", 0.024, 0.032)]
         else:
-            layout = [(0.093, "schneide", 0.056, 0.039), (0.275, "schneide", 0.056, 0.039), (0.455, "schneide", 0.053, 0.037),
-                      (0.6, "fang", 0.1, 0.043), (0.73, "backen", 0.047, 0.041), (0.84, "backen", 0.043, 0.041),
-                      (0.94, "backen", 0.036, 0.038)]
-        bases = []
+            layout = [(0.68, "fang", 0.062, 0.036), (0.84, "rund", 0.026, 0.034), (0.95, "rund", 0.022, 0.03)]
         for i, (uu, kind, L, w) in enumerate(layout):
             for s in (1, -1):
                 u = uu * s
-                u = u + rnd.uniform(-0.012, 0.012)
-                base = arch_pt(u, top) + Vector((0, rnd.uniform(-0.004, 0.004), (-0.016 if top else 0.016) + rnd.uniform(-0.004, 0.004)))
+                base = arch_pt(u, top) + Vector((0, 0, -0.01 if top else 0.01))
                 tang = (arch_pt(u + 0.01, top) - arch_pt(u - 0.01, top)).normalized()
-                down = Vector((-0.1 * u + rnd.uniform(-0.09, 0.09), 0.06 * abs(u) + rnd.uniform(-0.05, 0.05), -1 if top else 1))
-                Lr = L * rnd.uniform(0.86, 1.08)
-                w = w * rnd.uniform(0.9, 1.06)
-                curve = 0.12 if kind == "fang" else 0.025
-                t_ = w * (0.75 if kind == "schneide" else (0.95 if kind == "fang" else 1.05))
-                parts.append(tooth("Zahn%s%d%s" % ("O" if top else "U", i, "L" if s > 0 else "R"), base, down, tang, Lr, w * 0.5, t_ * 0.5,
-                                   kind, (enamel, neck), curve=-curve))
-                parts.append(give(sphere("Zahnfleischbogen%s%d%d" % ("O" if top else "U", i, s), tuple(base - down.normalized() * 0.006),
-                                         1.0, (w * 0.5, w * 0.45, 0.02), segs=(14, 8)), gum))
-                bases.append((u, base))
-        bases.sort(key=lambda t: t[0])
-        for (u0, b0), (u1, b1) in zip(bases, bases[1:]):            # Zahnfleischwulst zwischen zwei Zähnen
-            m = (b0 + b1) / 2 + Vector((0, -0.004, -0.006 if top else 0.006))
-            parts.append(give(sphere("Papille%s%.2f" % ("O" if top else "U", u0), tuple(m), 1.0, (0.011, 0.012, 0.014), segs=(10, 6)), gum))
+                down = Vector((-0.06 * u, 0.04 * abs(u), -1 if top else 1))
+                curve = 0.1 if kind == "fang" else 0.0
+                parts.append(tooth("Zahn%s%d%s" % ("O" if top else "U", i, "L" if s > 0 else "R"), base, down, tang,
+                                   L * rnd.uniform(0.97, 1.02), w * 0.5, w * 0.36, kind, (enamel, enamel), curve=-curve))
     out = []
     for o in parts:
         attach(o, arm, "mixamorig:Head")
         out.append(o)
     out.append(tongue(arm))
     return out
-
-# ---------------------------------------------------------------- Sternenhaut
 
 # ---------------------------------------------------------------- Linien auf der Haut (Leuchtadern, Falten)
 
@@ -669,10 +679,10 @@ def skin_lines(body, arm, rnd):
     for z0 in (1.432, 1.448):                                       # Falten auf der Schnauze
         folds.append(front_curve(bvh, [(x, z0 + 0.012 * (x / 0.05) ** 2) for x in np.linspace(-0.05, 0.05, 5)], 0.8, 16))
     for s in (1, -1):
-        folds.append(front_curve(bvh, [(0.06 * s, 1.41), (0.12 * s, 1.378), (0.19 * s, 1.348), (0.238 * s, 1.29), (0.252 * s, 1.22),
-                                       (0.248 * s, 1.16)], 1.2))     # Falte von der Nase um den Mundwinkel
+        folds.append(front_curve(bvh, [(0.06 * s, 1.41), (0.12 * s, 1.388), (0.18 * s, 1.37), (0.225 * s, 1.33), (0.245 * s, 1.28),
+                                       (0.248 * s, 1.235)], 1.1))    # Falte von der Nase zum Mundwinkel
         folds.append(front_curve(bvh, [(0.065 * s, 1.398), (0.12 * s, 1.388), (0.19 * s, 1.4)], 0.9, 20))   # unter den Augen
-        folds.append(front_curve(bvh, [(0.218 * s, 1.215), (0.255 * s, 1.205), (0.29 * s, 1.18)], 1.1, 16))   # Mundwinkel
+        folds.append(front_curve(bvh, [(0.228 * s, 1.245), (0.25 * s, 1.236), (0.268 * s, 1.22)], 0.9, 12))   # Mundwinkel
     return veins, stars, [f for f in folds if len(f) > 1]
 
 def line_field(T, groups, reach=0.06):
@@ -730,12 +740,12 @@ def paint_skin(body, arm):
     mi = mouth_inside(P)
     inside = (mi < 1.04) & (P[..., 1] > LIP_Y - 0.02)
     depth = smoothstep(LIP_Y + 0.02, MOUTH_BACK - 0.02, P[..., 1])
-    mouth_col = gradient((0.72, 0.34, 0.52), (0.3, 0.08, 0.2), depth ** 0.8)
+    mouth_col = gradient((0.5, 0.14, 0.32), (0.1, 0.02, 0.07), depth ** 0.6)
     rings = 0.5 + 0.5 * np.sin(depth * np.pi * 14)
     ridges_c = 0.5 + 0.5 * np.sin(P[..., 2] * 170 + np.sin(P[..., 1] * 40) * 2)
-    mouth_col = mouth_col * (0.62 + 0.55 * (rings * smoothstep(0.2, 0.45, depth) + ridges_c * (1 - smoothstep(0.2, 0.45, depth)) * 0.7)[..., None])
-    lip = np.clip(1 - np.abs(mi - 1.08) / 0.1, 0, 1) * (P[..., 1] < LIP_Y + 0.08) * (~inside)
-    col = col * (1 - 0.4 * lip[..., None])
+    mouth_col = mouth_col * (0.9 + 0.12 * rings[..., None] * smoothstep(0.2, 0.45, depth)[..., None])
+    lip = np.clip(1 - np.abs(mi - 1.22) / 0.24, 0, 1) ** 0.7 * (P[..., 1] < LIP_Y + 0.08) * (~inside)
+    col = col * (1 - 0.75 * lip[..., None]) + np.asarray((0.34, 0.17, 0.44), np.float32) * (0.75 * lip[..., None])
     # Sternenstaub: feine Punkte, einzelne hellere Sterne
     dust = np.clip((noise3(P, 300, 31) - 0.87) / 0.05, 0, 1) * np.clip((noise3(P, 25, 32) - 0.3) / 0.3, 0, 1)
     big = np.clip((noise3(P, 70, 33) - 0.955) / 0.025, 0, 1)
@@ -760,7 +770,7 @@ def paint_skin(body, arm):
         col = col * (1 - k[..., None]) + np.asarray((1.0, 0.85, 1.0), np.float32) * k[..., None]
         em += np.asarray((1.0, 0.7, 1.0), np.float32) * k[..., None] + glow_c * (np.exp(-d / 0.028) * 0.5 * w)[..., None]
     fold = np.clip(1 - D / (0.012 * np.maximum(Wd, 0.3)), 0, 1) ** 2 * (K == 1)
-    col = col * (1 - 0.45 * fold[..., None])
+    col = col * (1 - 0.32 * fold[..., None])
     # Augen: kräftiger magentafarbener Schein auf Brauenwulst, Lidern und Wangen
     for x, z in EYES:
         d = np.linalg.norm((P - np.asarray((x, -0.31, z), np.float32)) * np.asarray((1, 1.3, 1.3), np.float32), axis=-1)
@@ -772,7 +782,7 @@ def paint_skin(body, arm):
         d = np.linalg.norm((P - np.asarray((0.03 * s, -0.35, 1.392), np.float32)) * np.asarray((1.0, 1.3, 1.8), np.float32), axis=-1)
         col = col * (1 - 0.85 * np.clip(1 - d / 0.015, 0, 1)[..., None])
     col = np.where(inside[..., None], mouth_col, col)
-    em = np.where(inside[..., None], mouth_col * (0.18 * smoothstep(0.2, 0.8, depth))[..., None], em)
+    em = np.where(inside[..., None], mouth_col * (0.06 * smoothstep(0.2, 0.8, depth))[..., None], em)
     T["out"][..., :3] = np.where(cov[..., None], np.clip(col, 0, 1), T["out"][..., :3])
     T["em"][..., :3] = np.where(cov[..., None], np.clip(em, 0, 1), 0)
     commit(T, strength=1.6)
