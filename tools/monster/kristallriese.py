@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from monster_aufsatz import *
 from mathutils.bvhtree import BVHTree
 from mathutils.kdtree import KDTree
+from mathutils import Quaternion
 
 import boss_aufsatz
 boss_aufsatz.EXPORT_IMAGE_FORMAT = "JPEG"     # Bilder als JPEG ins GLB (Haut 2048 als PNG wäre über 2 MB groß)
@@ -25,17 +26,17 @@ def mb_family(name):
     o = bpy.data.objects.new(name, mb); bpy.context.scene.collection.objects.link(o)
     return o
 
-def mb_ell(o, c, semi, rot=None):
+def mb_ell(o, c, semi, rot=None, neg=False):
     e = o.data.elements.new(type='ELLIPSOID')
-    e.co = c; e.radius = 1.0; e.stiffness = 2.0
+    e.co = c; e.radius = 1.0; e.stiffness = 2.0; e.use_negative = neg
     e.size_x, e.size_y, e.size_z = (s / MB_K for s in semi)
     if rot is not None:
         e.rotation = rot
     return e
 
-def mb_caps(o, p0, p1, r):
+def mb_caps(o, p0, p1, r, neg=False):
     p0, p1 = Vector(p0), Vector(p1); d = p1 - p0
-    e = o.data.elements.new(type='CAPSULE'); e.co = (p0 + p1) / 2; e.radius = r / MB_K; e.stiffness = 2.0
+    e = o.data.elements.new(type='CAPSULE'); e.co = (p0 + p1) / 2; e.radius = r / MB_K; e.stiffness = 2.0; e.use_negative = neg
     e.size_x = d.length / 2
     e.rotation = Vector((1, 0, 0)).rotation_difference(d.normalized())
     return e
@@ -70,14 +71,15 @@ def mirror(p):
 
 # Maul: Öffnung vorn im Gesicht (Mitte, halbe Breite, halbe Höhe oben/unten) und Tiefe; der Hohlraum wird mit einem
 # Schneidekörper aus dem Kopf geschnitten, Zahnfleisch, Zähne und Zunge sitzen darin.
-MOUTH_Z, MOUTH_A, MOUTH_BU, MOUTH_BL = 1.245, 0.19, 0.105, 0.145
-MOUTH_FRONT, MOUTH_BACK = -0.52, -0.06
-LIP_Y = -0.345
+MOUTH_Z, MOUTH_A, MOUTH_BU, MOUTH_BL = 1.22, 0.245, 0.148, 0.17
+MOUTH_FRONT, MOUTH_BACK = -0.52, -0.02
+EYES = [(0.138, 1.458), (-0.138, 1.458)]
+LIP_Y = -0.325
 
 def mouth_section(y):
     """Querschnitt des Maulraums bei Tiefe y: (halbe Breite, halbe Höhe oben, unten, Mitte z) – vorn so groß wie die
     Öffnung, nach hinten zum Schlund hin enger"""
-    t = np.clip((y - (-0.3)) / (MOUTH_BACK - (-0.3)), 0, 1)       # 0 an der Öffnung, 1 ganz hinten
+    t = np.clip((y - (-0.25)) / (MOUTH_BACK - (-0.25)), 0, 1)     # 0 an der Öffnung, 1 ganz hinten
     k = np.sqrt(np.clip(1 - t ** 2.2, 0, 1)) * 0.75 + 0.25 * (1 - t)
     return MOUTH_A * k, MOUTH_BU * (0.95 * k + 0.05), MOUTH_BL * k, MOUTH_Z + 0.02 * t
 
@@ -110,53 +112,63 @@ def mouth_cutter():
     bm.faces.new(list(reversed(rings[0]))); bm.faces.new(rings[-1])
     return finish("Maulschnitt", bm)
 
+TOES, TOE_Y = (-0.12, -0.04, 0.04, 0.12), -0.215
+
 def body_shape(arm):
     """Körper aus Metaballs: Rumpf mit Kopf (ohne Hals, Kopf tief und vorn), Arme und Beine je eigene Familie"""
     R = mb_family("Rumpf")
-    mb_ell(R, (0, 0.05, 1.0), (0.34, 0.27, 0.3))                  # Brust
-    mb_ell(R, (0, 0.0, 0.77), (0.3, 0.28, 0.24))                  # Bauch
-    mb_ell(R, (0, 0.08, 0.57), (0.27, 0.22, 0.15))                # Becken
-    mb_ell(R, (0, 0.17, 1.15), (0.34, 0.24, 0.16))                # Nacken und Rücken (kein Hals)
-    mb_ell(R, (0, -0.04, 1.41), (0.32, 0.3, 0.28))                # Schädel (groß, tief sitzend)
-    mb_ell(R, (0, -0.12, 1.15), (0.28, 0.22, 0.15))               # Unterkiefer und Kinn
-    mb_ell(R, (0, -0.355, 1.44), (0.045, 0.04, 0.05))             # Nasenrücken
+    mb_ell(R, (0, 0.06, 1.05), (0.38, 0.27, 0.3))                 # breite Brust
+    mb_ell(R, (0, 0.02, 0.78), (0.3, 0.26, 0.23))                 # Bauch
+    mb_ell(R, (0, 0.08, 0.57), (0.28, 0.22, 0.15))                # Becken
+    mb_ell(R, (0, 0.16, 1.22), (0.4, 0.25, 0.2))                  # Nacken und Rücken (kein Hals)
+    mb_ell(R, (0, -0.04, 1.43), (0.4, 0.29, 0.26))                # Schädel: breit, gewölbt, tief zwischen den Schultern
+    mb_ell(R, (0, -0.1, 1.1), (0.36, 0.24, 0.16))                 # schwerer, breiter Unterkiefer
+    mb_ell(R, (0, -0.3, 1.418), (0.08, 0.04, 0.034))              # kurze, flache Schnauze direkt über dem Maul
     for s in (1, -1):
-        mb_ell(R, (0.16 * s, -0.16, 1.03), (0.16, 0.09, 0.12))      # Brustmuskeln
-        mb_ell(R, (0.4 * s, 0.08, 1.15), (0.16, 0.17, 0.15))        # Schulteransatz
-        mb_ell(R, (0.21 * s, -0.2, 1.3), (0.12, 0.12, 0.12))        # Wangen
-        mb_caps(R, (0.035 * s, -0.333, 1.505), (0.2 * s, -0.28, 1.55), 0.036)   # Brauenwulst (schräg: böser Blick)
-        mb_ell(R, (0.028 * s, -0.385, 1.4), (0.028, 0.025, 0.022))  # Nasenflügel
-    # Lippenwulst rund um die Öffnung (wird beim Schneiden halbiert und rundet den Rand)
+        mb_ell(R, (0.18 * s, -0.17, 1.02), (0.17, 0.09, 0.12))      # Brustmuskeln
+        mb_ell(R, (0.32 * s, 0.08, 1.32), (0.18, 0.2, 0.16))        # Nackenmuskel bis zur Schulter: Kopf sitzt dazwischen
+        mb_ell(R, (0.42 * s, 0.06, 1.25), (0.16, 0.17, 0.15))       # Schulteransatz
+        mb_ell(R, (0.3 * s, -0.13, 1.22), (0.13, 0.14, 0.16))       # Hängebacken hinter den Mundwinkeln
+        q = Quaternion((0, 0, 1), math.radians(14 * s)) @ Quaternion((0, 1, 0), math.radians(-22 * s))
+        mb_ell(R, (0.09 * s, -0.29, 1.5), (0.09, 0.065, 0.047), q)    # Brauenwulst innen (tiefer: böser Blick)
+        mb_ell(R, (0.2 * s, -0.265, 1.535), (0.085, 0.06, 0.045), q)  # Brauenwulst außen
+        mb_ell(R, (0.1 * s, -0.21, 1.6), (0.09, 0.09, 0.055))         # Stirnwulst (Schädel knubbelig wie in der Vorlage)
+        mb_ell(R, (0.03 * s, -0.33, 1.408), (0.027, 0.022, 0.018))  # Nasenflügel
+        mb_ell(R, (EYES[0][0] * s, -0.31, EYES[0][1]), (0.08, 0.06, 0.05), neg=True)      # tiefe Augenhöhle
+        mb_caps(R, (MOUTH_A * 0.97 * s, LIP_Y + 0.09, MOUTH_Z + 0.01), ((MOUTH_A + 0.05) * s, LIP_Y + 0.15, MOUTH_Z - 0.02), 0.02,
+                neg=True)                                         # Mundwinkel nach hinten eingezogen
+    # schmaler Lippenrand oben und unten (nicht in den Mundwinkeln)
     pts = []
-    for k in range(28):
-        th = k * 2 * math.pi / 28
+    for k in range(40):
+        th = k * 2 * math.pi / 40
         c, s_ = math.cos(th), math.sin(th)
-        x = (MOUTH_A + 0.02) * np.sign(c) * abs(c) ** (2 / 2.6)
-        z = ((MOUTH_BU if s_ > 0 else MOUTH_BL) + 0.02) * np.sign(s_) * abs(s_) ** (2 / 2.6)
-        pts.append(Vector((x, LIP_Y + 0.06 * (x / MOUTH_A) ** 2, MOUTH_Z + z)))
+        x = (MOUTH_A + 0.012) * np.sign(c) * abs(c) ** (2 / 2.6)
+        z = ((MOUTH_BU if s_ > 0 else MOUTH_BL) + 0.012) * np.sign(s_) * abs(s_) ** (2 / 2.6)
+        pts.append(Vector((x, LIP_Y + 0.09 * (x / MOUTH_A) ** 2, MOUTH_Z + z)))
     for p0, p1 in zip(pts, pts[1:] + pts[:1]):
-        mb_caps(R, p0, p1, 0.03)
+        if abs(p0.x) < MOUTH_A * 0.85 and abs(p1.x) < MOUTH_A * 0.85:
+            mb_caps(R, p0, p1, 0.018)
     parts = [R]
     for side, s in (("Left", 1), ("Right", -1)):
         A_ = mb_family("Arm" + side)
         sh, el, wr = B(arm, side + "Arm"), B(arm, side + "ForeArm"), B(arm, side + "Hand")
-        mb_ell(A_, (0.5 * s, 0.05, 1.15), (0.18, 0.18, 0.19))       # Deltamuskel
-        mb_caps(A_, sh, el, 0.13)
-        c, semi, q = along(sh, el, 0.135, 0.15, 0.5, (0, -0.035, 0)); mb_ell(A_, c, semi, q)   # Bizeps
-        mb_caps(A_, el, wr, 0.115)
-        c, semi, q = along(el, wr, 0.15, 0.17, 0.35); mb_ell(A_, c, semi, q)                   # schwerer Unterarm
-        mb_ell(A_, tuple(wr), (0.1, 0.1, 0.1))
+        mb_ell(A_, (0.5 * s, 0.05, 1.2), (0.18, 0.18, 0.2))         # Deltamuskel (hoch: Schultern über dem Gelenk)
+        mb_caps(A_, sh, el, 0.14)
+        c, semi, q = along(sh, el, 0.15, 0.16, 0.5, (0, -0.035, 0)); mb_ell(A_, c, semi, q)    # Bizeps
+        mb_caps(A_, el, wr, 0.125)
+        c, semi, q = along(el, wr, 0.165, 0.18, 0.35); mb_ell(A_, c, semi, q)                  # schwerer Unterarm
+        mb_ell(A_, tuple(wr), (0.11, 0.11, 0.11))
         parts.append(A_)
         L_ = mb_family("Bein" + side)
         up, kn, an = B(arm, side + "UpLeg"), B(arm, side + "Leg"), B(arm, side + "Foot")
         an = Vector((0.248 * s, 0.126, 0.166))                    # Fußgelenk (rechts im Skelett verdreht: gespiegelt)
         kn = Vector((0.23 * s, 0.051, 0.399))
-        mb_ell(L_, (0.15 * s, 0.07, 0.47), (0.16, 0.17, 0.16))       # Oberschenkel
-        mb_caps(L_, kn, an, 0.13)
-        mb_ell(L_, (0.24 * s, 0.13, 0.3), (0.125, 0.12, 0.14))      # Wade
-        mb_ell(L_, (0.27 * s, -0.01, 0.07), (0.15, 0.2, 0.075))     # Fuß
-        for i, dx in enumerate((-0.09, -0.03, 0.03, 0.09)):
-            mb_ell(L_, ((0.27 + dx) * s, -0.17 - 0.012 * (1.5 - abs(i - 1.5)), 0.05), (0.042, 0.055, 0.042))   # Zehen
+        mb_ell(L_, (0.15 * s, 0.07, 0.47), (0.21, 0.2, 0.18))        # Oberschenkel
+        mb_caps(L_, kn, an, 0.165)
+        mb_ell(L_, (0.24 * s, 0.13, 0.3), (0.14, 0.13, 0.15))       # Wade
+        mb_ell(L_, (0.27 * s, -0.03, 0.08), (0.2, 0.23, 0.09))      # breiter Fuß
+        for i, dx in enumerate(TOES):
+            mb_ell(L_, ((0.27 + dx) * s, TOE_Y - 0.012 * (1.5 - abs(i - 1.5)), 0.055), (0.052, 0.062, 0.05))   # Zehen
         parts.append(L_)
     meshes = [mb_to_mesh(o) for o in parts]
     body = join_parts(meshes, "Kristallriese")
@@ -204,6 +216,16 @@ def star_hand(name, side, skin, nail, k=1.3, fist=0.7):
     parts.append(give(sphere(name + "DaumenNagel", tuple(tip + d * 0.016 * k), 0.03 * k, (0.9, 0.8, 0.8)), nail))
     return join_parts(parts, name)
 
+def give_idx(o, *mats):
+    """Materialien setzen und die Zuordnung der Flächen behalten (materials.clear() setzt sie sonst alle auf 0)"""
+    idx = [p.material_index for p in o.data.polygons]
+    o.data.materials.clear()
+    for m in mats:
+        o.data.materials.append(m)
+    for p, i in zip(o.data.polygons, idx):
+        p.material_index = min(i, len(mats) - 1)
+    return o
+
 def group_all(o, name, w=1.0):
     g = o.vertex_groups.new(name=name)
     g.add([v.index for v in o.data.vertices], w, 'REPLACE')
@@ -228,7 +250,7 @@ def bind(body, arm):
     for b in arm.data.bones:
         b.use_deform = saved[b.name]
     # Kopf: Gesicht, Maul und Schädel ganz am Kopfknochen (Zähne, Augen hängen starr daran)
-    hc = Vector((0, -0.08, 1.34)); hs = Vector((0.37, 0.37, 0.34))
+    hc = Vector((0, -0.08, 1.3)); hs = Vector((0.43, 0.37, 0.37))
     head = body.vertex_groups.get("mixamorig:Head") or body.vertex_groups.new(name="mixamorig:Head")
     for v in body.data.vertices:
         q = v.co - hc
@@ -342,52 +364,81 @@ def smoothstep(a, b, x):
 
 # ---------------------------------------------------------------- Augen
 
-EYES = [(0.122, 1.468), (-0.122, 1.468)]
 
 def eye_image(n=256):
     y, x = np.mgrid[0:n, 0:n]
     u = (x + 0.5) / n * 2 - 1; v = (y + 0.5) / n * 2 - 1
     r = np.sqrt(u ** 2 + v ** 2)
-    col = gradient((1.0, 0.96, 1.0), (1.0, 0.55, 0.97), smoothstep(0.15, 0.85, r))
-    ri = np.sqrt((u * 1.1) ** 2 + (v + 0.32) ** 2)                       # Iris unten, halb vom Lid verdeckt
-    iris = (1 - smoothstep(0.34, 0.46, ri)) * 0.75
-    col = col * (1 - iris[..., None]) + gradient((0.62, 0.55, 1.0), (0.42, 0.3, 0.95), ri / 0.46) * iris[..., None]
-    hot = 1 - smoothstep(0.0, 0.16, np.sqrt(u ** 2 + (v + 0.25) ** 2))
+    col = gradient((1.0, 0.96, 1.0), (1.0, 0.5, 0.95), smoothstep(0.12, 0.7, r))
+    ri = np.sqrt((u * 1.0) ** 2 + (v + 0.2) ** 2)                        # Iris unten in der Mitte, oben vom Wulst verdeckt
+    iris = (1 - smoothstep(0.3, 0.4, ri)) * 0.9
+    col = col * (1 - iris[..., None]) + gradient((0.55, 0.52, 1.0), (0.32, 0.28, 0.95), ri / 0.4) * iris[..., None]
+    hot = (1 - smoothstep(0.0, 0.1, np.sqrt((u + 0.08) ** 2 + (v + 0.08) ** 2))) * 0.9
     col = col * (1 - hot[..., None]) + np.asarray((1.0, 1.0, 1.0), np.float32) * hot[..., None]
-    edge = smoothstep(0.82, 1.0, r)
-    col = col * (1 - edge[..., None]) + np.asarray((0.7, 0.15, 0.7), np.float32) * edge[..., None]
+    edge = smoothstep(0.62, 1.0, r)
+    col = col * (1 - edge[..., None]) + np.asarray((0.9, 0.2, 0.85), np.float32) * edge[..., None]
     arr = np.ones((n, n, 4), np.float32); arr[..., :3] = col
     return arr
 
-def star_eyes(body, arm):
+EYE_FRAMES = []
+
+def eye_frames(body):
+    """Lage der Augen in den Augenhöhlen (vor dem Anbau der Lider bestimmt, für Augäpfel und Lider gleich)"""
     bvh = BVHTree.FromObject(body, bpy.context.evaluated_depsgraph_get())
+    EYE_FRAMES.clear()
+    for x, z in EYES:
+        hit, n, _, _ = bvh.ray_cast(Vector((x, -1.0, z)), Vector((0, 1, 0)), 2.0)
+        s = 1 if x > 0 else -1
+        f = (n * 0.45 + Vector((0, -1, 0)) * 0.55).normalized()                 # Blickrichtung
+        lng = Vector((s * math.cos(math.radians(20)), 0, math.sin(math.radians(20))))   # Augenachse, außen höher
+        lng = (lng - f * lng.dot(f)).normalized(); up = f.cross(lng) * s
+        if up.z < 0:
+            up = -up
+        EYE_FRAMES.append((hit + f * (-0.012), f, lng, up, s))
+    return EYE_FRAMES
+
+EYE_A, EYE_B, EYE_D = 0.076, 0.043, 0.034
+
+def eye_shell(name, frame, a, b, d, keep=None, uv=False):
+    """Ellipsoid im Rahmen eines Auges (x außen, z oben, y Blickrichtung); keep(lx, ly, lz) lässt nur einen Teil stehen"""
+    c, f, lng, up, s = frame
+    bm = bmesh.new()
+    bmesh.ops.create_uvsphere(bm, u_segments=36, v_segments=18, radius=1.0)
+    if keep is not None:
+        bmesh.ops.delete(bm, geom=[v for v in bm.verts if not keep(v.co.x, v.co.y, v.co.z)], context='VERTS')
+    for v in bm.verts:
+        lx, ly, lz = v.co.x, v.co.y, v.co.z
+        v.co = c + lng * (lx * a) + up * (lz * b) + f * (ly * d)
+    if uv:
+        lay = bm.loops.layers.uv.new("UVMap")
+        for fc in bm.faces:
+            for lp in fc.loops:
+                q = lp.vert.co - c
+                lp[lay].uv = (0.5 + 0.5 * q.dot(lng) / a, 0.5 + 0.5 * q.dot(up) / b)
+    return finish(name, bm)
+
+def eye_lids(skin):
+    """Oberlider: schräg geschnitten, innen tief über dem Auge, außen hoch – der böse Blick der Vorlage"""
+    out = []
+    for frame in EYE_FRAMES:
+        o = eye_shell("Lid" + ("L" if frame[4] > 0 else "R"), frame, EYE_A * 1.14, EYE_B * 1.3, EYE_D * 1.5,
+                      keep=lambda lx, ly, lz: lz >= 0.16 + 0.4 * lx and ly > -0.6)
+        md = o.modifiers.new("Dicke", 'SOLIDIFY'); md.thickness = 0.009; md.offset = 1.0
+        apply_mod(o, md)
+        give(o, skin)
+        out.append(o)
+    return out
+
+def star_eyes(body, arm):
     img = eye_image()
     m = bpy.data.materials.new("Sternenauge"); m.use_nodes = True
     nt = m.node_tree; p = nt.nodes["Principled BSDF"]
     tex = nt.nodes.new("ShaderNodeTexImage"); tex.image = new_image("Sternenauge_Bild", img)
     nt.links.new(tex.outputs["Color"], p.inputs["Base Color"]); nt.links.new(tex.outputs["Color"], p.inputs["Emission Color"])
-    p.inputs["Emission Strength"].default_value = 2.2; p.inputs["Roughness"].default_value = 0.15
+    p.inputs["Emission Strength"].default_value = 3.4; p.inputs["Roughness"].default_value = 0.15
     out = []
-    for x, z in EYES:
-        hit, n, _, _ = bvh.ray_cast(Vector((x, -1.0, z)), Vector((0, 1, 0)), 2.0)
-        s = 1 if x > 0 else -1
-        f = (n * 0.45 + Vector((0, -1, 0)) * 0.55).normalized()                 # Blickrichtung
-        lng = Vector((s * math.cos(math.radians(17)), 0, math.sin(math.radians(17))))   # Augenachse, außen höher
-        lng = (lng - f * lng.dot(f)).normalized(); up = f.cross(lng) * s
-        if up.z < 0:
-            up = -up
-        a, b, d = 0.072, 0.033, 0.03
-        bm = bmesh.new()
-        bmesh.ops.create_uvsphere(bm, u_segments=32, v_segments=16, radius=1.0)
-        uv = bm.loops.layers.uv.new("UVMap")
-        for v in bm.verts:
-            lx, ly, lz = v.co.x, v.co.y, v.co.z
-            v.co = hit + f * (-0.012) + lng * (lx * a) + up * (lz * b) + (-f) * (-ly * d)
-        for fc in bm.faces:
-            for lp in fc.loops:
-                q = lp.vert.co - (hit + f * (-0.012))
-                lp[uv].uv = (0.5 + 0.5 * q.dot(lng) / a, 0.5 + 0.5 * q.dot(up) / b)
-        o = finish("Auge" + ("L" if s > 0 else "R"), bm)
+    for frame in EYE_FRAMES:
+        o = eye_shell("Auge" + ("L" if frame[4] > 0 else "R"), frame, EYE_A, EYE_B, EYE_D, uv=True)
         give(o, m)
         attach(o, arm, "mixamorig:Head")
         out.append(o)
@@ -405,7 +456,7 @@ def arch_pt(u, top, inset=0.0):
     """Zahnbogen: u -1…1 von Mundwinkel zu Mundwinkel, hinter der Lippe, an den Seiten nach hinten gebogen"""
     x = 0.9 * MOUTH_A * u
     y = LIP_Y + 0.045 + 0.05 * u * u + 0.05 * u ** 4 + inset
-    z = lip_edge(x, top) + (-0.012 if top else 0.012) * (1 - 0.5 * u * u)
+    z = lip_edge(x, top) + (-0.03 if top else 0.014) * (1 - 0.5 * u * u)
     return Vector((x, y, z))
 
 def tooth(name, base, down, along_dir, L, w, t, kind, mats, curve=0.0):
@@ -444,7 +495,7 @@ def tooth(name, base, down, along_dir, L, w, t, kind, mats, curve=0.0):
         bm.faces.new([rings[-1][k], rings[-1][(k + 1) % S], tip])
     bm.faces.new(list(reversed(rings[0])))
     o = finish(name, bm)
-    give(o, *mats)
+    give_idx(o, *mats)
     if kind == "backen":                                            # Höcker auf der Kaufläche
         cusps = []
         for i, (a_, b_) in enumerate(((-0.45, -0.4), (0.45, -0.4), (-0.45, 0.4), (0.45, 0.4))):
@@ -457,55 +508,69 @@ def tongue(arm):
     m = image_material("Zunge", 512, (0.8, 0.42, 0.58), rough=0.32)
     bm = bmesh.new(); bm.loops.layers.uv.new("UVMap")
     bmesh.ops.create_uvsphere(bm, u_segments=40, v_segments=20, radius=1.0, calc_uvs=True)
-    c = Vector((0, -0.135, 1.15)); a, b, h = 0.13, 0.15, 0.055
+    c = Vector((0, -0.105, 1.115)); a, b, h = 0.175, 0.165, 0.065
     for v in bm.verts:
         x, y, z = v.co.x * a, v.co.y * b, v.co.z * h
         if z > 0:
-            z -= 0.02 * math.exp(-(x / 0.028) ** 2) * (0.4 + 0.6 * max(0.0, -v.co.y + 0.3))    # Mittelfurche
+            z -= 0.024 * math.exp(-(x / 0.03) ** 2) * (0.4 + 0.6 * max(0.0, -v.co.y + 0.3))    # Mittelfurche
             z += 0.018 * max(0.0, -v.co.y) ** 2                                            # Spitze vorn leicht erhoben
         v.co = c + Vector((x, y, z))
     o = finish("Zunge", bm)
     o.data.uv_layers[0].name = "UVMap"
     give(o, m)
     T = texels(o); P = T["P"]
-    groove = np.exp(-(P[..., 0] / 0.014) ** 2) * (P[..., 2] > 1.16)
-    pap = np.clip((noise3(P, 260, 5) - 0.55) / 0.2, 0, 1)
-    back = smoothstep(-0.25, -0.06, P[..., 1])
-    col = gradient((0.86, 0.45, 0.62), (0.45, 0.14, 0.28), back * 0.8 + groove * 0.5)
-    col = col * (0.95 + 0.08 * pap[..., None])
+    groove = np.exp(-(P[..., 0] / 0.016) ** 2) * (P[..., 2] > 1.13)
+    pap = np.clip((noise3(P, 200, 5) - 0.5) / 0.25, 0, 1) * 0.6 + np.clip((noise3(P, 420, 6) - 0.5) / 0.25, 0, 1) * 0.4
+    back = smoothstep(-0.25, -0.02, P[..., 1])
+    col = gradient((0.8, 0.4, 0.6), (0.4, 0.12, 0.27), back * 0.8 + groove * 0.45)
+    col = col * (0.88 + 0.2 * pap[..., None])
     T["out"][..., :3] = np.where(T["cov"][..., None], col, T["out"][..., :3])
     commit(T, pad=False)
     attach(o, arm, "mixamorig:Head")
     return o
 
 def star_mouth(arm, rnd):
-    enamel = look("Zahnschmelz", (0.95, 0.91, 0.8), rough=0.22)
-    neck = look("Zahnhals", (0.86, 0.78, 0.6), rough=0.3)
-    gum = look("Zahnfleisch", (0.86, 0.45, 0.56), rough=0.35)
+    enamel = look("Zahnschmelz", (0.93, 0.87, 0.74), rough=0.25)
+    neck = look("Zahnhals", (0.8, 0.68, 0.52), rough=0.32)
+    gum = look("Zahnfleisch", (0.84, 0.42, 0.55), rough=0.32)
     parts = []
     for top in (True, False):
-        pts = [arch_pt(-1.02 + 2.04 * k / 24, top) for k in range(25)]
-        parts.append(give(tube("Zahnfleisch" + ("Oben" if top else "Unten"), [tuple(p_) for p_ in pts],
-                               [0.012] + [0.026 if top else 0.02] * 23 + [0.012], segs=12), gum))
-        if top:
-            layout = [(0.09, "schneide", 0.058, 0.031), (0.27, "schneide", 0.055, 0.03), (0.45, "schneide", 0.05, 0.029),
-                      (0.62, "fang", 0.12, 0.036), (0.77, "backen", 0.042, 0.034), (0.89, "backen", 0.034, 0.034), (0.98, "backen", 0.024, 0.03)]
+        pts = [arch_pt(-1.03 + 2.06 * k / 30, top) for k in range(31)]
+        g = give(tube("Zahnfleisch" + ("Oben" if top else "Unten"), [tuple(p_) for p_ in pts],
+                      [0.014] + [0.03] * 29 + [0.014], segs=16), gum)
+        sub = g.modifiers.new("Fein", 'SUBSURF'); sub.levels = 2; apply_mod(g, sub)
+        for v in g.data.vertices:                                     # feine Querrillen wie in der Vorlage
+            v.co += v.normal * (0.0028 * math.sin(v.co.x * 300.0 + v.co.z * 80.0))
+        parts.append(g)
+        if top:   # (u, Art, Länge, Breite)
+            layout = [(0.1, "schneide", 0.058, 0.041), (0.295, "schneide", 0.056, 0.041), (0.49, "schneide", 0.053, 0.039),
+                      (0.67, "fang", 0.13, 0.048), (0.8, "backen", 0.05, 0.041), (0.9, "backen", 0.043, 0.04),
+                      (0.985, "backen", 0.034, 0.036)]
         else:
-            layout = [(0.08, "schneide", 0.052, 0.03), (0.24, "schneide", 0.052, 0.03), (0.4, "schneide", 0.048, 0.029),
-                      (0.55, "fang", 0.088, 0.032), (0.7, "backen", 0.04, 0.033), (0.83, "backen", 0.034, 0.033), (0.94, "backen", 0.026, 0.03)]
+            layout = [(0.093, "schneide", 0.056, 0.039), (0.275, "schneide", 0.056, 0.039), (0.455, "schneide", 0.053, 0.037),
+                      (0.6, "fang", 0.1, 0.043), (0.73, "backen", 0.047, 0.041), (0.84, "backen", 0.043, 0.041),
+                      (0.94, "backen", 0.036, 0.038)]
+        bases = []
         for i, (uu, kind, L, w) in enumerate(layout):
             for s in (1, -1):
                 u = uu * s
-                base = arch_pt(u, top) + Vector((0, 0, -0.012 if top else 0.012))
+                u = u + rnd.uniform(-0.012, 0.012)
+                base = arch_pt(u, top) + Vector((0, rnd.uniform(-0.004, 0.004), (-0.016 if top else 0.016) + rnd.uniform(-0.004, 0.004)))
                 tang = (arch_pt(u + 0.01, top) - arch_pt(u - 0.01, top)).normalized()
-                down = Vector((0, 0.08 * abs(u), -1 if top else 1)) + Vector((-0.12 * u, 0, 0))
-                Lr = L * rnd.uniform(0.94, 1.04)
-                curve = 0.1 if kind == "fang" else 0.03
-                t_ = w * (0.62 if kind == "schneide" else (0.9 if kind == "fang" else 1.05))
+                down = Vector((-0.1 * u + rnd.uniform(-0.09, 0.09), 0.06 * abs(u) + rnd.uniform(-0.05, 0.05), -1 if top else 1))
+                Lr = L * rnd.uniform(0.86, 1.08)
+                w = w * rnd.uniform(0.9, 1.06)
+                curve = 0.12 if kind == "fang" else 0.025
+                t_ = w * (0.75 if kind == "schneide" else (0.95 if kind == "fang" else 1.05))
                 parts.append(tooth("Zahn%s%d%s" % ("O" if top else "U", i, "L" if s > 0 else "R"), base, down, tang, Lr, w * 0.5, t_ * 0.5,
                                    kind, (enamel, neck), curve=-curve))
-                parts.append(give(sphere("Zahnfleischbogen%s%d%d" % ("O" if top else "U", i, s), tuple(base - down.normalized() * 0.004),
-                                         1.0, (w * 0.48, w * 0.42, 0.016), segs=(14, 8)), gum))
+                parts.append(give(sphere("Zahnfleischbogen%s%d%d" % ("O" if top else "U", i, s), tuple(base - down.normalized() * 0.006),
+                                         1.0, (w * 0.5, w * 0.45, 0.02), segs=(14, 8)), gum))
+                bases.append((u, base))
+        bases.sort(key=lambda t: t[0])
+        for (u0, b0), (u1, b1) in zip(bases, bases[1:]):            # Zahnfleischwulst zwischen zwei Zähnen
+            m = (b0 + b1) / 2 + Vector((0, -0.004, -0.006 if top else 0.006))
+            parts.append(give(sphere("Papille%s%.2f" % ("O" if top else "U", u0), tuple(m), 1.0, (0.011, 0.012, 0.014), segs=(10, 6)), gum))
     out = []
     for o in parts:
         attach(o, arm, "mixamorig:Head")
@@ -514,6 +579,140 @@ def star_mouth(arm, rnd):
     return out
 
 # ---------------------------------------------------------------- Sternenhaut
+
+# ---------------------------------------------------------------- Linien auf der Haut (Leuchtadern, Falten)
+
+def body_point(bvh, origin, direction):
+    hit = bvh.ray_cast(Vector(origin), Vector(direction).normalized(), 6.0)
+    return hit[0]
+
+def surface_walk(bvh, start, direction, length, rnd, w0=1.0, w1=0.3, avoid=None, depth=0, step=0.007):
+    """Riss über die Haut laufen lassen: kleine Knicke wie ein Blitz, gelegentlich eine Abzweigung"""
+    loc, nrm, _, _ = bvh.find_nearest(Vector(start))
+    p = loc; d = Vector(direction); d = (d - nrm * d.dot(nrm)).normalized()
+    n = max(2, int(length / step))
+    line = [(p.copy(), w0)]; out = []
+    for k in range(1, n + 1):
+        if k % 4 == 0:
+            side = nrm.cross(d).normalized()
+            d = (d + side * rnd.uniform(-0.28, 0.28)).normalized()
+        loc, nrm, _, _ = bvh.find_nearest(p + d * step)
+        if loc is None or (avoid is not None and avoid(loc)):
+            break
+        dd = loc - p
+        if dd.length < 1e-6:
+            break
+        d = dd.normalized(); p = loc
+        w = w0 + (w1 - w0) * k / n
+        line.append((p.copy(), w))
+        if depth < 1 and 4 < k < n - 4 and rnd.random() < 0.02:
+            side = nrm.cross(d).normalized() * rnd.choice((-1, 1))
+            out += surface_walk(bvh, p, d * 0.55 + side * 0.85, (n - k) * step * rnd.uniform(0.35, 0.6), rnd, w * 0.75, w1 * 0.8,
+                                avoid, depth + 1, step)
+    return [line] + out
+
+def front_curve(bvh, pts2d, w, n=40):
+    """Linie vorn auf dem Körper (Falten im Gesicht): Punkte (x, z) von vorn auf die Haut gelegt"""
+    xs = np.interp(np.linspace(0, len(pts2d) - 1, n), np.arange(len(pts2d)), [q[0] for q in pts2d])
+    zs = np.interp(np.linspace(0, len(pts2d) - 1, n), np.arange(len(pts2d)), [q[1] for q in pts2d])
+    line = []
+    for x, z in zip(xs, zs):
+        loc = body_point(bvh, (float(x), -2.0, float(z)), (0, 1, 0))
+        if loc is not None:
+            line.append((loc, w))
+    return line
+
+def skin_lines(body, arm, rnd):
+    """Leuchtadern wie in der Vorlage: wenige helle Sternknoten, von denen gezackte Risse ausgehen und sich
+    verzweigen (Brust, Bauch, Arme, Beine, Rücken, mitten über die Stirn), dazu Falten im Gesicht"""
+    bvh = BVHTree.FromObject(body, bpy.context.evaluated_depsgraph_get())
+
+    def avoid(p):
+        if mouth_inside(np.asarray(p, np.float32)) < 1.25:
+            return True
+        if any((p - Vector((x, -0.3, z))).length < 0.1 for x, z in EYES):
+            return True
+        return (abs(p.x) > 0.84 and p.z < 0.8) or p.z < 0.12
+    F = lambda x, z: body_point(bvh, (x, -2, z), (0, 1, 0))
+    Bk = lambda x, z: body_point(bvh, (x, 2, z), (0, -1, 0))
+    nodes = []
+    for side, s in (("Left", 1), ("Right", -1)):
+        nodes.append((F(0.36 * s, 1.1), [((-0.3 * s, 0, -1), 0.3, 1.2), ((-s, 0, -0.3), 0.2, 1.0), ((s, 0, -0.6), 0.15, 0.9),
+                                         ((0.2 * s, 0, 1), 0.1, 0.8)]))
+        nodes.append((F(0.14 * s, 0.86), [((0.7 * s, 0, 0.7), 0.15, 1.0), ((-0.7 * s, 0, 0.7), 0.12, 0.9), ((0.6 * s, 0, -0.8), 0.18, 1.0),
+                                          ((-0.5 * s, 0, -0.8), 0.15, 0.9)]))
+        nodes.append((F(0.22 * s, 0.5), [((0, 0, -1), 0.2, 1.0), ((0.5 * s, 0, 0.8), 0.12, 0.8), ((-s, 0, -0.3), 0.08, 0.7)]))
+        nodes.append((F(0.27 * s, 0.3), [((0.1 * s, 0, -1), 0.12, 0.7)]))
+        nodes.append((body_point(bvh, (0.9 * s, -0.9, 1.56), (-0.7 * s, 0.85, -0.06)), [((0.3 * s, 0.5, 0.8), 0.2, 0.9),
+                                                                                         ((0.4 * s, 0.6, -0.5), 0.12, 0.7)]))
+        sh, el, wr = B(arm, side + "Arm"), B(arm, side + "ForeArm"), B(arm, side + "Hand")
+        o1 = Vector((s, -0.6, 0.1)).normalized(); up_ = (el - sh).normalized()
+        nodes.append((body_point(bvh, sh.lerp(el, 0.55) + o1, -o1), [(-up_, 0.14, 0.9), (up_, 0.18, 0.9), (Vector((0, -1, 0)), 0.08, 0.7)]))
+        o2 = Vector((s, -0.5, 0.2)).normalized(); fo = (wr - el).normalized()
+        nodes.append((body_point(bvh, el.lerp(wr, 0.55) + o2, -o2), [(fo, 0.1, 0.8), (-fo, 0.12, 0.8)]))
+        nodes.append((Bk(0.28 * s, 0.92), [((0.4 * s, 0, -1), 0.2, 0.9), ((s, 0, 0.2), 0.12, 0.8)]))
+        nodes.append((Bk(0.14 * s, 0.55), [((0.3 * s, 0, -1), 0.15, 0.8), ((0, 0, 1), 0.1, 0.7)]))
+    nodes.append((F(0, 1.555), [((0, 0, 1), 0.34, 1.2), ((-0.6, 0, 0.8), 0.16, 0.9), ((0.6, 0, 0.8), 0.16, 0.9)]))   # Stirn
+    nodes.append((Bk(0, 1.5), [((0.6, 0, -0.8), 0.18, 0.9), ((-0.6, 0, -0.8), 0.18, 0.9), ((0, 0, 1), 0.15, 0.9)]))
+    nodes.append((Bk(0, 0.8), [((-0.5, 0, -1), 0.22, 1.0), ((0.5, 0, -1), 0.22, 1.0), ((0, 0, -1), 0.18, 0.9)]))     # unter der Rückenplatte
+    veins, stars = [], []
+    for start, rays in nodes:
+        if start is None:
+            continue
+        stars.append((start, max(r[2] for r in rays)))
+        for d, L, w in rays:
+            veins += surface_walk(bvh, start, Vector(d), L, rnd, w, w * 0.3, avoid)
+    folds = []
+    for z0 in (1.578, 1.612):                                       # Stirnfalten über dem Brauenwulst (Mitte frei für den Riss)
+        for sg in (1, -1):
+            folds.append(front_curve(bvh, [(sg * x, z0 - 0.035 + 0.05 * x / 0.2) for x in np.linspace(0.05, 0.2, 5)], 1.0, 20))
+    for z0 in (1.432, 1.448):                                       # Falten auf der Schnauze
+        folds.append(front_curve(bvh, [(x, z0 + 0.012 * (x / 0.05) ** 2) for x in np.linspace(-0.05, 0.05, 5)], 0.8, 16))
+    for s in (1, -1):
+        folds.append(front_curve(bvh, [(0.06 * s, 1.41), (0.12 * s, 1.378), (0.19 * s, 1.348), (0.238 * s, 1.29), (0.252 * s, 1.22),
+                                       (0.248 * s, 1.16)], 1.2))     # Falte von der Nase um den Mundwinkel
+        folds.append(front_curve(bvh, [(0.065 * s, 1.398), (0.12 * s, 1.388), (0.19 * s, 1.4)], 0.9, 20))   # unter den Augen
+        folds.append(front_curve(bvh, [(0.218 * s, 1.215), (0.255 * s, 1.205), (0.29 * s, 1.18)], 1.1, 16))   # Mundwinkel
+    return veins, stars, [f for f in folds if len(f) > 1]
+
+def line_field(T, groups, reach=0.06):
+    """Für jedes Texel: Abstand zur nächsten Linie, deren Stärke dort und welche Gruppe (0 Adern, 1 Falten …)"""
+    pts, wid, nxt, kind = [], [], [], []
+    for g, lines in enumerate(groups):
+        for line in lines:
+            base = len(pts)
+            for i, (p, w) in enumerate(line):
+                pts.append(p); wid.append(w); kind.append(g); nxt.append(base + i + 1 if i + 1 < len(line) else -1)
+    prv = [-1] * len(pts)
+    for i, nx in enumerate(nxt):
+        if nx >= 0:
+            prv[nx] = i
+    kd = KDTree(len(pts))
+    for i, p in enumerate(pts):
+        kd.insert(p, i)
+    kd.balance()
+    P, cov = T["P"], T["cov"]
+    D = np.full(cov.shape, 9.0, np.float32); W = np.zeros(cov.shape, np.float32); K = np.full(cov.shape, -1, np.int8)
+    ys, xs = np.nonzero(cov)
+    Pl = P[ys, xs].tolist()
+    for y, x, pp in zip(ys.tolist(), xs.tolist(), Pl):
+        p = Vector(pp)
+        co, i, d = kd.find(p)
+        if d > reach:
+            continue
+        best, bw = d, wid[i]
+        for j in (prv[i], nxt[i]):
+            if j < 0:
+                continue
+            a = pts[i]; ab = pts[j] - a; L2 = ab.length_squared
+            if L2 < 1e-12:
+                continue
+            t = max(0.0, min(1.0, (p - a).dot(ab) / L2))
+            dd = (p - (a + ab * t)).length
+            if dd < best:
+                best, bw = dd, wid[i] * (1 - t) + wid[j] * t
+        D[y, x] = best; W[y, x] = bw; K[y, x] = kind[i]
+    return D, W, K
 
 def paint_skin(body, arm):
     ao = vertex_ao(body)
@@ -527,49 +726,53 @@ def paint_skin(body, arm):
     occ = np.clip(AO * 1.6, 0, 1)
     col = col * (1 - 0.55 * occ[..., None]) + np.asarray((0.08, 0.05, 0.2), np.float32) * (0.55 * occ[..., None])
     em = np.zeros(P.shape, np.float32)
-    # Maulraum: hinten dunkel, vorn rosig-violett; Gaumen mit Querfalten; Lippen etwas dunkler
+    # Maulraum: vorn rosig-violett, nach hinten dunkler Schlund mit Ringfalten, Gaumen und Innenwangen gerippt
     mi = mouth_inside(P)
     inside = (mi < 1.04) & (P[..., 1] > LIP_Y - 0.02)
     depth = smoothstep(LIP_Y + 0.02, MOUTH_BACK - 0.02, P[..., 1])
-    mouth_col = gradient((0.6, 0.27, 0.45), (0.1, 0.03, 0.08), depth ** 0.7)
-    palate = (P[..., 2] > MOUTH_Z + 0.02) * (0.5 + 0.5 * np.sin(P[..., 1] * 140 + np.abs(P[..., 0]) * 40))
-    mouth_col = mouth_col * (0.85 + 0.25 * palate[..., None] * (1 - depth[..., None]))
-    lip = np.clip(1 - np.abs(mi - 1.1) / 0.12, 0, 1) * (P[..., 1] < LIP_Y + 0.06) * (~inside)
-    col = col * (1 - 0.35 * lip[..., None])
+    mouth_col = gradient((0.72, 0.34, 0.52), (0.3, 0.08, 0.2), depth ** 0.8)
+    rings = 0.5 + 0.5 * np.sin(depth * np.pi * 14)
+    ridges_c = 0.5 + 0.5 * np.sin(P[..., 2] * 170 + np.sin(P[..., 1] * 40) * 2)
+    mouth_col = mouth_col * (0.62 + 0.55 * (rings * smoothstep(0.2, 0.45, depth) + ridges_c * (1 - smoothstep(0.2, 0.45, depth)) * 0.7)[..., None])
+    lip = np.clip(1 - np.abs(mi - 1.08) / 0.1, 0, 1) * (P[..., 1] < LIP_Y + 0.08) * (~inside)
+    col = col * (1 - 0.4 * lip[..., None])
     # Sternenstaub: feine Punkte, einzelne hellere Sterne
-    dust = np.clip((noise3(P, 260, 31) - 0.9) / 0.05, 0, 1) * np.clip((noise3(P, 25, 32) - 0.35) / 0.3, 0, 1)
+    dust = np.clip((noise3(P, 300, 31) - 0.87) / 0.05, 0, 1) * np.clip((noise3(P, 25, 32) - 0.3) / 0.3, 0, 1)
     big = np.clip((noise3(P, 70, 33) - 0.955) / 0.025, 0, 1)
     star = np.maximum(dust * 0.55, big * 0.9)
     col = col * (1 - star[..., None]) + np.asarray((0.75, 0.8, 1.0), np.float32) * star[..., None]
     em += star[..., None] * np.asarray((0.4, 0.45, 0.9), np.float32) * 0.7
-    # Leuchtrisse: verzweigte Linien (Zellgrenzen im Raum, verwirbelt, nur stellenweise), nicht im Gesicht
-    W = P + 0.05 * np.stack([fbm3(P, 5.0, 41, 3), fbm3(P, 5.0, 42, 3), fbm3(P, 5.0, 43, 3)], -1)
-    edge, cid = worley3(W, 5.5, 44)
-    keep = smoothstep(0.53, 0.6, fbm3(P, 2.3, 45, 3)) * smoothstep(0.42, 0.5, noise3(P, 9.0, 47))
-    face = np.zeros(P.shape[:2], np.float32)
-    for x, z in EYES:
-        face = np.maximum(face, 1 - smoothstep(0.07, 0.1, np.linalg.norm(P - np.asarray((x, -0.3, z), np.float32), axis=-1)))
-    face = np.maximum(face, (mi < 1.3) * 1.0)
-    hands = ((np.abs(P[..., 0]) > 0.84) & (P[..., 2] < 0.8)) | (P[..., 2] < 0.12)            # keine Risse auf Händen und Zehen
-    keep = keep * (1 - face) * (1 - hands)
-    core = np.clip(1 - edge / 0.0026, 0, 1) * keep
-    halo = np.clip(1 - edge / 0.013, 0, 1) ** 2 * keep
-    node = np.clip((noise3(P, 18, 46) - 0.78) / 0.08, 0, 1) * np.clip(1 - edge / 0.02, 0, 1) ** 3 * keep
+    # Leuchtadern und Falten
+    veins, stars, folds = skin_lines(body, arm, random.Random(17))
+    D, Wd, K = line_field(T, [veins, folds])
+    vein = (K == 0)
+    core = np.clip(1 - D / (0.005 * np.maximum(Wd, 0.35)), 0, 1) * vein
+    mid = np.clip(1 - D / (0.013 * np.maximum(Wd, 0.35)), 0, 1) ** 1.5 * vein
+    halo = np.exp(-D / 0.022) * np.clip(Wd, 0, 1.2) * vein
     glow_c = np.asarray((1.0, 0.3, 0.92), np.float32)
-    col = col * (1 - halo[..., None] * 0.35) + glow_c * (halo[..., None] * 0.35)
-    col = col * (1 - core[..., None]) + np.asarray((1.0, 0.75, 1.0), np.float32) * core[..., None]
-    em += glow_c * (np.maximum(core, halo * 0.45) + node * 0.8)[..., None]
-    # Augen: weicher magentafarbener Schein auf der Haut darum
+    col = col * (1 - halo[..., None] * 0.3) + glow_c * (halo[..., None] * 0.3)
+    col = col * (1 - mid[..., None]) + np.asarray((0.95, 0.32, 0.9), np.float32) * mid[..., None]
+    col = col * (1 - core[..., None]) + np.asarray((1.0, 0.86, 1.0), np.float32) * core[..., None]
+    em += glow_c * (mid * 0.9 + halo * 0.45)[..., None] + np.asarray((1.0, 0.75, 1.0), np.float32) * core[..., None]
+    for p0, w in stars:                                              # Sternknoten, an denen die Risse zusammenlaufen
+        d = np.linalg.norm(P - np.asarray(tuple(p0), np.float32), axis=-1)
+        k = np.exp(-(d / (0.011 * w)) ** 2)
+        col = col * (1 - k[..., None]) + np.asarray((1.0, 0.85, 1.0), np.float32) * k[..., None]
+        em += np.asarray((1.0, 0.7, 1.0), np.float32) * k[..., None] + glow_c * (np.exp(-d / 0.028) * 0.5 * w)[..., None]
+    fold = np.clip(1 - D / (0.012 * np.maximum(Wd, 0.3)), 0, 1) ** 2 * (K == 1)
+    col = col * (1 - 0.45 * fold[..., None])
+    # Augen: kräftiger magentafarbener Schein auf Brauenwulst, Lidern und Wangen
     for x, z in EYES:
-        d = np.linalg.norm((P - np.asarray((x, -0.31, z), np.float32)) * np.asarray((1, 1.5, 1.4), np.float32), axis=-1)
-        g = np.clip(1 - d / 0.085, 0, 1) ** 2 * (P[..., 1] < -0.2)
-        em += glow_c * g[..., None] * 0.35
+        d = np.linalg.norm((P - np.asarray((x, -0.31, z), np.float32)) * np.asarray((1, 1.3, 1.3), np.float32), axis=-1)
+        g = np.clip(1 - d / 0.12, 0, 1) ** 2 * (P[..., 1] < -0.18)
+        em += glow_c * g[..., None] * 0.8
+        col = col * (1 - 0.25 * g[..., None]) + glow_c * 0.25 * g[..., None]
     # Nasenlöcher
     for s in (1, -1):
-        d = np.linalg.norm((P - np.asarray((0.03 * s, -0.395, 1.385), np.float32)) * np.asarray((1.0, 1.3, 1.8), np.float32), axis=-1)
-        col = col * (1 - 0.8 * np.clip(1 - d / 0.016, 0, 1)[..., None])
+        d = np.linalg.norm((P - np.asarray((0.03 * s, -0.35, 1.392), np.float32)) * np.asarray((1.0, 1.3, 1.8), np.float32), axis=-1)
+        col = col * (1 - 0.85 * np.clip(1 - d / 0.015, 0, 1)[..., None])
     col = np.where(inside[..., None], mouth_col, col)
-    em = np.where(inside[..., None], 0, em)
+    em = np.where(inside[..., None], mouth_col * (0.18 * smoothstep(0.2, 0.8, depth))[..., None], em)
     T["out"][..., :3] = np.where(cov[..., None], np.clip(col, 0, 1), T["out"][..., :3])
     T["em"][..., :3] = np.where(cov[..., None], np.clip(em, 0, 1), 0)
     commit(T, strength=1.6)
@@ -674,7 +877,7 @@ def star_plate(name, bvh, origin, n, up, hw, hh, kind, gal_m, rim_m, uv_rot=0.0,
                 lp[uvl].uv = uvc(x, y, sc_) if mi == 0 else (0.02, 0.02)
     o = finish(name, bm)
     o.data.uv_layers[0].name = "UVMap"
-    give(o, gal_m, rim_m)
+    give_idx(o, gal_m, rim_m)
     return o
 
 def star_plates(body, arm):
@@ -693,13 +896,13 @@ def star_plates(body, arm):
     for side, s in (("Left", 1), ("Right", -1)):
         sh, el, wr = B(arm, side + "Arm"), B(arm, side + "ForeArm"), B(arm, side + "Hand")
         arm_up = (sh - el).normalized()
-        plates.append(star_plate("PlatteSchulter" + side, bvh, Vector((0.5 * s, 0.05, 1.14)), (0.92 * s, -0.18, 0.35), arm_up,
+        plates.append(star_plate("PlatteSchulter" + side, bvh, Vector((0.5 * s, 0.05, 1.25)), (0.85 * s, -0.2, 0.5), arm_up,
                                  0.15, 0.19, "oval", mats[0 if s > 0 else 1], rim_m, uv_rot=0.4 * s))
         fore = (wr - el).normalized()
         c = el.lerp(wr, 0.34)
         out = Vector((s, 0.15, 0.25)).normalized(); out = (out - fore * out.dot(fore)).normalized()
         plates.append(star_plate("PlatteArm" + side, bvh, c, out, -fore, 0.085, 0.12, "tropfen", mats[2], rim_m, uv_rot=1.0 * s, uv_scale=0.8))
-    plates.append(star_plate("PlatteRuecken", bvh, Vector((0, 0.2, 1.12)), (0, 1, 0.18), (0, 0, 1), 0.29, 0.3, "schild", mats[1], rim_m,
+    plates.append(star_plate("PlatteRuecken", bvh, Vector((0, 0.2, 1.17)), (0, 1, 0.2), (0, 0, 1), 0.3, 0.31, "schild", mats[1], rim_m,
                              uv_rot=0.2, dome=0.035))
     return plates
 
@@ -711,27 +914,31 @@ def kristallriese(arm, body):
     fix_elbows(arm)
     pose_hands(arm)
     skin = look("Sternenhaut", (0.32, 0.22, 0.5), rough=0.5)
-    nail = look("Naegel", (0.8, 0.74, 0.82), rough=0.35)
+    nail = look("Naegel", (0.84, 0.78, 0.86), rough=0.35)
     body = body_shape(arm)
+    eye_frames(body)
     bind(body, arm)
     extra = []
+    for o in eye_lids(skin):
+        group_all(o, "insel_naechst"); extra.append(o)
     for side in ("Left", "Right"):
-        h = star_hand("Hand" + side, side, skin, nail)
+        h = star_hand("Hand" + side, side, skin, nail, k=1.45, fist=0.45)
         h.matrix_world = arm.matrix_world @ arm.data.bones["mixamorig:%sHand" % side].matrix_local @ h.matrix_world
         bake_transform(h); group_all(h, "mixamorig:%sHand" % side)
         extra.append(h)
         s = 1 if side == "Left" else -1
-        for i, dx in enumerate((-0.09, -0.03, 0.03, 0.09)):
-            y = -0.17 - 0.012 * (1.5 - abs(i - 1.5))
-            n_ = give(sphere("Zehennagel%s%d" % (side, i), ((0.27 + dx) * s, y - 0.038, 0.062), 0.034, (0.95, 0.8, 0.6)), nail)
+        for i, dx in enumerate(TOES):
+            y = TOE_Y - 0.012 * (1.5 - abs(i - 1.5))
+            n_ = give(sphere("Zehennagel%s%d" % (side, i), ((0.27 + dx) * s, y - 0.06, 0.078), 0.052, (0.95, 0.7, 0.55)), nail)
             group_all(n_, "insel_naechst"); extra.append(n_)
     if body.data.materials:
         body.data.materials.clear()
     body.data.materials.append(skin); body.data.materials.append(nail)
     for o in extra:
-        for pl in o.data.polygons:
-            pl.material_index = 1 if o.data.materials and o.data.materials[pl.material_index] == nail else 0
+        idx = [1 if o.data.materials and o.data.materials[pl.material_index] == nail else 0 for pl in o.data.polygons]
         o.data.materials.clear(); o.data.materials.append(skin); o.data.materials.append(nail)
+        for pl, i in zip(o.data.polygons, idx):
+            pl.material_index = i
     bpy.ops.object.select_all(action='DESELECT')
     for o in extra:
         o.select_set(True)
