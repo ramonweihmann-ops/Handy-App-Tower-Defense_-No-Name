@@ -30,6 +30,7 @@ Bitte nacheinander abschicken, jeweils erst den nächsten, wenn der vorige gelie
 | T1 | Talent-Symbole Funkenherz, Werkzeugkiste, Bollwerk, Schwerefeld (gemalt) | `CHATGPT_PROMPTS.md`, Prompt T1 | keine | **geliefert als Talente_v3** (mit neuem Munitionslager), im Spiel seit 0.10.32 |
 | M1 | Meister-Abzeichen (aus Prompt 4 vorgezogen) | `CHATGPT_PROMPTS.md`, Prompt M1 | keine | bereit zum Abschicken (Mockup „Karten-Meister“ freigegeben 19.11.2026) |
 | B1–B4 | Bosse neu entwerfen: Kristallriese, Fabrikmutter, Schrottkoloss, Pilzriese (Blätter in `Bosse_Neu_Referenz/`) | `BOSSE_NEU_FUER_CHATGPT.md` | keine | B1 Kristallriese **geliefert 25.11.2026** (`Kristallriese_Neuentwurf_v1`), in Blender nachgebaut (`tools/monster/kristallriese.py`), Mockup zur Prüfung; B2 Fabrikmutter abgeschickt; B3, B4 offen |
+| B5 | Edelsteingolem neu entwerfen (Farben, Kristallformen, Krone, Augen, Maul gefallen nicht) | `BOSSE_NEU_FUER_CHATGPT.md`, B5 | keine | bereit zum Abschicken (25.11.2026) |
 
 ## Gemerkt für später (noch kein Auftrag)
 

@@ -146,12 +146,14 @@ def head_parts(M, rnd):
     H0 = Vector((0, 0.03, 1.47))
     P = []
     helm = ball("Helm", H0, 0.215, M["rust"], (1.08, 1.0, 0.88)); P.append(helm)
-    # grauer Streifen über die Mitte des Helms
-    bm = bmesh.new(); bmesh.ops.create_uvsphere(bm, u_segments=48, v_segments=24, radius=1.0)
-    bmesh.ops.delete(bm, geom=[v for v in bm.verts if abs(v.co.x) > 0.17 or v.co.z < -0.1 or (v.co.y < -0.55 and v.co.z < 0.45)], context='VERTS')
-    for v in bm.verts:
-        v.co = H0 + Vector((v.co.x * 0.215 * 1.08, v.co.y * 0.215, v.co.z * 0.215 * 0.88)) * 1.012
-    P.append(give(finish("HelmStreifen", bm), M["steel_l"]))
+    # grauer Streifen über die Mitte des Helms: flaches Band von der Stirn bis in den Nacken
+    rx, ry, rz = 0.215 * 1.08, 0.215, 0.215 * 0.88
+    pts = [H0 + Vector((0, -ry * math.cos(math.radians(t)), rz * math.sin(math.radians(t)))) * 1.0 for t in range(38, 175, 8)]
+    pts = [H0 + (p_ - H0) * 0.985 for p_ in pts]
+    band = give(tube("HelmStreifen", [tuple(p_) for p_ in pts], [0.03] * len(pts), segs=16), look("Streifengrau", (0.62, 0.61, 0.58), rough=0.45, metal=0.15))
+    for v in band.data.vertices:
+        v.co.x *= 1.5
+    P.append(smooth_obj(band, 60))
     P.append(ball("Gesicht", (0, -0.07, 1.34), 0.19, M["steel"], (1.0, 0.8, 0.82)))
     for s in (1, -1):
         q = Quaternion((0, 1, 0), math.radians(-20 * s)) @ Quaternion((1, 0, 0), math.radians(-10))
