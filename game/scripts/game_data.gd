@@ -277,23 +277,35 @@ const WORLDS := [
 	# Planet Ozeanwelt (Level 61–70)
 	{"name": "Korallenriff", "kinds": ["blubberfisch", "tentakler", "krabbenpanzer", "tiefseekrake"],
 		"prefix": "Riff-", "tint": Color(0.60, 1.15, 1.25),
+		"monster_looks": {"tentakler": "ozean_tentakler"},
+		"monster_names": {"tentakler": ["Rochenflieger", "Rochenflieger"]},
 		"c1": Color(0.07, 0.79, 0.93), "c2": Color(0.92, 0.28, 0.37), "rim": Color(0.34, 0.87, 0.96)},
 	{"name": "Tiefseegraben", "kinds": ["blubberfisch", "tentakler", "brecher", "tiefseekrake"],
 		"prefix": "Tiefsee-", "tint": Color(0.50, 0.75, 1.30),
+		"monster_looks": {"tentakler": "ozean_tentakler", "brecher": "ozean_brecher"},
+		"monster_names": {"tentakler": ["Rochenflieger", "Rochenflieger"], "brecher": ["Krakenschläger", "Krakenschläger"]},
 		"c1": Color(0.07, 0.34, 0.93), "c2": Color(0.92, 0.53, 0.28), "rim": Color(0.34, 0.53, 0.96)},
 	# Planet Kristallplanet (Level 71–80)
 	{"name": "Rosenkristalle", "kinds": ["schleimling", "zombie", "panzerkaefer", "schleimmutter"],
 		"prefix": "Rosen-", "tint": Color(1.30, 0.75, 1.10),
+		"boss_looks": {"schleimmutter": "juwelen_schnecke"}, "monster_looks": {"schleimling": "rosen_schleimling", "zombie": "rosen_zombie", "panzerkaefer": "rosen_panzerkaefer"},
+		"monster_names": {"schleimling": ["Glitzerschnecke", "Glitzerschnecken"], "zombie": ["Rosenritter", "Rosenritter"], "panzerkaefer": ["Juwelenkäfer", "Juwelenkäfer"], "schleimmutter": ["Juwelenschnecke", "Juwelenschnecken"]},
 		"c1": Color(0.93, 0.07, 0.62), "c2": Color(0.28, 0.92, 0.32), "rim": Color(0.96, 0.34, 0.74)},
 	{"name": "Glitzerschlucht", "kinds": ["krabbler", "tentakler", "brecher", "koloss"],
 		"prefix": "Glitzer-", "tint": Color(1.15, 1.00, 1.35),
+		"boss_looks": {"koloss": "edelstein_golem"}, "monster_looks": {"krabbler": "glitzer_krabbler", "tentakler": "glitzer_tentakler", "brecher": "glitzer_brecher"},
+		"monster_names": {"krabbler": ["Glitzerwicht", "Glitzerwichte"], "tentakler": ["Facettenfalter", "Facettenfalter"], "brecher": ["Goldbrecher", "Goldbrecher"], "koloss": ["Edelsteingolem", "Edelsteingolems"]},
 		"c1": Color(0.44, 0.07, 0.93), "c2": Color(0.84, 0.92, 0.28), "rim": Color(0.60, 0.34, 0.96)},
 	# Planet Sturmriese (Level 81–90)
 	{"name": "Wolkenwirbel", "kinds": ["schleimling", "tentakler", "brecher", "schleimmutter"],
 		"prefix": "Sturm-", "tint": Color(1.20, 1.15, 0.70),
+		"boss_looks": {"schleimmutter": "sturm_wolke"}, "monster_looks": {"schleimling": "sturm_schleimling", "tentakler": "sturm_tentakler", "brecher": "sturm_brecher"},
+		"monster_names": {"schleimling": ["Wölkchen", "Wölkchen"], "tentakler": ["Sturmflügler", "Sturmflügler"], "brecher": ["Donnerbrecher", "Donnerbrecher"], "schleimmutter": ["Sturmwolke", "Sturmwolken"]},
 		"c1": Color(0.93, 0.84, 0.07), "c2": Color(0.28, 0.54, 0.92), "rim": Color(0.96, 0.90, 0.34)},
 	{"name": "Blitzfront", "kinds": ["krabbler", "zombie", "panzerkaefer", "koloss"],
 		"prefix": "Blitz-", "tint": Color(0.85, 1.00, 1.35),
+		"boss_looks": {"koloss": "donner_riese"}, "monster_looks": {"krabbler": "blitz_krabbler", "zombie": "blitz_zombie", "panzerkaefer": "blitz_panzerkaefer"},
+		"monster_names": {"krabbler": ["Funkenwicht", "Funkenwichte"], "zombie": ["Blitzläufer", "Blitzläufer"], "panzerkaefer": ["Donnerpanzer", "Donnerpanzer"], "koloss": ["Donnerriese", "Donnerriesen"]},
 		"c1": Color(0.07, 0.33, 0.93), "c2": Color(0.92, 0.54, 0.28), "rim": Color(0.34, 0.52, 0.96)},
 	# Planet Schrottwelt (Level 91–100)
 	{"name": "Schrotthalden", "kinds": ["krabbler", "zombie", "brecher", "koloss"],
@@ -485,7 +497,7 @@ static func world_kinds(level: int) -> Array:
 ## Name eines Gegners in der Welt dieses Levels (mit Vorsilbe der Welt).
 static func enemy_name(kind: String, level: int, plural := false) -> String:
 	var own: Array = WORLDS[world_of(level)].get("monster_names", {}).get(kind, []) if monster_looks_on() else []
-	if own.size() == 2:
+	if own.size() == 2 and (ENEMIES[kind]["tier"] != "boss" or BOSS_LOOKS_LIVE or test_boss_looks):
 		return str(own[1] if plural else own[0])
 	var d: Dictionary = ENEMIES[kind]
 	var n: String = d["plural"] if plural else d["name"]

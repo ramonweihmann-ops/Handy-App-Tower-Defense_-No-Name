@@ -1522,6 +1522,788 @@ def sternenpanzer(arm, body):
     if q is not None:
         attach(join_parts(cluster("Stirnkristall", q, (m + Vector((0, -0.2, 1.2))).normalized(), 0.16, 0.035, (M["cr"], M["cr2"]), rnd, count=2), "Stirnkristall"), arm, "Head")
 
+# ---------------------------------------------------------------- Ozeanwelt (Welt 13 und 14): Stil der Tiefseekrake
+# (Violett, Türkis, Orange wie Tiefseekrake, Blubberfisch und Krabbenpanzer)
+
+def ocean_mats():
+    return {
+        "purple": look("Krakenviolett", (0.5, 0.22, 0.72), rough=0.45),
+        "teal": look("Meerestuerkis", (0.15, 0.75, 0.8), rough=0.4),
+        "orange": look("Flossenorange", (1.0, 0.45, 0.15), rough=0.45),
+        "sucker": look("Saugnapf", (0.93, 0.85, 0.68), rough=0.5),
+        "lure": look("Leuchtkoeder", (0.85, 1.0, 0.6), rough=0.2, emit=(0.6, 1.0, 0.5), strength=4.0),
+    }
+
+def fin(name, base, d, length, width, mat, curl=0.3):
+    """flache Flosse: gebogene, flach gedrückte Spitze von base in Richtung d"""
+    d = Vector(d).normalized()
+    side = d.cross(Vector((0, 0, 1)))
+    if side.length < 0.1:
+        side = d.cross(Vector((1, 0, 0)))
+    side.normalize()
+    up = side.cross(d).normalized()
+    o = horn(name, tuple(base), tuple(Vector(base) + d * length * 0.55 + up * length * curl * 0.4), tuple(Vector(base) + d * length + up * length * curl), width, n=10)
+    for v in o.data.vertices:                      # flach: Dicke in Richtung side zusammendrücken
+        rel = v.co - Vector(base)
+        v.co = Vector(base) + rel - side * rel.dot(side) * 0.7
+    return give(o, mat)
+
+@variante("ozean_tentakler", "tentakler")
+def rochenflieger(arm, body):
+    """Ozeanwelt, mittel: Rochenflieger – fliegender Rochen: violetter Körper mit hellem Bauch, breite türkise
+    Flügelflossen mit dunklen Flecken, orange Flossenkamm auf dem Kopf (wie die Tiefseekrake), orange Hörner und ein
+    langer Rochenschwanz mit Endflosse"""
+    M = ocean_mats()
+    T = texels(body)
+    px, P, N = T["px"], T["P"], T["N"]
+    red = hue_mask(px, 0.02, 0.06, 0.35)
+    teal = hue_mask(px, 0.49, 0.08, 0.3)
+    hh, s, v = hsv(px)
+    beige = np.clip((0.6 - s) / 0.1, 0, 1) * np.clip((v - 0.5) / 0.1, 0, 1) * hue_mask(px, 0.11, 0.07, 0.08)
+    belly = np.clip(-N[..., 2] * 1.5, 0, 1)
+    paint(T, red, gradient((0.5, 0.22, 0.72), (0.78, 0.6, 0.9), belly), keep_shading=0.45)
+    edge, cid = worley3(P, 14.0, 151)
+    spot = np.clip((0.35 - cid) / 0.1, 0, 1) * np.clip((edge - 0.008) / 0.01, 0, 1)
+    paint(T, teal, gradient((0.12, 0.62, 0.72), (0.3, 0.85, 0.88), fbm3(P, 5.0, 153, 3)), keep_shading=0.35)
+    paint(T, teal * spot, (0.08, 0.35, 0.5), keep_shading=0.2)
+    paint(T, beige, (1.0, 0.5, 0.18), keep_shading=0.5)
+    commit(T)
+    parts = []
+    for k, (x, y, L, tx) in enumerate(((0.0, 0.02, 0.24, 0.0), (-0.09, 0.08, 0.17, -0.5), (0.09, 0.08, 0.17, 0.5))):
+        p, n = head_top(body, x, y)
+        if p is not None:
+            parts.append(fin("Kopfflosse%d" % k, p - n * 0.03, (tx, 0.45, 1.0), L, 0.07, M["orange"], curl=-0.25))
+    q, m = back_pt(body, 0.0, 0.8)
+    if q is not None:
+        tail = tendril("Schwanz", tuple(q - m * 0.02), (0.0, 1.0, -0.25), 0.7, 0.035, 0.35, seed=7, n=14)
+        parts.append(give(tail, M["purple"]))
+        end = Vector(tail.data.vertices[-1].co)
+        parts.append(fin("Schwanzflosse", end + Vector((0, -0.03, 0.0)), (0.0, 0.6, 0.5), 0.12, 0.05, M["orange"]))
+    attach(join_parts(parts, "Rochenteile"), arm, "Bone_001")
+
+@variante("ozean_brecher", "brecher")
+def krakenschlaeger(arm, body):
+    """Ozeanwelt, stark: Krakenschläger – massiger Tiefseeschläger mit violetter Krakenhaut und hellen Saugnapfpunkten,
+    türkisem Taucheranzug, orangen Kopfflossen, einer leuchtenden Anglerfisch-Laterne auf der Stirn, kurzen
+    Kinntentakeln und Flossen an den Unterarmen"""
+    M = ocean_mats()
+    T = texels(body); R = regions(T, arm)
+    P = T["P"]
+    paint(T, R["skin"], (0.5, 0.22, 0.72), keep_shading=0.5)
+    edge, cid = worley3(P, 18.0, 161)
+    dots = np.clip((0.012 - (edge * 0 + np.linalg.norm(P * 0, axis=-1))) , 0, 1)
+    f1 = noise3(P, 40.0, 163)
+    suck = np.clip((f1 - 0.82) / 0.05, 0, 1) * np.clip((fbm3(P, 4.0, 165, 2) - 0.45) / 0.1, 0, 1)
+    paint(T, R["skin"] * suck, (0.93, 0.85, 0.68), keep_shading=0.3)
+    paint(T, R["purple"] * (1 - R["head"]), (0.12, 0.58, 0.64), keep_shading=0.6)
+    paint(T, R["purple"] * R["head"], (0.62, 0.32, 0.82), keep_shading=0.5)
+    paint(T, R["grey"], (1.0, 0.5, 0.18), keep_shading=0.5)
+    collar = np.maximum(R["white"] * (1 - R["head"]), R["collar"])
+    paint(T, collar, (0.25, 0.85, 0.88), keep_shading=0.4)
+    commit(T)
+    parts = []
+    for s_ in (-1, 1):
+        p, n = surface(body, (s_ * 2.0, 0.02, bone_pt(arm, "mixamorig:Head", 0.75).z), (-s_, 0, 0))
+        if p is not None:
+            parts.append(fin("Kopfflosse%d" % s_, p - n * 0.03, (s_ * 1.0, 0.4, 0.6), 0.2, 0.08, M["orange"], curl=0.2))
+    p, n = head_top(body, 0.0, 0.0)
+    if p is not None:
+        parts.append(fin("Kammflosse", p - n * 0.03, (0.0, 0.6, 1.0), 0.22, 0.08, M["orange"], curl=-0.2))
+    q, m = front_pt(body, 0.0, bone_pt(arm, "mixamorig:Head", 0.85).z)
+    if q is not None:
+        st = [q - m * 0.01, q + Vector((0, -0.08, 0.12)), q + Vector((0, -0.2, 0.14)), q + Vector((0, -0.27, 0.06))]
+        parts.append(give(tube("Laternenstiel", [tuple(c) for c in st], [0.016, 0.013, 0.011, 0.01], segs=8), M["purple"]))
+        parts.append(give(sphere("Laterne", tuple(st[-1] + Vector((0, 0, -0.035))), 0.045), M["lure"]))
+    jaw = front_pt(body, 0.0, bone_pt(arm, "mixamorig:Head", 0.1).z)
+    if jaw[0] is not None:
+        c0 = jaw[0] - jaw[1] * 0.02
+        for k, (dx, L) in enumerate(((-0.08, 0.16), (-0.03, 0.2), (0.03, 0.2), (0.08, 0.16))):
+            t_ = tendril("Kinntentakel%d" % k, tuple(c0 + Vector((dx, 0.01, 0.0))), (dx * 2.0, -0.35, -1.0), L, 0.025, 0.9, seed=40 + k)
+            parts.append(give(t_, M["purple"]))
+    attach(join_parts(parts, "Krakenkopf"), arm, "mixamorig:Head")
+    for s_, side in ((1, "Left"), (-1, "Right")):
+        f0 = bone_pt(arm, "mixamorig:%sForeArm" % side, 0.4)
+        attach(fin("Armflosse" + side, f0 + Vector((s_ * 0.06, 0.04, 0.0)), (s_ * 0.7, 0.6, 0.4), 0.17, 0.06, M["teal"], curl=0.25), arm, "mixamorig:%sForeArm" % side)
+
+# ---------------------------------------------------------------- Kristallplanet (Welt 15 und 16): Juwelen
+# Geschliffene Edelsteine in Gold gefasst, Rosenquarz, Diamant (klar anders als Höhlenkristall und Sternenkristall)
+
+def gem_mats():
+    return {
+        "gold": look("Gold", (1.0, 0.78, 0.32), rough=0.25, metal=0.9),
+        "gold2": look("Altgold", (0.82, 0.58, 0.22), rough=0.35, metal=0.85),
+        "rose": look("Rosenquarz", (1.0, 0.58, 0.76), rough=0.08, emit=(1.0, 0.45, 0.7), strength=0.35),
+        "rose2": look("Rosenquarz2", (0.95, 0.4, 0.62), rough=0.08, emit=(0.9, 0.3, 0.55), strength=0.35),
+        "diamond": look("Diamant", (0.92, 0.97, 1.0), rough=0.04, emit=(0.7, 0.85, 1.0), strength=0.5),
+        "ruby": look("Rubin", (0.92, 0.1, 0.26), rough=0.06, emit=(0.85, 0.05, 0.2), strength=0.9),
+        "sapphire": look("Saphir", (0.15, 0.35, 1.0), rough=0.06, emit=(0.1, 0.3, 1.0), strength=0.9),
+        "emerald": look("Smaragd", (0.1, 0.85, 0.45), rough=0.06, emit=(0.05, 0.8, 0.4), strength=0.9),
+        "pearl": look("Perle", (0.96, 0.93, 0.95), rough=0.25),
+        "dark": look("Juwelendunkel", (0.12, 0.06, 0.12), rough=0.4),
+    }
+
+def gem(name, c, n, r, mat):
+    """geschliffener Edelstein (Brillant): Tafel, Krone, Rundiste, Spitze; die Tafel zeigt in Richtung n"""
+    bm = bmesh.new()
+    k = 8
+    table = [bm.verts.new((r * 0.55 * math.cos(a + math.pi / k), r * 0.55 * math.sin(a + math.pi / k), r * 0.35)) for a in [i * 2 * math.pi / k for i in range(k)]]
+    girdle = [bm.verts.new((r * math.cos(a), r * math.sin(a), 0.0)) for a in [i * 2 * math.pi / k for i in range(k)]]
+    tip = bm.verts.new((0, 0, -r * 0.85))
+    bm.faces.new(table)
+    for i in range(k):
+        j = (i + 1) % k
+        bm.faces.new([girdle[i], girdle[j], table[i]])
+        bm.faces.new([table[i], girdle[j], table[j]])
+        bm.faces.new([girdle[j], girdle[i], tip])
+    o = finish(name, bm, smooth=False)
+    o.matrix_world = Matrix.Translation(Vector(c)) @ Vector(n).normalized().to_track_quat('Z', 'Y').to_matrix().to_4x4()
+    return give(o, mat)
+
+def set_gem(name, p, n, r, mat, G, sink=0.4):
+    """Edelstein in goldener Fassung, etwas in die Oberfläche eingelassen"""
+    c = Vector(p) + Vector(n) * r * (0.35 - sink)
+    parts = [gem(name, c, n, r, mat)]
+    t = torus(name + "Fassung", (0, 0, 0), r * 1.02, r * 0.16, rot=(0, 0, 0), segs=24)
+    t.matrix_world = Matrix.Translation(c) @ Vector(n).normalized().to_track_quat('Z', 'Y').to_matrix().to_4x4()
+    parts.append(give(t, G["gold"]))
+    return parts
+
+def gold_paint(T, mask, seed, engrave=True, base=(1.0, 0.78, 0.32)):
+    """Gold mit Gravur (feine dunkle Ranken)"""
+    P = T["P"]
+    paint(T, mask, np.asarray(base, np.float32) * (0.85 + 0.3 * fbm3(P, 6.0, seed, 2)[..., None]), keep_shading=0.6)
+    if engrave:
+        paint(T, mask * ridges(P, 9.0, seed + 1, 0.03) * 0.7, (0.55, 0.36, 0.12), keep_shading=0.0)
+
+def facet_paint(T, mask, seed, cols, freq=14.0, lead=None, glow_k=0.4):
+    """facettierter Edelstein: jede Zelle eine Farbe aus cols, helle Lichtpunkte; lead: Bleifassung (Farbe der Kanten)"""
+    P = T["P"]
+    edge, cid = worley3(P, freq, seed)
+    out = np.zeros(cid.shape + (3,), np.float32)
+    n = len(cols)
+    for i, c in enumerate(cols):
+        k = ((cid * n).astype(int) == i)[..., None]
+        out = np.where(k, np.asarray(c, np.float32), out)
+    out = out * (0.8 + 0.35 * fbm3(P, 30.0, seed + 2, 2)[..., None])
+    paint(T, mask, out, keep_shading=0.3)
+    glint = np.clip((noise3(P, 70.0, seed + 3) - 0.84) / 0.05, 0, 1)
+    paint(T, mask * glint, (1.0, 1.0, 1.0), keep_shading=0.0)
+    if lead is not None:
+        paint(T, mask * np.clip(1 - edge / 0.004, 0, 1), lead, keep_shading=0.2)
+    glow(T, mask * (glow_k * 0.5 + glint), (0.9, 0.8, 1.0))
+
+def snail(name, length, height, G, body_m, shell_m, band_m, gem_mats, rnd, gems=6):
+    """Juwelenschnecke: Schneckenfuß (flach, vorn mit Kopf und Fühleraugen) und ein eingerolltes Gehäuse aus
+    Rosenquarz mit Goldband und eingesetzten Edelsteinen. Liefert (Fußteile, Gehäuseteile, Kopfteile)."""
+    L = length; Hh = height
+    path = [(0.0, L * 0.5, 0.04 * Hh), (0.0, L * 0.25, 0.09 * Hh), (0.0, 0.0, 0.12 * Hh), (0.0, -L * 0.25, 0.14 * Hh), (0.0, -L * 0.42, 0.22 * Hh), (0.0, -L * 0.5, 0.34 * Hh)]
+    radii = [L * 0.03, L * 0.13, L * 0.17, L * 0.16, L * 0.13, L * 0.11]
+    foot = tube(name + "Fuss", path, radii, segs=24)
+    for v in foot.data.vertices:
+        v.co.z = max(v.co.z, 0.0)
+        v.co.x *= 1.25
+    give(foot, body_m)
+    head = give(sphere(name + "Kopf", path[-1], L * 0.115, (1.15, 1.0, 1.0)), body_m)
+    # Gehäuse: logarithmische Spirale in der Seitenebene, Röhre wird nach innen dünner
+    cy, cz = L * 0.08, Hh * 0.62
+    pts, rr = [], []
+    for i in range(40):
+        t = i / 39
+        a = t * 2.6 * math.pi
+        R = Hh * 0.36 * math.exp(-0.42 * a)
+        pts.append((0.0, cy + R * math.sin(a), cz - R * math.cos(a)))
+        rr.append(Hh * 0.3 * math.exp(-0.42 * a) + 0.004)
+    shell = give(tube(name + "Gehaeuse", pts, rr, segs=28), shell_m)
+    for v in shell.data.vertices:
+        v.co.x *= 1.1
+    band_pts = []
+    for (x, y, z), r_ in zip(pts, rr):
+        band_pts.append((0.0, y, z))
+    band = give(tube(name + "Goldband", band_pts, [r_ * 1.04 for r_ in rr], segs=28), band_m)
+    for v in band.data.vertices:                   # nur ein schmaler Streifen oben auf der Röhre bleibt sichtbar
+        v.co.x *= 0.25
+    shell_parts = [shell, band]
+    for i in range(6, 30, 4):
+        (x, y, z), r_ = pts[i], rr[i]
+        c = Vector((0.0, y, z)); out = (c - Vector((0.0, cy, cz))).normalized()
+        shell_parts.append(shard(name + "Kamm%d" % i, c + out * r_ * 0.8, out, r_ * 0.9, r_ * 0.22, gem_mats[(i // 4) % len(gem_mats)] if i % 8 == 2 else shell_m))
+    for g_ in range(gems):
+        i = int(4 + g_ * 30 / max(1, gems))
+        (x, y, z), r_ = pts[i], rr[i]
+        for s_ in (-1, 1):
+            if g_ % 2 == (0 if s_ > 0 else 1):
+                continue
+            c = Vector((s_ * r_ * 1.05, y, z))
+            shell_parts += set_gem(name + "Stein%d_%d" % (g_, s_), c, (s_, 0, 0.2), r_ * 0.45, gem_mats[g_ % len(gem_mats)], G)
+    # Fühler mit Edelsteinaugen
+    head_parts = []
+    hp = Vector(path[-1])
+    for s_ in (-1, 1):
+        st = [hp + Vector((s_ * L * 0.05, 0, L * 0.06)), hp + Vector((s_ * L * 0.09, -L * 0.03, L * 0.2)), hp + Vector((s_ * L * 0.12, -L * 0.02, L * 0.32))]
+        head_parts.append(give(tube(name + "Fuehler%d" % s_, [tuple(c) for c in st], [L * 0.025, L * 0.02, L * 0.017], segs=10), body_m))
+        head_parts.append(gem(name + "Auge%d" % s_, st[-1] + Vector((0, -L * 0.01, L * 0.02)), (0, -1, 0.4), L * 0.05, gem_mats[0]))
+    return [foot, head], shell_parts, head_parts
+
+@variante("rosen_schleimling", "schleimling")
+def glitzerschnecke(arm, body):
+    """Kristallplanet, leicht: Glitzerschnecke – kleine Schnecke wie ein Junges der Juwelenschnecke: rosa
+    Schneckenfuß, eingerolltes Gehäuse aus Rosenquarz mit Goldband und kleinen Edelsteinen, Fühler mit Diamantaugen.
+    Eigene Figur auf dem Skelett des Schleimlings (hüpft wie er)."""
+    G = gem_mats()
+    skin = look("Schneckenhaut", (1.0, 0.72, 0.82), rough=0.35, emit=(0.9, 0.5, 0.7), strength=0.15)
+    rnd = random.Random(171)
+    foot, shell, head = snail("Glitzer", 0.95, 0.85, G, skin, G["rose"], G["gold"], [G["diamond"], G["ruby"], G["sapphire"]], rnd, gems=4)
+    for o in foot:
+        skin_to(o, arm, lambda c: {"Top": smooth01((c.z - 0.1) / 0.3), "Body": 1 - smooth01((c.z - 0.1) / 0.3)})
+    mouth = give(tube("Mund", [(-0.03, -0.53, 0.25), (0.0, -0.545, 0.24), (0.03, -0.53, 0.25)], [0.007, 0.008, 0.007], segs=6), G["dark"])
+    attach(join_parts(shell + head + [mouth], "Glitzer_Oben"), arm, "Top")
+    dampen_scale(arm, ("Body", "Top"), 0.5)
+    remove_body(body)
+
+@variante("rosen_zombie", "zombie")
+def rosenritter(arm, body):
+    """Kristallplanet, mittel: Rosenritter – schlanker Ritter mit Haut aus Rosenquarz (schimmernd, mit hellen
+    Lichtpunkten), goldener Rüstung mit Gravur, Perlenkragen, goldenen Schulterstücken mit Rubin, einem Rosenquarz-
+    Diadem und leuchtend rosa Augen"""
+    G = gem_mats()
+    T = texels(body); R = regions(T, arm)
+    facet_paint(T, R["skin"], 181, [(1.0, 0.6, 0.78), (0.95, 0.48, 0.68), (1.0, 0.72, 0.85)], freq=12.0, glow_k=0.3)
+    gold_paint(T, R["purple"] * (1 - R["head"]), 183)
+    paint(T, R["purple"] * R["head"], (1.0, 0.75, 0.86), keep_shading=0.4)
+    paint(T, R["grey"], (0.96, 0.93, 0.95), keep_shading=0.4)
+    eyes = R["white"] * R["head"]
+    paint(T, eyes, (1.0, 0.75, 0.9), keep_shading=0.2)
+    glow(T, eyes, (1.0, 0.35, 0.7))
+    commit(T, strength=1.2)
+    rnd = random.Random(185)
+    for s_, side in ((1, "Left"), (-1, "Right")):
+        a0 = bone_pt(arm, "mixamorig:%sArm" % side)
+        p, n = surface(body, (a0.x, a0.y, a0.z + 0.12), (0, 0, -1))
+        c = p if p is not None else a0
+        dome = sphere("Schulterstueck" + side, (0, 0, 0), 0.085, (1.0, 1.1, 0.55)); dome.location = c + Vector((s_ * 0.015, 0, 0.01))
+        parts = [give(dome, G["gold"])] + set_gem("SchulterRubin" + side, c + Vector((s_ * 0.015, 0, 0.055)), (s_ * 0.3, 0, 1), 0.03, G["ruby"], G)
+        attach(join_parts(parts, "Schulter" + side), arm, "mixamorig:%sArm" % side)
+    p, n = front_pt(body, 0.0, bone_pt(arm, "mixamorig:Head", 0.9).z)
+    di = []
+    if p is not None:
+        di += set_gem("Stirnstein", p, n, 0.03, G["ruby"], G, sink=0.2)
+    for k, (x, h) in enumerate(((0.0, 0.14), (-0.07, 0.1), (0.07, 0.1))):
+        q, m = head_top(body, x, -0.02)
+        if q is not None:
+            di.append(shard("Diadem%d" % k, q - m * 0.02, (m + Vector((x * 3, -0.2, 0.6))).normalized(), h, 0.028, G["rose"] if k == 0 else G["rose2"]))
+    attach(join_parts(di, "Diadem"), arm, "mixamorig:Head")
+    nk = bone_pt(arm, "mixamorig:Neck", 0.1)
+    pearls = [give(sphere("Perle%d" % i, (nk.x + 0.1 * math.cos(a), nk.y + 0.09 * math.sin(a), nk.z - 0.02), 0.022), G["pearl"])
+              for i, a in enumerate([i * 2 * math.pi / 14 for i in range(14)])]
+    attach(join_parts(pearls, "Perlenkragen"), arm, "mixamorig:Neck")
+
+@variante("rosen_panzerkaefer", "panzerkaefer")
+def juwelenkaefer(arm, body):
+    """Kristallplanet, stark: Juwelenkäfer – schwerer Käfer mit goldenem, graviertem Panzer, in den große geschliffene
+    Edelsteine gefasst sind (Rosenquarz, Diamant, Rubin), Körper aus Rosenquarz, Perlenfüße und ein Rosenquarzhorn"""
+    G = gem_mats()
+    T = texels(body)
+    px, P, N = T["px"], T["P"], T["N"]
+    teal = hue_mask(px, 0.49, 0.08, 0.3)
+    red = np.maximum(hue_mask(px, 0.02, 0.06, 0.35), hue_mask(px, 0.97, 0.05, 0.3))
+    hh, s, v = hsv(px)
+    beige = np.clip((0.6 - s) / 0.1, 0, 1) * np.clip((v - 0.5) / 0.1, 0, 1) * hue_mask(px, 0.11, 0.07, 0.08)
+    gold_paint(T, teal, 191)
+    facet_paint(T, red, 193, [(1.0, 0.6, 0.78), (0.95, 0.48, 0.68), (1.0, 0.72, 0.85)], freq=16.0, glow_k=0.25)
+    paint(T, beige, (0.96, 0.93, 0.95), keep_shading=0.5)
+    commit(T, strength=1.0)
+    parts = []
+    mats = [G["rose"], G["diamond"], G["ruby"], G["rose2"], G["sapphire"], G["diamond"], G["emerald"]]
+    for k, (x, y, r) in enumerate(((0.0, 0.05, 0.07), (-0.14, 0.1, 0.05), (0.14, 0.08, 0.05), (-0.08, -0.08, 0.04), (0.09, -0.09, 0.04), (0.0, 0.2, 0.045), (-0.2, -0.02, 0.035))):
+        p, n = surface(body, (x, y, 2.0), (0, 0, -1))
+        if p is not None and p.z > 0.15:
+            parts += set_gem("Panzerstein%d" % k, p, n, r, mats[k % len(mats)], G, sink=0.35)
+    attach(join_parts(parts, "Juwelenpanzer"), arm, "Body")
+    h0 = bone_pt(arm, "Head", 0.4)
+    q, m = surface(body, (0.0, -1.5, h0.z + 0.07), (0, 1, 0))
+    if q is not None:
+        attach(join_parts([shard("Horn", q - m * 0.03, (0, -0.6, 1.0), 0.2, 0.045, G["rose"]), shard("Horn2", q - m * 0.02 + Vector((0.04, 0, 0.02)), (0.4, -0.5, 1.0), 0.11, 0.03, G["rose2"])], "Horn"), arm, "Head")
+
+@variante("glitzer_krabbler", "krabbler")
+def glitzerwicht(arm, body):
+    """Kristallplanet, leicht: Glitzerwicht – kleiner Kobold mit Haut aus geschliffenem Diamant (weiß-blau funkelnd),
+    königsblauem Samtanzug mit Gold, bunten Edelsteinen am Kopf (Rubin, Saphir, Smaragd) und einem Diamantkrönchen"""
+    G = gem_mats()
+    T = texels(body); R = regions(T, arm)
+    facet_paint(T, R["skin"], 201, [(0.9, 0.95, 1.0), (0.75, 0.85, 1.0), (0.97, 0.97, 1.0)], freq=14.0, glow_k=0.25)
+    paint(T, R["purple"] * (1 - R["head"]), (0.16, 0.22, 0.62), keep_shading=0.6)
+    facet_paint(T, R["purple"] * R["head"], 203, [(0.92, 0.1, 0.26), (0.15, 0.35, 1.0), (0.1, 0.85, 0.45)], freq=3.0, glow_k=0.9)
+    gold_paint(T, R["grey"], 205, engrave=False)
+    eyes = R["white"] * R["head"]
+    paint(T, eyes, (0.85, 0.95, 1.0), keep_shading=0.2)
+    glow(T, eyes, (0.5, 0.75, 1.0))
+    commit(T, strength=1.2)
+    cr = []
+    for k, (x, h) in enumerate(((0.0, 0.15), (-0.09, 0.11), (0.09, 0.11), (-0.16, 0.08), (0.16, 0.08))):
+        q, m = head_top(body, x, 0.0)
+        if q is not None:
+            cr.append(shard("Krone%d" % k, q - m * 0.02, (m + Vector((x * 2, 0, 0.5))).normalized(), h, 0.026, G["diamond"]))
+    attach(join_parts(cr, "Diamantkrone"), arm, "mixamorig:Head")
+
+@variante("glitzer_tentakler", "tentakler")
+def facettenfalter(arm, body):
+    """Kristallplanet, mittel: Facettenfalter – Flugwesen mit Flügeln wie Bleiglasfenster aus bunten Edelsteinen
+    (Rubin, Saphir, Smaragd, Topas) in goldener Fassung, Körper aus geschliffenem Saphir, goldenen Hörnern und
+    Diamanten an den Flügelspitzen"""
+    G = gem_mats()
+    T = texels(body)
+    px, P = T["px"], T["P"]
+    red = hue_mask(px, 0.02, 0.06, 0.35)
+    teal = hue_mask(px, 0.49, 0.08, 0.3)
+    hh, s, v = hsv(px)
+    beige = np.clip((0.6 - s) / 0.1, 0, 1) * np.clip((v - 0.5) / 0.1, 0, 1) * hue_mask(px, 0.11, 0.07, 0.08)
+    facet_paint(T, red, 211, [(0.2, 0.35, 0.95), (0.12, 0.25, 0.8), (0.3, 0.48, 1.0)], freq=12.0, glow_k=0.3)
+    facet_paint(T, teal, 213, [(0.92, 0.12, 0.28), (0.15, 0.4, 1.0), (0.1, 0.85, 0.45), (1.0, 0.75, 0.15)], freq=10.0, lead=(0.95, 0.72, 0.28), glow_k=0.9)
+    gold_paint(T, beige, 215, engrave=False)
+    commit(T, strength=1.3)
+    for side, chain in ((1, ("Bone_031", "Bone_030", "Bone_029")), (-1, ("Bone_026", "Bone_025", "Bone_024"))):
+        tip = bone_pt(arm, chain[2], 1.0)
+        attach(shard("Flügeldiamant%d" % side, tip + Vector((0, 0, -0.02)), Vector((side * 0.6, 0.0, 1.0)), 0.12, 0.035, G["diamond"]), arm, chain[2])
+        mid = bone_pt(arm, chain[1], 0.9)
+        attach(gem("Flügelstein%d" % side, mid + Vector((0, -0.03, 0.0)), (0, -1, 0.2), 0.04, G["ruby"]), arm, chain[1])
+    q, m = front_pt(body, 0.0, 1.12)
+    if q is not None:
+        attach(join_parts(set_gem("Stirnstein", q, m, 0.035, G["emerald"], G, sink=0.2), "Stirnstein"), arm, "Bone_001")
+
+@variante("glitzer_brecher", "brecher")
+def goldbrecher(arm, body):
+    """Kristallplanet, stark: Goldbrecher – massiger Schläger mit Haut aus graviertem Gold, königsblauer Rüstung,
+    leuchtendem Diamantkragen, großem Rubin in der Brust, Edelsteingruppen auf den Schultern, Goldreifen mit Steinen
+    an den Unterarmen und einem Diamantkamm"""
+    G = gem_mats()
+    T = texels(body); R = regions(T, arm)
+    gold_paint(T, R["skin"], 221, base=(0.95, 0.74, 0.3))
+    paint(T, R["purple"] * (1 - R["head"]), (0.16, 0.22, 0.62), keep_shading=0.6)
+    gold_paint(T, R["purple"] * R["head"], 223, base=(0.85, 0.6, 0.24))
+    paint(T, R["grey"], (0.96, 0.93, 0.95), keep_shading=0.4)
+    collar = np.maximum(R["white"] * (1 - R["head"]), R["collar"])
+    facet_paint(T, collar, 225, [(0.9, 0.95, 1.0), (0.75, 0.85, 1.0), (0.97, 0.97, 1.0)], freq=20.0, glow_k=0.8)
+    eyes = R["white"] * R["head"]
+    paint(T, eyes, (0.85, 0.95, 1.0), keep_shading=0.2)
+    glow(T, eyes, (0.5, 0.75, 1.0))
+    commit(T, strength=1.2)
+    rnd = random.Random(227)
+    sp = bone_pt(arm, "mixamorig:Spine1", 0.6)
+    p, n = front_pt(body, 0.0, sp.z)
+    if p is not None:
+        attach(join_parts(set_gem("Brustrubin", p, n, 0.075, G["ruby"], G, sink=0.3), "Brustrubin"), arm, "mixamorig:Spine1")
+    mats = (G["diamond"], G["ruby"], G["sapphire"], G["emerald"])
+    for s_, side in ((1, "Left"), (-1, "Right")):
+        a0 = bone_pt(arm, "mixamorig:%sArm" % side)
+        parts = []
+        for k, (dx, dy, h, r) in enumerate(((0.0, 0.0, 0.18, 0.05), (-s_ * 0.07, 0.06, 0.13, 0.04), (s_ * 0.05, -0.07, 0.12, 0.035))):
+            p, n = surface(body, (a0.x + dx, a0.y + dy, a0.z + 0.15), (0, 0, -1))
+            if p is not None:
+                parts.append(shard("Schulterstein%s%d" % (side, k), p - n * 0.03, (n + Vector((s_ * 0.5, 0.1, 0))).normalized(), h, r, mats[k]))
+        attach(join_parts(parts, "Schultersteine" + side), arm, "mixamorig:%sArm" % side)
+        f0, f1 = bone_pt(arm, "mixamorig:%sForeArm" % side), bone_pt(arm, "mixamorig:%sForeArm" % side, 1.0)
+        fm = f0.lerp(f1, 0.6)
+        t = torus("Goldreif" + side, tuple(fm), 0.085, 0.022)
+        t.rotation_euler = (f1 - f0).normalized().to_track_quat('Z', 'Y').to_euler()
+        ring = [give(t, G["gold"])]
+        ring.append(gem("Reifstein" + side, fm + Vector((s_ * 0.03, -0.07, 0.03)), (s_ * 0.3, -1, 0.3), 0.03, G["sapphire"]))
+        attach(join_parts(ring, "Goldreif" + side), arm, "mixamorig:%sForeArm" % side)
+    cr = []
+    for k, (y, h) in enumerate(((-0.06, 0.16), (0.02, 0.2), (0.1, 0.15))):
+        q, m = head_top(body, 0.0, y)
+        if q is not None:
+            cr.append(shard("Kamm%d" % k, q - m * 0.02, (m + Vector((0, y * 2, 0.3))).normalized(), h, 0.035, G["diamond"]))
+    attach(join_parts(cr, "Diamantkamm"), arm, "mixamorig:Head")
+
+# ---------------------------------------------------------------- Neue Bosse Kristallplanet (Welt 15 und 16)
+
+@variante("juwelen_schnecke", "schleimmutter")
+def juwelenschnecke(arm, body):
+    """Rosenkristalle (Welt 15), Boss: Juwelenschnecke – riesige Schnecke mit rosa schimmerndem Fuß und einem
+    eingerollten Gehäuse aus Rosenquarz mit Goldband, eingesetzten Edelsteinen und einem Kamm aus Kristallen, Fühler mit
+    Rubinaugen, goldene Krone mit Steinen und ein Maul mit Diamantzähnen. Eigene Figur auf dem Skelett der Schleimmutter."""
+    G = gem_mats()
+    skin = look("Schneckenhaut", (1.0, 0.68, 0.8), rough=0.3, emit=(0.9, 0.45, 0.65), strength=0.2)
+    rnd = random.Random(301)
+    foot, shell, head = snail("Juwel", 1.25, 1.2, G, skin, G["rose"], G["gold"], [G["ruby"], G["diamond"], G["sapphire"], G["emerald"]], rnd, gems=8)
+    for o in foot:
+        skin_to(o, arm, lambda c: {"Top": smooth01((c.z - 0.12) / 0.3), "Body": 1 - smooth01((c.z - 0.12) / 0.3)})
+    hp = Vector((0.0, -0.625, 0.408))
+    extra = []
+    for k in range(5):
+        a = math.radians(-60 + 30 * k)
+        b0 = hp + Vector((math.sin(a) * 0.1, -math.cos(a) * 0.05, 0.11))
+        extra.append(shard("Krone%d" % k, b0, (math.sin(a) * 0.4, -0.2, 1.0), 0.09 + 0.04 * (k == 2), 0.022, G["gold"]))
+    extra += set_gem("Kronenstein", hp + Vector((0, -0.12, 0.1)), (0, -1, 0.3), 0.03, G["ruby"], G, sink=0.1)
+    mouth = [give(tube("Maul", [(-0.08, -0.74, 0.37), (0.0, -0.765, 0.355), (0.08, -0.74, 0.37)], [0.012, 0.016, 0.012], segs=8), G["dark"])]
+    for s_ in (-1, 1):
+        mouth.append(shard("Zahn%d" % s_, Vector((s_ * 0.04, -0.765, 0.37)), (0, -0.2, -1), 0.04, 0.012, G["diamond"]))
+        mouth.append(tube("Braue%d" % s_, [(s_ * 0.14, -0.7, 0.5), (s_ * 0.08, -0.74, 0.47), (s_ * 0.02, -0.75, 0.44)], [0.018, 0.022, 0.016]))
+        give(mouth[-1], G["rose2"])
+    attach(join_parts(shell + head + extra + mouth, "Juwel_Oben"), arm, "Top")
+    dampen_scale(arm, ("Body", "Top"), 0.35)
+    remove_body(body)
+
+@variante("edelstein_golem", "koloss")
+def edelsteingolem(arm, body):
+    """Glitzerschlucht (Welt 16), Boss: Edelsteingolem – riesiger Golem aus Goldblöcken mit Gelenken aus leuchtendem
+    Rubin, Gesicht mit Diamantaugen und Diamantzähnen, Rubinadern, Krone aus Diamanten, einem großen Rubin in der Brust
+    und Saphiren und Smaragden auf den Schultern. Eigene Figur auf dem Koloss-Skelett."""
+    G = gem_mats()
+    joint = look("Rubinglut", (0.95, 0.15, 0.3), rough=0.1, emit=(0.9, 0.08, 0.25), strength=2.2)
+    g = golem_body(arm, body, G["gold"], G["gold2"], joint, flat=True, subdiv=1, fist_m=G["gold2"], nail_m=G["diamond"], legs=1.4)
+    H = "mixamorig:Head"
+    hc = g["head"] + Vector((0, -0.08, 0.24))
+    skull = block_at("Kopf", hc, (0.25, 0.23, 0.22), G["gold"], 31, True, 1)
+    jaw = block_at("Kiefer", hc + Vector((0, -0.07, -0.15)), (0.22, 0.17, 0.1), G["gold2"], 32, True, 1)
+    socket = look("Augenhoehle", (0.1, 0.06, 0.14), rough=0.6, emit=(0.2, 0.3, 0.6), strength=0.5)
+    eye = look("Diamantauge", (0.85, 0.95, 1.0), rough=0.1, emit=(0.6, 0.85, 1.0), strength=4.0)
+    core = look("Diamantkern", (1.0, 1.0, 1.0), rough=0.1, emit=(0.9, 0.95, 1.0), strength=8.0)
+    mouth_in = look("Maulinneres", (0.3, 0.04, 0.12), rough=0.6, emit=(0.7, 0.05, 0.2), strength=1.2)
+    head_parts = [skull, jaw] + golem_face(skull, jaw, hc, {"socket": socket, "eye": eye, "core": core, "mouth": mouth_in, "tooth": G["diamond"],
+                                                           "brow": G["gold2"], "crack": joint, "throat": joint})
+    for k in range(7):
+        a = math.radians(-90 + 30 * k)
+        b0 = hc + Vector((math.sin(a) * 0.19, -math.cos(a) * 0.17 + 0.02, 0.18))
+        head_parts.append(shard("Krone%d" % k, b0, (math.sin(a) * 0.3, -math.cos(a) * 0.2, 1.0), 0.13 + 0.07 * (k == 3), 0.035, G["diamond"]))
+    head_parts += set_gem("Stirnrubin", hc + Vector((0, -0.24, 0.12)), (0, -1, 0.25), 0.045, G["ruby"], G, sink=0.2)
+    attach(join_parts(head_parts, "Golem_Kopf"), arm, H)
+    ch = g["chest"] + Vector((0, -0.3, 0.02))
+    chest = set_gem("Brustrubin", ch, (0, -1, 0.1), 0.15, G["ruby"], G, sink=0.2)
+    for i, (dx, dz, m_) in enumerate(((-0.2, 0.13, G["sapphire"]), (0.2, 0.13, G["emerald"]), (-0.2, -0.13, G["emerald"]), (0.2, -0.13, G["sapphire"]))):
+        chest += set_gem("Bruststein%d" % i, ch + Vector((dx, 0.03, dz)), (dx * 1.5, -1, dz), 0.05, m_, G, sink=0.2)
+    attach(join_parts(chest, "Golem_Brust"), arm, "mixamorig:Spine2")
+    rnd = random.Random(311)
+    for s_, side in ((1, "Left"), (-1, "Right")):
+        a0 = bone_pt(arm, "mixamorig:%sArm" % side)
+        c = a0 + Vector((s_ * 0.06, 0.0, 0.3))
+        parts = cluster("Schulterkristall" + side, c, Vector((s_ * 0.5, 0.1, 1.0)).normalized(), 0.3, 0.06, (G["sapphire"], G["emerald"], G["diamond"]), rnd, count=4)
+        attach(join_parts(parts, "Schulterkristall" + side), arm, "mixamorig:%sArm" % side)
+
+# ---------------------------------------------------------------- Sturmriese (Welt 17 und 18): Wolken und Blitze
+
+def storm_mats():
+    return {
+        "cloud": look("Wolke", (0.93, 0.95, 1.0), rough=0.85, emit=(0.6, 0.65, 0.8), strength=0.12),
+        "cloud_dark": look("Gewitterwolke", (0.42, 0.47, 0.6), rough=0.85),
+        "bolt": look("Blitz", (1.0, 0.95, 0.45), rough=0.3, emit=(1.0, 0.9, 0.3), strength=6.0),
+        "eye": look("Blitzauge", (1.0, 0.97, 0.6), rough=0.2, emit=(1.0, 0.9, 0.35), strength=5.0),
+        "dark": look("Sturmdunkel", (0.08, 0.09, 0.16), rough=0.5),
+        "copper": look("Kupfer", (0.85, 0.5, 0.3), rough=0.3, metal=0.85),
+        "rain": look("Regen", (0.55, 0.75, 1.0), rough=0.1, emit=(0.3, 0.5, 1.0), strength=0.5),
+        "tooth": look("Sturmzahn", (0.97, 0.97, 1.0), rough=0.3),
+    }
+
+def cloud_parts(name, c, size, seed, M, n=12, flat=0.75, dark_below=True):
+    """Wolke aus vielen weichen Kugeln: oben hell, unten dunkler (Gewitter)"""
+    rnd = random.Random(seed)
+    c = Vector(c)
+    parts = []
+    for i in range(n):
+        a = rnd.uniform(0, 2 * math.pi); u = rnd.uniform(-0.25, 1.0)
+        p = c + Vector((math.cos(a) * size * rnd.uniform(0.25, 0.95), math.sin(a) * size * rnd.uniform(0.2, 0.7), u * size * 0.45))
+        r = size * rnd.uniform(0.32, 0.5) * (1.0 - 0.25 * max(0.0, u))
+        mat = M["cloud_dark"] if (dark_below and p.z < c.z - size * 0.05) else M["cloud"]
+        parts.append(give(sphere("%s%d" % (name, i), tuple(p), r, (1.0, 1.0, flat), segs=(18, 10)), mat))
+    return parts
+
+def bolt(name, p0, p1, r, M, n=5, jitter=0.25, seed=0):
+    """Blitz: Zickzack von p0 nach p1, wird zur Spitze dünner"""
+    rnd = random.Random(seed)
+    p0, p1 = Vector(p0), Vector(p1)
+    d = p1 - p0
+    side = d.cross(Vector((0, 1, 0)))
+    if side.length < 1e-3:
+        side = d.cross(Vector((1, 0, 0)))
+    side.normalize()
+    pts = [p0]
+    for i in range(1, n):
+        t = i / n
+        pts.append(p0 + d * t + side * d.length * jitter * (1 if i % 2 else -1) * rnd.uniform(0.6, 1.0))
+    pts.append(p1)
+    radii = [r * (1 - 0.8 * i / n) for i in range(n)] + [0.0]
+    o = tube(name, [tuple(q) for q in pts], radii, segs=6)
+    for pl in o.data.polygons:
+        pl.use_smooth = False
+    return give(o, M["bolt"])
+
+def storm_skin(T, mask, seed, base=(0.32, 0.44, 0.68)):
+    """Sturmhaut: blaugrau mit hellen Wolkenschlieren und gelb leuchtenden Blitzadern"""
+    P = T["P"]
+    paint(T, mask, gradient(base, (0.55, 0.65, 0.85), fbm3(P, 5.0, seed, 3) * 1.4 - 0.3), keep_shading=0.4)
+    veins = ridges(P, 6.0, seed + 1, 0.025) ** 1.5 * np.clip((fbm3(P, 3.5, seed + 2, 2) - 0.45) / 0.08, 0, 1)
+    paint(T, mask * veins, (1.0, 0.95, 0.5), keep_shading=0.0)
+    glow(T, mask * veins, (1.0, 0.85, 0.25))
+
+def storm_face(c, k, M, parts):
+    """Gewitter-Gesicht vorn auf einer Wolke: wütende, gelb leuchtende Augen, dicke dunkle Brauen, offenes Maul mit Zähnen"""
+    c = Vector(c)
+    for s_ in (-1, 1):
+        so = sphere("Augenhoehle%d" % s_, (0, 0, 0), 0.07 * k, (1.2, 0.5, 0.8)); so.location = c + Vector((s_ * 0.12 * k, 0, 0.06 * k))
+        so.rotation_euler = (0, math.radians(-s_ * 18), 0); parts.append(give(so, M["dark"]))
+        e = sphere("Auge%d" % s_, (0, 0, 0), 0.05 * k, (1.2, 0.5, 0.75)); e.location = c + Vector((s_ * 0.12 * k, -0.02 * k, 0.06 * k))
+        e.rotation_euler = (0, math.radians(-s_ * 18), 0); parts.append(give(e, M["eye"]))
+        parts.append(give(tube("Braue%d" % s_, [tuple(c + Vector((s_ * 0.22 * k, -0.01 * k, 0.17 * k))), tuple(c + Vector((s_ * 0.12 * k, -0.04 * k, 0.15 * k))),
+                                               tuple(c + Vector((s_ * 0.03 * k, -0.05 * k, 0.1 * k)))], [0.035 * k, 0.04 * k, 0.03 * k]), M["cloud_dark"]))
+    m = sphere("Maul", (0, 0, 0), 0.1 * k, (1.3, 0.45, 0.6)); m.location = c + Vector((0, -0.01 * k, -0.12 * k))
+    parts.append(give(m, M["dark"]))
+    for i, x in enumerate((-0.07, 0.0, 0.07)):
+        parts.append(shard("Zahn%d" % i, c + Vector((x * k, -0.045 * k, -0.075 * k)), (0, -0.2, -1), 0.04 * k, 0.014 * k, M["tooth"]))
+
+@variante("sturm_wolke", "schleimmutter")
+def sturmwolke(arm, body):
+    """Wolkenwirbel (Welt 17), Boss: Sturmwolke – riesige, wütende Gewitterwolke: oben weiß, unten dunkel, gelb
+    leuchtende Augen unter dicken Brauen, offenes Maul mit Zähnen, Blitze und Regentropfen darunter und Windwirbel an
+    den Seiten. Schwebt. Eigene Figur auf dem Skelett der Schleimmutter."""
+    M = storm_mats()
+    low = cloud_parts("WolkeUnten", (0, 0.02, 0.42), 0.62, 321, M, n=14, flat=0.7)
+    up = cloud_parts("WolkeOben", (0, 0.05, 0.72), 0.5, 322, M, n=12, flat=0.8, dark_below=False)
+    face = []
+    storm_face((0, -0.47, 0.6), 1.25, M, face)
+    attach(join_parts(up + face, "Sturm_Oben"), arm, "Top")
+    below = []
+    for k, (x, y, L) in enumerate(((-0.28, -0.1, 0.42), (0.05, -0.2, 0.5), (0.3, 0.05, 0.38), (-0.05, 0.25, 0.34))):
+        below.append(bolt("Blitz%d" % k, (x, y, 0.18), (x + 0.08 * (1 if k % 2 else -1), y - 0.05, 0.18 - L), 0.035, M, n=5, jitter=0.22, seed=330 + k))
+    rnd = random.Random(331)
+    for i in range(10):
+        x, y = rnd.uniform(-0.45, 0.45), rnd.uniform(-0.3, 0.35)
+        below.append(give(sphere("Tropfen%d" % i, (x, y, rnd.uniform(-0.15, 0.15)), 0.022, (0.8, 0.8, 1.6)), M["rain"]))
+    for s_ in (-1, 1):
+        pts = []; radii = []
+        for k in range(18):
+            t = k / 17; a = t * 1.7 * 2 * math.pi
+            pts.append((s_ * (0.75 + 0.06 * t), 0.05 + 0.14 * (1 - t) * math.cos(a), 0.5 + 0.14 * (1 - t) * math.sin(a)))
+            radii.append(0.03 * (1 - t) + 0.006)
+        radii[-1] = 0.0
+        below.append(give(tube("Wind%d" % s_, pts, radii), M["cloud"]))
+    attach(join_parts(low + below, "Sturm_Unten"), arm, "Body")
+    dampen_scale(arm, ("Body", "Top"), 0.5)
+    remove_body(body)
+
+@variante("sturm_schleimling", "schleimling")
+def woelkchen(arm, body):
+    """Wolkenwirbel, leicht: Wölkchen – kleine, wütende Gewitterwolke wie ein Junges der Sturmwolke: gelb leuchtende
+    Augen, dunkle Brauen, kleines Maul und ein Blitz darunter. Eigene Figur auf dem Skelett des Schleimlings."""
+    M = storm_mats()
+    low = cloud_parts("WolkeUnten", (0, 0.0, 0.3), 0.36, 341, M, n=10, flat=0.7)
+    up = cloud_parts("WolkeOben", (0, 0.03, 0.5), 0.3, 342, M, n=8, flat=0.8, dark_below=False)
+    face = []
+    storm_face((0, -0.28, 0.42), 0.85, M, face)
+    attach(join_parts(up + face, "Woelkchen_Oben"), arm, "Top")
+    below = [bolt("Blitz", (0.02, -0.05, 0.12), (0.07, -0.1, -0.12), 0.028, M, n=4, jitter=0.3, seed=343)]
+    attach(join_parts(low + below, "Woelkchen_Unten"), arm, "Body")
+    remove_body(body)
+
+@variante("sturm_tentakler", "tentakler")
+def sturmfluegler(arm, body):
+    """Wolkenwirbel, mittel: Sturmflügler – Flugwesen mit blaugrauer Sturmhaut und gelb leuchtenden Blitzadern,
+    Flügeln aus Gewitterwolke mit Blitzen, Wolkenbäuschen an der Flügelkante, Blitzhörnern, gelb leuchtenden Augen und
+    einem Blitz als Schwanz"""
+    M = storm_mats()
+    T = texels(body)
+    px, P = T["px"], T["P"]
+    red = hue_mask(px, 0.02, 0.06, 0.35)
+    teal = hue_mask(px, 0.49, 0.08, 0.3)
+    hh, s, v = hsv(px)
+    beige = np.clip((0.6 - s) / 0.1, 0, 1) * np.clip((v - 0.5) / 0.1, 0, 1) * hue_mask(px, 0.11, 0.07, 0.08)
+    white = np.clip((0.15 - s) / 0.06, 0, 1) * np.clip((v - 0.8) / 0.06, 0, 1)
+    storm_skin(T, red, 351)
+    paint(T, teal, gradient((0.3, 0.34, 0.46), (0.78, 0.82, 0.92), fbm3(P, 4.0, 353, 3) * 1.5 - 0.25), keep_shading=0.3)
+    veins = ridges(P, 5.0, 354, 0.02) ** 2
+    paint(T, teal * veins, (1.0, 0.95, 0.5), keep_shading=0.0)
+    glow(T, teal * veins, (1.0, 0.85, 0.25))
+    paint(T, beige, (1.0, 0.92, 0.45), keep_shading=0.3)
+    glow(T, beige * 0.8, (1.0, 0.85, 0.25))
+    paint(T, white, (1.0, 0.97, 0.6), keep_shading=0.2)
+    glow(T, white, (1.0, 0.85, 0.3))
+    commit(T, strength=2.0)
+    for side, chain in ((1, ("Bone_031", "Bone_030", "Bone_029")), (-1, ("Bone_026", "Bone_025", "Bone_024"))):
+        for k, (bone, t) in enumerate(((chain[1], 0.5), (chain[2], 0.35))):
+            b0 = bone_pt(arm, bone, t)
+            attach(join_parts(cloud_parts("Fluegelwolke%d_%d" % (side, k), b0 + Vector((0, 0.02, 0.04)), 0.12, 360 + k + side, M, n=5, flat=0.8, dark_below=False),
+                              "Fluegelwolke%d_%d" % (side, k)), arm, bone)
+    q, m = surface(body, (0.0, 0.15, -1.0), (0, 0, 1))
+    if q is not None:
+        attach(bolt("Schwanzblitz", q + Vector((0, 0, 0.03)), q + Vector((0.05, 0.35, -0.3)), 0.04, M, n=5, jitter=0.25, seed=365), arm, "Bone_001")
+
+@variante("sturm_brecher", "brecher")
+def donnerbrecher(arm, body):
+    """Wolkenwirbel, stark: Donnerbrecher – massiger Schläger mit blaugrauer Sturmhaut und Blitzadern, dunkelblauer
+    Rüstung mit Kupfer, Wolkenkragen, Gewitterwolken auf den Schultern, Blitzkamm auf dem Kopf, Blitzen an den
+    Unterarmen und gelb leuchtenden Augen"""
+    M = storm_mats()
+    T = texels(body); R = regions(T, arm)
+    storm_skin(T, R["skin"], 371)
+    paint(T, R["purple"] * (1 - R["head"]), (0.1, 0.13, 0.28), keep_shading=0.6)
+    paint(T, R["purple"] * R["head"], (0.25, 0.34, 0.55), keep_shading=0.5)
+    paint(T, R["grey"], (0.85, 0.5, 0.3), keep_shading=0.5)
+    collar = np.maximum(R["white"] * (1 - R["head"]), R["collar"])
+    paint(T, collar, (0.93, 0.95, 1.0), keep_shading=0.4)
+    eyes = R["white"] * R["head"]
+    paint(T, eyes, (1.0, 0.97, 0.6), keep_shading=0.2)
+    glow(T, eyes, (1.0, 0.85, 0.3))
+    commit(T, strength=2.0)
+    for s_, side in ((1, "Left"), (-1, "Right")):
+        a0 = bone_pt(arm, "mixamorig:%sArm" % side)
+        p, n = surface(body, (a0.x, a0.y, a0.z + 0.15), (0, 0, -1))
+        c = (p if p is not None else a0) + Vector((s_ * 0.02, 0, 0.05))
+        parts = cloud_parts("Schulterwolke" + side, c, 0.15, 380 + s_, M, n=7, flat=0.75)
+        parts.append(bolt("Schulterblitz" + side, c + Vector((s_ * 0.05, 0, -0.05)), c + Vector((s_ * 0.12, -0.05, -0.3)), 0.022, M, n=4, seed=382 + s_))
+        attach(join_parts(parts, "Schulterwolke" + side), arm, "mixamorig:%sArm" % side)
+        f0, f1 = bone_pt(arm, "mixamorig:%sForeArm" % side, 0.2), bone_pt(arm, "mixamorig:%sForeArm" % side, 0.8)
+        attach(bolt("Armblitz" + side, f0 + Vector((s_ * 0.08, 0.05, 0.05)), f1 + Vector((s_ * 0.1, 0.05, 0.08)), 0.02, M, n=5, jitter=0.15, seed=384 + s_), arm, "mixamorig:%sForeArm" % side)
+    crest = []
+    for k, (y, L) in enumerate(((-0.06, 0.17), (0.03, 0.22), (0.12, 0.16))):
+        q, m = head_top(body, 0.0, y)
+        if q is not None:
+            crest.append(bolt("Kammblitz%d" % k, q - m * 0.02, q + Vector((0.0, y * 1.5 + 0.04, L)), 0.03, M, n=3, jitter=0.25, seed=390 + k))
+    attach(join_parts(crest, "Blitzkamm"), arm, "mixamorig:Head")
+
+# Blitzfront (Welt 18): gleiche Sturmwelt, aber elektrisch: Kupfer, Funken, Blitzableiter
+
+def antenna(name, base, L, M, ball=0.04):
+    b = Vector(base)
+    pts = [b, b + Vector((0, 0.01, L * 0.5)), b + Vector((0, 0.02, L))]
+    parts = [give(tube(name + "Stab", [tuple(p) for p in pts], [0.012, 0.01, 0.009], segs=8), M["copper"])]
+    for k in range(3):
+        parts.append(give(torus(name + "Ring%d" % k, tuple(b + Vector((0, 0.01, L * (0.3 + 0.2 * k)))), 0.022, 0.006, rot=(0, 0, 0), segs=16), M["copper"]))
+    parts.append(give(sphere(name + "Kugel", tuple(pts[-1] + Vector((0, 0, ball * 0.8))), ball), M["bolt"]))
+    return parts
+
+def electric_body(T, R, seed):
+    storm_skin(T, R["skin"], seed, base=(0.28, 0.48, 0.9))
+    paint(T, R["purple"] * (1 - R["head"]), (0.08, 0.1, 0.24), keep_shading=0.6)
+    spots = R["purple"] * R["head"]
+    paint(T, spots, (1.0, 0.92, 0.4), keep_shading=0.3)
+    glow(T, spots, (1.0, 0.85, 0.25))
+    paint(T, R["grey"], (0.85, 0.5, 0.3), keep_shading=0.5)
+    eyes = R["white"] * R["head"]
+    paint(T, eyes, (1.0, 0.97, 0.6), keep_shading=0.2)
+    glow(T, eyes, (1.0, 0.85, 0.3))
+
+@variante("blitz_krabbler", "krabbler")
+def funkenwicht(arm, body):
+    """Blitzfront, leicht: Funkenwicht – flinker Kobold mit elektrisch blauer Haut und gelb leuchtenden Blitzadern,
+    leuchtenden Funkenflecken am Kopf, gelb leuchtenden Augen und einer Kupferantenne mit Funkenkugel"""
+    M = storm_mats()
+    T = texels(body); R = regions(T, arm)
+    electric_body(T, R, 401)
+    commit(T, strength=2.0)
+    q, m = head_top(body, 0.05, 0.0)
+    if q is not None:
+        attach(join_parts(antenna("Antenne", q - m * 0.02, 0.22, M, ball=0.045), "Antenne"), arm, "mixamorig:Head")
+    sp = []
+    for s_ in (-1, 1):
+        a0 = bone_pt(arm, "mixamorig:%sArm" % s_ if False else "mixamorig:%sArm" % ("Left" if s_ > 0 else "Right"))
+        sp.append(bolt("Schulterfunke%d" % s_, a0 + Vector((s_ * 0.02, 0, 0.08)), a0 + Vector((s_ * 0.1, 0.02, 0.2)), 0.016, M, n=3, jitter=0.3, seed=405 + s_))
+    attach(join_parts(sp, "Funken"), arm, "mixamorig:Spine2")
+
+@variante("blitz_zombie", "zombie")
+def blitzlaeufer(arm, body):
+    """Blitzfront, mittel: Blitzläufer – hagerer Läufer mit elektrisch blauer Haut und Blitzadern, Blitzhörnern auf dem
+    Kopf, Wolkenkragen und einem Blitzableiter aus Kupfer auf dem Rücken, an dessen Spitze eine Funkenkugel leuchtet"""
+    M = storm_mats()
+    T = texels(body); R = regions(T, arm)
+    electric_body(T, R, 411)
+    commit(T, strength=2.0)
+    horns = []
+    for s_ in (-1, 1):
+        q, m = head_top(body, s_ * 0.09, 0.0)
+        if q is not None:
+            horns.append(bolt("Blitzhorn%d" % s_, q - m * 0.02, q + Vector((s_ * 0.1, 0.03, 0.2)), 0.028, M, n=3, jitter=0.3, seed=415 + s_))
+    attach(join_parts(horns, "Blitzhoerner"), arm, "mixamorig:Head")
+    p, n = back_pt(body, 0.0, bone_pt(arm, "mixamorig:Spine2").z)
+    if p is not None:
+        attach(join_parts(antenna("Ableiter", p + Vector((0, 0.02, -0.05)), 0.55, M, ball=0.05), "Ableiter"), arm, "mixamorig:Spine2")
+    nk = bone_pt(arm, "mixamorig:Neck", 0.0)
+    attach(join_parts(cloud_parts("Wolkenkragen", nk + Vector((0, 0.02, -0.02)), 0.13, 419, M, n=8, flat=0.6, dark_below=False), "Wolkenkragen"), arm, "mixamorig:Spine2")
+
+@variante("blitz_panzerkaefer", "panzerkaefer")
+def donnerpanzer(arm, body):
+    """Blitzfront, stark: Donnerpanzer – schwerer Käfer mit Panzer aus dunkler Gewitterwolke und gelb leuchtenden
+    Blitznähten, einer Kupferspule mit Funkenkugel oben, Blitzableitern rundum, aus denen Blitze springen,
+    Wolkenbäuschen am Rand und elektrisch blauem Körper"""
+    M = storm_mats()
+    T = texels(body)
+    px, P, N = T["px"], T["P"], T["N"]
+    teal = hue_mask(px, 0.49, 0.08, 0.3)
+    red = np.maximum(hue_mask(px, 0.02, 0.06, 0.35), hue_mask(px, 0.97, 0.05, 0.3))
+    hh, s, v = hsv(px)
+    beige = np.clip((0.6 - s) / 0.1, 0, 1) * np.clip((v - 0.5) / 0.1, 0, 1) * hue_mask(px, 0.11, 0.07, 0.08)
+    edge, cid = worley3(P, 8.0, 421)
+    paint(T, teal, gradient((0.25, 0.28, 0.4), (0.62, 0.67, 0.8), np.clip(N[..., 2], 0, 1) * 0.8 + cid * 0.3), keep_shading=0.4)
+    line = np.clip(1 - edge / 0.004, 0, 1)
+    paint(T, teal * line, (1.0, 0.95, 0.5), keep_shading=0.0)
+    glow(T, teal * line, (1.0, 0.85, 0.25))
+    storm_skin(T, red, 423, base=(0.28, 0.48, 0.9))
+    paint(T, beige, (0.85, 0.5, 0.3), keep_shading=0.5)
+    commit(T, strength=2.0)
+    parts = []
+    p, n = surface(body, (0.0, 0.05, 2.0), (0, 0, -1))
+    top = p if p is not None else Vector((0, 0.05, 0.4))
+    coil = [give(tube("Spule", [tuple(top + Vector((0, 0, -0.02))), tuple(top + Vector((0, 0, 0.16)))], [0.045, 0.04], segs=14), M["copper"])]
+    for k in range(5):
+        coil.append(give(torus("Spulenring%d" % k, tuple(top + Vector((0, 0, 0.02 + 0.03 * k))), 0.05, 0.009, rot=(0, 0, 0), segs=20), M["copper"]))
+    ball = top + Vector((0, 0, 0.21))
+    coil.append(give(sphere("Funkenkugel", tuple(ball), 0.055), M["bolt"]))
+    parts += coil
+    rim = ring_hits(body, (0, 0.03, 0.2), 4, 0.35, phase=math.pi / 4)
+    for k, (q, m, a) in enumerate(rim):
+        tip = q + m * 0.02 + Vector((0, 0, 0.12))
+        parts.append(give(tube("Ableiter%d" % k, [tuple(q - m * 0.01), tuple(tip)], [0.012, 0.009], segs=8), M["copper"]))
+        parts.append(give(sphere("Ableiterkugel%d" % k, tuple(tip + Vector((0, 0, 0.015))), 0.022), M["bolt"]))
+        parts.append(bolt("Funke%d" % k, ball, tip + Vector((0, 0, 0.02)), 0.012, M, n=4, jitter=0.15, seed=430 + k))
+    cl = ring_hits(body, (0, 0.03, 0.18), 6, 0.1, phase=0.5, skip=lambda a: math.sin(a) < -0.6)
+    for k, (q, m, a) in enumerate(cl):
+        parts += cloud_parts("Randwolke%d" % k, q + m * 0.02, 0.07, 440 + k, M, n=4, flat=0.7, dark_below=False)
+    attach(join_parts(parts, "Donnerpanzer_Aufbau"), arm, "Body")
+
+@variante("donner_riese", "koloss")
+def donnerriese(arm, body):
+    """Blitzfront (Welt 18), Boss: Donnerriese – riesiger Sturmkrieger mit elektrisch blauer Haut und gelb leuchtenden
+    Blitzadern, dunkelblauer Rüstung mit Kupfer, Wolkenmantel auf den Schultern, großen Blitzhörnern, einer Krone aus
+    Gewitterwolken, zwei Blitzableitern auf dem Rücken und einer leuchtenden Sturmkugel in der Brust"""
+    M = storm_mats()
+    skin = look("Sturmhaut", (0.3, 0.48, 0.88), rough=0.5)
+    T = texels(body); R = regions(T, arm)
+    electric_body(T, R, 451)
+    collar = np.maximum(R["white"] * (1 - R["head"]), R["collar"])
+    paint(T, collar, (0.93, 0.95, 1.0), keep_shading=0.4)
+    commit(T, strength=2.0)
+    koloss_arms(arm, body, skin, M["dark"], M["copper"], cuff_style="stulpe", fingers=4)
+    hc = bone_pt(arm, "mixamorig:Head", 0.45)
+    head = []
+    for s_ in (-1, 1):
+        q, m = head_top(body, s_ * 0.17, 0.08)
+        if q is not None:
+            head.append(bolt("Blitzhorn%d" % s_, q - m * 0.03, q + Vector((s_ * 0.22, 0.06, 0.42)), 0.06, M, n=4, jitter=0.25, seed=455 + s_))
+    q, m = head_top(body, 0.0, 0.1)
+    if q is not None:
+        for k in range(6):
+            a = k * 2 * math.pi / 6 + 0.3
+            c = q + Vector((math.cos(a) * 0.28, 0.05 + math.sin(a) * 0.22, 0.04))
+            head += cloud_parts("Kronenwolke%d" % k, c, 0.09, 460 + k, M, n=4, flat=0.7)
+    attach(join_parts(head, "Donner_Kopf"), arm, "mixamorig:Head")
+    for s_, side in ((1, "Left"), (-1, "Right")):
+        a0 = bone_pt(arm, "mixamorig:%sArm" % side)
+        p, n = surface(body, (a0.x, a0.y, a0.z + 0.2), (0, 0, -1))
+        c = (p if p is not None else a0) + Vector((s_ * 0.03, 0.02, 0.06))
+        parts = cloud_parts("Wolkenmantel" + side, c, 0.27, 470 + s_, M, n=9, flat=0.7)
+        parts.append(bolt("Mantelblitz" + side, c + Vector((s_ * 0.12, -0.05, -0.08)), c + Vector((s_ * 0.22, -0.12, -0.55)), 0.035, M, n=5, seed=472 + s_))
+        attach(join_parts(parts, "Wolkenmantel" + side), arm, "mixamorig:%sArm" % side)
+    sp = bone_pt(arm, "mixamorig:Spine2")
+    back = []
+    for s_ in (-1, 1):
+        p, n = back_pt(body, s_ * 0.16, sp.z + 0.05)
+        if p is not None:
+            back += antenna("Ableiter%d" % s_, p + Vector((0, 0.02, -0.08)), 0.75, M, ball=0.07)
+    q, m = front_pt(body, 0.0, bone_pt(arm, "mixamorig:Spine1", 0.6).z)
+    if q is not None:
+        back.append(give(sphere("Sturmkugel", tuple(q + m * 0.02), 0.085), M["bolt"]))
+        t = torus("Sturmring", (0, 0, 0), 0.1, 0.018, segs=28); t.matrix_world = Matrix.Translation(q + m * 0.02) @ m.to_track_quat('Z', 'Y').to_matrix().to_4x4()
+        back.append(give(t, M["copper"]))
+    attach(join_parts(back, "Donner_Ruecken"), arm, "mixamorig:Spine2")
+
 # ---------------------------------------------------------------- Ablauf
 
 if __name__ == "__main__":
