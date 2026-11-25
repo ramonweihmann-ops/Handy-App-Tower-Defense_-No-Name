@@ -228,15 +228,23 @@ const WORLDS := [
 		"c1": Color(0.35, 0.85, 0.2), "c2": Color(0.95, 0.85, 0.2), "rim": Color(0.5, 1.0, 0.3)},
 	{"name": "Frostmond", "kinds": ["schleimling", "tentakler", "panzerkaefer", "schleimmutter"],
 		"prefix": "Frost-", "tint": Color(0.6, 0.85, 1.25), "boss_looks": {"schleimmutter": "frost_yeti"},
+		"monster_looks": {"schleimling": "frost_schleimling", "tentakler": "frost_tentakler", "panzerkaefer": "frost_panzerkaefer"},
+		"monster_names": {"schleimling": ["Frostknäuel", "Frostknäuel"], "tentakler": ["Eisschwinge", "Eisschwingen"], "panzerkaefer": ["Gletscherpanzer", "Gletscherpanzer"]},
 		"c1": Color(0.3, 0.6, 1.0), "c2": Color(0.85, 0.95, 1.0), "rim": Color(0.6, 0.85, 1.0)},
 	{"name": "Lava-Kolonie", "kinds": ["krabbler", "zombie", "brecher", "koloss"],
 		"prefix": "Lava-", "tint": Color(1.3, 0.65, 0.45), "boss_looks": {"koloss": "magma_golem"},
+		"monster_looks": {"krabbler": "lava_krabbler", "zombie": "lava_zombie", "brecher": "lava_brecher"},
+		"monster_names": {"krabbler": ["Glutwicht", "Glutwichte"], "zombie": ["Schlackenwandler", "Schlackenwandler"], "brecher": ["Magmabrecher", "Magmabrecher"]},
 		"c1": Color(1.0, 0.35, 0.1), "c2": Color(1.0, 0.8, 0.2), "rim": Color(1.0, 0.5, 0.2)},
 	{"name": "Giftsumpf", "kinds": ["schleimling", "zombie", "panzerkaefer", "schleimmutter"],
 		"prefix": "Gift-", "tint": Color(0.75, 1.25, 0.5), "boss_looks": {"schleimmutter": "gift_kroete"},
+		"monster_looks": {"schleimling": "gift_schleimling", "zombie": "gift_zombie", "panzerkaefer": "gift_panzerkaefer"},
+		"monster_names": {"schleimling": ["Krötling", "Krötlinge"], "zombie": ["Moorschlurfer", "Moorschlurfer"], "panzerkaefer": ["Pilzpanzer", "Pilzpanzer"]},
 		"c1": Color(0.4, 0.9, 0.2), "c2": Color(0.8, 0.3, 0.9), "rim": Color(0.6, 1.0, 0.3)},
 	{"name": "Kristallhöhlen", "kinds": ["krabbler", "tentakler", "brecher", "koloss"],
 		"prefix": "Kristall-", "tint": Color(1.05, 0.8, 1.35), "boss_looks": {"koloss": "kristall_kaefer"},
+		"monster_looks": {"krabbler": "kristall_krabbler", "tentakler": "kristall_tentakler", "brecher": "kristall_brecher"},
+		"monster_names": {"krabbler": ["Splitterwicht", "Splitterwichte"], "tentakler": ["Glimmerflügler", "Glimmerflügler"], "brecher": ["Drusenbrecher", "Drusenbrecher"]},
 		"c1": Color(0.95, 0.4, 1.0), "c2": Color(0.4, 1.0, 1.0), "rim": Color(0.9, 0.6, 1.0)},
 	{"name": "Sternenwüste", "kinds": ["krabbler", "zombie", "panzerkaefer", "koloss"],
 		"prefix": "Sand-", "tint": Color(1.25, 1.05, 0.7), "boss_looks": {"koloss": "nashorn_krieger"},
@@ -438,6 +446,25 @@ static func boss_look(level: int, kind: String) -> String:
 	return str(WORLDS[world_of(level)].get("boss_looks", {}).get(kind, ""))
 
 
+## Monster je Welt (Wunsch 25.11.2026): eigene leichte, mittlere und starke Monster im Stil des Bosses der Welt statt
+## eingefärbter Kopien (tools/monster/monster_aufsatz.py, Modelle in enemies_v2/monster/). Werte bleiben die der
+## Grundart. Noch nicht freigegeben: nur mit dem Labor-Schalter --monster-neu, danach MONSTER_LOOKS_LIVE = true.
+const MONSTER_LOOKS_LIVE := false
+static var test_monster_looks := false
+
+
+static func monster_looks_on() -> bool:
+	return MONSTER_LOOKS_LIVE or test_monster_looks
+
+
+## Aussehen eines Gegners in der Welt dieses Levels: eigener Boss oder eigenes Monster, leer = Grundmodell
+static func enemy_look(level: int, kind: String) -> String:
+	var b := boss_look(level, kind)
+	if b != "" or not monster_looks_on():
+		return b
+	return str(WORLDS[world_of(level)].get("monster_looks", {}).get(kind, ""))
+
+
 ## Gegnerarten der Welt dieses Levels (leicht, mittel, stark, Boss). Mit dem Prüf-Schalter --neue-monster
 ## die neuen, noch nicht freigegebenen Gegner („kinds_neu“).
 static func world_kinds(level: int) -> Array:
@@ -449,6 +476,9 @@ static func world_kinds(level: int) -> Array:
 
 ## Name eines Gegners in der Welt dieses Levels (mit Vorsilbe der Welt).
 static func enemy_name(kind: String, level: int, plural := false) -> String:
+	var own: Array = WORLDS[world_of(level)].get("monster_names", {}).get(kind, []) if monster_looks_on() else []
+	if own.size() == 2:
+		return str(own[1] if plural else own[0])
 	var d: Dictionary = ENEMIES[kind]
 	var n: String = d["plural"] if plural else d["name"]
 	var prefix: String = "" if bool(d.get("own_look", false)) else WORLDS[world_of(level)].get("prefix", "")

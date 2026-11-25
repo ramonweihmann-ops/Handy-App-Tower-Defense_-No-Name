@@ -6,7 +6,7 @@ extends Node3D
 const VIS_SCALE := 1.45
 
 var kind := ""
-var look := ""   # Boss je Welt (GameData.boss_look), leer = Grundmodell
+var look := ""   # Boss oder Monster je Welt (GameData.enemy_look), leer = Grundmodell
 var data: Dictionary
 var battle: Battle
 var hp := 1.0

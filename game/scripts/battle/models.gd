@@ -84,13 +84,14 @@ static func enemy(kind: String, look := "") -> Dictionary:
 	var d: Dictionary = ENEMIES.get(kind, {})
 	if not d.is_empty() and has_look(look):
 		d = d.duplicate()
-		d["file"] = "enemies_v2/bosse/" + look
-		d.merge(BOSS_LOOK_DATA.get(look, {}), true)
+		d["file"] = look_file(look)
+		d.merge(LOOK_DATA.get(look, {}), true)
 	return d
 
 
-## Abweichende Maße der Bosse mit eigenem Körper (Höhe, Schweben, Schrittlänge des Grundmodells)
-const BOSS_LOOK_DATA := {
+## Abweichende Maße der Bosse und Monster mit eigenem Körper (Höhe, Schweben, Schrittlänge des Grundmodells).
+## Monster: Höhe so, dass der Körper so groß bleibt wie beim Grundmodell (Höhe Grundart × Modellhöhe neu / alt).
+const LOOK_DATA := {
 	"schleimmutter_krone": {"height": 1.6},
 	"frost_yeti": {"height": 2.7, "stride": 0.58},
 	"gift_kroete": {"height": 1.75},
@@ -99,12 +100,34 @@ const BOSS_LOOK_DATA := {
 	"nebel_geist": {"height": 2.1, "lift": 0.3},
 	"schatten_wesen": {"height": 3.2},
 	"kristall_riese": {"height": 3.5},
+	"frost_schleimling": {"height": 1.0},
+	"frost_tentakler": {"height": 1.21},
+	"frost_panzerkaefer": {"height": 1.16},
+	"lava_krabbler": {"height": 1.51},
+	"lava_zombie": {"height": 1.68},
+	"lava_brecher": {"height": 2.04},
+	"gift_schleimling": {"height": 0.86},
+	"gift_zombie": {"height": 1.54},
+	"gift_panzerkaefer": {"height": 1.39},
+	"kristall_krabbler": {"height": 1.69},
+	"kristall_tentakler": {"height": 1.25},
+	"kristall_brecher": {"height": 2.18},
 }
 
 
-## Gibt es für diesen Boss ein eigenes Modell? Dann trägt er seine eigenen Farben (keine Weltfärbung).
+## Gibt es für diesen Boss oder dieses Monster ein eigenes Modell? Dann trägt es seine eigenen Farben (keine Weltfärbung).
 static func has_look(look: String) -> bool:
-	return look != "" and ResourceLoader.exists("res://models/enemies_v2/bosse/%s.glb" % look)
+	return look_file(look) != ""
+
+
+## Datei des eigenen Modells (Bosse: enemies_v2/bosse/, Monster je Welt: enemies_v2/monster/), leer = keins
+static func look_file(look: String) -> String:
+	if look == "":
+		return ""
+	for dir in ["bosse", "monster"]:
+		if ResourceLoader.exists("res://models/enemies_v2/%s/%s.glb" % [dir, look]):
+			return "enemies_v2/%s/%s" % [dir, look]
+	return ""
 
 
 static var _scenes := {}

@@ -358,6 +358,10 @@ func _parse_args() -> void:
 			Battle.test_boss_preview = true
 		elif arg == "--boss-neu":
 			GameData.test_boss_looks = true   # Bosse je Welt (noch nicht freigegeben) für Prüfbilder
+		elif arg == "--monster-neu":
+			GameData.test_monster_looks = true   # Monster je Welt (noch nicht freigegeben) für Prüfbilder
+		elif arg == "--monster-vorschau":
+			Battle.test_monster_preview = true   # die drei Monster der Welt nah an der Mauer (Prüfbilder)
 		elif arg == "--neue-monster":
 			Models.test_new = true   # noch nicht freigegebene Gegnermodelle zeigen (Prüfbilder)
 		elif arg == "--mp":

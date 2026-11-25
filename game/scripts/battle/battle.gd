@@ -144,6 +144,7 @@ func _apply_world() -> void:
 ## Grafikstufe aus den Einstellungen: Hoch = Leuchten, Schatten und Stations-Inseln,
 ## Sparsam = ohne (spart Rechenzeit auf älteren Handys).
 static var test_boss_preview := false
+static var test_monster_preview := false
 
 
 func spawn_z() -> float:
@@ -281,6 +282,13 @@ func start() -> void:
 		var e := spawn_enemy(str(GameData.world_kinds(level)[3]), Vector3(0, 0, spawn_z() * 0.3))
 		e.hp *= 50.0
 		e.max_hp *= 50.0
+	if test_monster_preview:
+		# Labor (--monster-vorschau): die drei Monster der Welt nebeneinander nah an der Mauer, sehr zäh, für Prüfbilder
+		var ks: Array = GameData.world_kinds(level)
+		for i in 3:
+			var m := spawn_enemy(str(ks[i]), Vector3(-2.2 + 2.2 * i, 0, spawn_z() * (0.28 + 0.05 * i)))
+			m.hp *= 50.0
+			m.max_hp *= 50.0
 
 
 ## joined: per Karte im Kampf dazugerufen (nicht der erste Held).
@@ -430,7 +438,7 @@ func spawn_enemy(kind: String, pos := Vector3.INF) -> Enemy:
 	if pos == Vector3.INF:
 		pos = Vector3(randf_range(-3.6, 3.6), 0, spawn_z() + randf_range(-1.0, 1.0))
 	e.position = pos
-	e.look = GameData.boss_look(level, kind) if mode != "mp" else ""
+	e.look = GameData.enemy_look(level, kind) if mode != "mp" else ""
 	e.tint = Color(1, 1, 1) if Models.has_look(e.look) else GameData.world_tint(level, kind)
 	e.dps_scale = GameData.dps_mult(level, mode != "mp")
 	var hp := (MpData.hp_mult(level, maxi(wave, 1)) if mode == "mp" else GameData.hp_mult(level, maxi(wave, 1))) * hp_scale

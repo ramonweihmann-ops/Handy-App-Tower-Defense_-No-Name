@@ -2045,19 +2045,24 @@ def kristall_kaefer(arm, body):
 
 # ---------------------------------------------------------------- Ablauf
 
-basis, build = VARIANTEN[VAR]
-bpy.ops.import_scene.gltf(filepath=os.path.join(ROOT, "game/models/enemies_v2/%s.glb" % basis))
-arm = next(o for o in bpy.data.objects if o.type == 'ARMATURE')
-body = next(o for o in bpy.data.objects if o.type == 'MESH' and o.parent == arm)
-arm.data.pose_position = 'REST'
-bpy.context.view_layer.update()
-build(arm, body)
-arm.data.pose_position = 'POSE'
-# Animationen heißen im Spiel „Walk“, „Attack“ (und „Run“); beim Laden hängt Blender „_Armature“ an
-for a in bpy.data.actions:
-    if a.name.endswith("_Armature"):
-        a.name = a.name[:-len("_Armature")]
-bpy.ops.object.select_all(action='SELECT')
-bpy.ops.export_scene.gltf(filepath=OUT, export_format='GLB', export_animations=True, export_animation_mode='ACTIONS',
-                          export_yup=True, export_apply=False, export_force_sampling=True)
-print("FERTIG", OUT)
+def run(var, out):
+    """Grundmodell laden, Variante bauen, als GLB mit allen Animationen ausgeben (auch für tools/monster)"""
+    basis, build = VARIANTEN[var]
+    bpy.ops.import_scene.gltf(filepath=os.path.join(ROOT, "game/models/enemies_v2/%s.glb" % basis))
+    arm = next(o for o in bpy.data.objects if o.type == 'ARMATURE')
+    body = next(o for o in bpy.data.objects if o.type == 'MESH' and o.parent == arm)
+    arm.data.pose_position = 'REST'
+    bpy.context.view_layer.update()
+    build(arm, body)
+    arm.data.pose_position = 'POSE'
+    # Animationen heißen im Spiel „Walk“, „Attack“ (und „Run“); beim Laden hängt Blender „_Armature“ an
+    for a in bpy.data.actions:
+        if a.name.endswith("_Armature"):
+            a.name = a.name[:-len("_Armature")]
+    bpy.ops.object.select_all(action='SELECT')
+    bpy.ops.export_scene.gltf(filepath=out, export_format='GLB', export_animations=True, export_animation_mode='ACTIONS',
+                              export_yup=True, export_apply=False, export_force_sampling=True)
+    print("FERTIG", out)
+
+if __name__ == "__main__":
+    run(VAR, OUT)
