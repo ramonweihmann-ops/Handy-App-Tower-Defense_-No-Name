@@ -163,3 +163,31 @@ Stil: stilisiertes 3D-Spielmodell mit großen, ruhigen Formen und runden Kanten 
 
 Ausgabe: Bild 1 ist ein Charakter-Turnaround: vorn, schräg vorn, Seite, hinten. Ganzer Körper in neutraler A-Pose, einfarbig grauer Hintergrund, kein Text. Danach Bild 2: Nahaufnahme von Kopf und Maul plus die Angriffspose.
 ~~~~
+
+## B6: Magma-Golem (Kommentar 25.11.2026)
+
+Der Magma-Golem (Welt 4, Lava-Kolonie) soll komplett neu entworfen werden. Blatt: `Bosse_Neu_Referenz/magmagolem.png`.
+
+~~~~text
+Referenzblatt „Magma-Golem“ aus meinem 3D-Tower-Defense-Spiel fürs Handy, bitte öffnen und genau ansehen:
+https://raw.githubusercontent.com/ramonweihmann-ops/Handy-App-Tower-Defense_-No-Name/claude/amazing-hypatia-yl59v4/Vorlage_Raw/Bosse_Neu_Referenz/magmagolem.png
+
+Oben siehst du den aktuellen Boss der Welt „Lava-Kolonie“, unten rechts die Monster dieser Welt (Glutwicht, Schlackenwandler, Magmabrecher) als Stilvorlage. Der aktuelle Boss gefällt mir nicht: Er wirkt wie ein Haufen eckiger Felsbrocken mit gelben Kugeln, ohne Charakter.
+
+Aufgabe: Entwirf den „Magma-Golem“ komplett neu. Schlage zuerst 3 unterschiedliche Konzepte in je 2 Sätzen vor und zeichne dann das stärkste.
+
+Thema: Ein Riese aus dem Inneren eines Vulkans. Dunkles, erkaltetes Lavagestein (Basalt, Schlacke) mit glühenden Rissen, aus denen Magma leuchtet; ein glühender Kern in der Brust; heiße Lavaströme, die über Schultern und Arme laufen und erstarren; Rauch und Glut nur als feste Formen am Körper. Farben passend zu den Monstern: fast schwarzes Gestein, glühendes Orange und Gelb, etwas tiefes Rot. Er muss sich klar unterscheiden von einem Schrott-Roboter, einem violetten Sternen-Riesen und einem Golem aus Gold und Edelsteinen – und darf kein Stapel aus eckigen Low-Poly-Blöcken sein.
+
+Gesicht: gut lesbares, böses Gesicht mit glühenden Augen unter schweren Gesteinsbrauen. Maul im Comic-Stil, das zum Lavawesen passt (z. B. ein halb geöffnetes Maul mit Gesteinslippen, in dem Magma glüht, und ein paar kantigen Basaltzähnen) – nicht weit aufgerissen und nicht wie ein echtes Gebiss.
+
+Bau (muss so bleiben, die Figur wird in Blender nachgebaut und auf ein vorhandenes Skelett gesetzt):
+- Zweibeiner mit 2 Armen und 2 Beinen, große Hände mit Daumen und vier Fingern. Er läuft langsam. Beim Angriff reißt er beide Fäuste hoch und schlägt zu.
+- Alles sitzt fest am Körper: Nichts schwebt, keine dünnen, weit abstehenden Teile, keine losen Funken oder Rauchwolken.
+- Bedrohlich, aber im freundlichen Comic-Stil, nicht blutig oder eklig.
+- Im Spiel ist er klein und schräg von oben vorn zu sehen. Er braucht eine klare Silhouette, ein gut lesbares Gesicht und 2–3 Hauptfarben plus einen Leuchtakzent.
+- Eigenständiges Design, keine bekannte Figur aus Spielen oder Filmen.
+
+Stil: stilisiertes 3D-Spielmodell mit großen, ruhigen Formen und runden Kanten (wenig Kleinteile), deutliche Oberflächenstruktur, weiches Studiolicht.
+
+Ausgabe: Bild 1 ist ein Charakter-Turnaround: vorn, schräg vorn, Seite, hinten. Ganzer Körper in neutraler A-Pose, einfarbig grauer Hintergrund, kein Text. Danach Bild 2: Nahaufnahme von Kopf und Maul plus die Angriffspose.
+~~~~
