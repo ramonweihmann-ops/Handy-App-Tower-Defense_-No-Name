@@ -145,7 +145,7 @@ const LOOK_DATA := {
 	"schrott_krabbler": {"height": 1.45},
 	"schrott_zombie": {"height": 1.6},
 	"schrott_brecher": {"height": 2.0},
-	"schrott_koloss": {"height": 3.5},
+	"schrott_koloss": {"height": 3.2},
 	"robo_schleimling": {"height": 0.76},
 	"robo_tentakler": {"height": 1.2},
 	"robo_panzerkaefer": {"height": 1.11},

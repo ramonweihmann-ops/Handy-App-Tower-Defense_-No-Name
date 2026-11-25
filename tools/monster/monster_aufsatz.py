@@ -2672,7 +2672,7 @@ def schrottbrecher(arm, body):
             parts += exhaust("Auspuff%d" % s_, p - n * 0.01, (s_ * 0.2, 1.0, 0.2), 0.36, 0.035, M)
     attach(join_parts(parts, "Auspuffe"), arm, "mixamorig:Spine2")
 
-@variante("schrott_koloss", "koloss")
+@variante("schrott_koloss_alt", "koloss")          # alter Schrottkoloss; neu: tools/monster/schrottkoloss.py
 def schrottkoloss(arm, body):
     """Schrotthalden (Welt 19), Boss: Schrottkoloss – riesiger Golem aus rostigen Stahlblöcken mit Warnstreifen,
     Gelenken aus glühenden Lampen, einem Kopf mit rot leuchtenden Augen und Stahlzähnen, einer Öltonne als Brust,
@@ -2807,7 +2807,7 @@ def panzerroboter(arm, body):
             parts += exhaust("Auspuff%d" % s_, q - m * 0.01, (s_ * 0.2, 1.0, 0.3), 0.18, 0.025, M)
     attach(join_parts(parts, "Auspuffe"), arm, "Body")
 
-@variante("fabrik_mutter", "schleimmutter")
+@variante("fabrik_mutter_alt", "schleimmutter")      # alte Kuppel-Fabrikmutter; neu: tools/monster/fabrikmutter.py
 def fabrikmutter(arm, body):
     """Robo-Fabrik (Welt 20), Boss: Fabrikmutter – riesiger Kuppelroboter aus Blech mit Warnstreifen, Bildschirmgesicht
     mit rot leuchtenden LED-Augen, zwei Greifarmen, qualmenden Schornsteinen oben und Rädern unten. Eigene Figur auf dem
