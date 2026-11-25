@@ -1335,7 +1335,7 @@ def magma_golem(arm, body):
                                      glow_from=6), basalt, glut))
     attach(join_parts(chest_parts, "Golem_Brustkern"), arm, "mixamorig:Spine2")
 
-@variante("kristall_riese", "koloss")
+@variante("kristall_riese_alt", "koloss")          # alter rosa Kristallgolem; neu: tools/monster/kristallriese.py
 def kristall_riese(arm, body):
     """Herz des Wurmlochs (Welt 10): Kristallriese – in Koloss-Form, aber ganz aus facettierten violetten und rosa
     Kristallblöcken: kristalliner Kopf mit Kristallkrone und leuchtenden Augen, leuchtender Kern in der Brust,
@@ -2045,6 +2045,8 @@ def kristall_kaefer(arm, body):
 
 # ---------------------------------------------------------------- Ablauf
 
+EXPORT_IMAGE_FORMAT = "AUTO"        # Bildformat im GLB; einzelne Bauskripte können "JPEG" setzen (kleinere Dateien)
+
 def run(var, out):
     """Grundmodell laden, Variante bauen, als GLB mit allen Animationen ausgeben (auch für tools/monster)"""
     basis, build = VARIANTEN[var]
@@ -2061,7 +2063,8 @@ def run(var, out):
             a.name = a.name[:-len("_Armature")]
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.export_scene.gltf(filepath=out, export_format='GLB', export_animations=True, export_animation_mode='ACTIONS',
-                              export_yup=True, export_apply=False, export_force_sampling=True)
+                              export_yup=True, export_apply=False, export_force_sampling=True,
+                              export_image_format=EXPORT_IMAGE_FORMAT, export_jpeg_quality=90)
     print("FERTIG", out)
 
 if __name__ == "__main__":

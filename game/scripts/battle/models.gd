@@ -99,7 +99,7 @@ const LOOK_DATA := {
 	"kristall_kaefer": {"height": 2.4, "stride": 0.23},
 	"nebel_geist": {"height": 2.1, "lift": 0.3},
 	"schatten_wesen": {"height": 3.2},
-	"kristall_riese": {"height": 3.5},
+	"kristall_riese": {"height": 3.2},
 	"frost_schleimling": {"height": 1.0},
 	"frost_tentakler": {"height": 1.21},
 	"frost_panzerkaefer": {"height": 1.16},
