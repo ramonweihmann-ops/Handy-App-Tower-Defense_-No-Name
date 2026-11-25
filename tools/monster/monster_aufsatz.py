@@ -123,6 +123,11 @@ def worley3(P, freq, seed=0):
                 f1 = np.where(closer, d, f1)
     return (f2 - f1) * 0.5 / freq, cid
 
+def ridges(P, freq, seed, width, stretch=(1.0, 1.0, 1.0)):
+    """feine, fließende Linien im Raum (Höhenlinien eines Rauschens): Adern, Hautfalten"""
+    n = fbm3(P * np.asarray(stretch, np.float32), freq, seed, 3)
+    return np.clip(1 - np.abs(n - 0.5) / width, 0, 1)
+
 def paint(T, mask, color, keep_shading=0.5):
     """Maske (0..1 je Texel) in eine Farbe umfärben; keep_shading: wie viel der alten Helligkeit erhalten bleibt"""
     px = T["px"]
@@ -970,9 +975,9 @@ def sand_mats():
 def hide_skin(T, mask, seed, freq=22.0):
     """graue Nashornhaut mit Falten (feine dunkle Linien im Raum)"""
     P = T["P"]
-    edge, cid = worley3(P, freq, seed)
-    paint(T, mask, np.asarray((0.62, 0.6, 0.58), np.float32) * (0.9 + 0.2 * cid[..., None]), keep_shading=0.5)
-    paint(T, mask * np.clip(1 - edge / 0.0025, 0, 1) * 0.8, (0.3, 0.28, 0.27), keep_shading=0.0)
+    paint(T, mask, np.asarray((0.62, 0.6, 0.58), np.float32) * (0.92 + 0.16 * fbm3(P, 8.0, seed, 3)[..., None]), keep_shading=0.5)
+    folds = ridges(P, freq * 0.35, seed + 1, 0.035, (1.0, 1.0, 2.8)) * np.clip((fbm3(P, 4.0, seed + 2, 2) - 0.35) / 0.15, 0, 1)
+    paint(T, mask * folds * 0.75, (0.34, 0.32, 0.31), keep_shading=0.0)
 
 def sand_cloth(T, R):
     """Anzug wird Lederrüstung, Grau wird Messing, Kopfflecken Sandstein"""
@@ -1003,6 +1008,20 @@ def face_horn(body, arm, M, z, length, r0, bone="mixamorig:Head", small=True):
             parts.append(give(horn("Stirnhorn", tuple(q - m * 0.02), tuple(q + Vector((0, -length * 0.25, length * 0.15))), tuple(q + Vector((0, -length * 0.18, length * 0.45))), r0 * 0.55, n=9), M["ivory"]))
     attach(join_parts(parts, "Hoerner"), arm, bone)
 
+def rhino_ears(body, arm, M, size):
+    """Nashornohren seitlich oben am Kopf (flach, spitz, nach außen oben)"""
+    parts = []
+    for s_ in (-1, 1):
+        p, n = surface(body, (s_ * 2.0, 0.03, bone_pt(arm, "mixamorig:Head", 1.0).z + size * 0.6), (-s_, 0, 0))
+        if p is None:
+            continue
+        b0 = p - n * 0.02
+        ear = horn("Ohr%d" % s_, tuple(b0), tuple(b0 + Vector((s_ * size * 0.5, 0.02, size * 0.45))), tuple(b0 + Vector((s_ * size * 0.75, 0.05, size * 0.95))), size * 0.33, n=8)
+        for v in ear.data.vertices:                       # flach drücken (Ohrmuschel)
+            v.co.y = b0.y + (v.co.y - b0.y) * 0.45
+        parts.append(give(ear, M["hide_dark"]))
+    attach(join_parts(parts, "Ohren"), arm, "mixamorig:Head")
+
 @variante("sand_krabbler", "krabbler")
 def hornling(arm, body):
     """Sternenwüste, leicht: Hornling – flinker Wüstenkobold mit grauer Faltenhaut, Nashornhorn vorn am Kopf,
@@ -1012,7 +1031,8 @@ def hornling(arm, body):
     hide_skin(T, R["skin"], 71)
     sand_cloth(T, R)
     commit(T)
-    face_horn(body, arm, M, bone_pt(arm, "mixamorig:Head", 0.35).z, 0.17, 0.05)
+    face_horn(body, arm, M, bone_pt(arm, "mixamorig:Head", 0.35).z, 0.24, 0.07)
+    rhino_ears(body, arm, M, 0.14)
     a0 = bone_pt(arm, "mixamorig:LeftArm")
     p, n = surface(body, (a0.x, a0.y, a0.z + 0.1), (0, 0, -1))
     stone_dome("Panzer", (p if p is not None else a0) + Vector((0.02, 0, 0.01)), 0.08, 1, M, arm, "mixamorig:LeftArm", rivets=6)
@@ -1026,7 +1046,8 @@ def duenenwaechter(arm, body):
     hide_skin(T, R["skin"], 73)
     sand_cloth(T, R)
     commit(T)
-    face_horn(body, arm, M, bone_pt(arm, "mixamorig:Head", 0.3).z, 0.15, 0.045)
+    face_horn(body, arm, M, bone_pt(arm, "mixamorig:Head", 0.3).z, 0.2, 0.058)
+    rhino_ears(body, arm, M, 0.11)
     for s_, side in ((1, "Left"), (-1, "Right")):
         a0 = bone_pt(arm, "mixamorig:%sArm" % side)
         p, n = surface(body, (a0.x, a0.y, a0.z + 0.12), (0, 0, -1))
@@ -1186,7 +1207,7 @@ def geisterflatterer(arm, body):
     glow(T, white, (0.45, 0.85, 1.0))
     commit(T, strength=1.0)
     c = bone_pt(arm, "Bone_001", 0.5)
-    parts = fog_ring("Nebelring", (c.x, c.y + 0.05, c.z - 0.05), 0.5, 0.014, 6, 0.035, M, tilt=-8)
+    parts = fog_ring("Nebelring", (c.x, c.y + 0.12, c.z - 0.42), 0.66, 0.016, 6, 0.045, M, tilt=10)
     p, n = head_top(body, 0.0, 0.05)
     if p is not None:
         parts.append(fog_curl("Locke", p - n * 0.02, 0.24, M["ghost"]))
@@ -1205,7 +1226,7 @@ def nebelhuene(arm, body):
     T = texels(body); R = regions(T, arm)
     ghost_paint(T, R["skin"], 0.3)
     paint(T, R["purple"] * (1 - R["head"]), (0.3, 0.22, 0.48), keep_shading=0.6)
-    paint(T, R["purple"] * R["head"], (0.72, 0.68, 0.95), keep_shading=0.5)
+    ghost_paint(T, R["purple"] * R["head"], 0.3)
     paint(T, R["grey"], (0.72, 0.68, 0.92), keep_shading=0.5)
     collar = np.maximum(R["white"] * (1 - R["head"]), R["collar"])
     paint(T, collar, (0.9, 0.93, 1.0), keep_shading=0.3)
@@ -1252,8 +1273,7 @@ def shadow_skin(T, mask, seed, freq=12.0):
     P = T["P"]
     sheen = fbm3(P, 6.0, seed, 3)[..., None]
     paint(T, mask, np.asarray((0.05, 0.04, 0.08), np.float32) + sheen * np.asarray((0.07, 0.03, 0.12), np.float32), keep_shading=0.25)
-    edge, cid = worley3(P, freq, seed + 1)
-    k = np.clip(1 - edge / 0.004, 0, 1) ** 1.5 * (fbm3(P, 5.0, seed + 2, 3) > 0.45)
+    k = ridges(P, freq * 0.45, seed + 1, 0.03) ** 1.5 * np.clip((fbm3(P, 4.0, seed + 2, 3) - 0.42) / 0.08, 0, 1)
     paint(T, mask * k, (0.75, 0.45, 1.0), keep_shading=0.0)
     glow(T, mask * k, (0.7, 0.3, 1.0))
 
@@ -1414,14 +1434,14 @@ def sternenflatterer(arm, body):
     commit(T, strength=1.5)
     rnd = random.Random(127)
     c = bone_pt(arm, "Bone_001", 0.5)
-    attach(join_parts(energy_ring("Energiering", (c.x, c.y + 0.08, c.z - 0.02), 0.52, 0.014, (-12, 18, 0), M, 5, rnd), "Energiering"), arm, "Bone_001")
+    attach(join_parts(energy_ring("Energiering", (c.x, c.y + 0.12, c.z - 0.42), 0.68, 0.016, (10, 14, 0), M, 5, rnd), "Energiering"), arm, "Bone_001")
     for chain in (("Bone_009", "Bone_008", "Bone_006"), ("Bone_013", "Bone_012", "Bone_010")):
         tip = bone_pt(arm, chain[2], 1.0)
         attach(shard("HornKristall" + chain[0], tip - Vector((0, 0, 0.04)), Vector((0, 0.1, 1.0)), 0.12, 0.03, M["cr"]), arm, chain[2])
 
 @variante("wurm_zombie", "zombie")
 def leerenwandler(arm, body):
-    """Herz des Wurmlochs, mittel-stark: Leerenwandler – hagere Gestalt aus Sternenhimmel mit funkelnden Sternen,
+    """Herz des Wurmlochs, mittel: Leerenwandler – hagere Gestalt aus Sternenhimmel mit funkelnden Sternen,
     Rüstung aus violetten Kristallplatten mit leuchtenden Kanten, cyan leuchtendem Kern in der Brust, einem
     Energiering über dem Kopf mit kreisenden Kristallsplittern und Kristallen auf den Schultern"""
     M = wurm_mats()

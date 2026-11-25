@@ -112,6 +112,18 @@ const LOOK_DATA := {
 	"kristall_krabbler": {"height": 1.69},
 	"kristall_tentakler": {"height": 1.25},
 	"kristall_brecher": {"height": 2.18},
+	"sand_krabbler": {"height": 1.45},
+	"sand_zombie": {"height": 1.6},
+	"sand_panzerkaefer": {"height": 0.93},
+	"nebel_schleimling": {"height": 1.05},
+	"nebel_tentakler": {"height": 1.2},
+	"nebel_brecher": {"height": 2.23},
+	"schatten_krabbler": {"height": 1.59},
+	"schatten_zombie": {"height": 1.73},
+	"schatten_brecher": {"height": 2.0},
+	"wurm_tentakler": {"height": 1.26},
+	"wurm_zombie": {"height": 1.8},
+	"wurm_panzerkaefer": {"height": 0.85},
 }
 
 
