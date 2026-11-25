@@ -2225,7 +2225,7 @@ def storm_face(c, k, M, parts, fill=False):
     mc = c + Vector((0, -0.01 * k, -0.12 * k))
     parts += jaw_set("Sturmgebiss", mc, 0.13 * k, 0.058 * k, M["dark"], M["throat"], random.Random(17), gum_col=(0.3, 0.33, 0.48))
 
-@variante("sturm_wolke", "schleimmutter")
+@variante("sturm_wolke_alt", "schleimmutter")      # alte Kugelwolke; neu: tools/monster/sturmwolke.py
 def sturmwolke(arm, body):
     """Wolkenwirbel (Welt 17), Boss: Sturmwolke – riesige, wütende Gewitterwolke: oben weiß, unten dunkel, gelb
     leuchtende Augen unter dicken Brauen, offenes Maul mit Zähnen, Blitze und Regentropfen darunter und Windwirbel an
