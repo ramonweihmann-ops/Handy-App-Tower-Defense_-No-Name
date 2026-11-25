@@ -508,9 +508,9 @@ def tooth(name, base, down, along_dir, L, w, t, kind, mats, curve=0.0):
     return o
 
 def tongue(arm):
-    """Große Comic-Zunge, aus dem Maul gestreckt: liegt über der Unterlippe, Spitze hängt nach unten, Mittelfurche"""
+    """Comic-Zunge mit Mittelfurche, schaut nur ein Stück über die Unterlippe (Wunsch 25.11.: nicht alles überdecken)"""
     m = image_material("Zunge", 512, (0.85, 0.42, 0.6), rough=0.3)
-    ctrl = [Vector(c) for c in ((0, -0.08, 1.19), (0, -0.24, 1.205), (0, -0.34, 1.2), (0, -0.39, 1.178), (0, -0.418, 1.142))]
+    ctrl = [Vector(c) for c in ((0, -0.08, 1.19), (0, -0.22, 1.2), (0, -0.31, 1.2), (0, -0.352, 1.194), (0, -0.374, 1.181))]
     N, S = 26, 28
     cen = []
     for i in range(N):                                               # Mittellinie (Catmull-Rom durch die Stützpunkte)
@@ -525,7 +525,7 @@ def tongue(arm):
         if up.z < 0:
             up = -up
         end = math.sqrt(max(0.0, 1 - ((max(t, 0.8) - 0.8) / 0.2) ** 2))   # rund geschlossene Spitze
-        a_ = 0.085 * (1 - 0.25 * t * t) * (0.25 + 0.75 * end); h_ = 0.03 * (1 - 0.3 * t) * (0.3 + 0.7 * end)
+        a_ = 0.072 * (1 - 0.2 * t * t) * (0.25 + 0.75 * end); h_ = 0.028 * (1 - 0.3 * t) * (0.3 + 0.7 * end)
         ring = []
         for k in range(S):
             th = k * 2 * math.pi / S
