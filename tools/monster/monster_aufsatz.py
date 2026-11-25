@@ -2090,7 +2090,7 @@ def brooch(name, p, n, r, G, center_m, halo_m, n_halo=12):
         parts.append(gem(name + "Tropfen%d" % k, tip + d * r * 0.08, n, r * 0.12, center_m))
     return parts
 
-@variante("edelstein_golem", "koloss")
+@variante("edelstein_golem_alt", "koloss")
 def edelsteingolem(arm, body):
     """Glitzerschlucht (Welt 16), Boss: Edelsteingolem – riesiger Golem aus Goldblöcken (Kommentar 25.11.: Farben
     abgestimmt auf Gold, tiefrotes Rubin und Diamant): Gelenke aus dunkel glühendem Rubin, Gesicht mit leuchtenden
