@@ -653,6 +653,58 @@ def toad_eyes(c_left, c_right, r, M, parts):
                               [r * 0.33, r * 0.4, r * 0.33]), M["leg"]))
 
 @variante("gift_schleimling", "schleimling")
+def giftkaulquappe(arm, body):
+    """Giftsumpf, leicht: Giftkaulquappe – kleine, flinke Kaulquappe (Kommentar 25.11.: nicht wie ein Junges der
+    Giftkröte, keine Füße): ovaler Kopfkörper, oben dunkeloliv mit violetten Flecken, heller Bauch, seitliche gelbe
+    Augen mit Schlitzpupillen, kleines Maul mit Gifttropfen, ein paar leuchtende Warzen und ein breiter Flossenschwanz.
+    Eigene Figur auf dem Skelett des Schleimlings (hüpft wie er)."""
+    M = gift_mats()
+    skin = look("KaulquappenHaut", (1.0, 1.0, 1.0), rough=0.35)
+    prof = [(0.46, 0.0), (0.455, 0.08), (0.43, 0.16), (0.385, 0.23), (0.32, 0.28), (0.24, 0.3), (0.16, 0.295), (0.09, 0.27), (0.04, 0.21), (0.01, 0.12), (0.0, 0.0)]
+    g = lathe("Kaulquappe", prof, segs=56)
+    for v in g.data.vertices:
+        v.co.y *= 1.22
+        v.co.x *= 0.92
+    H_, W_ = 1024, 1024
+    vv = np.linspace(0, 1, H_)[:, None] * np.ones((1, W_))
+    spots = fbm(H_, W_, 14, 97)
+    grad = np.clip((vv - 0.4) / 0.2, 0, 1)
+    col = np.asarray((0.8, 0.84, 0.5)) * (1 - grad[..., None]) + np.asarray((0.24, 0.36, 0.12)) * grad[..., None]
+    k = (np.clip((spots - 0.6) * 45, 0, 1) * grad)[..., None]
+    col = col * (1 - k) + np.asarray((0.5, 0.17, 0.6)) * k
+    col = np.clip(col + ((fbm(H_, W_, 50, 98, 2) - 0.5) * 0.1)[..., None], 0, 1)
+    arr = np.ones((H_, W_, 4), np.float32); arr[..., :3] = col
+    lathe_texture(skin, arr)
+    give(g, skin)
+    bpy.context.view_layer.update()
+    face = []
+    for s_ in (-1, 1):
+        p, n = surface(g, (s_ * 2.0, -0.24, 0.25), (-s_, 0, 0))
+        c = p - n * 0.02
+        face.append(give(sphere("Augapfel%d" % s_, tuple(c), 0.06), M["eye"]))
+        face.append(give(sphere("Schlitz%d" % s_, tuple(c + n * 0.052 + Vector((0, -0.012, 0))), 0.022, (0.5, 1.3, 0.4)), M["black"]))
+        face.append(give(tube("Lid%d" % s_, [tuple(c + Vector((0, 0.05, 0.045))), tuple(c + n * 0.03 + Vector((0, -0.01, 0.055))), tuple(c + Vector((0, -0.06, 0.035)))], [0.015, 0.02, 0.015]), M["leg"]))
+    hits = on_surface(g, (0, 0, 0.17), [(math.sin(a), -math.cos(a), -0.15 + 0.12 * (abs(a) / 0.8) ** 2) for a in [math.radians(t) for t in range(-40, 44, 8)]], lift=0.003)
+    face.append(give(tube("Maul", [tuple(p) for p, n in hits], [0.008] + [0.013] * (len(hits) - 2) + [0.008], segs=8), M["mouth"]))
+    p, n = hits[-1]
+    face.append(give(sphere("Gifttropfen", tuple(p + Vector((0, -0.01, -0.05))), 0.016, (1, 1, 1.3)), M["toxic"]))
+    rnd = random.Random(31)
+    for i in range(7):
+        a = rnd.uniform(-1.9, 1.9) + math.pi / 2
+        el = rnd.uniform(0.6, 1.3)
+        d = Vector((math.cos(a) * math.cos(el), math.sin(a) * math.cos(el), math.sin(el)))
+        q, m = surface(g, Vector((0, 0, 0.2)) + d * 2.0, -d)
+        if q is not None and q.z > 0.22:
+            face.append(give(sphere("Warze%d" % i, tuple(q), rnd.uniform(0.012, 0.02), (1, 1, 0.7)), M["wart"]))
+    attach(join_parts(face, "Kaulquappe_Kopf"), arm, "Top")
+    q, m = surface(g, (0, 2.0, 0.17), (0, -1, 0))
+    tail = [fin("Schwanz", q - m * 0.05, (0, 1.0, 0.25), 0.48, 0.13, M["leg"], curl=0.25),
+            fin("Schwanzsaum", q - m * 0.04 + Vector((0, 0.02, 0.0)), (0, 1.0, 0.18), 0.5, 0.09, M["belly"], curl=0.3)]
+    attach(join_parts(tail, "Kaulquappe_Schwanz"), arm, "Body")
+    skin_to(g, arm, lambda c: {"Top": smooth01((c.z - 0.02) / 0.13), "Body": 1 - smooth01((c.z - 0.02) / 0.13)})   # Maul bewegt sich mit dem Kopf
+    dampen_scale(arm, ("Body", "Top"), 0.55)
+    remove_body(body)
+
 def kroetling(arm, body):
     """Giftsumpf, leicht: Krötling – kleine, runde Kröte (wie ein Junges der Giftkröte): oliv mit violetten Flecken,
     große gelbe Augen mit Schlitzpupillen, breites Maul mit Gifttropfen, leuchtende Giftwarzen, ein Giftpilz auf
@@ -1080,6 +1132,8 @@ def nashornkaefer(arm, body):
     paint(T, teal * np.clip(1 - edge / 0.004, 0, 1), (0.45, 0.32, 0.18), keep_shading=0.0)
     hide_skin(T, red, 83)
     paint(T, beige, (0.93, 0.86, 0.7), keep_shading=0.5)
+    white = np.clip((0.2 - s) / 0.06, 0, 1) * np.clip((v - 0.75) / 0.08, 0, 1)
+    paint(T, white, (0.99, 0.98, 0.95), keep_shading=0.35)          # Zähne sauber weiß (Kommentar 25.11.)
     commit(T)
     # Messingband mit Nieten um den Panzerrand
     rim = ring_hits(body, (0, 0.03, 0.17), 40, 0.0, phase=0.0, skip=lambda a: math.sin(a) < -0.75)
@@ -1096,10 +1150,18 @@ def nashornkaefer(arm, body):
     if p is None or p.z < 0.15:
         p, n = surface(body, (0.0, -1.5, h0.z + 0.06), (0, 1, 0))
     hp = [give(horn("Kaeferhorn", tuple(p - n * 0.02), tuple(p + Vector((0, -0.1, 0.12))), tuple(p + Vector((0, -0.06, 0.3))), 0.055, n=12), M["ivory"])]
-    q, m = surface(body, (0.0, -1.5, h0.z - 0.0), (0, 1, 0))
-    if q is not None:
-        hp.append(give(horn("Nasenhorn", tuple(q - m * 0.02), tuple(q + Vector((0, -0.07, 0.03))), tuple(q + Vector((0, -0.1, 0.1))), 0.03, n=9), M["ivory"]))
-    attach(join_parts(hp, "Kaeferhoerner"), arm, "Head")
+    attach(join_parts(hp, "Kaeferhoerner"), arm, "Head")          # unteres Horn entfernt (Kommentar 25.11.: mit den Zähnen verhakt)
+    # Hörner auf dem Rückenpanzer (Kommentar 25.11.): Reihe in der Mitte, nach hinten geschwungen, kleinere seitlich
+    back = []
+    for k, (x, y, L, r0) in enumerate(((0.0, -0.06, 0.2, 0.045), (0.0, 0.07, 0.17, 0.04), (0.0, 0.19, 0.13, 0.035),
+                                       (-0.13, 0.0, 0.11, 0.03), (0.13, 0.0, 0.11, 0.03), (-0.12, 0.14, 0.09, 0.026), (0.12, 0.14, 0.09, 0.026))):
+        q, m = surface(body, (x, y, 2.0), (0, 0, -1))
+        if q is None:
+            continue
+        b0 = q - m * 0.02
+        out = Vector((x * 2.0, 0.0, 0.0))
+        back.append(give(horn("Rueckenhorn%d" % k, tuple(b0), tuple(b0 + m * L * 0.55 + out * 0.15 + Vector((0, 0.03, 0))), tuple(b0 + m * L + out * 0.3 + Vector((0, L * 0.45, 0))), r0, n=10), M["ivory"]))
+    attach(join_parts(back, "Rueckenhoerner"), arm, "Body")
 
 # ---------------------------------------------------------------- Nebelfelder (Welt 8): Stil des Nebelgeists
 
@@ -1143,6 +1205,46 @@ def ghost_paint(T, mask, glow_k=0.25):
     glow(T, mask * glow_k, (0.72, 0.68, 1.0))
 
 @variante("nebel_schleimling", "schleimling")
+def nebelirrlicht(arm, body):
+    """Nebelfelder, leicht: Nebelirrlicht – kleine, schwebende Nebelflamme (Kommentar 25.11.: nicht wie ein Junges des
+    Nebelgeists): runder Bauch, nach oben spitz zulaufend und nach hinten geweht, leuchtend lavendel bis weiß, zwei
+    schräge cyan leuchtende Augen, ein freches Grinsen und drei kleine Nebelkugeln, die um den Fuß kreisen. Eigene Figur
+    auf dem Skelett des Schleimlings."""
+    M = nebel_mats()
+    wisp = look("Irrlicht", (0.95, 0.94, 1.0), rough=0.4, emit=(0.6, 0.52, 0.95), strength=0.35)
+    prof = [(0.78, 0.0), (0.7, 0.035), (0.6, 0.08), (0.5, 0.14), (0.4, 0.2), (0.31, 0.24), (0.22, 0.255), (0.14, 0.24), (0.07, 0.2), (0.025, 0.12), (0.0, 0.0)]
+    g = lathe("Irrlicht", prof, segs=48)
+    for v in g.data.vertices:
+        if v.co.z > 0.32:
+            t = (v.co.z - 0.32) / 0.46
+            v.co.y += 0.22 * t * t
+            v.co.x += 0.05 * math.sin(t * 3.0) * t
+    H_, W_ = 512, 512
+    vv = np.linspace(0, 1, H_)[:, None] * np.ones((1, W_))
+    col = gradient((0.5, 0.4, 0.88), (0.93, 0.9, 1.0), (vv - 0.05) / 0.75)
+    col = np.clip(col + ((fbm(H_, W_, 6, 81) - 0.5) * 0.22)[..., None], 0, 1)
+    arr = np.ones((H_, W_, 4), np.float32); arr[..., :3] = col
+    lathe_texture(wisp, arr)
+    give(g, wisp)
+    bpy.context.view_layer.update()
+    skin_to(g, arm, lambda c: {"Top": smooth01((c.z - 0.12) / 0.3), "Body": 1 - smooth01((c.z - 0.12) / 0.3)})
+    face = []
+    p, n = surface(g, (0, -2.0, 0.26), (0, 1, 0))
+    for s_ in (-1, 1):
+        so = sphere("Augenhoehle%d" % s_, (0, 0, 0), 0.068, (1.2, 0.35, 0.85)); so.location = p + Vector((s_ * 0.085, 0.022, 0.045)); so.rotation_euler = (0, math.radians(s_ * -25), 0)
+        face.append(give(so, M["dark"]))
+        e = sphere("Auge%d" % s_, (0, 0, 0), 0.052, (1.2, 0.45, 0.8)); e.location = p + Vector((s_ * 0.085, 0.004, 0.045)); e.rotation_euler = (0, math.radians(s_ * -25), 0)
+        face.append(give(e, M["eye"]))
+        face.append(give(sphere("Pupille%d" % s_, tuple(p + Vector((s_ * 0.078, -0.018, 0.04))), 0.018), M["pupil"]))
+    grin = [tuple(p + Vector((x, 0.006 + 0.05 * x * x, -0.05 + 2.4 * x * x))) for x in (-0.09, -0.045, 0.0, 0.045, 0.09)]
+    face.append(give(tube("Grinsen", grin, [0.008, 0.014, 0.016, 0.014, 0.008], segs=8), M["dark"]))
+    attach(join_parts(face, "Irrlicht_Gesicht"), arm, "Top")
+    orbs = [give(sphere("Nebelkugel%d" % i, (0.3 * math.cos(a), 0.3 * math.sin(a), 0.1 + 0.04 * math.sin(3 * a)), 0.04), M["fog"])
+            for i, a in enumerate([i * 2 * math.pi / 3 + 0.5 for i in range(3)])]
+    attach(join_parts(orbs, "Irrlicht_Kugeln"), arm, "Body")
+    dampen_scale(arm, ("Body", "Top"), 0.6)
+    remove_body(body)
+
 def nebelwisch(arm, body):
     """Nebelfelder, leicht: Nebelwisch – kleines Gespenst wie ein Junges des Nebelgeists: gewellter Saum, leuchtende
     Augen, kleines Maul, Stummelärmchen, Nebellocke oben und ein kleiner Nebelring. Eigene Figur auf dem Skelett des
@@ -1692,7 +1794,7 @@ def facet_paint(T, mask, seed, cols, freq=14.0, lead=None, glow_k=0.4):
         paint(T, mask * np.clip(1 - edge / 0.004, 0, 1), lead, keep_shading=0.2)
     glow(T, mask * (glow_k * 0.5 + glint), (0.9, 0.8, 1.0))
 
-def snail(name, length, height, G, body_m, shell_m, band_m, gem_mats, rnd, gems=6):
+def snail(name, length, height, G, body_m, shell_m, band_m, gem_mats, rnd, gems=6, spike=1.0, spike_m=None):
     """Juwelenschnecke: Schneckenfuß (flach, vorn mit Kopf und Fühleraugen) und ein eingerolltes Gehäuse aus
     Rosenquarz mit Goldband und eingesetzten Edelsteinen. Liefert (Fußteile, Gehäuseteile, Kopfteile)."""
     L = length; Hh = height
@@ -1700,8 +1802,8 @@ def snail(name, length, height, G, body_m, shell_m, band_m, gem_mats, rnd, gems=
     radii = [L * 0.03, L * 0.13, L * 0.17, L * 0.16, L * 0.13, L * 0.11]
     foot = tube(name + "Fuss", path, radii, segs=24)
     for v in foot.data.vertices:
-        v.co.z = max(v.co.z, 0.0)
         v.co.x *= 1.25
+        v.co.z = max(v.co.z, 0.012 + 0.35 * v.co.x * v.co.x)   # leicht gewölbter Bauch statt flacher Fläche (flackerte)
     give(foot, body_m)
     head = give(sphere(name + "Kopf", path[-1], L * 0.115, (1.15, 1.0, 1.0)), body_m)
     # Gehäuse: logarithmische Spirale in der Seitenebene, Röhre wird nach innen dünner
@@ -1716,17 +1818,20 @@ def snail(name, length, height, G, body_m, shell_m, band_m, gem_mats, rnd, gems=
     shell = give(tube(name + "Gehaeuse", pts, rr, segs=28), shell_m)
     for v in shell.data.vertices:
         v.co.x *= 1.1
-    band_pts = []
+    # Goldband als eigener schmaler Wulst auf dem Rücken der Röhre (Kommentar 25.11.: das übergestülpte Band flackerte)
+    band_pts, band_r = [], []
     for (x, y, z), r_ in zip(pts, rr):
-        band_pts.append((0.0, y, z))
-    band = give(tube(name + "Goldband", band_pts, [r_ * 1.04 for r_ in rr], segs=28), band_m)
-    for v in band.data.vertices:                   # nur ein schmaler Streifen oben auf der Röhre bleibt sichtbar
-        v.co.x *= 0.25
+        out = Vector((0.0, y - cy, z - cz))
+        out = out.normalized() if out.length > 1e-4 else Vector((0, 0, 1))
+        band_pts.append(tuple(Vector((0.0, y, z)) + out * r_ * 0.97))
+        band_r.append(max(0.004, r_ * 0.11))
+    band = give(tube(name + "Goldband", band_pts[:-2], band_r[:-2], segs=10), band_m)
     shell_parts = [shell, band]
     for i in range(6, 30, 4):
         (x, y, z), r_ = pts[i], rr[i]
         c = Vector((0.0, y, z)); out = (c - Vector((0.0, cy, cz))).normalized()
-        shell_parts.append(shard(name + "Kamm%d" % i, c + out * r_ * 0.8, out, r_ * 0.9, r_ * 0.22, gem_mats[(i // 4) % len(gem_mats)] if i % 8 == 2 else shell_m))
+        shell_parts.append(shard(name + "Kamm%d" % i, c + out * r_ * 0.8, out, r_ * 0.9 * spike, r_ * 0.22 * min(spike, 1.4),
+                                 spike_m or (gem_mats[(i // 4) % len(gem_mats)] if i % 8 == 2 else shell_m)))
     for g_ in range(gems):
         i = int(4 + g_ * 30 / max(1, gems))
         (x, y, z), r_ = pts[i], rr[i]
@@ -1745,6 +1850,30 @@ def snail(name, length, height, G, body_m, shell_m, band_m, gem_mats, rnd, gems=
     return [foot, head], shell_parts, head_parts
 
 @variante("rosen_schleimling", "schleimling")
+def glitzerling(arm, body):
+    """Kristallplanet, leicht: Glitzerling – kleiner, schwebender Edelstein (Kommentar 25.11.: keine Schnecke, kleiner und
+    leichter): ein geschliffener Rosenquarz mit Gesicht auf der Tafel, zwei kleine goldene Flügel und zwei winzige
+    Diamanten, die um ihn kreisen. Eigene Figur auf dem Skelett des Schleimlings (hüpft und schwebt)."""
+    G = gem_mats()
+    eye_m = look("Glitzeraugen", (0.08, 0.03, 0.08), rough=0.2)
+    shine = look("Glanzpunkt", (1, 1, 1), rough=0.2, emit=(1, 1, 1), strength=2.0)
+    c = Vector((0.0, 0.0, 0.34))
+    parts = [gem("Rosenstein", c, (0, -1, 0.12), 0.24, G["rose"])]
+    fy = c.y - 0.24 * 0.35 - 0.004
+    for s_ in (-1, 1):
+        parts.append(give(sphere("Auge%d" % s_, (s_ * 0.05, fy, c.z + 0.035), 0.028, (0.85, 0.3, 1.15)), eye_m))
+        parts.append(give(sphere("Glanz%d" % s_, (s_ * 0.05 + 0.01, fy - 0.008, c.z + 0.05), 0.009), shine))
+        parts.append(give(tube("Braue%d" % s_, [(s_ * 0.085, fy - 0.004, c.z + 0.085), (s_ * 0.05, fy - 0.006, c.z + 0.078), (s_ * 0.02, fy - 0.005, c.z + 0.066)], [0.007, 0.008, 0.006], segs=6), eye_m))
+    parts.append(give(tube("Mund", [(-0.03, fy - 0.004, c.z - 0.035), (0.0, fy - 0.006, c.z - 0.045), (0.03, fy - 0.004, c.z - 0.035)], [0.006, 0.007, 0.006], segs=6), eye_m))
+    for s_ in (-1, 1):
+        b0 = c + Vector((s_ * 0.2, 0.06, 0.04))
+        parts += feather_fan("Fluegel%d_" % s_, b0, (s_ * 1.0, 0.35, 0.5), (0, 0, 1), 3, 0.15, 0.045, (G["gold"], G["gold2"]), spread=50)
+    for i, a in enumerate((0.6, 3.6)):
+        parts.append(gem("Begleiter%d" % i, c + Vector((0.32 * math.cos(a), 0.32 * math.sin(a), -0.12 + 0.1 * i)), (math.cos(a), math.sin(a), 0.5), 0.035, G["diamond"]))
+    attach(join_parts(parts, "Glitzerling"), arm, "Top")
+    dampen_scale(arm, ("Body", "Top"), 0.5)
+    remove_body(body)
+
 def glitzerschnecke(arm, body):
     """Kristallplanet, leicht: Glitzerschnecke – kleine Schnecke wie ein Junges der Juwelenschnecke: rosa
     Schneckenfuß, eingerolltes Gehäuse aus Rosenquarz mit Goldband und kleinen Edelsteinen, Fühler mit Diamantaugen.
@@ -1919,6 +2048,61 @@ def goldbrecher(arm, body):
 
 @variante("juwelen_schnecke", "schleimmutter")
 def juwelenschnecke(arm, body):
+    """Rosenkristalle (Welt 15), Boss: Juwelenschnecke – riesige, bedrohliche Schnecke (Kommentar 25.11.: zu harmlos):
+    dunkelrosa Fuß mit Rubinstacheln an den Seiten, eingerolltes Gehäuse aus Rosenquarz mit Goldwulst, eingesetzten
+    Edelsteinen und einem Kamm aus großen Rubinstacheln, Fühler mit Rubinaugen, rot glühende, böse Augen am Kopf, ein
+    breites Maul mit zwei Reihen Diamantzähnen und glühendem Schlund, goldene Krone. Eigene Figur auf dem Skelett der
+    Schleimmutter."""
+    G = gem_mats()
+    skin = look("Schneckenhaut", (0.86, 0.38, 0.58), rough=0.3, emit=(0.6, 0.15, 0.35), strength=0.15)
+    ruby_d = look("Rubinstachel", (0.7, 0.03, 0.14), rough=0.06, emit=(0.6, 0.02, 0.1), strength=0.9)
+    glow_eye = look("Gluehauge", (1.0, 0.25, 0.2), rough=0.2, emit=(1.0, 0.12, 0.08), strength=5.0)
+    socket = look("Augenhoehle", (0.12, 0.02, 0.06), rough=0.5)
+    throat = look("Schlund", (0.6, 0.05, 0.12), rough=0.5, emit=(0.8, 0.08, 0.15), strength=1.6)
+    rnd = random.Random(301)
+    foot, shell, head = snail("Juwel", 1.25, 1.2, G, skin, G["rose"], G["gold"], [G["ruby"], G["diamond"], G["ruby"], G["diamond"]], rnd, gems=8, spike=1.9, spike_m=ruby_d)
+    for o in foot:
+        skin_to(o, arm, lambda c: {"Top": smooth01((c.z - 0.12) / 0.3), "Body": 1 - smooth01((c.z - 0.12) / 0.3)})
+    hd = next(o for o in foot if o.name.endswith("Kopf"))
+    hp = Vector((0.0, -0.625, 0.408))
+    extra = []
+    # Kopf vorn: böse Augen in dunklen Höhlen, breites Maul mit glühendem Schlund und zwei Zahnreihen
+    p, n = surface(hd, (0.0, -2.0, hp.z + 0.04), (0, 1, 0))
+    for s_ in (-1, 1):
+        so = sphere("Augenhoehle%d" % s_, (0, 0, 0), 0.045, (1.3, 0.5, 0.75)); so.location = p + Vector((s_ * 0.07, 0.012, 0.035)); so.rotation_euler = (0, math.radians(-s_ * 22), 0)
+        extra.append(give(so, socket))
+        e = sphere("Gluehauge%d" % s_, (0, 0, 0), 0.032, (1.3, 0.5, 0.7)); e.location = p + Vector((s_ * 0.07, -0.006, 0.035)); e.rotation_euler = (0, math.radians(-s_ * 22), 0)
+        extra.append(give(e, glow_eye))
+        extra.append(give(tube("Braue%d" % s_, [tuple(p + Vector((s_ * 0.13, -0.0, 0.09))), tuple(p + Vector((s_ * 0.07, -0.02, 0.08))), tuple(p + Vector((s_ * 0.015, -0.02, 0.055)))],
+                               [0.014, 0.018, 0.013]), ruby_d))
+    mc = p + Vector((0.0, 0.005, -0.06))
+    maw = sphere("Maul", (0, 0, 0), 0.1, (1.25, 0.45, 0.55)); maw.location = mc
+    extra.append(give(maw, socket))
+    th = sphere("Schlund", (0, 0, 0), 0.075, (1.2, 0.3, 0.45)); th.location = mc + Vector((0, -0.04, 0.0))
+    extra.append(give(th, throat))
+    for i, x in enumerate((-0.08, -0.04, 0.0, 0.04, 0.08)):
+        extra.append(shard("Oberzahn%d" % i, mc + Vector((x, -0.045 + 0.08 * x * x, 0.05 - 0.6 * x * x)), (0, -0.15, -1), 0.04, 0.012, G["diamond"]))
+    for i, x in enumerate((-0.06, -0.02, 0.02, 0.06)):
+        extra.append(shard("Unterzahn%d" % i, mc + Vector((x, -0.045 + 0.08 * x * x, -0.05 + 0.6 * x * x)), (0, -0.15, 1), 0.032, 0.011, G["diamond"]))
+    # Krone sitzt auf dem Kopf (Strahl von oben)
+    for k in range(5):
+        a = math.radians(-60 + 30 * k)
+        q, m = surface(hd, (math.sin(a) * 0.08, hp.y - math.cos(a) * 0.05 + 0.03, 2.0), (0, 0, -1))
+        if q is not None:
+            extra.append(shard("Krone%d" % k, q - m * 0.015, (math.sin(a) * 0.4, -0.15, 1.0), 0.09 + 0.05 * (k == 2), 0.022, G["gold"]))
+    # Rubinstacheln an den Seiten des Fußes
+    spikes = []
+    for s_ in (-1, 1):
+        for k, y in enumerate((-0.3, -0.12, 0.06, 0.24)):
+            q, m = surface(foot[0], (s_ * 2.0, y, 0.12), (-s_, 0, 0))
+            if q is not None:
+                spikes.append(shard("Fussstachel%d_%d" % (s_, k), q - m * 0.02, (m + Vector((0, 0.3, 0.6))).normalized(), 0.1 - 0.015 * k, 0.025, ruby_d))
+    attach(join_parts(shell + head + extra, "Juwel_Oben"), arm, "Top")
+    attach(join_parts(spikes, "Juwel_Stacheln"), arm, "Body")
+    dampen_scale(arm, ("Body", "Top"), 0.35)
+    remove_body(body)
+
+def juwelenschnecke(arm, body):
     """Rosenkristalle (Welt 15), Boss: Juwelenschnecke – riesige Schnecke mit rosa schimmerndem Fuß und einem
     eingerollten Gehäuse aus Rosenquarz mit Goldband, eingesetzten Edelsteinen und einem Kamm aus Kristallen, Fühler mit
     Rubinaugen, goldene Krone mit Steinen und ein Maul mit Diamantzähnen. Eigene Figur auf dem Skelett der Schleimmutter."""
@@ -1944,7 +2128,100 @@ def juwelenschnecke(arm, body):
     dampen_scale(arm, ("Body", "Top"), 0.35)
     remove_body(body)
 
+def brooch(name, p, n, r, G, center_m, halo_m, n_halo=12):
+    """Prunk-Brosche: großer Brillant in Krappenfassung, Goldring, Kranz aus kleinen Diamanten, äußerer Goldring und
+    goldene Zierstrahlen mit Rubintropfen (Kommentar 25.11.: Brustteil wirkte billig und ohne Details)"""
+    n = Vector(n).normalized()
+    q = n.to_track_quat('Z', 'Y').to_matrix()
+    ex, ey = q @ Vector((1, 0, 0)), q @ Vector((0, 1, 0))
+    c = Vector(p) + n * r * 0.1
+    parts = [gem(name, c, n, r, center_m)]
+    bez = torus(name + "Fassung", (0, 0, 0), r * 1.04, r * 0.09, segs=40); bez.matrix_world = Matrix.Translation(c - n * r * 0.02) @ q.to_4x4()
+    parts.append(give(bez, G["gold"]))
+    for k in range(8):
+        a = k * math.pi / 4 + math.pi / 8
+        d = ex * math.cos(a) + ey * math.sin(a)
+        parts.append(give(tube(name + "Krappe%d" % k, [tuple(c + d * r * 1.08 - n * r * 0.05), tuple(c + d * r * 1.0 + n * r * 0.22), tuple(c + d * r * 0.82 + n * r * 0.3)],
+                               [r * 0.06, r * 0.05, r * 0.035], segs=6), G["gold"]))
+    plate = torus(name + "Teller", (0, 0, 0), r * 1.35, r * 0.2, segs=48); plate.matrix_world = Matrix.Translation(c - n * r * 0.12) @ q.to_4x4()
+    parts.append(give(plate, G["gold2"]))
+    for k in range(n_halo):
+        a = k * 2 * math.pi / n_halo
+        d = ex * math.cos(a) + ey * math.sin(a)
+        parts += set_gem(name + "Kranz%d" % k, c + d * r * 1.35 + n * r * 0.1, n, r * 0.14, halo_m, G, sink=0.1)
+    outer = torus(name + "Aussenring", (0, 0, 0), r * 1.62, r * 0.06, segs=56); outer.matrix_world = Matrix.Translation(c - n * r * 0.1) @ q.to_4x4()
+    parts.append(give(outer, G["gold"]))
+    for k in range(4):
+        a = k * math.pi / 2 + math.pi / 4
+        d = ex * math.cos(a) + ey * math.sin(a)
+        b0 = c + d * r * 1.62 - n * r * 0.1
+        tip = b0 + d * r * 0.7 - n * r * 0.05
+        parts.append(give(tube(name + "Strahl%d" % k, [tuple(b0), tuple(b0 + d * r * 0.35 + n * r * 0.08 + (ex * -math.sin(a) + ey * math.cos(a)) * r * 0.12), tuple(tip)],
+                               [r * 0.06, r * 0.05, r * 0.03], segs=8), G["gold"]))
+        parts.append(gem(name + "Tropfen%d" % k, tip + d * r * 0.08, n, r * 0.12, center_m))
+    return parts
+
 @variante("edelstein_golem", "koloss")
+def edelsteingolem(arm, body):
+    """Glitzerschlucht (Welt 16), Boss: Edelsteingolem – riesiger Golem aus Goldblöcken (Kommentar 25.11.: Farben
+    abgestimmt auf Gold, tiefrotes Rubin und Diamant): Gelenke aus dunkel glühendem Rubin, Gesicht mit leuchtenden
+    Diamantaugen und sauber sitzenden Diamantzähnen, eine Diamantkrone mit goldenen Fassungen, die auf dem Kopf sitzt,
+    eine Prunk-Brosche mit großem Rubin auf der Brust und Rubin-Diamant-Kristalle auf den Schultern. Eigene Figur."""
+    G = gem_mats()
+    ruby = look("Rubin", (0.72, 0.03, 0.12), rough=0.05, emit=(0.55, 0.0, 0.08), strength=0.8)
+    joint = look("Rubingelenk", (0.6, 0.03, 0.1), rough=0.08, emit=(0.45, 0.0, 0.07), strength=1.0)
+    g = golem_body(arm, body, G["gold"], G["gold2"], joint, flat=True, subdiv=1, fist_m=G["gold2"], nail_m=G["diamond"], legs=1.4)
+    H = "mixamorig:Head"
+    hc = g["head"] + Vector((0, -0.08, 0.24))
+    skull = block_at("Kopf", hc, (0.25, 0.23, 0.22), G["gold"], 31, True, 1)
+    jaw = block_at("Kiefer", hc + Vector((0, -0.07, -0.15)), (0.22, 0.17, 0.1), G["gold2"], 32, True, 1)
+    socket = look("Augenhoehle", (0.18, 0.02, 0.05), rough=0.6, emit=(0.35, 0.0, 0.05), strength=0.6)
+    eye = look("Diamantauge", (0.9, 0.97, 1.0), rough=0.1, emit=(0.75, 0.9, 1.0), strength=4.0)
+    core = look("Diamantkern", (1.0, 1.0, 1.0), rough=0.1, emit=(0.95, 0.97, 1.0), strength=8.0)
+    mouth_in = look("Maulinneres", (0.3, 0.02, 0.06), rough=0.6, emit=(0.6, 0.02, 0.08), strength=1.2)
+    face = golem_face(skull, jaw, hc, {"socket": socket, "eye": eye, "core": core, "mouth": mouth_in, "tooth": G["diamond"],
+                                      "brow": G["gold2"], "crack": ruby, "throat": joint})
+    # Zähne ordentlich (Kommentar 25.11.): kürzer, damit sich obere und untere Reihe nicht kreuzen
+    for o in face:
+        if o.name.startswith("Oberzahn"):
+            o.scale = (1.0, 1.0, 0.55)
+        elif o.name.startswith("Unterzahn"):
+            o.scale = (1.0, 1.0, 0.5)
+    head = [skull, jaw] + face
+    # Krone sitzt auf dem Schädel (Strahl von oben je Zacke) mit goldener Fassung am Fuß
+    bpy.context.view_layer.update()
+    for k in range(5):
+        x = (k - 2) * 0.075
+        q, m = surface(skull, (hc.x + x, hc.y - 0.06 + 0.02 * abs(k - 2), hc.z + 1.0), (0, 0, -1))
+        if q is None:
+            continue
+        hgt = (0.24, 0.17, 0.12)[abs(k - 2)]
+        d = (Vector((x * 1.6, 0.05, 1.0))).normalized()
+        head.append(shard("Krone%d" % k, q - m * 0.03, d, hgt, 0.035, G["diamond"]))
+        col = torus("Kronenfassung%d" % k, (0, 0, 0), 0.042, 0.012, segs=16); col.matrix_world = Matrix.Translation(q + m * 0.005) @ d.to_track_quat('Z', 'Y').to_matrix().to_4x4()
+        head.append(give(col, G["gold"]))
+    q, m = surface(skull, (hc.x, hc.y - 1.0, hc.z + 0.13), (0, 1, 0))
+    if q is not None:
+        head += set_gem("Stirnrubin", q, m, 0.04, ruby, G, sink=0.3)
+    attach(join_parts(head, "Golem_Kopf"), arm, H)
+    # Brosche vor die Brust (zwischen den beiden Brustblöcken liegt eine Fuge): vorderste Stelle der Blöcke messen,
+    # Brosche auf eine goldene Grundplatte davor setzen, Blick nach vorn
+    chest_o = bpy.data.objects.get("Golem_Spine2")
+    zc = g["chest"].z + 0.02
+    ys = [surface(chest_o, (x, -2.0, zc), (0, 1, 0))[0] for x in (-0.14, -0.08, 0.08, 0.14)] if chest_o is not None else []
+    ys = [q.y for q in ys if q is not None]
+    yf = (min(ys) if ys else g["chest"].y - 0.32) - 0.015
+    p, n = Vector((0.0, yf, zc)), Vector((0.0, -1.0, 0.08)).normalized()
+    plate = lathe("Grundplatte", [(0.03, 0.0), (0.03, 0.2), (0.0, 0.215), (-0.03, 0.2), (-0.03, 0.0)], segs=48)
+    plate.matrix_world = Matrix.Translation(p + n * 0.005) @ n.to_track_quat('Z', 'Y').to_matrix().to_4x4()
+    attach(join_parts([give(plate, G["gold2"])] + brooch("Brust", p + n * 0.04, n, 0.11, G, ruby, G["diamond"]), "Golem_Brosche"), arm, "mixamorig:Spine2")
+    rnd = random.Random(311)
+    for s_, side in ((1, "Left"), (-1, "Right")):
+        a0 = bone_pt(arm, "mixamorig:%sArm" % side)
+        c = a0 + Vector((s_ * 0.06, 0.0, 0.3))
+        parts = cluster("Schulterkristall" + side, c, Vector((s_ * 0.5, 0.1, 1.0)).normalized(), 0.3, 0.06, (ruby, G["diamond"], ruby), rnd, count=4)
+        attach(join_parts(parts, "Schulterkristall" + side), arm, "mixamorig:%sArm" % side)
+
 def edelsteingolem(arm, body):
     """Glitzerschlucht (Welt 16), Boss: Edelsteingolem – riesiger Golem aus Goldblöcken mit Gelenken aus leuchtendem
     Rubin, Gesicht mit Diamantaugen und Diamantzähnen, Rubinadern, Krone aus Diamanten, einem großen Rubin in der Brust
@@ -1992,6 +2269,7 @@ def storm_mats():
         "copper": look("Kupfer", (0.85, 0.5, 0.3), rough=0.3, metal=0.85),
         "rain": look("Regen", (0.55, 0.75, 1.0), rough=0.1, emit=(0.3, 0.5, 1.0), strength=0.5),
         "tooth": look("Sturmzahn", (0.97, 0.97, 1.0), rough=0.3),
+        "throat": look("Gewitterschlund", (1.0, 0.75, 0.3), rough=0.4, emit=(1.0, 0.6, 0.15), strength=2.2),
     }
 
 def cloud_parts(name, c, size, seed, M, n=12, flat=0.75, dark_below=True):
@@ -2035,7 +2313,7 @@ def storm_skin(T, mask, seed, base=(0.32, 0.44, 0.68)):
     paint(T, mask * veins, (1.0, 0.95, 0.5), keep_shading=0.0)
     glow(T, mask * veins, (1.0, 0.85, 0.25))
 
-def storm_face(c, k, M, parts):
+def storm_face(c, k, M, parts, fill=False):
     """Gewitter-Gesicht vorn auf einer Wolke: wütende, gelb leuchtende Augen, dicke dunkle Brauen, offenes Maul mit Zähnen"""
     c = Vector(c)
     for s_ in (-1, 1):
@@ -2047,8 +2325,19 @@ def storm_face(c, k, M, parts):
                                                tuple(c + Vector((s_ * 0.03 * k, -0.05 * k, 0.1 * k)))], [0.035 * k, 0.04 * k, 0.03 * k]), M["cloud_dark"]))
     m = sphere("Maul", (0, 0, 0), 0.1 * k, (1.3, 0.45, 0.6)); m.location = c + Vector((0, -0.01 * k, -0.12 * k))
     parts.append(give(m, M["dark"]))
-    for i, x in enumerate((-0.07, 0.0, 0.07)):
-        parts.append(shard("Zahn%d" % i, c + Vector((x * k, -0.045 * k, -0.075 * k)), (0, -0.2, -1), 0.04 * k, 0.014 * k, M["tooth"]))
+    if not fill:
+        for i, x in enumerate((-0.07, 0.0, 0.07)):
+            parts.append(shard("Zahn%d" % i, c + Vector((x * k, -0.045 * k, -0.075 * k)), (0, -0.2, -1), 0.04 * k, 0.014 * k, M["tooth"]))
+        return
+    # gefülltes Maul (Kommentar 25.11.: wirkte leer): glühender Gewitterschlund, Blitz als Zunge, zwei Zahnreihen
+    mc = c + Vector((0, -0.01 * k, -0.12 * k))
+    th = sphere("Schlund", (0, 0, 0), 0.085 * k, (1.25, 0.3, 0.5)); th.location = mc + Vector((0, -0.032 * k, 0.0))
+    parts.append(give(th, M["throat"]))
+    parts.append(bolt("Zungenblitz", mc + Vector((-0.07 * k, -0.05 * k, 0.005 * k)), mc + Vector((0.07 * k, -0.05 * k, -0.01 * k)), 0.009 * k, M, n=4, jitter=0.25, seed=7))
+    for i, x in enumerate((-0.1, -0.05, 0.0, 0.05, 0.1)):
+        parts.append(shard("Oberzahn%d" % i, mc + Vector((x * k, -0.045 * k, (0.052 - 0.9 * x * x) * k)), (0, -0.2, -1), 0.04 * k, 0.014 * k, M["tooth"]))
+    for i, x in enumerate((-0.075, -0.025, 0.025, 0.075)):
+        parts.append(shard("Unterzahn%d" % i, mc + Vector((x * k, -0.045 * k, (-0.052 + 0.9 * x * x) * k)), (0, -0.2, 1), 0.033 * k, 0.013 * k, M["tooth"]))
 
 @variante("sturm_wolke", "schleimmutter")
 def sturmwolke(arm, body):
@@ -2059,7 +2348,7 @@ def sturmwolke(arm, body):
     low = cloud_parts("WolkeUnten", (0, 0.02, 0.42), 0.62, 321, M, n=14, flat=0.7)
     up = cloud_parts("WolkeOben", (0, 0.05, 0.72), 0.5, 322, M, n=12, flat=0.8, dark_below=False)
     face = []
-    storm_face((0, -0.47, 0.6), 1.25, M, face)
+    storm_face((0, -0.47, 0.6), 1.25, M, face, fill=True)
     attach(join_parts(up + face, "Sturm_Oben"), arm, "Top")
     below = []
     for k, (x, y, L) in enumerate(((-0.28, -0.1, 0.42), (0.05, -0.2, 0.5), (0.3, 0.05, 0.38), (-0.05, 0.25, 0.34))):
@@ -2081,6 +2370,38 @@ def sturmwolke(arm, body):
     remove_body(body)
 
 @variante("sturm_schleimling", "schleimling")
+def gewittertropfen(arm, body):
+    """Wolkenwirbel, leicht: Gewittertropfen – kleiner, glänzender Regentropfen (Kommentar 25.11.: keine kleine Wolke):
+    tiefblau, oben spitz, gelb leuchtende, wütende Augen, kleines Maul, ein Blitz als Haarlocke an der Spitze und zwei
+    Funken, die um ihn springen. Eigene Figur auf dem Skelett des Schleimlings (hüpft wie er)."""
+    M = storm_mats()
+    water = look("Regenwasser", (1, 1, 1), rough=0.06, emit=(0.15, 0.3, 0.7), strength=0.35)
+    prof = [(0.7, 0.0), (0.64, 0.05), (0.55, 0.11), (0.45, 0.18), (0.35, 0.24), (0.25, 0.27), (0.16, 0.265), (0.08, 0.22), (0.025, 0.13), (0.0, 0.0)]
+    g = lathe("Tropfen", prof, segs=48)
+    H_, W_ = 512, 512
+    vv = np.linspace(0, 1, H_)[:, None] * np.ones((1, W_))
+    col = gradient((0.12, 0.3, 0.78), (0.45, 0.72, 1.0), (vv - 0.15) / 0.75)
+    arr = np.ones((H_, W_, 4), np.float32); arr[..., :3] = np.clip(col, 0, 1)
+    lathe_texture(water, arr)
+    give(g, water)
+    bpy.context.view_layer.update()
+    skin_to(g, arm, lambda c: {"Top": smooth01((c.z - 0.1) / 0.3), "Body": 1 - smooth01((c.z - 0.1) / 0.3)})
+    face = []
+    p, n = surface(g, (0, -2.0, 0.24), (0, 1, 0))
+    for s_ in (-1, 1):
+        e = sphere("Auge%d" % s_, (0, 0, 0), 0.04, (1.2, 0.45, 0.8)); e.location = p + Vector((s_ * 0.07, 0.01, 0.035)); e.rotation_euler = (0, math.radians(-s_ * 18), 0)
+        face.append(give(e, M["eye"]))
+        face.append(give(sphere("Pupille%d" % s_, tuple(p + Vector((s_ * 0.065, -0.006, 0.03))), 0.013), M["dark"]))
+        face.append(give(tube("Braue%d" % s_, [tuple(p + Vector((s_ * 0.12, 0.0, 0.09))), tuple(p + Vector((s_ * 0.07, -0.012, 0.085))), tuple(p + Vector((s_ * 0.02, -0.012, 0.065)))],
+                              [0.011, 0.014, 0.01]), M["dark"]))
+    face.append(give(tube("Maul", [tuple(p + Vector((-0.035, -0.004, -0.04))), tuple(p + Vector((0.0, -0.008, -0.05))), tuple(p + Vector((0.035, -0.004, -0.04)))], [0.008, 0.01, 0.008], segs=8), M["dark"]))
+    face.append(bolt("Blitzlocke", (0.0, 0.0, 0.66), (0.06, 0.06, 0.86), 0.022, M, n=3, jitter=0.35, seed=345))
+    face.append(bolt("Funke1", (0.26, -0.05, 0.42), (0.34, -0.02, 0.52), 0.012, M, n=3, jitter=0.4, seed=346))
+    face.append(bolt("Funke2", (-0.25, 0.04, 0.3), (-0.34, 0.06, 0.38), 0.012, M, n=3, jitter=0.4, seed=347))
+    attach(join_parts(face, "Tropfen_Gesicht"), arm, "Top")
+    dampen_scale(arm, ("Body", "Top"), 0.55)
+    remove_body(body)
+
 def woelkchen(arm, body):
     """Wolkenwirbel, leicht: Wölkchen – kleine, wütende Gewitterwolke wie ein Junges der Sturmwolke: gelb leuchtende
     Augen, dunkle Brauen, kleines Maul und ein Blitz darunter. Eigene Figur auf dem Skelett des Schleimlings."""
@@ -2303,6 +2624,918 @@ def donnerriese(arm, body):
         t = torus("Sturmring", (0, 0, 0), 0.1, 0.018, segs=28); t.matrix_world = Matrix.Translation(q + m * 0.02) @ m.to_track_quat('Z', 'Y').to_matrix().to_4x4()
         back.append(give(t, M["copper"]))
     attach(join_parts(back, "Donner_Ruecken"), arm, "mixamorig:Spine2")
+
+# ---------------------------------------------------------------- Gemeinsame Bausteine für Planet 10 bis 15
+
+def lathe_uv_grid(H_=1024, W_=1024):
+    vv = np.linspace(0, 1, H_)[:, None] * np.ones((1, W_))
+    uu = np.ones((H_, 1)) * np.linspace(0, 1, W_)[None, :]
+    return uu, vv
+
+def feather_tex(base, tip, rows=14, cols=18, seed=1, H_=1024, W_=1024):
+    """Federkleid für Drehkörper: Reihen schuppiger Federn (Abwicklung: u rundum, v unten→oben)"""
+    uu, vv = lathe_uv_grid(H_, W_)
+    r = vv * rows
+    row = np.floor(r); loc = r - row
+    sc = 0.5 + 0.5 * np.abs(np.sin(math.pi * (uu * cols + row * 0.5)))
+    edge = np.clip((loc - sc * 0.35) / 0.08, 0, 1)
+    shade = 0.75 + 0.25 * edge
+    col = np.asarray(base) * (1 - loc[..., None] * 0.35) + np.asarray(tip) * (loc[..., None] * 0.35)
+    col = col * shade[..., None] * (0.92 + (fbm(H_, W_, 60, seed, 2) - 0.5)[..., None] * 0.15)
+    arr = np.ones((H_, W_, 4), np.float32); arr[..., :3] = np.clip(col, 0, 1)
+    return arr
+
+def metal_tex(base, seed=1, panels=(8, 6), rust=0.3, stripes=None, H_=1024, W_=1024):
+    """Blech für Drehkörper: Platten mit Fugen, Nieten an den Ecken, Rostflecken; stripes=(v0, v1): Warnstreifen-Band"""
+    uu, vv = lathe_uv_grid(H_, W_)
+    fu = (uu * panels[0]) % 1.0; fv = (vv * panels[1]) % 1.0
+    seam = np.clip(1 - np.minimum(np.minimum(fu, 1 - fu), np.minimum(fv, 1 - fv)) / 0.012, 0, 1)
+    riv = np.clip(1 - np.hypot(np.minimum(fu, 1 - fu) - 0.05, np.minimum(fv, 1 - fv) - 0.08) / 0.018, 0, 1)
+    col = np.ones((H_, W_, 3)) * np.asarray(base) * (0.9 + 0.15 * fbm(H_, W_, 8, seed, 3))[..., None]
+    rk = np.clip((fbm(H_, W_, 6, seed + 1, 4) - (1 - rust)) / 0.08, 0, 1)
+    col = col * (1 - rk[..., None]) + np.asarray((0.55, 0.3, 0.14)) * rk[..., None]
+    if stripes is not None:
+        band = (vv > stripes[0]) & (vv < stripes[1])
+        st = ((uu * 24 + vv * 6) % 1.0) < 0.5
+        col = np.where((band & st)[..., None], np.asarray((0.95, 0.75, 0.1)), np.where(band[..., None], np.asarray((0.08, 0.08, 0.08)), col))
+    col = col * (1 - seam[..., None] * 0.55)
+    col = col * (1 - riv[..., None] * 0.2) + riv[..., None] * 0.25
+    arr = np.ones((H_, W_, 4), np.float32); arr[..., :3] = np.clip(col, 0, 1)
+    return arr
+
+def metal_paint(T, mask, seed, base=(0.55, 0.57, 0.6), rust=0.35, freq=7.0):
+    """Blech im Raum: Platten mit dunklen Fugen, Nietpunkte, Rostflecken"""
+    P = T["P"]
+    edge, cid = worley3(P, freq, seed)
+    paint(T, mask, np.asarray(base, np.float32) * (0.85 + 0.25 * cid[..., None]), keep_shading=0.5)
+    rk = np.clip((fbm3(P, 6.0, seed + 1, 4) - (1 - rust)) / 0.08, 0, 1)
+    paint(T, mask * rk, (0.58, 0.3, 0.13), keep_shading=0.5)
+    paint(T, mask * np.clip(1 - edge / 0.003, 0, 1), (0.16, 0.16, 0.18), keep_shading=0.0)
+    riv = np.clip((noise3(P, 55.0, seed + 2) - 0.86) / 0.04, 0, 1) * np.clip((0.02 - edge) / 0.01, 0, 1)
+    paint(T, mask * riv, (0.8, 0.8, 0.82), keep_shading=0.2)
+
+def hazard_paint(T, mask, freq=9.0):
+    P = T["P"]
+    st = (((P[..., 0] + P[..., 2]) * freq) % 1.0) < 0.5
+    paint(T, mask * st, (0.95, 0.75, 0.1), keep_shading=0.5)
+    paint(T, mask * (~st), (0.1, 0.1, 0.1), keep_shading=0.5)
+
+def robo_mats():
+    return {
+        "steel": look("Stahl", (0.6, 0.62, 0.66), rough=0.35, metal=0.8),
+        "steel_dark": look("StahlDunkel", (0.28, 0.29, 0.32), rough=0.4, metal=0.7),
+        "rust": look("Rost", (0.55, 0.3, 0.14), rough=0.75, metal=0.2),
+        "led": look("LED", (1.0, 0.2, 0.12), rough=0.2, emit=(1.0, 0.12, 0.05), strength=6.0),
+        "hazard": look("Warngelb", (0.95, 0.75, 0.1), rough=0.5),
+        "rubber": look("Gummi", (0.07, 0.07, 0.08), rough=0.85),
+        "smoke": look("Rauch", (0.45, 0.45, 0.48), rough=0.9),
+    }
+
+def exhaust(name, base, d, L, r, M, smoke=True):
+    b = Vector(base); d = Vector(d).normalized()
+    pts = [b, b + d * L * 0.5 + Vector((0, 0, L * 0.15)), b + d * L * 0.7 + Vector((0, 0, L * 0.5))]
+    parts = [give(tube(name, [tuple(p) for p in pts], [r, r, r * 1.15], segs=12), M["steel_dark"])]
+    parts.append(give(torus(name + "Rand", tuple(pts[-1]), r * 1.15, r * 0.25, rot=(0, 0, 0), segs=16), M["steel"]))
+    if smoke:
+        for k in range(3):
+            parts.append(give(sphere(name + "Rauch%d" % k, tuple(pts[-1] + Vector((0.02 * k, 0.01 * k, r * 2 + k * r * 2.2))), r * (1.3 + 0.5 * k)), M["smoke"]))
+    return parts
+
+def gear(name, c, n, r, M, teeth=10):
+    """Zahnrad: flache Scheibe mit Zähnen und Nabe, Achse in Richtung n"""
+    parts = [give(lathe(name, [(r * 0.12, 0.0), (r * 0.12, r * 0.85), (-r * 0.12, r * 0.85), (-r * 0.12, 0.0)], segs=32), M["steel"])]
+    for k in range(teeth):
+        a = k * 2 * math.pi / teeth
+        parts.append(give(block_at(name + "Zahn%d" % k, (math.cos(a) * r * 0.95, math.sin(a) * r * 0.95, 0), (r * 0.14, r * 0.14, r * 0.11), M["steel"], k, True, 0), M["steel"]))
+    parts.append(give(sphere(name + "Nabe", (0, 0, 0), r * 0.25, (1, 1, 0.8)), M["steel_dark"]))
+    o = join_parts(parts, name)
+    o.matrix_world = Matrix.Translation(Vector(c)) @ Vector(n).normalized().to_track_quat('Z', 'Y').to_matrix().to_4x4()
+    return o
+
+def rotor(name, c, r, M, blades=3):
+    parts = [give(sphere(name + "Nabe", tuple(c), r * 0.18), M["steel_dark"])]
+    for k in range(blades):
+        a = k * 2 * math.pi / blades
+        tip = Vector(c) + Vector((math.cos(a) * r, math.sin(a) * r, 0.0))
+        bl = block_at(name + "Blatt%d" % k, (Vector(c) + tip) / 2, (r * 0.5, r * 0.08, r * 0.025), M["steel"], k, True, 0)
+        bl.rotation_euler = (0.25, 0, a); bl.location = (Vector(c) + tip) / 2
+        parts.append(bl)
+    return parts
+
+def robo_body(T, R, seed, rust=0.4, suit=(0.36, 0.2, 0.12), hazard=False):
+    metal_paint(T, R["skin"], seed, rust=rust)
+    if hazard:
+        hazard_paint(T, R["purple"] * (1 - R["head"]))
+    else:
+        paint(T, R["purple"] * (1 - R["head"]), suit, keep_shading=0.6)
+    paint(T, R["purple"] * R["head"], (0.3, 0.31, 0.34), keep_shading=0.5)
+    paint(T, R["grey"], (0.95, 0.75, 0.1), keep_shading=0.5)
+    eyes = R["white"] * R["head"]
+    paint(T, eyes, (1.0, 0.35, 0.25), keep_shading=0.2)
+    glow(T, eyes, (1.0, 0.12, 0.05))
+
+# ---------------------------------------------------------------- Schrottwelt (Welt 19 und 20): Rost, Stahl, Warnstreifen, rote LEDs
+
+@variante("schrott_krabbler", "krabbler")
+def schrottwicht(arm, body):
+    """Schrotthalden, leicht: Schrottwicht – kleiner Kobold aus verbeultem, rostigem Blech mit Nieten, rot leuchtenden
+    LED-Augen, Bolzen statt Flecken am Kopf, einem Auspuffrohr auf dem Rücken und einem Zahnrad an der Schulter"""
+    M = robo_mats()
+    T = texels(body); R = regions(T, arm)
+    robo_body(T, R, 501, rust=0.5)
+    commit(T, strength=2.0)
+    p, n = back_pt(body, 0.0, bone_pt(arm, "mixamorig:Spine1").z)
+    if p is not None:
+        attach(join_parts(exhaust("Auspuff", p - n * 0.01, (0.0, 1.0, 0.2), 0.22, 0.025, M), "Auspuff"), arm, "mixamorig:Spine2")
+    a0 = bone_pt(arm, "mixamorig:LeftArm")
+    attach(gear("Zahnrad", a0 + Vector((0.04, 0.0, 0.05)), (1, 0, 0.3), 0.07, M), arm, "mixamorig:LeftArm")
+
+@variante("schrott_zombie", "zombie")
+def rostschlurfer(arm, body):
+    """Schrotthalden, mittel: Rostschlurfer – hagerer Blechläufer mit viel Rost, aufgenieteten Flickblechen, rot
+    leuchtenden Augen und zwei qualmenden Auspuffrohren auf dem Rücken"""
+    M = robo_mats()
+    T = texels(body); R = regions(T, arm)
+    robo_body(T, R, 511, rust=0.6)
+    commit(T, strength=2.0)
+    hc = bone_pt(arm, "mixamorig:Head", 0.4)
+    patch_on("BlechKopf", body, hc + Vector((-1.2, -0.3, 0.5)), (1.0, 0.25, -0.42), (0.1, 0.09), M["steel"], M["steel_dark"], arm, "mixamorig:Head", spin=0.4, rivets=True)
+    sp = bone_pt(arm, "mixamorig:Spine1")
+    patch_on("BlechBrust", body, (sp.x + 0.05, sp.y - 1.5, sp.z + 0.05), (0, 1, 0), (0.11, 0.1), M["rust"], M["steel_dark"], arm, "mixamorig:Spine1", spin=-0.3, rivets=True)
+    parts = []
+    for s_ in (-1, 1):
+        p, n = back_pt(body, s_ * 0.07, bone_pt(arm, "mixamorig:Spine1", 0.8).z)
+        if p is not None:
+            parts += exhaust("Auspuff%d" % s_, p - n * 0.01, (s_ * 0.3, 1.0, 0.1), 0.3, 0.028, M)
+    attach(join_parts(parts, "Auspuffe"), arm, "mixamorig:Spine2")
+
+@variante("schrott_brecher", "brecher")
+def schrottbrecher(arm, body):
+    """Schrotthalden, stark: Schrottbrecher – massiger Schläger aus rostigem Stahl mit Warnstreifen-Rüstung, einem
+    Reifen auf der Schulter, Blechschienen an den Unterarmen, rot leuchtenden Augen und Auspuffrohren"""
+    M = robo_mats()
+    T = texels(body); R = regions(T, arm)
+    robo_body(T, R, 521, rust=0.45, hazard=True)
+    collar = np.maximum(R["white"] * (1 - R["head"]), R["collar"])
+    paint(T, collar, (0.1, 0.1, 0.11), keep_shading=0.5)
+    commit(T, strength=2.0)
+    a0 = bone_pt(arm, "mixamorig:LeftArm")
+    tire = torus("Reifen", tuple(a0 + Vector((0.02, 0.0, 0.1))), 0.14, 0.055, rot=(0, 70, 0), segs=36)
+    attach(give(tire, M["rubber"]), arm, "mixamorig:LeftArm")
+    for s_, side in ((1, "Left"), (-1, "Right")):
+        f0, f1 = bone_pt(arm, "mixamorig:%sForeArm" % side, 0.2), bone_pt(arm, "mixamorig:%sForeArm" % side, 0.85)
+        attach(chunk_between("Schiene" + side, f0 + Vector((s_ * 0.05, 0.03, 0.02)), f1 + Vector((s_ * 0.05, 0.03, 0.02)), 0.065, M["steel"], 50 + s_, True, 1), arm, "mixamorig:%sForeArm" % side)
+    parts = []
+    for s_ in (-1, 1):
+        p, n = back_pt(body, s_ * 0.14, bone_pt(arm, "mixamorig:Spine2").z)
+        if p is not None:
+            parts += exhaust("Auspuff%d" % s_, p - n * 0.01, (s_ * 0.2, 1.0, 0.2), 0.36, 0.035, M)
+    attach(join_parts(parts, "Auspuffe"), arm, "mixamorig:Spine2")
+
+@variante("schrott_koloss", "koloss")
+def schrottkoloss(arm, body):
+    """Schrotthalden (Welt 19), Boss: Schrottkoloss – riesiger Golem aus rostigen Stahlblöcken mit Warnstreifen,
+    Gelenken aus glühenden Lampen, einem Kopf mit rot leuchtenden Augen und Stahlzähnen, einer Öltonne als Brust,
+    Reifen auf der Schulter und qualmenden Schornsteinen auf dem Rücken"""
+    M = robo_mats()
+    lamp = look("Warnlampe", (1.0, 0.55, 0.1), rough=0.3, emit=(1.0, 0.45, 0.05), strength=3.0)
+    g = golem_body(arm, body, M["steel"], M["rust"], lamp, flat=True, subdiv=1, fist_m=M["steel_dark"], nail_m=M["hazard"], legs=1.35)
+    hc = g["head"] + Vector((0, -0.08, 0.24))
+    skull = block_at("Kopf", hc, (0.25, 0.23, 0.22), M["steel"], 31, True, 1)
+    jaw = block_at("Kiefer", hc + Vector((0, -0.07, -0.15)), (0.22, 0.17, 0.1), M["rust"], 32, True, 1)
+    socket = look("Augenhoehle", (0.05, 0.05, 0.06), rough=0.6, emit=(0.4, 0.04, 0.02), strength=0.6)
+    core = look("LEDkern", (1.0, 0.9, 0.8), rough=0.2, emit=(1.0, 0.8, 0.6), strength=8.0)
+    mouth_in = look("Maulinneres", (0.12, 0.05, 0.04), rough=0.6, emit=(0.6, 0.1, 0.03), strength=0.8)
+    head = [skull, jaw] + golem_face(skull, jaw, hc, {"socket": socket, "eye": M["led"], "core": core, "mouth": mouth_in, "tooth": M["steel"],
+                                                    "brow": M["steel_dark"], "crack": M["rust"], "throat": lamp})
+    head.append(gear("Kopfzahnrad", hc + Vector((0.2, 0.05, 0.16)), (1, 0.2, 0.5), 0.09, M))
+    attach(join_parts(head, "Schrott_Kopf"), arm, "mixamorig:Head")
+    ch = g["chest"] + Vector((0, -0.25, 0.0))
+    barrel = [give(lathe("Oeltonne", [(0.17, 0.0), (0.17, 0.14), (0.1, 0.15), (-0.1, 0.15), (-0.17, 0.14), (-0.17, 0.0)], segs=28), M["hazard"])]
+    barrel[0].rotation_euler = (math.radians(90), 0, 0); barrel[0].location = ch
+    for k, z in enumerate((-0.09, 0.0, 0.09)):
+        barrel.append(give(torus("Tonnenring%d" % k, tuple(ch + Vector((0, 0, z))), 0.155, 0.012, rot=(0, 0, 0), segs=28), M["rubber"]))
+    attach(join_parts(barrel, "Oeltonne"), arm, "mixamorig:Spine2")
+    a0 = bone_pt(arm, "mixamorig:LeftArm")
+    attach(give(torus("Reifen", tuple(a0 + Vector((0.08, 0.0, 0.26))), 0.22, 0.08, rot=(0, 60, 0), segs=40), M["rubber"]), arm, "mixamorig:LeftArm")
+    back = []
+    for s_ in (-1, 1):
+        b0 = g["chest"] + Vector((s_ * 0.2, 0.38, 0.1))
+        back.append(give(tube("Schornstein%d" % s_, [tuple(b0), tuple(b0 + Vector((0, 0.05, 0.55)))], [0.07, 0.065], segs=16), M["steel_dark"]))
+        for k in range(3):
+            back.append(give(sphere("Qualm%d_%d" % (s_, k), tuple(b0 + Vector((0.03 * k * s_, 0.06 + 0.02 * k, 0.65 + 0.14 * k))), 0.08 + 0.04 * k), M["smoke"]))
+    attach(join_parts(back, "Schornsteine"), arm, "mixamorig:Spine2")
+
+def dome_robot(name, prof, M, base_col, eye_r, H_=1024):
+    """Kuppel-Roboter (Drehkörper aus Blech mit Warnstreifen-Band) für Schleim-Skelette"""
+    g = lathe(name, prof, segs=48)
+    mat = look(name + "Blech", (1, 1, 1), rough=0.35, metal=0.6)
+    lathe_texture(mat, metal_tex(base_col, seed=7, panels=(10, 5), rust=0.2, stripes=(0.12, 0.2)))
+    give(g, mat)
+    return g
+
+@variante("robo_schleimling", "schleimling")
+def schraubling(arm, body):
+    """Robo-Fabrik, leicht: Schraubling – kleiner Kuppelroboter mit Warnstreifen-Band, einem großen rot leuchtenden
+    Auge, einem Propeller oben und Stummelbeinchen. Eigene Figur auf dem Skelett des Schleimlings (hüpft wie er)."""
+    M = robo_mats()
+    prof = [(0.7, 0.0), (0.69, 0.1), (0.66, 0.2), (0.6, 0.28), (0.5, 0.34), (0.38, 0.37), (0.22, 0.37), (0.1, 0.35), (0.04, 0.3), (0.0, 0.2), (0.0, 0.0)]
+    g = dome_robot("Schraubling", prof, M, (0.62, 0.64, 0.68), 0.08)
+    skin_to(g, arm, lambda c: {"Top": smooth01((c.z - 0.15) / 0.3), "Body": 1 - smooth01((c.z - 0.15) / 0.3)})
+    parts = []
+    p, n = surface(g, (0, -2.0, 0.45), (0, 1, 0))
+    eye_ring = torus("Augenring", (0, 0, 0), 0.1, 0.022, segs=32); eye_ring.matrix_world = Matrix.Translation(p + n * 0.01) @ n.to_track_quat('Z', 'Y').to_matrix().to_4x4()
+    parts += [give(eye_ring, M["steel_dark"]), give(sphere("Auge", tuple(p - n * 0.02), 0.085, (1, 0.6, 1)), M["led"])]
+    parts.append(give(tube("Mast", [(0, 0, 0.68), (0, 0, 0.8)], [0.015, 0.015], segs=8), M["steel_dark"]))
+    parts += rotor("Propeller", (0, 0, 0.81), 0.22, M)
+    for s_ in (-1, 1):
+        parts.append(give(block_at("Braue%d" % s_, p + Vector((s_ * 0.06, -0.01, 0.12 - 0.0)), (0.05, 0.015, 0.012), M["steel_dark"], 3, True, 0), M["steel_dark"]))
+        parts[-1].rotation_euler = (0, math.radians(s_ * 20), 0)
+    attach(join_parts(parts, "Schraubling_Oben"), arm, "Top")
+    legs = []
+    for s_ in (-1, 1):
+        legs.append(give(tube("Bein%d" % s_, [(s_ * 0.14, 0.0, 0.08), (s_ * 0.17, -0.02, 0.0)], [0.025, 0.022], segs=8), M["steel_dark"]))
+        legs.append(give(sphere("Fuss%d" % s_, (s_ * 0.18, -0.05, 0.015), 0.045, (1, 1.4, 0.5)), M["hazard"]))
+    attach(join_parts(legs, "Schraubling_Beine"), arm, "Body")
+    dampen_scale(arm, ("Body", "Top"), 0.5)
+    remove_body(body)
+
+@variante("robo_tentakler", "tentakler")
+def drohnenfluegler(arm, body):
+    """Robo-Fabrik, mittel: Drohnenflügler – fliegende Drohne aus Stahlblech mit Nieten, Flügeln aus dunklem Blech,
+    Rotoren auf den Flügeln, gelb-schwarzen Hörnern und rot leuchtenden Augen"""
+    M = robo_mats()
+    T = texels(body)
+    px, P = T["px"], T["P"]
+    red = hue_mask(px, 0.02, 0.06, 0.35)
+    teal = hue_mask(px, 0.49, 0.08, 0.3)
+    hh, s, v = hsv(px)
+    beige = np.clip((0.6 - s) / 0.1, 0, 1) * np.clip((v - 0.5) / 0.1, 0, 1) * hue_mask(px, 0.11, 0.07, 0.08)
+    white = np.clip((0.15 - s) / 0.06, 0, 1) * np.clip((v - 0.8) / 0.06, 0, 1)
+    metal_paint(T, red, 531, rust=0.2)
+    metal_paint(T, teal, 533, base=(0.3, 0.31, 0.35), rust=0.1, freq=10.0)
+    hazard_paint(T, beige, freq=14.0)
+    paint(T, white, (1.0, 0.35, 0.25), keep_shading=0.2)
+    glow(T, white, (1.0, 0.12, 0.05))
+    commit(T, strength=2.0)
+    for side, chain in ((1, ("Bone_031", "Bone_030", "Bone_029")), (-1, ("Bone_026", "Bone_025", "Bone_024"))):
+        b0 = bone_pt(arm, chain[2], 0.1)
+        attach(join_parts(rotor("Rotor%d" % side, b0 + Vector((0, 0.02, 0.08)), 0.18, M) + [give(tube("Rotormast%d" % side, [tuple(b0), tuple(b0 + Vector((0, 0.02, 0.08)))], [0.015, 0.015], segs=8), M["steel_dark"])],
+                          "Rotor%d" % side), arm, chain[2])
+    q, m = back_pt(body, 0.0, 0.85)
+    if q is not None:
+        attach(join_parts(exhaust("Duese", q - m * 0.01, (0, 1, -0.3), 0.18, 0.03, M, smoke=False), "Duese"), arm, "Bone_001")
+
+@variante("robo_panzerkaefer", "panzerkaefer")
+def panzerroboter(arm, body):
+    """Robo-Fabrik, stark: Panzerroboter – schwerer Käferpanzer aus Stahlplatten mit Nieten und Warnstreifen am Rand,
+    einem kleinen Geschützturm oben, rot leuchtenden Augen und Auspuffrohren hinten"""
+    M = robo_mats()
+    T = texels(body)
+    px, P, N = T["px"], T["P"], T["N"]
+    teal = hue_mask(px, 0.49, 0.08, 0.3)
+    red = np.maximum(hue_mask(px, 0.02, 0.06, 0.35), hue_mask(px, 0.97, 0.05, 0.3))
+    hh, s, v = hsv(px)
+    beige = np.clip((0.6 - s) / 0.1, 0, 1) * np.clip((v - 0.5) / 0.1, 0, 1) * hue_mask(px, 0.11, 0.07, 0.08)
+    blue = hue_mask(px, 0.55, 0.08, 0.3)
+    metal_paint(T, teal, 541, rust=0.25, freq=6.0)
+    rim = teal * np.clip((0.12 - P[..., 2]) / 0.03, 0, 1)
+    hazard_paint(T, rim, freq=12.0)
+    metal_paint(T, red, 543, base=(0.3, 0.31, 0.35), rust=0.15)
+    paint(T, beige, (0.95, 0.75, 0.1), keep_shading=0.5)
+    paint(T, blue, (1.0, 0.3, 0.2), keep_shading=0.3)
+    glow(T, blue, (1.0, 0.12, 0.05))
+    commit(T, strength=2.0)
+    p, n = surface(body, (0.0, 0.05, 2.0), (0, 0, -1))
+    top = p if p is not None else Vector((0, 0.05, 0.4))
+    tur = [give(sphere("Turm", tuple(top + Vector((0, 0, 0.01))), 0.09, (1, 1, 0.55)), M["steel"])]
+    tur.append(give(tube("Rohr", [tuple(top + Vector((0, -0.05, 0.03))), tuple(top + Vector((0, -0.24, 0.06)))], [0.022, 0.02], segs=10), M["steel_dark"]))
+    tur.append(give(torus("Muendung", tuple(top + Vector((0, -0.24, 0.06))), 0.022, 0.008, rot=(90, 0, 0), segs=12), M["steel"]))
+    tur.append(give(sphere("Turmlampe", tuple(top + Vector((0.05, 0.02, 0.055))), 0.018), M["led"]))
+    attach(join_parts(tur, "Geschuetzturm"), arm, "Body")
+    parts = []
+    for s_ in (-1, 1):
+        q, m = surface(body, (s_ * 0.1, 1.5, 0.2), (0, -1, 0))
+        if q is not None:
+            parts += exhaust("Auspuff%d" % s_, q - m * 0.01, (s_ * 0.2, 1.0, 0.3), 0.18, 0.025, M)
+    attach(join_parts(parts, "Auspuffe"), arm, "Body")
+
+@variante("fabrik_mutter", "schleimmutter")
+def fabrikmutter(arm, body):
+    """Robo-Fabrik (Welt 20), Boss: Fabrikmutter – riesiger Kuppelroboter aus Blech mit Warnstreifen, Bildschirmgesicht
+    mit rot leuchtenden LED-Augen, zwei Greifarmen, qualmenden Schornsteinen oben und Rädern unten. Eigene Figur auf dem
+    Skelett der Schleimmutter."""
+    M = robo_mats()
+    prof = [(1.0, 0.0), (0.99, 0.12), (0.95, 0.24), (0.88, 0.34), (0.76, 0.42), (0.6, 0.47), (0.4, 0.5), (0.2, 0.5), (0.08, 0.48), (0.02, 0.42), (0.0, 0.3), (0.0, 0.0)]
+    g = dome_robot("Fabrik", prof, M, (0.58, 0.6, 0.64), 0.1)
+    skin_to(g, arm, lambda c: {"Top": smooth01((c.z - 0.2) / 0.4), "Body": 1 - smooth01((c.z - 0.2) / 0.4)})
+    screen_m = look("Bildschirm", (0.03, 0.05, 0.06), rough=0.15, emit=(0.0, 0.08, 0.06), strength=0.5)
+    parts = []
+    p, n = surface(g, (0, -2.0, 0.62), (0, 1, 0))
+    scr = block_at("Bildschirm", p + n * 0.0, (0.3, 0.05, 0.17), screen_m, 3, True, 0)
+    parts.append(give(scr, screen_m))
+    parts.append(give(block_at("Rahmen", p - n * 0.01, (0.33, 0.04, 0.2), M["steel_dark"], 4, True, 0), M["steel_dark"]))
+    for s_ in (-1, 1):
+        e = sphere("LEDAuge%d" % s_, (0, 0, 0), 0.06, (1.4, 0.4, 0.8)); e.location = p + Vector((s_ * 0.12, -0.05, 0.02)); e.rotation_euler = (0, math.radians(-s_ * 15), 0)
+        parts.append(give(e, M["led"]))
+        br = block_at("LEDBraue%d" % s_, p + Vector((s_ * 0.12, -0.05, 0.11)), (0.08, 0.01, 0.014), M["led"], 5, True, 0); br.rotation_euler = (0, math.radians(s_ * 22), 0)
+        parts.append(give(br, M["led"]))
+    mouth = block_at("LEDMund", p + Vector((0, -0.05, -0.09)), (0.12, 0.01, 0.016), M["led"], 6, True, 0)
+    parts.append(give(mouth, M["led"]))
+    for s_ in (-1, 1):
+        b0 = Vector((s_ * 0.22, 0.12, 0.95))
+        parts.append(give(tube("Schornstein%d" % s_, [tuple(b0 - Vector((0, 0, 0.1))), tuple(b0 + Vector((0, 0, 0.25)))], [0.06, 0.055], segs=16), M["steel_dark"]))
+        parts.append(give(torus("Schornsteinring%d" % s_, tuple(b0 + Vector((0, 0, 0.25))), 0.06, 0.012, rot=(0, 0, 0), segs=20), M["hazard"]))
+        for k in range(3):
+            parts.append(give(sphere("Qualm%d_%d" % (s_, k), tuple(b0 + Vector((0.02 * k * s_, 0.02 * k, 0.33 + 0.12 * k))), 0.06 + 0.035 * k), M["smoke"]))
+    attach(join_parts(parts, "Fabrik_Oben"), arm, "Top")
+    arms_ = []
+    for s_ in (-1, 1):
+        sh = Vector((s_ * 0.48, -0.05, 0.4)); el = Vector((s_ * 0.68, -0.25, 0.42)); wr = Vector((s_ * 0.6, -0.48, 0.32))
+        arms_.append(give(sphere("Schultergelenk%d" % s_, tuple(sh), 0.08), M["hazard"]))
+        arms_.append(give(tube("Oberarm%d" % s_, [tuple(sh), tuple(el)], [0.045, 0.04], segs=12), M["steel"]))
+        arms_.append(give(sphere("Ellbogen%d" % s_, tuple(el), 0.055), M["steel_dark"]))
+        arms_.append(give(tube("Unterarm%d" % s_, [tuple(el), tuple(wr)], [0.04, 0.035], segs=12), M["steel"]))
+        for k in (-1, 1):
+            arms_.append(give(horn("Greifer%d_%d" % (s_, k), tuple(wr), tuple(wr + Vector((k * 0.06, -0.08, 0.0))), tuple(wr + Vector((k * 0.02, -0.15, -0.02))), 0.025, n=8), M["steel_dark"]))
+    for s_ in (-1, 1):
+        for y in (-0.25, 0.25):
+            arms_.append(give(torus("Rad%d_%d" % (s_, int(y * 10)), (s_ * 0.45, y, 0.08), 0.08, 0.035, rot=(0, 90, 0), segs=24), M["rubber"]))
+    attach(join_parts(arms_, "Fabrik_Arme"), arm, "Body")
+    dampen_scale(arm, ("Body", "Top"), 0.4)
+    remove_body(body)
+
+# ---------------------------------------------------------------- Wolkenstadt (Welt 21 und 22): Marmor, Himmelblau, Federn
+
+def sky_mats():
+    return {
+        "marble": look("Marmor", (0.94, 0.94, 0.96), rough=0.25),
+        "sky": look("Himmelblau", (0.45, 0.7, 0.98), rough=0.4),
+        "gold": look("Himmelsgold", (1.0, 0.82, 0.4), rough=0.25, metal=0.9),
+        "feather": look("Feder", (0.97, 0.97, 1.0), rough=0.7),
+        "feather2": look("FederBlau", (0.62, 0.8, 1.0), rough=0.7),
+        "eye": look("Himmelsauge", (1.0, 0.9, 0.5), rough=0.2, emit=(1.0, 0.8, 0.3), strength=2.5),
+        "dark": look("Pupille", (0.05, 0.05, 0.08), rough=0.3),
+        "beak": look("Schnabel", (1.0, 0.75, 0.25), rough=0.35),
+    }
+
+def marble_paint(T, mask, seed):
+    P = T["P"]
+    paint(T, mask, np.asarray((0.94, 0.94, 0.96), np.float32) * (0.93 + 0.1 * fbm3(P, 5.0, seed, 3)[..., None]), keep_shading=0.45)
+    paint(T, mask * ridges(P, 4.0, seed + 1, 0.02) * 0.7, (0.62, 0.66, 0.78), keep_shading=0.0)
+
+def feather_fan(name, base, d, side, n, L, w, mats, spread=70):
+    """Fächer aus Federn (Flügel, Schwanz, Federbusch)"""
+    d = Vector(d).normalized(); side = Vector(side).normalized()
+    parts = []
+    for k in range(n):
+        t = k / max(1, n - 1)
+        a = math.radians(-spread / 2 + spread * t)
+        dd = (d * math.cos(a) + side * math.sin(a)).normalized()
+        parts.append(fin("%s%d" % (name, k), Vector(base), dd, L * (0.75 + 0.25 * math.sin(math.pi * t)), w, mats[k % len(mats)], curl=0.15))
+    return parts
+
+def sky_body(T, R, seed, suit=(0.45, 0.7, 0.98)):
+    marble_paint(T, R["skin"], seed)
+    paint(T, R["purple"] * (1 - R["head"]), suit, keep_shading=0.6)
+    paint(T, R["purple"] * R["head"], (0.75, 0.86, 1.0), keep_shading=0.5)
+    paint(T, R["grey"], (1.0, 0.82, 0.4), keep_shading=0.5)
+    eyes = R["white"] * R["head"]
+    paint(T, eyes, (1.0, 0.92, 0.6), keep_shading=0.2)
+    glow(T, eyes, (1.0, 0.8, 0.3))
+
+def back_wings(body, arm, M, span, n=6, z=None, bone="mixamorig:Spine2"):
+    sp = bone_pt(arm, bone)
+    p, nn = back_pt(body, 0.0, z if z is not None else sp.z + 0.05)
+    if p is None:
+        return
+    parts = []
+    for s_ in (-1, 1):
+        b0 = p + Vector((s_ * 0.05, 0.02, 0.0))
+        parts += feather_fan("Fluegel%d_" % s_, b0, (s_ * 1.0, 0.5, 0.45), (0, 0, -1), n, span, span * 0.22, (M["feather"], M["feather2"]), spread=80)
+    attach(join_parts(parts, "Fluegel"), arm, bone)
+
+def plume(body, arm, M, L, n=5):
+    p, nn = head_top(body, 0.0, 0.03)
+    if p is None:
+        return
+    parts = feather_fan("Federbusch", p - nn * 0.02, (0, 0.5, 1.0), (1, 0, 0), n, L, L * 0.25, (M["feather2"], M["feather"]), spread=60)
+    attach(join_parts(parts, "Federbusch"), arm, "mixamorig:Head")
+
+@variante("himmel_krabbler", "krabbler")
+def federwicht(arm, body):
+    """Himmelsbrücken, leicht: Federwicht – kleiner Himmelskobold mit Haut aus weißem Marmor, himmelblauem Anzug mit
+    Gold, golden leuchtenden Augen, kleinen Federflügeln und einem Federbusch"""
+    M = sky_mats()
+    T = texels(body); R = regions(T, arm)
+    sky_body(T, R, 601)
+    commit(T, strength=1.5)
+    back_wings(body, arm, M, 0.22, n=5)
+    plume(body, arm, M, 0.16)
+
+@variante("himmel_tentakler", "tentakler")
+def himmelsflatterer(arm, body):
+    """Himmelsbrücken, mittel: Himmelsflatterer – Flugwesen mit weißem Federkleid, himmelblauen Federflügeln, goldenen
+    Hörnern, golden leuchtenden Augen, Federkamm und Schwanzfedern"""
+    M = sky_mats()
+    T = texels(body)
+    px, P = T["px"], T["P"]
+    red = hue_mask(px, 0.02, 0.06, 0.35)
+    teal = hue_mask(px, 0.49, 0.08, 0.3)
+    hh, s, v = hsv(px)
+    beige = np.clip((0.6 - s) / 0.1, 0, 1) * np.clip((v - 0.5) / 0.1, 0, 1) * hue_mask(px, 0.11, 0.07, 0.08)
+    white = np.clip((0.15 - s) / 0.06, 0, 1) * np.clip((v - 0.8) / 0.06, 0, 1)
+    paint(T, red, np.asarray((0.97, 0.97, 1.0), np.float32) * (0.9 + 0.12 * fbm3(P, 40.0, 611, 2)[..., None]), keep_shading=0.4)
+    lines = ridges(P * np.asarray((1.0, 1.0, 0.3), np.float32), 14.0, 613, 0.05)
+    paint(T, teal, gradient((0.45, 0.68, 0.98), (0.8, 0.9, 1.0), lines), keep_shading=0.35)
+    paint(T, beige, (1.0, 0.82, 0.4), keep_shading=0.4)
+    paint(T, white, (1.0, 0.92, 0.6), keep_shading=0.2)
+    glow(T, white, (1.0, 0.8, 0.3))
+    commit(T, strength=1.5)
+    p, n = head_top(body, 0.0, 0.05)
+    parts = []
+    if p is not None:
+        parts += feather_fan("Kamm", p - n * 0.02, (0, 0.5, 1.0), (1, 0, 0), 5, 0.2, 0.05, (M["feather2"], M["feather"]), spread=60)
+    q, m = back_pt(body, 0.0, 0.8)
+    if q is not None:
+        parts += feather_fan("Schwanz", q - m * 0.02, (0, 1.0, -0.3), (1, 0, 0), 5, 0.3, 0.06, (M["feather"], M["feather2"]), spread=70)
+    attach(join_parts(parts, "Federn"), arm, "Bone_001")
+
+@variante("himmel_brecher", "brecher")
+def wolkenwaechter(arm, body):
+    """Himmelsbrücken, stark: Wolkenwächter – massiger Himmelsritter mit Marmorhaut, himmelblauer Rüstung mit Gold,
+    goldenen Schulterplatten, Federflügeln auf dem Rücken, Federbusch und golden leuchtenden Augen"""
+    M = sky_mats()
+    T = texels(body); R = regions(T, arm)
+    sky_body(T, R, 621)
+    collar = np.maximum(R["white"] * (1 - R["head"]), R["collar"])
+    paint(T, collar, (1.0, 0.82, 0.4), keep_shading=0.5)
+    commit(T, strength=1.5)
+    back_wings(body, arm, M, 0.5, n=7)
+    plume(body, arm, M, 0.24, n=6)
+    for s_, side in ((1, "Left"), (-1, "Right")):
+        a0 = bone_pt(arm, "mixamorig:%sArm" % side)
+        p, n = surface(body, (a0.x, a0.y, a0.z + 0.15), (0, 0, -1))
+        c = (p if p is not None else a0) + Vector((s_ * 0.02, 0, 0.02))
+        d = sphere("Schulterplatte" + side, (0, 0, 0), 0.13, (1.0, 1.1, 0.5)); d.location = c; d.rotation_euler = (0, math.radians(-s_ * 25), 0)
+        attach(join_parts([give(d, M["gold"]), give(torus("Schulterrand" + side, tuple(c), 0.125, 0.015, rot=(0, -s_ * 25, 0), segs=32), M["sky"])], "Schulterplatte" + side), arm, "mixamorig:%sArm" % side)
+
+def eagle_head(hc, R_, M, parts):
+    """Adlerkopf: weißer Federkopf, goldener Hakenschnabel, golden leuchtende Augen mit Brauenwulst, Federkamm"""
+    parts.append(give(sphere("Adlerkopf", tuple(hc), R_, (0.95, 1.05, 0.95), segs=(40, 24)), M["feather"]))
+    tipb = hc + Vector((0, -R_ * 1.35, -R_ * 0.35))
+    parts.append(give(horn("Schnabel", tuple(hc + Vector((0, -R_ * 0.75, -R_ * 0.05))), tuple(hc + Vector((0, -R_ * 1.3, 0.0))), tuple(tipb), R_ * 0.32, n=12), M["beak"]))
+    for s_ in (-1, 1):
+        c = hc + Vector((s_ * R_ * 0.45, -R_ * 0.78, R_ * 0.18))
+        parts.append(give(sphere("Auge%d" % s_, tuple(c), R_ * 0.16), M["eye"]))
+        parts.append(give(sphere("Pupille%d" % s_, tuple(c + Vector((0, -R_ * 0.12, 0))), R_ * 0.07), M["dark"]))
+        parts.append(give(tube("Brauenwulst%d" % s_, [tuple(c + Vector((s_ * R_ * 0.25, R_ * 0.05, R_ * 0.18))), tuple(c + Vector((0, -R_ * 0.08, R_ * 0.14))),
+                                                    tuple(c + Vector((-s_ * R_ * 0.2, -R_ * 0.1, R_ * 0.05)))], [R_ * 0.09, R_ * 0.1, R_ * 0.07]), M["feather2"]))
+    parts += feather_fan("Kopffedern", hc + Vector((0, R_ * 0.3, R_ * 0.6)), (0, 0.8, 0.6), (1, 0, 0), 6, R_ * 1.5, R_ * 0.3, (M["feather"], M["feather2"]), spread=70)
+
+@variante("greifen_waechter", "koloss")
+def greifenwaechter(arm, body):
+    """Himmelsbrücken (Welt 21), Boss: Greifenwächter – riesiger Himmelswächter mit Marmorhaut, himmelblau-goldener
+    Rüstung, Adlerkopf mit goldenem Hakenschnabel und leuchtenden Augen, großen Federflügeln, Federstulpen und
+    Krallenhänden. Eigene Figur auf dem Koloss-Skelett."""
+    M = sky_mats()
+    T = texels(body); R = regions(T, arm)
+    sky_body(T, R, 631)
+    collar = np.maximum(R["white"] * (1 - R["head"]), R["collar"])
+    paint(T, collar, (1.0, 0.82, 0.4), keep_shading=0.5)
+    commit(T, strength=1.5)
+    koloss_arms(arm, body, M["marble"], M["beak"], M["feather"], cuff_style="fell", fingers=4, claws=True)
+    c0, half = cut_head(body)
+    R_ = max(half.x, half.z) * 0.98
+    parts = []
+    eagle_head(c0 + Vector((0, -0.02, 0.0)), R_, M, parts)
+    attach(join_parts(parts, "Adlerkopf"), arm, "mixamorig:Head")
+    back_wings(body, arm, M, 1.0, n=8)
+
+@variante("turm_schleimling", "schleimling")
+def eulchen(arm, body):
+    """Goldene Türme, leicht: Eulchen – kleine, runde Eule wie ein Junges der Wolkeneule: Federkleid in Weiß und
+    Himmelblau, große goldene Augen, goldener Schnabel, Federohren und Stummelflügel. Eigene Figur auf dem Skelett des
+    Schleimlings (hüpft wie er)."""
+    M = sky_mats()
+    skin = look("Eulenfedern", (1, 1, 1), rough=0.7)
+    prof = [(0.72, 0.0), (0.71, 0.1), (0.68, 0.19), (0.62, 0.27), (0.53, 0.33), (0.42, 0.37), (0.3, 0.38), (0.19, 0.36), (0.1, 0.31), (0.04, 0.23), (0.005, 0.12), (0.0, 0.0)]
+    g = lathe("Eulchen", prof, segs=56)
+    lathe_texture(skin, feather_tex((0.6, 0.78, 1.0), (0.98, 0.98, 1.0), rows=10, cols=14, seed=641))
+    give(g, skin)
+    bpy.context.view_layer.update()
+    parts = owl_face(g, 0.47, 0.75, M)
+    attach(join_parts(parts, "Eulchen_Kopf"), arm, "Top")
+    wings = []
+    for s_ in (-1, 1):
+        p, n = surface(g, (s_ * 2.0, 0.05, 0.3), (-s_, 0, 0))
+        wings += feather_fan("Fluegel%d_" % s_, p - n * 0.03, (s_ * 0.5, 0.3, -1.0), (0, 1, 0), 4, 0.17, 0.05, (M["feather2"], M["feather"]), spread=50)
+        wings.append(give(sphere("Fuss%d" % s_, (s_ * 0.1, -0.3, 0.02), 0.04, (1, 1.3, 0.5)), M["beak"]))
+    attach(join_parts(wings, "Eulchen_Fluegel"), arm, "Body")
+    skin_to(g, arm, lambda c: {"Top": smooth01((c.z - 0.15) / 0.35), "Body": 1 - smooth01((c.z - 0.15) / 0.35)})
+    dampen_scale(arm, ("Body", "Top"), 0.5)
+    remove_body(body)
+
+def owl_face(g, zc, k, M):
+    """Eulengesicht: große goldene Augen in hellen Federscheiben, Schnabel, Brauen, Federohren"""
+    p, n = surface(g, (0, -2.0, zc), (0, 1, 0))
+    parts = []
+    for s_ in (-1, 1):
+        c = p + Vector((s_ * 0.11 * k, 0.02 * k, 0.03 * k))
+        disc = sphere("Federscheibe%d" % s_, (0, 0, 0), 0.12 * k, (1.0, 0.35, 1.0)); disc.location = c + Vector((0, 0.01, 0))
+        parts.append(give(disc, M["feather"]))
+        parts.append(give(sphere("Auge%d" % s_, tuple(c + Vector((0, -0.035 * k, 0))), 0.07 * k, (1, 0.6, 1)), M["eye"]))
+        parts.append(give(sphere("Pupille%d" % s_, tuple(c + Vector((0, -0.075 * k, 0))), 0.035 * k, (1, 0.5, 1)), M["dark"]))
+        parts.append(give(tube("Braue%d" % s_, [tuple(c + Vector((s_ * 0.12 * k, -0.03 * k, 0.11 * k))), tuple(c + Vector((0, -0.07 * k, 0.1 * k))),
+                                               tuple(c + Vector((-s_ * 0.09 * k, -0.08 * k, 0.05 * k)))], [0.022 * k, 0.026 * k, 0.018 * k]), M["feather2"]))
+        q, m = surface(g, (s_ * 0.18 * k / 0.75, 0.0, 3.0), (0, 0, -1))
+        if q is not None:
+            parts.append(fin("Federohr%d" % s_, q - m * 0.02, (s_ * 0.5, 0.1, 1.0), 0.18 * k, 0.06 * k, M["feather2"], curl=-0.2))
+    parts.append(give(horn("Schnabel", tuple(p + Vector((0, -0.02 * k, -0.04 * k))), tuple(p + Vector((0, -0.08 * k, -0.06 * k))), tuple(p + Vector((0, -0.07 * k, -0.13 * k))), 0.035 * k, n=8), M["beak"]))
+    return parts
+
+@variante("turm_zombie", "zombie")
+def turmwaechter(arm, body):
+    """Goldene Türme, mittel: Turmwächter – schlanker Himmelsritter mit Marmorhaut, himmelblauer Rüstung mit Gold,
+    Helmbusch aus Federn, kleinen Federflügeln und golden leuchtenden Augen"""
+    M = sky_mats()
+    T = texels(body); R = regions(T, arm)
+    sky_body(T, R, 651, suit=(0.95, 0.8, 0.42))
+    commit(T, strength=1.5)
+    plume(body, arm, M, 0.22, n=6)
+    back_wings(body, arm, M, 0.3, n=5)
+
+@variante("turm_panzerkaefer", "panzerkaefer")
+def turmpanzer(arm, body):
+    """Goldene Türme, stark: Turmpanzer – schwerer Käfer, dessen Panzer aus weißem Marmor mit Goldlinien ein kleines
+    Türmchen mit goldenem Spitzdach und Fenstern trägt; himmelblauer Körper, Federn an den Seiten"""
+    M = sky_mats()
+    T = texels(body)
+    px, P, N = T["px"], T["P"], T["N"]
+    teal = hue_mask(px, 0.49, 0.08, 0.3)
+    red = np.maximum(hue_mask(px, 0.02, 0.06, 0.35), hue_mask(px, 0.97, 0.05, 0.3))
+    hh, s, v = hsv(px)
+    beige = np.clip((0.6 - s) / 0.1, 0, 1) * np.clip((v - 0.5) / 0.1, 0, 1) * hue_mask(px, 0.11, 0.07, 0.08)
+    marble_paint(T, teal, 661)
+    edge, cid = worley3(P, 7.0, 663)
+    paint(T, teal * np.clip(1 - edge / 0.003, 0, 1), (1.0, 0.82, 0.4), keep_shading=0.2)
+    paint(T, red, (0.45, 0.7, 0.98), keep_shading=0.55)
+    paint(T, beige, (1.0, 0.82, 0.4), keep_shading=0.5)
+    commit(T, strength=1.0)
+    p, n = surface(body, (0.0, 0.05, 2.0), (0, 0, -1))
+    top = p if p is not None else Vector((0, 0.05, 0.4))
+    win_m = look("Fenster", (0.3, 0.55, 1.0), rough=0.2, emit=(0.4, 0.65, 1.0), strength=1.5)
+    tw = [give(lathe("Tuermchen", [(0.18, 0.0), (0.18, 0.07), (0.0, 0.075), (-0.03, 0.08), (-0.03, 0.0)], segs=24), M["marble"])]
+    tw[0].location = top
+    tw.append(give(horn("Spitzdach", tuple(top + Vector((0, 0, 0.17))), tuple(top + Vector((0, 0, 0.25))), tuple(top + Vector((0, 0, 0.34))), 0.1, n=6), M["gold"]))
+    for k in range(4):
+        a = k * math.pi / 2 + 0.3
+        w = block_at("Fenster%d" % k, top + Vector((math.cos(a) * 0.073, math.sin(a) * 0.073, 0.1)), (0.018, 0.018, 0.03), win_m, k, True, 0)
+        w.rotation_euler = (0, 0, a); tw.append(give(w, win_m))
+    for s_ in (-1, 1):
+        q, m = surface(body, (s_ * 2.0, 0.05, 0.18), (-s_, 0, 0))
+        if q is not None:
+            tw += feather_fan("Seitenfedern%d" % s_, q - m * 0.02, (s_ * 1.0, 0.4, 0.2), (0, 0, 1), 4, 0.14, 0.04, (M["feather"], M["feather2"]), spread=50)
+    attach(join_parts(tw, "Turm"), arm, "Body")
+
+@variante("wolken_eule", "schleimmutter")
+def wolkeneule(arm, body):
+    """Goldene Türme (Welt 22), Boss: Wolkeneule – riesige, runde Eule mit Federkleid in Weiß und Himmelblau, großen
+    golden leuchtenden Augen, goldenem Schnabel, Federohren, ausgebreiteten Federflügeln, goldenen Krallen und einer
+    Federkrone. Eigene Figur auf dem Skelett der Schleimmutter."""
+    M = sky_mats()
+    skin = look("Eulenfedern", (1, 1, 1), rough=0.7)
+    prof = [(1.15, 0.0), (1.14, 0.14), (1.1, 0.28), (1.02, 0.4), (0.9, 0.5), (0.74, 0.56), (0.56, 0.58), (0.38, 0.56), (0.22, 0.5), (0.1, 0.4), (0.03, 0.26), (0.0, 0.0)]
+    g = lathe("Wolkeneule", prof, segs=64)
+    lathe_texture(skin, feather_tex((0.55, 0.75, 1.0), (0.98, 0.98, 1.0), rows=14, cols=18, seed=671))
+    give(g, skin)
+    bpy.context.view_layer.update()
+    parts = owl_face(g, 0.78, 1.5, M)
+    q, m = surface(g, (0, 0.0, 3.0), (0, 0, -1))
+    parts += feather_fan("Krone", q - m * 0.03, (0, 0.3, 1.0), (1, 0, 0), 7, 0.3, 0.07, (M["gold"], M["feather2"]), spread=90)
+    attach(join_parts(parts, "Eule_Kopf"), arm, "Top")
+    wings = []
+    for s_ in (-1, 1):
+        p, n = surface(g, (s_ * 2.0, 0.05, 0.55), (-s_, 0, 0))
+        wings += feather_fan("Fluegel%d_" % s_, p - n * 0.04, (s_ * 1.0, 0.2, -0.3), (0, 0, 1), 8, 0.55, 0.12, (M["feather2"], M["feather"]), spread=100)
+        for k in range(3):
+            a = math.radians(-25 + 25 * k)
+            b0 = Vector((s_ * 0.18 + math.sin(a) * 0.05, -0.42, 0.04))
+            wings.append(give(horn("Kralle%d_%d" % (s_, k), tuple(b0), tuple(b0 + Vector((math.sin(a) * 0.05, -0.06, -0.01))), tuple(b0 + Vector((math.sin(a) * 0.06, -0.1, -0.04))), 0.03, n=7), M["gold"]))
+    attach(join_parts(wings, "Eule_Fluegel"), arm, "Body")
+    skin_to(g, arm, lambda c: {"Top": smooth01((c.z - 0.25) / 0.5), "Body": 1 - smooth01((c.z - 0.25) / 0.5)})
+    dampen_scale(arm, ("Body", "Top"), 0.4)
+    remove_body(body)
+
+# ---------------------------------------------------------------- Sporenwelt (Welt 23 und 24): Leuchtpilze, Myzel, Baumpilze
+
+def spore_mats():
+    return {
+        "stalk": look("Pilzstiel", (0.93, 0.88, 0.76), rough=0.6),
+        "cap": look("Pilzkappe", (0.95, 0.45, 0.15), rough=0.5, emit=(0.9, 0.35, 0.05), strength=0.4),
+        "cap2": look("Pilzkappe2", (0.8, 0.3, 0.12), rough=0.5),
+        "spot": look("Leuchtpunkt", (1.0, 0.95, 0.6), rough=0.4, emit=(1.0, 0.85, 0.4), strength=2.5),
+        "teal": look("Sporenleuchten", (0.3, 1.0, 0.9), rough=0.3, emit=(0.2, 1.0, 0.85), strength=2.5),
+        "bracket": look("Baumpilz", (0.75, 0.55, 0.3), rough=0.6),
+        "bracket2": look("Baumpilz2", (0.3, 0.75, 0.7), rough=0.5, emit=(0.15, 0.6, 0.55), strength=0.8),
+        "gill": look("Lamellen", (0.85, 0.7, 0.5), rough=0.7),
+        "eye": look("Pilzauge", (0.4, 1.0, 0.9), rough=0.2, emit=(0.3, 1.0, 0.85), strength=3.0),
+        "dark": look("Pilzdunkel", (0.12, 0.07, 0.05), rough=0.5),
+    }
+
+def glow_shroom(name, p, n, h, r, M, cap="cap", spots=True):
+    n = Vector(n).normalized()
+    parts = [give(tube(name + "Stiel", [tuple(p - n * 0.01), tuple(p + n * h * 0.5), tuple(p + n * h)], [r * 0.3, r * 0.26, r * 0.24]), M["stalk"])]
+    c = sphere(name + "Hut", (0, 0, 0), r, (1, 1, 0.5)); c.location = p + n * h
+    c.rotation_euler = n.to_track_quat('Z', 'Y').to_euler()
+    parts.append(give(c, M[cap]))
+    if spots:
+        q = n.to_track_quat('Z', 'Y').to_matrix()
+        for i in range(6):
+            a = i * 2 * math.pi / 6 + 0.2
+            d = q @ Vector((math.cos(a) * 0.6, math.sin(a) * 0.6, 0.42)).normalized()
+            parts.append(give(sphere(name + "Punkt%d" % i, tuple(p + n * h + Vector((d.x * r, d.y * r, d.z * r * 0.55))), r * 0.13, (1, 1, 0.5)), M["spot"]))
+    return parts
+
+def bracket(name, p, n, r, mat):
+    """Baumpilz: flacher, halbrunder Konsolenpilz, der waagerecht aus der Oberfläche wächst"""
+    n = Vector(n); n.z = 0
+    if n.length < 1e-3:
+        n = Vector((1, 0, 0))
+    n.normalize()
+    o = sphere(name, (0, 0, 0), r, (1.0, 0.75, 0.22), segs=(20, 10))
+    o.location = Vector(p) + n * r * 0.45
+    o.rotation_euler = (0, 0, math.atan2(n.y, n.x) - math.pi / 2)
+    return give(o, mat)
+
+def spores(name, c, spread, n, r, M, seed):
+    rnd = random.Random(seed)
+    return [give(sphere("%s%d" % (name, i), tuple(Vector(c) + Vector((rnd.uniform(-1, 1), rnd.uniform(-1, 1), rnd.uniform(-0.3, 1))) * spread), r * rnd.uniform(0.6, 1.2)), M["teal"])
+            for i in range(n)]
+
+def mycel_paint(T, mask, seed, base=(0.42, 0.3, 0.2)):
+    """Erdig-braune Haut, überzogen mit hellen Myzelfäden"""
+    P = T["P"]
+    paint(T, mask, np.asarray(base, np.float32) * (0.85 + 0.3 * fbm3(P, 6.0, seed, 3)[..., None]), keep_shading=0.5)
+    th = np.maximum(ridges(P, 9.0, seed + 1, 0.02), ridges(P, 13.0, seed + 2, 0.015)) * np.clip((fbm3(P, 3.0, seed + 3, 2) - 0.4) / 0.1, 0, 1)
+    paint(T, mask * th, (0.92, 0.9, 0.82), keep_shading=0.2)
+
+def shroom_stalk_body(name, prof, M, H_=512):
+    g = lathe(name, prof, segs=48)
+    skin = look(name + "Haut", (1, 1, 1), rough=0.6)
+    uu, vv = lathe_uv_grid(H_, H_)
+    col = gradient((0.86, 0.78, 0.62), (0.96, 0.92, 0.82), vv) * (0.92 + 0.1 * fbm(H_, H_, 30, 3, 2))[..., None]
+    arr = np.ones((H_, H_, 4), np.float32); arr[..., :3] = col
+    lathe_texture(skin, arr)
+    return give(g, skin)
+
+def shroom_face(c, k, M, parts):
+    c = Vector(c)
+    for s_ in (-1, 1):
+        parts.append(give(sphere("Auge%d" % s_, tuple(c + Vector((s_ * 0.09 * k, 0, 0.04 * k))), 0.045 * k, (1, 0.55, 1.2)), M["eye"]))
+        parts.append(give(sphere("Pupille%d" % s_, tuple(c + Vector((s_ * 0.085 * k, -0.025 * k, 0.035 * k))), 0.018 * k), M["dark"]))
+        parts.append(give(tube("Braue%d" % s_, [tuple(c + Vector((s_ * 0.15 * k, -0.0, 0.11 * k))), tuple(c + Vector((s_ * 0.09 * k, -0.02 * k, 0.1 * k))), tuple(c + Vector((s_ * 0.03 * k, -0.02 * k, 0.075 * k)))],
+                               [0.016 * k, 0.02 * k, 0.014 * k]), M["cap2"]))
+    m = sphere("Maul", (0, 0, 0), 0.06 * k, (1.3, 0.4, 0.6)); m.location = c + Vector((0, 0.0, -0.08 * k))
+    parts.append(give(m, M["dark"]))
+
+@variante("pilz_schleimling", "schleimling")
+def pilzling(arm, body):
+    """Pilzwald, leicht: Pilzling – kleiner laufender Pilz wie ein Junges der Pilzkönigin: heller Stiel mit Gesicht
+    und türkis leuchtenden Augen, orange Kappe mit Leuchtpunkten, Lamellen darunter und schwebende Sporen. Eigene
+    Figur auf dem Skelett des Schleimlings (hüpft wie er)."""
+    M = spore_mats()
+    g = shroom_stalk_body("Pilzling", [(0.5, 0.0), (0.5, 0.2), (0.4, 0.23), (0.25, 0.25), (0.1, 0.27), (0.02, 0.26), (0.0, 0.2), (0.0, 0.0)], M)
+    skin_to(g, arm, lambda c: {"Top": smooth01((c.z - 0.1) / 0.3), "Body": 1 - smooth01((c.z - 0.1) / 0.3)})
+    parts = []
+    shroom_face((0, -0.26, 0.3), 1.0, M, parts)
+    cap = sphere("Kappe", (0, 0, 0.55), 0.42, (1, 1, 0.55)); parts.append(give(cap, M["cap"]))
+    parts.append(give(lathe("Lamellen", [(0.47, 0.4), (0.5, 0.15), (0.505, 0.0)], segs=48), M["gill"]))
+    for i in range(7):
+        a = i * 2 * math.pi / 7 + 0.3
+        el = 0.55 + 0.3 * (i % 2)
+        d = Vector((math.cos(a) * math.cos(el), math.sin(a) * math.cos(el), math.sin(el)))
+        parts.append(give(sphere("Leuchtpunkt%d" % i, (d.x * 0.42, d.y * 0.42, 0.55 + d.z * 0.42 * 0.55), 0.05, (1, 1, 0.5)), M["spot"]))
+    parts += spores("Spore", (0, 0, 0.75), 0.28, 5, 0.022, M, 701)
+    attach(join_parts(parts, "Pilzling_Oben"), arm, "Top")
+    dampen_scale(arm, ("Body", "Top"), 0.6)
+    remove_body(body)
+
+@variante("pilz_tentakler", "tentakler")
+def sporenflatterer(arm, body):
+    """Pilzwald, mittel: Sporenflatterer – Flugwesen mit moosbrauner Haut und Myzelfäden, Flügeln wie Pilzlamellen
+    in Orange, kleinen Leuchtpilzen auf den Hornspitzen, türkis leuchtenden Augen und schwebenden Sporen"""
+    M = spore_mats()
+    T = texels(body)
+    px, P = T["px"], T["P"]
+    red = hue_mask(px, 0.02, 0.06, 0.35)
+    teal = hue_mask(px, 0.49, 0.08, 0.3)
+    hh, s, v = hsv(px)
+    beige = np.clip((0.6 - s) / 0.1, 0, 1) * np.clip((v - 0.5) / 0.1, 0, 1) * hue_mask(px, 0.11, 0.07, 0.08)
+    white = np.clip((0.15 - s) / 0.06, 0, 1) * np.clip((v - 0.8) / 0.06, 0, 1)
+    mycel_paint(T, red, 711, base=(0.45, 0.33, 0.2))
+    gl = ridges(P * np.asarray((1.0, 1.0, 0.25), np.float32), 18.0, 713, 0.12)
+    paint(T, teal, gradient((0.75, 0.3, 0.1), (1.0, 0.62, 0.3), gl), keep_shading=0.35)
+    glow(T, teal * gl * 0.3, (1.0, 0.45, 0.1))
+    paint(T, beige, (0.93, 0.88, 0.76), keep_shading=0.5)
+    paint(T, white, (0.5, 1.0, 0.92), keep_shading=0.2)
+    glow(T, white, (0.3, 1.0, 0.85))
+    commit(T, strength=1.5)
+    for chain in (("Bone_009", "Bone_008", "Bone_006"), ("Bone_013", "Bone_012", "Bone_010")):
+        tip = bone_pt(arm, chain[2], 1.0)
+        attach(join_parts(glow_shroom("Hornpilz" + chain[0], tip - Vector((0, 0, 0.02)), (0, 0.1, 1), 0.04, 0.06, M, spots=False), "Hornpilz" + chain[0]), arm, chain[2])
+    c = bone_pt(arm, "Bone_001", 0.5)
+    attach(join_parts(spores("Spore", c + Vector((0, 0.1, 0.1)), 0.55, 10, 0.025, M, 715), "Sporen"), arm, "Bone_001")
+
+@variante("pilz_panzerkaefer", "panzerkaefer")
+def morchelpanzer(arm, body):
+    """Pilzwald, stark: Morchelpanzer – schwerer Käfer, dessen Panzer wie eine Morchel aus Waben besteht, mit orange
+    leuchtenden Pilzen, Myzelfäden auf der Haut und türkis leuchtenden Augen"""
+    M = spore_mats()
+    T = texels(body)
+    px, P, N = T["px"], T["P"], T["N"]
+    teal = hue_mask(px, 0.49, 0.08, 0.3)
+    red = np.maximum(hue_mask(px, 0.02, 0.06, 0.35), hue_mask(px, 0.97, 0.05, 0.3))
+    hh, s, v = hsv(px)
+    beige = np.clip((0.6 - s) / 0.1, 0, 1) * np.clip((v - 0.5) / 0.1, 0, 1) * hue_mask(px, 0.11, 0.07, 0.08)
+    blue = hue_mask(px, 0.55, 0.08, 0.3)
+    edge, cid = worley3(P, 16.0, 721)
+    pit = np.clip((edge - 0.004) / 0.006, 0, 1)
+    paint(T, teal, gradient((0.72, 0.58, 0.38), (0.3, 0.2, 0.12), pit), keep_shading=0.4)
+    mycel_paint(T, red, 723)
+    paint(T, beige, (0.93, 0.88, 0.76), keep_shading=0.5)
+    paint(T, blue, (0.5, 1.0, 0.92), keep_shading=0.3)
+    glow(T, blue, (0.3, 1.0, 0.85))
+    commit(T, strength=1.5)
+    parts = []
+    for i, (x, y, h, r) in enumerate(((0.02, 0.06, 0.15, 0.09), (-0.15, 0.12, 0.1, 0.065), (0.15, 0.02, 0.09, 0.06), (0.05, -0.1, 0.07, 0.045), (-0.08, -0.06, 0.06, 0.04))):
+        p, n = surface(body, (x, y, 2.0), (0, 0, -1))
+        if p is not None:
+            parts += glow_shroom("Pilz%d" % i, p, (n + Vector((x, 0.1, 0))).normalized(), h, r, M)
+    parts += spores("Spore", (0, 0.05, 0.4), 0.3, 6, 0.02, M, 725)
+    attach(join_parts(parts, "Morchelpilze"), arm, "Body")
+
+@variante("pilz_koenigin", "schleimmutter")
+def pilzkoenigin(arm, body):
+    """Pilzwald (Welt 23), Boss: Pilzkönigin – riesiger Pilz mit dickem, hellem Stiel und wütendem Gesicht, breiter
+    orange Kappe mit Leuchtpunkten und Lamellen, einer Krone aus kleinen Leuchtpilzen, Pilzen am Fuß und schwebenden
+    Sporen. Eigene Figur auf dem Skelett der Schleimmutter."""
+    M = spore_mats()
+    g = shroom_stalk_body("Koenigin", [(0.7, 0.0), (0.7, 0.3), (0.55, 0.34), (0.35, 0.38), (0.15, 0.44), (0.04, 0.46), (0.0, 0.4), (0.0, 0.0)], M)
+    skin_to(g, arm, lambda c: {"Top": smooth01((c.z - 0.15) / 0.4), "Body": 1 - smooth01((c.z - 0.15) / 0.4)})
+    parts = []
+    shroom_face((0, -0.37, 0.4), 1.8, M, parts)
+    for i, x in enumerate((-0.08, 0.0, 0.08)):
+        parts.append(shard("Zahn%d" % i, Vector((x, -0.44, 0.285)), (0, -0.2, -1), 0.04, 0.014, M["stalk"]))
+    cap = sphere("Kappe", (0, 0, 0.78), 0.72, (1, 1, 0.5)); parts.append(give(cap, M["cap"]))
+    parts.append(give(lathe("Lamellen", [(0.68, 0.7), (0.72, 0.3), (0.725, 0.0)], segs=64), M["gill"]))
+    for i in range(12):
+        a = i * 2 * math.pi / 12 + 0.2
+        el = 0.4 + 0.35 * (i % 3) / 2
+        d = Vector((math.cos(a) * math.cos(el), math.sin(a) * math.cos(el), math.sin(el)))
+        parts.append(give(sphere("Leuchtpunkt%d" % i, (d.x * 0.72, d.y * 0.72, 0.78 + d.z * 0.72 * 0.5), 0.07, (1, 1, 0.5)), M["spot"]))
+    for k in range(5):
+        a = math.radians(-60 + 30 * k)
+        b0 = Vector((math.sin(a) * 0.2, -math.cos(a) * 0.12 + 0.04, 1.12))
+        parts += glow_shroom("Kronenpilz%d" % k, b0, (math.sin(a) * 0.3, -0.1, 1.0), 0.08 + 0.04 * (k == 2), 0.06, M, cap="cap2")
+    parts += spores("Spore", (0, 0, 1.3), 0.6, 12, 0.03, M, 731)
+    attach(join_parts(parts, "Koenigin_Oben"), arm, "Top")
+    foot = []
+    for i in range(6):
+        a = i * 2 * math.pi / 6 + 0.5
+        p = Vector((math.cos(a) * 0.55, math.sin(a) * 0.5, 0.0))
+        foot += glow_shroom("Fusspilz%d" % i, p, (math.cos(a) * 0.4, math.sin(a) * 0.4, 1.0), 0.09, 0.07, M, cap="cap" if i % 2 else "cap2")
+    attach(join_parts(foot, "Koenigin_Fuss"), arm, "Body")
+    dampen_scale(arm, ("Body", "Top"), 0.45)
+    remove_body(body)
+
+def spore_body(T, R, seed, suit=(0.22, 0.3, 0.14)):
+    mycel_paint(T, R["skin"], seed)
+    paint(T, R["purple"] * (1 - R["head"]), suit, keep_shading=0.6)
+    spots = R["purple"] * R["head"]
+    paint(T, spots, (0.4, 1.0, 0.9), keep_shading=0.3)
+    glow(T, spots, (0.2, 1.0, 0.85))
+    paint(T, R["grey"], (0.6, 0.45, 0.28), keep_shading=0.5)
+    eyes = R["white"] * R["head"]
+    paint(T, eyes, (0.5, 1.0, 0.92), keep_shading=0.2)
+    glow(T, eyes, (0.3, 1.0, 0.85))
+
+@variante("sporen_krabbler", "krabbler")
+def sporenwicht(arm, body):
+    """Sporennebel, leicht: Sporenwicht – kleiner Kobold mit erdbrauner Haut voller heller Myzelfäden, türkis
+    leuchtenden Sporenflecken am Kopf, kleinen Leuchtpilzen auf dem Kopf und schwebenden Sporen"""
+    M = spore_mats()
+    T = texels(body); R = regions(T, arm)
+    spore_body(T, R, 741)
+    commit(T, strength=1.8)
+    parts = []
+    for k, (x, y, h, r) in enumerate(((0.0, 0.05, 0.1, 0.07), (-0.13, 0.0, 0.07, 0.05), (0.12, 0.08, 0.06, 0.045))):
+        p, n = head_top(body, x, y)
+        if p is not None:
+            parts += glow_shroom("Kopfpilz%d" % k, p - n * 0.01, (n + Vector((x * 2, 0, 0.3))).normalized(), h, r, M, cap="bracket2", spots=False)
+    parts += spores("Spore", bone_pt(arm, "mixamorig:Head", 1.0) + Vector((0, 0, 0.3)), 0.3, 6, 0.02, M, 743)
+    attach(join_parts(parts, "Kopfpilze"), arm, "mixamorig:Head")
+
+@variante("sporen_zombie", "zombie")
+def myzelwandler(arm, body):
+    """Sporennebel, mittel: Myzelwandler – hagere Gestalt, überwuchert von hellen Myzelfäden, mit türkis leuchtenden
+    Baumpilzen an Schulter und Rücken, Leuchtpilzen auf dem Kopf und türkis leuchtenden Augen"""
+    M = spore_mats()
+    T = texels(body); R = regions(T, arm)
+    spore_body(T, R, 751, suit=(0.3, 0.22, 0.14))
+    commit(T, strength=1.8)
+    parts = []
+    for k, (x, y, h, r) in enumerate(((0.03, 0.05, 0.09, 0.06), (-0.08, 0.0, 0.06, 0.045))):
+        p, n = head_top(body, x, y)
+        if p is not None:
+            parts += glow_shroom("Kopfpilz%d" % k, p - n * 0.01, (n + Vector((x * 2, 0, 0.3))).normalized(), h, r, M, cap="bracket2", spots=False)
+    attach(join_parts(parts, "Kopfpilze"), arm, "mixamorig:Head")
+    a0 = bone_pt(arm, "mixamorig:LeftArm", 0.3)
+    br = [bracket("Schulterpilz%d" % k, *(lambda pn: (pn[0], pn[1]))(surface(body, a0 + Vector((1.0, dy, dz)), (-1, 0, 0))), r, M["bracket2"])
+          for k, (dy, dz, r) in enumerate(((0.0, 0.0, 0.07), (0.04, -0.07, 0.055), (-0.03, 0.06, 0.045))) if surface(body, a0 + Vector((1.0, dy, dz)), (-1, 0, 0))[0] is not None]
+    if br:
+        attach(join_parts(br, "Schulterpilze"), arm, "mixamorig:LeftArm")
+    back = []
+    for k, (x, z, r) in enumerate(((-0.06, 1.0, 0.07), (0.07, 0.92, 0.06), (-0.03, 0.82, 0.05))):
+        p, n = back_pt(body, x, z)
+        if p is not None:
+            back.append(bracket("Rueckenpilz%d" % k, p, n, r, M["bracket"] if k % 2 else M["bracket2"]))
+    attach(join_parts(back, "Rueckenpilze"), arm, "mixamorig:Spine1")
+
+@variante("sporen_brecher", "brecher")
+def schwammbrecher(arm, body):
+    """Sporennebel, stark: Schwammbrecher – massiger Schläger mit erdbrauner, von Myzel überzogener Haut, großen
+    Baumpilzen in Orange und Türkis auf Schultern, Rücken und Unterarmen, Leuchtpilzen auf dem Kopf und Sporenwolke"""
+    M = spore_mats()
+    T = texels(body); R = regions(T, arm)
+    spore_body(T, R, 761, suit=(0.25, 0.2, 0.12))
+    collar = np.maximum(R["white"] * (1 - R["head"]), R["collar"])
+    mycel_paint(T, collar, 763, base=(0.55, 0.45, 0.3))
+    commit(T, strength=1.8)
+    for s_, side in ((1, "Left"), (-1, "Right")):
+        a0 = bone_pt(arm, "mixamorig:%sArm" % side, 0.2)
+        br = []
+        for k, (dy, dz, r) in enumerate(((0.0, 0.05, 0.11), (0.06, -0.06, 0.085), (-0.05, -0.1, 0.07))):
+            p, n = surface(body, a0 + Vector((s_ * 1.0, dy, dz)), (-s_, 0, 0))
+            if p is not None:
+                br.append(bracket("Schulterpilz%s%d" % (side, k), p, n, r, M["bracket"] if (k + (s_ > 0)) % 2 else M["bracket2"]))
+        f0 = bone_pt(arm, "mixamorig:%sForeArm" % side, 0.5)
+        p, n = surface(body, f0 + Vector((s_ * 1.0, 0.0, 0.0)), (-s_, 0, 0))
+        if br:
+            attach(join_parts(br, "Schulterpilze" + side), arm, "mixamorig:%sArm" % side)
+        if p is not None:
+            attach(bracket("Armpilz" + side, p, n, 0.07, M["bracket2"]), arm, "mixamorig:%sForeArm" % side)
+    back = []
+    for k, (x, z, r) in enumerate(((-0.12, 1.15, 0.1), (0.12, 1.1, 0.09), (0.0, 0.98, 0.085), (-0.08, 0.86, 0.07))):
+        p, n = back_pt(body, x, z)
+        if p is not None:
+            back.append(bracket("Rueckenpilz%d" % k, p, n, r, M["bracket"] if k % 2 else M["bracket2"]))
+    back += spores("Spore", bone_pt(arm, "mixamorig:Spine2") + Vector((0, 0.3, 0.3)), 0.35, 8, 0.025, M, 765)
+    attach(join_parts(back, "Rueckenpilze"), arm, "mixamorig:Spine2")
+    parts = []
+    for k, (x, y, h, r) in enumerate(((0.0, 0.0, 0.11, 0.075), (-0.1, 0.05, 0.08, 0.055), (0.1, 0.05, 0.07, 0.05))):
+        p, n = head_top(body, x, y)
+        if p is not None:
+            parts += glow_shroom("Kopfpilz%d" % k, p - n * 0.01, (n + Vector((x * 2, 0, 0.3))).normalized(), h, r, M, cap="bracket2", spots=False)
+    attach(join_parts(parts, "Kopfpilze"), arm, "mixamorig:Head")
+
+@variante("pilz_riese", "koloss")
+def pilzriese(arm, body):
+    """Sporennebel (Welt 24), Boss: Pilzriese – riesiger, von Myzel überwucherter Waldgeist mit erdbrauner Haut, großen
+    Baumpilzen in Orange und Türkis auf Schultern und Rücken, einer Kappe aus Leuchtpilzen auf dem Kopf, türkis
+    leuchtenden Augen, Rindenstulpen und einer Wolke aus leuchtenden Sporen"""
+    M = spore_mats()
+    bark = look("Rinde", (0.35, 0.25, 0.16), rough=0.85)
+    T = texels(body); R = regions(T, arm)
+    spore_body(T, R, 771, suit=(0.22, 0.17, 0.1))
+    collar = np.maximum(R["white"] * (1 - R["head"]), R["collar"])
+    mycel_paint(T, collar, 773, base=(0.55, 0.45, 0.3))
+    commit(T, strength=1.8)
+    koloss_arms(arm, body, bark, M["dark"], M["bracket"], cuff_style="fell", fingers=3)
+    hc = bone_pt(arm, "mixamorig:Head", 0.6)
+    parts = []
+    for k, (x, y, h, r, cap) in enumerate(((0.0, 0.05, 0.22, 0.16, "cap"), (-0.2, 0.0, 0.14, 0.1, "bracket2"), (0.2, 0.02, 0.15, 0.11, "cap"), (-0.1, 0.18, 0.1, 0.08, "bracket2"), (0.12, 0.18, 0.11, 0.08, "cap2"))):
+        p, n = head_top(body, x, y)
+        if p is not None:
+            parts += glow_shroom("Kopfpilz%d" % k, p - n * 0.02, (n + Vector((x * 2, y, 0.3))).normalized(), h, r, M, cap=cap, spots=(cap == "cap"))
+    attach(join_parts(parts, "Pilzkappe"), arm, "mixamorig:Head")
+    for s_, side in ((1, "Left"), (-1, "Right")):
+        a0 = bone_pt(arm, "mixamorig:%sArm" % side, 0.15)
+        br = []
+        for k, (dy, dz, r) in enumerate(((0.0, 0.12, 0.2), (0.1, 0.0, 0.15), (-0.08, -0.08, 0.13), (0.0, -0.18, 0.11))):
+            p, n = surface(body, a0 + Vector((s_ * 1.5, dy, dz)), (-s_, 0, 0))
+            if p is not None:
+                br.append(bracket("Schulterpilz%s%d" % (side, k), p, n, r, M["bracket"] if (k + (s_ > 0)) % 2 else M["bracket2"]))
+        if br:
+            attach(join_parts(br, "Schulterpilze" + side), arm, "mixamorig:%sArm" % side)
+    back = []
+    sp = bone_pt(arm, "mixamorig:Spine2")
+    for k, (x, z, r) in enumerate(((-0.2, 0.1, 0.17), (0.2, 0.05, 0.16), (0.0, -0.1, 0.15), (-0.12, -0.3, 0.12), (0.14, -0.28, 0.12))):
+        p, n = back_pt(body, x, sp.z + z)
+        if p is not None:
+            back.append(bracket("Rueckenpilz%d" % k, p, n, r, M["bracket"] if k % 2 else M["bracket2"]))
+    back += spores("Spore", sp + Vector((0, 0.4, 0.4)), 0.7, 14, 0.04, M, 775)
+    attach(join_parts(back, "Rueckenpilze"), arm, "mixamorig:Spine2")
 
 # ---------------------------------------------------------------- Ablauf
 
