@@ -1266,15 +1266,34 @@ def nebelhuene(arm, body):
     eyes = R["white"] * R["head"]
     paint(T, eyes, (0.75, 0.95, 1.0), keep_shading=0.2)
     glow(T, eyes, (0.45, 0.85, 1.0))
+    # Beine in der Farbe des Gewands (wie eine Hose): was beim großen Schritt unter dem Saum vorschaut, ist Stoff
+    hz = bone_pt(arm, "mixamorig:Hips").z
+    hx = abs(bone_pt(arm, "mixamorig:LeftUpLeg").x - bone_pt(arm, "mixamorig:Hips").x)
+    P = T["P"]
+    thigh = np.clip((hz + 0.02 - P[..., 2]) / 0.04, 0, 1) * np.clip((hx * 2.8 - np.abs(P[..., 0])) / 0.04, 0, 1)
+    paint(T, thigh * (1 - R["grey"]), (0.3, 0.22, 0.48), keep_shading=0.6)
+    T["em"][..., :3] *= (1 - thigh * (1 - R["grey"]))[..., None]
     commit(T, strength=1.4)
     # Gewand mit gewelltem Saum um die Hüften
     hp = bone_pt(arm, "mixamorig:Hips")
     hem = lambda a: (-0.07 * (0.5 + 0.5 * math.cos(9 * a)) ** 1.5, 0.015 * math.cos(9 * a))
-    sk = lathe("Gewandsaum", [(0.12, 0.27), (0.02, 0.29), (-0.1, 0.31), (-0.2, 0.33)], segs=54, hem=hem)
+    prof = [(0.12 - 0.35 * t, 0.27 + 0.1 * t + 0.03 * t * t + 0.012 * math.sin(math.pi * t)) for t in [i / 10 for i in range(11)]]
+    sk = lathe("Gewandsaum", prof, segs=54, hem=hem)
     for v in sk.data.vertices:
-        v.co.y *= 0.85
-    sk.location = (hp.x, hp.y + 0.01, hp.z)
-    attach(give(sk, robe), arm, "mixamorig:Hips")
+        v.co.y *= 0.88 + 0.1 * smooth01((0.12 - v.co.z) / 0.35)
+        v.co.x += hp.x; v.co.y += hp.y + 0.01; v.co.z += hp.z
+    give(sk, robe)
+    # Kommentar 26.11.: Das Gewand läuft mit den Beinen mit (oben an der Hüfte, nach unten immer mehr am
+    # Oberschenkel der jeweiligen Seite), sonst rutschen die Beine beim Laufen durch den Stoff.
+    legs = {side: bone_pt(arm, "mixamorig:%sUpLeg" % side) for side in ("Left", "Right")}
+    lx = abs(legs["Left"].x - hp.x)
+    sgn = 1.0 if legs["Left"].x > hp.x else -1.0
+
+    def robe_weights(c):
+        t = smooth01((hp.z + 0.1 - c.z) / 0.34) * 0.8
+        left = smooth01(0.5 + sgn * (c.x - hp.x) / (lx * 3.0))
+        return {"mixamorig:Hips": 1 - t, "mixamorig:LeftUpLeg": t * left, "mixamorig:RightUpLeg": t * (1 - left)}
+    skin_to(sk, arm, robe_weights)
     p, n = head_top(body, 0.0, 0.0)
     parts = []
     if p is not None:
