@@ -138,7 +138,7 @@ const LOOK_DATA := {
 	"blitz_krabbler": {"height": 1.68},
 	"blitz_zombie": {"height": 1.77},
 	"blitz_panzerkaefer": {"height": 1.39},
-	"juwelen_schnecke": {"height": 2.17},
+	"juwelen_schnecke": {"height": 2.45},
 	"edelstein_golem": {"height": 3.3},
 	"sturm_wolke": {"height": 2.9, "lift": 0.5},
 	"donner_riese": {"height": 3.4},
