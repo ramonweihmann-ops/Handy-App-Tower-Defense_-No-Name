@@ -662,6 +662,7 @@ def giftkaulquappe(arm, body):
     skin = look("KaulquappenHaut", (1.0, 1.0, 1.0), rough=0.25)
     green = look("Quappengruen", (0.16, 0.62, 0.3), rough=0.3)
     pale = look("Quappenbauch", (0.88, 0.95, 0.6), rough=0.3)
+    fin_m = look("Quappenflosse", (0.62, 0.88, 0.38), rough=0.3)
     prof = [(0.46, 0.0), (0.455, 0.08), (0.43, 0.16), (0.385, 0.23), (0.32, 0.28), (0.24, 0.3), (0.16, 0.295), (0.09, 0.27), (0.04, 0.21), (0.01, 0.12), (0.0, 0.0)]
     g = lathe("Kaulquappe", prof, segs=56)
     for v in g.data.vertices:
@@ -740,9 +741,30 @@ def giftkaulquappe(arm, body):
             face.append(give(sphere("Warze%d" % i, tuple(q), rnd.uniform(0.012, 0.02), (1, 1, 0.7)), M["wart"]))
     attach(join_parts(face, "Kaulquappe_Kopf"), arm, "Top")
     q, m = surface(g, (0, 2.0, 0.17), (0, -1, 0))
-    tail = [fin("Schwanz", q - m * 0.05, (0, 1.0, 0.25), 0.48, 0.13, green, curl=0.25),
-            fin("Schwanzsaum", q - m * 0.04 + Vector((0, 0.02, 0.0)), (0, 1.0, 0.18), 0.5, 0.09, pale, curl=0.3)]
-    attach(join_parts(tail, "Kaulquappe_Schwanz"), arm, "Body")
+    # Kommentar 26.11.: Schwanz runder und fest am Körper. Dicker runder Schwanzstiel, der tief im Körper beginnt,
+    # darum ein rundes Flossenpaddel; hängt am selben Knochen wie die Haut an dieser Stelle (kein Spalt beim Hüpfen).
+    base = q - m * 0.1
+    def axis(t):
+        return base + Vector((0.0, 0.52 * t, 0.03 * t + 0.09 * t * t))
+    n_ = 22
+    core = tube("Schwanzstiel", [tuple(axis(k / n_)) for k in range(n_ + 1)] + [tuple(axis(1.0) + Vector((0, 0.016, 0.004)))],
+                [0.095 - 0.072 * (k / n_) ** 0.8 for k in range(n_ + 1)] + [0.0], segs=16)
+    bm = bmesh.new(); rings = []
+    for k in range(n_ + 1):
+        t = k / n_
+        c = axis(t)
+        h = 0.035 + 0.14 * math.sin(math.pi * (0.1 + 0.9 * t)) ** 0.55 if t < 1 else 0.02
+        w = 0.016 * (1 - 0.5 * t)
+        up = Vector((0, -(0.03 + 0.18 * t), 0.52)).normalized()        # senkrecht zur Schwanzachse
+        rings.append([bm.verts.new(c + Vector((w * math.copysign(abs(math.cos(a)) ** 0.7, math.cos(a)), 0, 0)) + up * (h * math.sin(a)))
+                      for a in [j * 2 * math.pi / 14 for j in range(14)]])
+    for r0, r1 in zip(rings, rings[1:]):
+        for j in range(14):
+            bm.faces.new([r0[j], r0[(j + 1) % 14], r1[(j + 1) % 14], r1[j]])
+    bm.faces.new(rings[0][::-1]); bm.faces.new(rings[-1])
+    paddle = finish("Schwanzflosse", bm)
+    tail = [give(core, green), give(paddle, fin_m)]
+    attach(join_parts(tail, "Kaulquappe_Schwanz"), arm, "Top")
     skin_to(g, arm, lambda c: {"Top": smooth01((c.z - 0.02) / 0.13), "Body": 1 - smooth01((c.z - 0.02) / 0.13)})   # Maul bewegt sich mit dem Kopf
     dampen_scale(arm, ("Body", "Top"), 0.55)
     remove_body(body)

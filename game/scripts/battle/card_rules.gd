@@ -1,14 +1,15 @@
 class_name CardRules
 ## Neues Kartensystem im Kampf (Vorschlag vom 14.11.2026, noch im Balance-Labor): nur mit dem Schalter
 ## --karten-neu aktiv, einzelne Teile mit --karten-neu=held5,plaetze,meister,symbiose.
-## - held5: Karten für neue Champions erst ab der Karte nach Welle 5
+## - held5: Karten für neue Champions erst ab der Karte nach Welle HERO_FROM_WAVE (der Name stammt von der ersten Fassung mit Welle 5)
 ## - plaetze: höchstens 3 Waffenfähigkeiten je Champion (die Superfähigkeit zum Antippen zählt extra)
 ## - meister: Waffenfähigkeiten haben höchstens Stufe 3; auf Stufe 3 werden sie zur Meisterfähigkeit
 ## - symbiose: zwei Champions mit ihren Spezialfähigkeiten ergeben zusammen eine neue Wirkung
 
 const PARTS := ["held5", "plaetze", "meister", "symbiose"]
-## ab dieser Welle (Karte danach) können neue Champions kommen
-const HERO_FROM_WAVE := 5
+## ab dieser Welle (Karte danach) können neue Champions kommen. Wunsch 26.11.2026: wieder ab Welle 3 statt 5 – mit
+## nur einem Champion bis Welle 5 war der Einstieg zu hart, vor allem mit einem unpassenden ersten Champion.
+const HERO_FROM_WAVE := 3
 const WEAPON_MODS := ["damage", "rate", "reload", "mag", "crit", "special"]
 const SLOTS := 3
 const MEISTER_LEVEL := 3
@@ -21,8 +22,8 @@ static var DUO_HP := 0.8
 
 ## Im normalen Spiel an: Meisterfähigkeit seit 0.10.31 (Mockup „Karten-Meister“ freigegeben am 19.11.2026),
 ## Platzgrenze seit 0.10.35 (freigegeben am 20.11.2026), Symbiosen seit 0.10.37 (Mockup „Karten-Symbiose“ freigegeben
-## am 20.11.2026), neue Champions erst ab Welle 5 seit 0.10.46 (Wunsch 22.11.2026, Labor mit den kurzen Wellen gleich
-## wie vorher); --karten-alt schaltet alles aus (Vergleich im Labor), --karten-neu schaltet Teile dazu
+## am 20.11.2026), neue Champions erst ab Welle 5 seit 0.10.46 (Wunsch 22.11.2026), ab Welle 3 seit 0.10.48
+## (Wunsch 26.11.2026); --karten-alt schaltet alles aus (Vergleich im Labor), --karten-neu schaltet Teile dazu
 const LIVE := ["meister", "plaetze", "symbiose", "held5"]
 static var on := {"meister": true, "plaetze": true, "symbiose": true, "held5": true}
 ## held5 gilt ab diesem Level: Im ersten Kampf (Tutorial) kommt der zweite Champion weiter schon nach Welle 1,

@@ -6,6 +6,9 @@ Nach jeder geschafften Welle wählt man eine Karte. Vorschlag des Nutzers vom 14
 - **Im Spiel:** Meisterfähigkeit (Regel 3) seit 0.10.31, Mockup „Karten-Meister“ freigegeben am 19.11.2026;
   Platzgrenze (Regel 2) seit 0.10.35, freigegeben am 20.11.2026; Symbiosen (Regel 4) seit 0.10.37, Mockup
   „Karten-Symbiose“ freigegeben am 20.11.2026.
+- **Seit 0.10.48 ab Welle 3 statt 5** (Wunsch 26.11.2026: mit nur einem Champion bis Welle 5 war der Einstieg zu
+  hart, vor allem mit einem unpassenden ersten Champion). `CardRules.HERO_FROM_WAVE = 3`; der Ausgleich bei den
+  Gegnerleben (bis Welle 8, ab Level 21) bleibt. Die Tabelle unten stammt noch von Welle 5.
 - **Im Spiel seit 0.10.46** (Wunsch 22.11.2026: „das muss kommen, sehr wichtig“): „Neue Champions erst ab Welle 5“,
   ab Level 2 (im ersten Kampf mit dem Tutorial kommt der zweite Champion weiter nach Welle 1), nicht im Mehrspieler.
   `--karten-alt` schaltet alle neuen Regeln aus (Vergleich wie vor 0.10.31).
@@ -46,8 +49,9 @@ Nach jeder geschafften Welle wählt man eine Karte. Vorschlag des Nutzers vom 14
 
 ## Regeln
 
-1. **Neue Champions erst ab Welle 5** (`held5`): Die Karten nach Welle 1–4 sind nur Verbesserungen. Ab der Karte
-   nach Welle 5 kann ein neuer Champion kommen (höchstens drei im Kampf wie bisher).
+1. **Neue Champions erst ab Welle 3** (`held5`, zuerst Welle 5, seit 0.10.48 Welle 3): Die Karten nach Welle 1–2
+   sind nur Verbesserungen. Ab der Karte nach Welle 3 kann ein neuer Champion kommen (höchstens drei im Kampf wie
+   bisher).
 2. **Höchstens 3 Waffenfähigkeiten je Champion** (`plaetze`): Schaden, Feuerrate, Nachladen, Magazin, Kritisch und
    Spezialfähigkeit belegen je einen Platz, sobald sie Stufe 1 haben. Sind drei belegt, kommen für diesen Champion
    nur noch Karten dieser drei. Die Superfähigkeit zum Antippen (SUPER-Karte) zählt extra.
