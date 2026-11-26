@@ -144,12 +144,13 @@ def paint_body(g, us, bel):
     occ = np.clip(AO * 1.8, 0, 1)
     col = col * (1 - 0.3 * occ[..., None]) + np.asarray((0.16, 0.08, 0.34), np.float32) * 0.3 * occ[..., None]
     face = (y < HEAD.y - 0.06) & (z > HEAD.z - 0.17) & (z < HEAD.z + 0.12) & (np.abs(x) < 0.15)
-    fcol = np.asarray((0.3, 0.17, 0.52), np.float32)                 # Gesicht eine Spur heller, damit es lesbar bleibt
+    fcol = np.asarray((0.21, 0.11, 0.4), np.float32)                 # Gesicht dunkel wie im Original: die Leuchtaugen heben sich klar ab
     col = np.where(face[..., None], col * 0.4 + fcol * 0.6, col)
     for s in (1, -1):
         d = np.linalg.norm(P - np.asarray(HEAD + Vector((0.075 * s, -0.175, 0.0)), np.float32), axis=-1)
-        gl = np.clip(1 - d / 0.1, 0, 1) ** 2
-        em += np.asarray((0.7, 0.45, 1.0), np.float32) * gl[..., None] * 0.5
+        gl = np.clip(1 - d / 0.115, 0, 1) ** 1.8
+        em += np.asarray((0.5, 0.25, 1.0), np.float32) * gl[..., None] * 0.9
+        col = col * (1 - 0.35 * gl[..., None]) + np.asarray((0.42, 0.2, 0.9), np.float32) * 0.35 * gl[..., None]
     T["out"][..., :3] = np.where(cov[..., None], np.clip(col, 0, 1), T["out"][..., :3])
     T["em"][..., :3] = np.where(cov[..., None], np.clip(em, 0, 1), 0)
     commit(T, strength=1.6)
@@ -304,6 +305,11 @@ def face(bvh, M):
         e.rotation_euler = Euler((0, math.radians(-24 * s), math.radians(math.degrees(math.atan2(nrm.x, -nrm.y)) * 0.8)), 'XYZ')
         e.location = hit + Vector((0, 0.008, 0))
         parts.append(give(e, M["eye"]))
+        # Kommentar 26.11.: Augen leuchten stärker und violetter. Heller Kern, darum ein kräftig violetter Leuchtrand,
+        # der sich klar von der dunklen Haut abhebt.
+        rim = sphere("Augenschein%d" % s, (0, 0, 0), 1.0, (0.074, 0.016, 0.046), segs=(22, 12))
+        rim.rotation_euler = e.rotation_euler; rim.location = hit + Vector((0, 0.013, 0))
+        parts.append(give(rim, M["eyeglow"]))
         brow = []
         for bx, bz in ((0.022, 0.04), (0.078, 0.06), (0.13, 0.068)):
             h = bvh.ray_cast(Vector((bx * s, -3.0, HEAD.z + bz)), Vector((0, 1, 0)), 6.0)[0]
@@ -425,7 +431,8 @@ def schlangenzauberin(arm, body):
         "hair": look("Schlangenhaar", (0.25, 0.12, 0.47), rough=0.45),
         "gold": look("Gold", (1.0, 0.76, 0.26), rough=0.3, metal=0.85),
         "gem": look("Zauberstein", (0.5, 0.18, 0.95), rough=0.08, emit=(0.5, 0.15, 1.0), strength=1.2),
-        "eye": look("Leuchtauge", (0.88, 0.78, 1.0), rough=0.2, emit=(0.8, 0.62, 1.0), strength=3.0),
+        "eye": look("Leuchtauge", (0.4, 0.3, 0.75), rough=0.25, emit=(0.76, 0.66, 1.0), strength=1.32),      # heller Kern in Lila, nicht reinweiß
+        "eyeglow": look("Augenschein", (0.3, 0.12, 0.8), rough=0.3, emit=(0.42, 0.2, 1.0), strength=1.8),
         "fang": look("Zahn", (0.97, 0.96, 1.0), rough=0.15),
         "brow": look("Braue", (0.12, 0.05, 0.24), rough=0.5),
     }
