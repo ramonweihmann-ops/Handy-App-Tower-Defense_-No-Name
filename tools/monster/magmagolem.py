@@ -145,14 +145,15 @@ def smooth_loop(pts, k=4):
             out.append(0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3))
     return out
 
-def loop_cutter(name, P2, front_y, depth, shrink=0.6, extra=0.3):
-    """Schneidekörper aus einem weichen Umriss (Punkte in Ruhehaltung, y wird gesetzt), nach hinten zur Schüssel"""
+def loop_cutter(name, P2, front_y, depth, shrink=0.6, extra=0.3, straight=0.06):
+    """Schneidekörper aus einem weichen Umriss (Punkte in Ruhehaltung, y wird gesetzt), nach hinten zur Schüssel
+    (bis straight hinter front_y gerade Wand, danach verjüngt)"""
     c = sum(P2, Vector()) / len(P2)
     bm = bmesh.new(); rings = []
-    for k in range(12):
-        t = k / 11
+    for k in range(16):
+        t = k / 15
         y = front_y - extra + (extra + depth) * t
-        dd = max(0.0, (y - front_y - 0.06) / max(depth - 0.06, 1e-3))
+        dd = max(0.0, (y - front_y - straight) / max(depth - straight, 1e-3))
         sc = 1.0 - (1 - shrink) * min(1.0, dd) ** 1.6
         rings.append([bm.verts.new((c.x + (p.x - c.x) * sc, y, c.z + (p.z - c.z) * sc)) for p in P2])
     n = len(P2)
@@ -166,8 +167,32 @@ def loop_cutter(name, P2, front_y, depth, shrink=0.6, extra=0.3):
 def mouth_loop():
     return smooth_loop([MV(px, py) for px, py in MOUTH3], 3)
 
-def crater_loop():
-    return smooth_loop([MV(px, py) for px, py in CRATER], 4)
+CRATER_K = 0.86                 # Öffnung etwas kleiner als der Umriss der Vorlage, außen herum der wulstige Rand
+
+def crater_loop(k=CRATER_K):
+    P = smooth_loop([MV(px, py) for px, py in CRATER], 4)
+    c = sum(P, Vector()) / len(P)
+    return [c + (p - c) * k for p in P]
+
+def seg_dist(X, Z, poly):
+    """Abstand der Punkte (X, Z) zum geschlossenen Umriss poly [(x, z)]"""
+    A = np.asarray(poly, np.float32); B_ = np.roll(A, -1, 0)
+    d = np.full(X.shape, 9.0, np.float32)
+    for (ax, az), (bx, bz) in zip(A, B_):
+        vx, vz = bx - ax, bz - az
+        t = np.clip(((X - ax) * vx + (Z - az) * vz) / (vx * vx + vz * vz + 1e-12), 0, 1)
+        d = np.minimum(d, np.hypot(X - ax - t * vx, Z - az - t * vz))
+    return d
+
+def crater_rim(body, cy):
+    """Wulstiger, runder Steinrand um die Kratermulde: Haut am Umriss etwas nach außen wölben"""
+    me = body.data
+    co = np.empty(len(me.vertices) * 3, np.float32); me.vertices.foreach_get("co", co); co = co.reshape(-1, 3)
+    nr = np.empty(len(me.vertices) * 3, np.float32); me.vertices.foreach_get("normal", nr); nr = nr.reshape(-1, 3)
+    d = seg_dist(co[:, 0], co[:, 2], [(p.x, p.z) for p in crater_loop(0.95)])
+    w = 0.04 * np.exp(-(d / 0.045) ** 2) * (co[:, 1] < cy + 0.14) * np.clip(-nr[:, 1] * 2, 0, 1)
+    co += nr * w[:, None]
+    me.vertices.foreach_set("co", co.ravel()); me.update()
 
 def magma_body(arm):
     """Ein Guss aus weichen, runden Basaltmassen (Comicform): Rumpf und Kopf verschmelzen weich, Arme und Beine je
@@ -243,7 +268,8 @@ def magma_body(arm):
     bvh0 = BVHTree.FromObject(body, bpy.context.evaluated_depsgraph_get())
     cy = front_hit(tbvh, MV(325, 315).x, MV(325, 315).z)[0].y
     my = front_hit(bvh0, 0, MV(318, 191).z)[0].y
-    cutters = [loop_cutter("Krater", crater_loop(), cy, 0.2, shrink=0.6),
+    crater_rim(body, cy)
+    cutters = [loop_cutter("Krater", crater_loop(), cy, 0.16, shrink=0.42, straight=-0.03),      # flache Schüssel
                loop_cutter("Maul", mouth_loop(), my, 0.12, shrink=0.85)]
     for kind, px, py, r in PORES:
         if r < 0.045:
@@ -351,16 +377,17 @@ def mouth_fill(bvh, M, my):
     return parts
 
 def crater_pool(M, cy):
-    """Unregelmäßiger, knotiger Lavakern am Grund der Kratermulde"""
+    """Unregelmäßiger, knotiger Lavakern in der Kratermulde, dicht hinter dem wulstigen Rand (kleiner Hohlraum);
+    reicht seitlich bis in die Wand, damit keine Fuge zu sehen ist"""
     P2 = crater_loop()
     c = sum(P2, Vector()) / len(P2)
     bm = bmesh.new(); rings = []
     rng = random.Random(9)
     for j in range(1, 7):
         t = j / 6
-        rings.append([bm.verts.new((c.x + (p.x - c.x) * 0.86 * t, cy + 0.12 - 0.03 * (1 - t) ** 2 + 0.03 * t ** 3 + rng.uniform(-0.008, 0.008),
-                                    c.z + (p.z - c.z) * 0.86 * t)) for p in P2])
-    cen = bm.verts.new((c.x, cy + 0.095, c.z))
+        rings.append([bm.verts.new((c.x + (p.x - c.x) * 1.04 * t, cy + 0.065 - 0.03 * (1 - t) ** 2 + 0.03 * t ** 3 + rng.uniform(-0.008, 0.008),
+                                    c.z + (p.z - c.z) * 1.04 * t)) for p in P2])
+    cen = bm.verts.new((c.x, cy + 0.04, c.z))
     n = len(P2)
     for k in range(n):
         bm.faces.new([cen, rings[0][(k + 1) % n], rings[0][k]])
@@ -524,7 +551,7 @@ def paint_magma(body, cy, arm):
         cross = ((z1 > Z) != (z2 > Z)) & (X < (x2 - x1) * (Z - z1) / (z2 - z1 + 1e-9) + x1)
         inside ^= cross
     front = P[..., 1] < cy + 0.3
-    deep = np.clip((P[..., 1] - (cy + 0.02)) / 0.11, 0, 1) * inside * front
+    deep = np.clip((P[..., 1] - (cy - 0.035)) / 0.075, 0, 1) * inside * front      # Wand glüht zur Lava hin
     col = col * (1 - deep[..., None] * 0.7) + np.asarray((0.75, 0.2, 0.04), np.float32) * (deep[..., None] * 0.7)
     em += np.asarray((0.9, 0.24, 0.03), np.float32) * (0.75 * deep ** 2.2)[..., None]       # Wand dunkler als der Kern
     cxz = np.asarray(sum((Vector((x, 0, z)) for x, z in poly), Vector()) / len(poly))
