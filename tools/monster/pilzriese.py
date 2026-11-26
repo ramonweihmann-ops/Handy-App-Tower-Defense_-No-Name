@@ -211,12 +211,17 @@ def pilz_mats():
 
 def pilz_body(arm):
     T = mb_family("Rumpf")
-    mb_ell(T, V(282, 345, 1290), (0.3, 0.2, 0.2))                  # Brust
-    mb_ell(T, V(284, 392, 1268), (0.27, 0.215, 0.19))              # runder Bauch, eine glatte Masse von der Brust bis
-    mb_ell(T, V(283, 430, 1300), (0.23, 0.17, 0.12))               # zum Becken (keine Taille: wirkte wie Speckrollen)
+    # Rumpf wie in der Vorlage (Rückmeldung 26.11.): breite Brust mit leichten Brustmuskeln, schlanker, flacher Bauch,
+    # schmale Hüfte und schmales Gesäß – eine glatte Masse ohne Wülste
+    mb_ell(T, V(282, 338, 1288), (0.31, 0.2, 0.17))                # Brust
+    for s in (1, -1):
+        pc = V(285 + 26 * s, 324); pc.y = -0.085
+        mb_ell(T, tuple(pc), (0.125, 0.075, 0.09))                 # Brustmuskeln
+    mb_ell(T, V(284, 388, 1282), (0.225, 0.17, 0.17))              # schlanker, flacher Bauch
+    mb_ell(T, V(283, 424, 1296), (0.225, 0.16, 0.11))              # schmales Becken
     for side, s in (("Left", 1), ("Right", -1)):
         kn = B(arm, side + "Leg")
-        mb_ell(T, (0.14 * s, kn.y + 0.02, kn.z + 0.1), (0.13, 0.14, 0.13))   # weicher Hüftansatz: Beine fließen in den Körper
+        mb_ell(T, (0.24 * s, kn.y + 0.01, kn.z + 0.03), (0.15, 0.15, 0.12))   # Hüfte läuft außen fließend in die Beine
     mb_ell(T, V(285, 298, 1280), (0.33, 0.2, 0.1))                 # Schultern
     mb_ell(T, V(285, 282, 1245), (0.21, 0.19, 0.12))               # kurzer Hals
     mb_ell(T, HEAD_C2, HEAD_S2)                                    # Kopf
@@ -237,19 +242,23 @@ def pilz_body(arm):
         mb_caps(A_, el, wr, 0.13)
         c, semi, q = along(el, wr, 0.145, 0.16, 0.55); mb_ell(A_, c, semi, q)
         parts.append(A_)
+        # Bein und Fuß wie in der Vorlage (Rückmeldung 26.11.) in einem Guss: oben an der Hüfte schlank, ein kleines
+        # Knie, nach unten dicker und fließend in den breiten Fuß; die Beine stehen leicht nach außen, zwischen Beinen
+        # und Füßen bleibt ein Abstand (die Haut wuchs unten zusammen)
         L_ = mb_family("Bein" + side)
         up, kn, an = B(arm, side + "UpLeg"), B(arm, side + "Leg"), B(arm, side + "Foot")
-        top = Vector((0.13 * s, kn.y + 0.02, kn.z + 0.04))
-        mb_caps(L_, top, kn, 0.16)                                 # schlanker Ansatz unter dem Bauch
-        mb_caps(L_, kn, an, 0.17)
+        hip = Vector((0.25 * s, kn.y + 0.01, kn.z - 0.03))         # Maße aus der Vorderansicht: Innenkanten senkrecht,
+        knee = Vector((0.27 * s, kn.y - 0.01, 0.57))               # außen wird das Bein nach unten breiter
+        ank = Vector((0.31 * s, an.y - 0.01, 0.29))
+        mb_caps(L_, hip, knee, 0.155)
+        mb_ell(L_, tuple(knee + Vector((0.012 * s, -0.135, 0.03))), (0.06, 0.05, 0.06))     # kleines Knie
+        mb_caps(L_, knee, ank, 0.178)
+        mb_ell(L_, tuple(ank), (0.205, 0.215, 0.19))               # zum Fuß hin dicker
+        fc = Vector((0.375 * s, an.y - 0.11, 0.1))
+        mb_ell(L_, tuple(fc), (0.275, 0.3, 0.13))                  # breiter Fuß
+        for k, x in enumerate((-0.18, -0.062, 0.062, 0.18)):
+            mb_ell(L_, tuple(fc + Vector((x * 1.05, -0.27 + abs(x) * 0.4, -0.035))), (0.066, 0.085, 0.072))
         parts.append(L_)
-        F_ = mb_family("Fuss" + side)
-        fc = Vector((an.x + 0.03 * s, an.y - 0.1, 0.1))
-        mb_ell(F_, tuple(fc), (0.25, 0.27, 0.13))
-        mb_ell(F_, tuple(an + Vector((0, 0, -0.02))), (0.18, 0.18, 0.12))
-        for k, x in enumerate((-0.16, -0.055, 0.055, 0.16)):
-            mb_ell(F_, tuple(fc + Vector((x * 1.05, -0.24 + abs(x) * 0.35, -0.035))), (0.06, 0.075, 0.065))
-        parts.append(F_)
     torso = mb_to_mesh(T)
     tbvh = BVHTree.FromObject(torso, bpy.context.evaluated_depsgraph_get())
     body = join_parts([torso] + [mb_to_mesh(o) for o in parts], "Pilzriese")
@@ -339,7 +348,8 @@ def bind_pilz(body, arm, tbvh):
 
 CAP_C = V(292, 158, 1355)       # Mitte des Huts (liegt hinter dem Kopf)
 CAP_R = 0.86
-CAP_N = Vector((0.2, 0.07, 0.98)).normalized()     # Hut kippt etwas nach links hinten ...
+CAP_N = Vector((0.2, float(os.environ.get("CAP_BACK", "0.38")), 0.9)).normalized()   # Hut vorn hochgeschwungen (Rückmeldung
+# 26.11.: wie in der Vorlage, man sieht von vorn die Lamellen und von oben das Gesicht), kippt nach links hinten ...
 CAP_DROOP = Vector((0.88, 0.47, 0)).normalized()   # ... und die weiche Krempe hängt dorthin herab, gegenüber hochgeschlagen
 
 def cap_frame():
@@ -379,7 +389,7 @@ def cap(M, head_top):
                 q = vv.co - C; a_ = q.dot(u); b_ = q.dot(v)
                 rr = math.sqrt(a_ * a_ + b_ * b_) / CAP_R
                 cd = (a_ * u + b_ * v).normalized().dot(dd) if rr > 1e-4 else 0.0
-                vv.co += n * (-0.2 * rr ** 2 * max(0.0, cd) ** 1.3 + 0.14 * rr ** 2 * max(0.0, -cd) ** 1.3)
+                vv.co += n * (-0.2 * rr ** 2 * max(0.0, cd) ** 1.3 + 0.22 * rr ** 2 * max(0.0, -cd) ** 1.3)
         m = len(prof)
         under = [z < -0.02 and i > 12 for i, (r, z) in enumerate(prof)]
         for k in range(S):

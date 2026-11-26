@@ -1813,7 +1813,7 @@ def closed_tube(name, pts, normals, r, segs=10):
 def slime_crown(c, up, golds, gem_m, R=0.2, band=0.095):
     """Goldkrone nach Vorlage (26.11.): breiter Reif mit Wulst unten und Zierlinie, sechs breite runde Zacken, jede
     mit fest angesetzter Goldkugel, vorn die höhere Zacke mit großem violettem Stein in runder Fassung; ein heller
-    Goldrand umrahmt die Zacken, Nieten zwischen den Zacken; innen dunkleres Gold (Schattierung). Kein
+    Goldrand umrahmt die Zacken, Nieten zwischen den Zacken, zwei kleinere Seitensteine; innen dunkleres Gold. Kein
     Schleimüberlauf (Kommentar 26.11.). golds = (außen, innen, Kanten); c = Mitte unten, up = Achse"""
     gold, gold_in, gold_hi = golds
     lobes = [(k * 2 * math.pi / 6, 0.14 if k == 0 else 0.095) for k in range(6)]     # sechs breite, runde Zacken
@@ -1862,16 +1862,19 @@ def slime_crown(c, up, golds, gem_m, R=0.2, band=0.095):
             continue
         zn = band * 0.45
         parts.append(give(sphere("Niete%d" % k, (rad(zn) * math.sin(a), -rad(zn) * math.cos(a), zn), 0.014), gold_hi))
-    # großer Stein vorn in der hohen Zacke
-    zg = band + 0.035
-    gc = Vector((0, -rad(zg) - 0.006, zg))
-    st = lathe("Kronstein", [(0.014, 0.0), (0.014, 0.026), (0.0, 0.04), (-0.022, 0.0)], segs=8)
-    st.data.transform(Matrix.Rotation(math.radians(90), 4, 'X') @ Matrix.Rotation(math.radians(22.5), 4, 'Z'))
-    st.data.transform(Matrix.Translation(gc))
-    for pl in st.data.polygons:
-        pl.use_smooth = False
-    parts.append(give(st, gem_m))
-    parts.append(give(torus("Steinfassung", tuple(gc + Vector((0, 0.004, 0))), 0.043, 0.01, rot=(90, 0, 0), segs=40), gold_hi))
+    # großer Stein vorn in der hohen Zacke, zwei kleinere Seitensteine in den Zacken links und rechts davon
+    for k, (ak, zg, sc) in enumerate(((0.0, band + 0.035, 1.0), (math.pi / 3, band + 0.03, 0.66), (-math.pi / 3, band + 0.03, 0.66))):
+        d = Vector((math.sin(ak), -math.cos(ak), 0.0))
+        gc = d * (rad(zg) + 0.006 * sc) + Vector((0, 0, zg))
+        qd = Vector((0, 0, 1)).rotation_difference(d).to_matrix().to_4x4()
+        st = lathe("Kronstein%d" % k, [(0.014, 0.0), (0.014, 0.026), (0.0, 0.04), (-0.022, 0.0)], segs=8)
+        st.data.transform(Matrix.Translation(gc) @ qd @ Matrix.Rotation(math.radians(22.5), 4, 'Z') @ Matrix.Scale(sc, 4))
+        for pl in st.data.polygons:
+            pl.use_smooth = False
+        parts.append(give(st, gem_m))
+        fa = torus("Steinfassung%d" % k, (0, 0, 0), 0.043 * sc, 0.01 * sc + 0.002 * (1 - sc), rot=(0, 0, 0), segs=40)
+        fa.matrix_world = Matrix.Translation(gc - d * 0.004) @ qd
+        parts.append(give(fa, gold_hi))
     obj = join_parts(parts, "Kroenchen")
     q = Vector((0, 0, 1)).rotation_difference(up)
     obj.data.transform(Matrix.Translation(c) @ q.to_matrix().to_4x4())
@@ -1928,6 +1931,15 @@ def schleimmutter_krone(arm, body):
         if p is None or p.z < 0.2 or math.hypot(x - CROWN_XY[0], y - CROWN_XY[1]) < CROWN_R + 0.07:
             continue                                  # nicht am Boden und nicht direkt an der Krone
         bub.append(give(sphere("Blase%d" % i, tuple(p + n * 0.005), rnd.uniform(0.018, 0.04)), bubble))
+    # flache, eingebettete Glanzbläschen vorn links und rechts auf der Kappe (Kommentar 26.11.: Ränder wirkten leer;
+    # wie die hellen Bläschen der Vorlage, vor den Schleimkindern bleibt alles frei)
+    for i, (x, y, r) in enumerate(((-0.29, -0.17, 0.034), (-0.345, -0.08, 0.019), (0.3, -0.15, 0.03), (0.25, -0.235, 0.017), (0.355, -0.05, 0.015))):
+        p, n = surface(body, (x, y, 1.5), (0, 0, -1))
+        if p is None or p.z < 0.25:
+            continue
+        o = sphere("Glanzblase%d" % i, (0, 0, 0), r, (1, 1, 0.42), segs=(24, 12))
+        o.matrix_world = Matrix.Translation(p - n * r * 0.12) @ Vector((0, 0, 1)).rotation_difference(n).to_matrix().to_4x4()
+        bub.append(give(o, bubble))
     attach(join_parts(bub, "Blaeschen"), arm, "Top")
     # zwei Schleimkinder wie in der Vorlage: je eins links und rechts hinten auf der Kappe
     for i, (x, y, r, bone) in enumerate(((-0.3, 0.12, 0.075, "Top"), (0.3, 0.12, 0.075, "Top"))):   # je eins links und rechts hinten auf der Kappe

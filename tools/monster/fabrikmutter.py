@@ -267,7 +267,9 @@ def track(name, s, M):
         if nrm.dot(Vector((0, y, z - R))) < 0:
             nrm = -nrm
         c = Vector((cx, y, z)) + nrm * 0.008
-        q = Vector((0, 0, 1)).rotation_difference(nrm)
+        # Drehung nur um die Querachse: rotation_difference ist für die Unterseite (genau entgegengesetzt) mehrdeutig
+        # und drehte die unteren Stollen um 90 Grad, sie ragten vorn als Stab heraus (Kommentar 26.11.)
+        q = Quaternion((1, 0, 0), math.atan2(-nrm.y, nrm.z))
         parts.append(rbox(name + "Stollen%d" % k, c, (w * 1.02, 0.012, 0.012), 0.005, M["rubber"], q, segs=1))
     for y in (-L / 2, L / 2):
         parts.append(cyl(name + "Rad%d" % int(y * 100), (cx + s * (w - 0.01), y, R), (cx + s * (w + 0.014), y, R), 0.088, M["steel"]))
