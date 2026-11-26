@@ -1686,43 +1686,34 @@ def fix_slime_eye(body):
 
 SLIME_PEARLS = (((-0.191, -0.158, 0.41), 0.075), ((-0.022, -0.188, 0.44), 0.09), ((0.155, -0.178, 0.41), 0.08))
 
-def flatten_pearls(body, pearls=SLIME_PEARLS):
-    """Die drei Goldperlen des Grundmodells in die Kappe einebnen (die neue Krone ersetzt sie, Vorlage 26.11.): die
-    Kappe unter jeder Perle wird aus dem Ring rundherum geschätzt (nur nach oben weisende Haut), die Punkte der Perle
-    darauf gelegt und der Übergang geglättet"""
-    from mathutils.kdtree import KDTree
-    me = body.data; mw = body.matrix_world; inv = mw.inverted()
-    co = np.array([tuple(mw @ v.co) for v in me.vertices], np.float64)
-    nz = np.array([(mw.to_3x3() @ v.normal).normalized().z for v in me.vertices])
+def flatten_pearls(body, pearls=SLIME_PEARLS, iters=220):
+    """Die drei Goldperlen des Grundmodells weichen der neuen Krone (Vorlage 26.11.): die Punkte jeder Perle werden
+    so lange auf den Mittelwert ihrer Nachbarn gezogen, bis sie wie eine weiche Haut über dem Rand der Perle liegen
+    (folgt der Wölbung der Kappe, keine flachen Platten oder Kanten; Kommentar 26.11.)"""
+    me = body.data; mw = body.matrix_world
+    bm = bmesh.new(); bm.from_mesh(me)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)      # Teilstücke der Haut verbinden (UV bleibt je Ecke)
+    bm.verts.ensure_lookup_table()
+    co = np.array([tuple(mw @ v.co) for v in bm.verts], np.float64)
     region = np.zeros(len(co), bool)
     for c, r in pearls:
-        c = np.asarray(c)
-        dxy = np.hypot(co[:, 0] - c[0], co[:, 1] - c[1])
-        ring = (dxy > r * 1.25) & (dxy < r * 2.6) & (nz > 0.55) & (np.abs(co[:, 2] - c[2]) < 0.16)
-        x, y, z = co[ring, 0] - c[0], co[ring, 1] - c[1], co[ring, 2]
-        A = np.stack([np.ones_like(x), x, y], 1)          # Ebene: schätzt auch an der Vorderkante der Kappe ruhig
-        k = np.linalg.lstsq(A, z, rcond=None)[0]
-        d3 = np.linalg.norm(co - c, axis=1)
-        sel = d3 < r * 1.15
-        X, Y = co[sel, 0] - c[0], co[sel, 1] - c[1]
-        fit = np.maximum(k[0] + k[1] * X + k[2] * Y, c[2] - r)
-        co[sel, 2] = np.minimum(co[sel, 2], fit - 0.003)
-        region |= d3 < r * 1.6
+        region |= np.linalg.norm(co - np.asarray(c), axis=1) < r * 1.12
     idx = np.nonzero(region)[0]
-    for _ in range(6):                                    # Übergang glätten (nach Lage, die Haut besteht aus vielen Stücken)
-        kd = KDTree(len(idx))
-        for j, i in enumerate(idx):
-            kd.insert(co[i], j)
-        kd.balance()
+    nbrs = [[e.other_vert(bm.verts[i]).index for e in bm.verts[i].link_edges] for i in idx]
+    for _ in range(iters):
         new = co.copy()
-        for i in idx:
-            nb = [co[idx[j]] for _, j, _ in kd.find_range(co[i], 0.022)]
-            if len(nb) > 2:
-                new[i] = 0.5 * co[i] + 0.5 * np.mean(nb, axis=0)
+        for i, nb in zip(idx, nbrs):
+            if nb:
+                new[i] = co[nb].mean(axis=0)
         co = new
+    inv = mw.inverted()
     for i in idx:
-        me.vertices[i].co = inv @ Vector(co[i])
-    me.update()
+        bm.verts[i].co = inv @ Vector(co[i])
+    bm.to_mesh(me); bm.free(); me.update()
+    att = me.attributes.new("perle", 'INT', 'FACE')                # Flächen der früheren Perlen: später Schleimfarbe
+    inreg = set(int(i) for i in idx)
+    for pl in me.polygons:
+        att.data[pl.index].value = 1 if any(v in inreg for v in pl.vertices) else 0
 
 def repaint_pearls(body, pearls=SLIME_PEARLS):
     """Goldfarbe der eingeebneten Perlen in der Textur durch die Schleimfarbe rundherum ersetzen"""
@@ -1735,11 +1726,22 @@ def repaint_pearls(body, pearls=SLIME_PEARLS):
     def uvpoly(poly):
         return [(uvl[li].uv.x * w, (1 - uvl[li].uv.y) * h) for li in poly.loop_indices]
     gold = (px[..., 0] > 0.55) & (px[..., 1] > 0.5) & (px[..., 2] < 0.32) & (px[..., 1] > 0.62 * px[..., 0])   # Gold, nicht das Rosa des Gesichts
+    att = body.data.attributes.get("perle")
+    allc = []                                             # Schleimfarbe der Kappe als Rückfall
+    for poly in body.data.polygons:
+        if (mw @ poly.center).z > 0.3 and (mw.to_3x3() @ poly.normal).z > 0.5 and not (att and att.data[poly.index].value):
+            u, v = np.mean(uvpoly(poly), axis=0)
+            t = px[int(np.clip((h - 1) - v, 0, h - 1)), int(np.clip(u, 0, w - 1)), :3]
+            if t[1] > t[0] + 0.15 and t[2] > t[0] + 0.15:
+                allc.append(t)
+    slime_col = np.median(np.array(allc), axis=0) if allc else np.asarray((0.2, 0.85, 0.8), np.float32)
     for c, r in pearls:
-        c = Vector(c); inner, ring = [], []
+        c = Vector(c); inner, ring, core = [], [], []
         for poly in body.data.polygons:
             q = mw @ poly.center
             d = math.hypot(q.x - c.x, q.y - c.y)
+            if att is not None and att.data[poly.index].value and d < r * 1.5:
+                core.append(poly)
             if d < r * 2.0 and q.z > c.z - 0.18:
                 inner.append(poly)
             elif r * 1.6 < d < r * 2.4 and q.z > c.z - 0.1 and (mw.to_3x3() @ poly.normal).z > 0.5:
@@ -1747,20 +1749,18 @@ def repaint_pearls(body, pearls=SLIME_PEARLS):
         cols = []
         for poly in ring:
             u, v = np.mean(uvpoly(poly), axis=0)
-            cols.append(px[int(np.clip((h - 1) - v, 0, h - 1)), int(np.clip(u, 0, w - 1)), :3])
-        if not cols:
-            continue
-        col = np.median(np.array(cols), axis=0)
+            t = px[int(np.clip((h - 1) - v, 0, h - 1)), int(np.clip(u, 0, w - 1)), :3]
+            if t[1] > t[0] + 0.15 and t[2] > t[0] + 0.15:       # nur Türkis (rundherum liegen auch andere Perlen)
+                cols.append(t)
+        col = np.median(np.array(cols), axis=0) if cols else slime_col
         mk = _Img.new("L", (w, h), 0); dr = _Draw.Draw(mk)
         for poly in inner:
             dr.polygon(uvpoly(poly), fill=255)
         sel = (np.array(mk) > 0)[::-1]
         base[sel & gold, :3] = col                        # Goldreste der Perlen rundherum übermalen
         mk2 = _Img.new("L", (w, h), 0); dr2 = _Draw.Draw(mk2)
-        for poly in inner:
-            q = mw @ poly.center
-            if math.hypot(q.x - c.x, q.y - c.y) < r * 1.2 and q.z > c.z - 0.06:
-                dr2.polygon(uvpoly(poly), fill=255)
+        for poly in core:                                 # ganze frühere Perle in Schleimfarbe (mit Rand gegen Nähte)
+            dr2.polygon(uvpoly(poly), fill=255, outline=255, width=3)
         base[(np.array(mk2) > 0)[::-1], :3] = col
     tex.image = new_image(body.name + "_Farbe", base)
 
@@ -1887,6 +1887,8 @@ def schleimmutter_krone(arm, body):
     fix_slime_eye(body)          # erst danach das rechte Auge nachmalen (auf der neuen Textur)
     fill_black_spots(body, keep=lambda c: c.y < -0.15 and -0.2 < c.x < 0.25 and 0.06 < c.z < 0.3)   # Gesicht vorn bleibt
     repaint_pearls(body)
+    if body.data.attributes.get("perle"):
+        body.data.attributes.remove(body.data.attributes["perle"])
     # Krone nach Vorlage (Schleimmutter_Neuentwurf_v1): sitzt oben vorn auf der Kappe, der Wölbung nach vorn und
     # leicht schief geneigt, der untere Reif in den Schleim eingesunken; Breite etwa 40 % der Pfütze
     p, n = surface(body, (-0.02, -0.1, 1.5), (0, 0, -1))
