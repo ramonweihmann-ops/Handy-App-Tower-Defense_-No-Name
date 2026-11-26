@@ -10,6 +10,9 @@ extends MockScreen
 
 const NAV := {"Shop": "shop", "Helden": "sammlung", "Kampf": "kampf", "Upgrades": "upgrades", "Basis": "basis"}
 const PART := "res://ui/helden_v2/%s.webp"
+## Augenmitte im Kartenbild (Anteil der Breite), wo die Figur sonst angeschnitten wäre: Brocken trägt den
+## Raketenwerfer links über der Schulter, sein Gesicht sitzt weit rechts im Bild (Rückmeldung 26.11.)
+const CARD_FACE_X := {"brocken": 0.62}
 ## Bänder (Breite, Höhe) und Lage des ersten Bands
 const BANNER_TOP := 32.0
 const BANNER_OK := Vector2(316.5, 50.1)
@@ -146,6 +149,7 @@ func bind() -> void:
 			v.head_crop = true
 			v.crop_face = 0.34      # Brustbild wie im Baukasten: Kopf und Oberkörper
 			v.crop_eye = 0.30
+			v.crop_cx = CARD_FACE_X.get(id, 0.5)
 			_figs.add_child(v)
 			_views[id] = v
 	_content_h = (y + ceili(_locked.size() / 3.0) * (LOCK_CARD.y + LOCK_GAP) if not _locked.is_empty() else _lock_y - 20.0) + BOTTOM_PAD

@@ -7,6 +7,7 @@ uniform vec2 img = vec2(286.0, 418.0);
 uniform vec3 face = vec3(0.5, 0.28, 0.38);
 uniform float face_frac = 0.62;
 uniform float eye_y = 0.40;
+uniform float face_cx = 0.5;   // Augenmitte waagerecht als Anteil der Boxbreite (0.5 = mittig)
 uniform float radius = 6.0;
 uniform float grey = 0.0;
 uniform float bright = 1.0;
@@ -14,7 +15,7 @@ uniform float bright = 1.0;
 void fragment() {
 	float w = face_frac * box.x / face.z;
 	vec2 sz = vec2(w, w * img.y / img.x);
-	vec2 lt = vec2(box.x * 0.5 - face.x * sz.x, eye_y * box.y - face.y * sz.y);
+	vec2 lt = vec2(box.x * face_cx - face.x * sz.x, eye_y * box.y - face.y * sz.y);
 	vec2 p = UV * box;
 	vec2 t = (p - lt) / sz;
 	vec4 c = texture(TEXTURE, clamp(t, vec2(0.0), vec2(1.0)));

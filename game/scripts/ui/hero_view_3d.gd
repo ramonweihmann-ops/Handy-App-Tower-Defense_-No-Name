@@ -36,6 +36,7 @@ var portrait := false     # Standbild von vorn ohne Waffe
 var head_crop := false    # Porträt: Kopf mittig aus dem Entwurfsbild (kleine Boxen wie in den Mockups)
 var crop_face := -1.0     # eigener Ausschnitt: Gesichtsbreite als Anteil der Boxbreite (−1 = Standard)
 var crop_eye := -1.0      # eigener Ausschnitt: Höhe der Augen als Anteil der Boxhöhe
+var crop_cx := 0.5        # eigener Ausschnitt: Augenmitte waagerecht als Anteil der Boxbreite (0.5 = mittig)
 var grayscale := false    # gesperrt: grau und dunkler (wie im Mockup grayscale(1) brightness(0.55))
 var px := 512             # Auflösung des 3D-Fensters (Höhe)
 var aspect := 1.0         # Breite / Höhe des Fensters
@@ -155,6 +156,7 @@ func _fit_crop() -> void:
 	var square := absf(size.x - size.y) < size.x * 0.12
 	m.set_shader_parameter("face_frac", crop_face if crop_face > 0.0 else (minf(0.66, 0.66 * size.y / size.x) if square else minf(0.62, 0.56 * size.y / size.x)))
 	m.set_shader_parameter("eye_y", crop_eye if crop_eye > 0.0 else (0.47 if square else 0.40))
+	m.set_shader_parameter("face_cx", crop_cx)
 	m.set_shader_parameter("radius", 6.0 * size.y / 88.0)
 
 
