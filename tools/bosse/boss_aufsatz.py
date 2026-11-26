@@ -1686,34 +1686,67 @@ def fix_slime_eye(body):
 
 SLIME_PEARLS = (((-0.191, -0.158, 0.41), 0.075), ((-0.022, -0.188, 0.44), 0.09), ((0.155, -0.178, 0.41), 0.08))
 
-def flatten_pearls(body, pearls=SLIME_PEARLS, iters=220):
-    """Die drei Goldperlen des Grundmodells weichen der neuen Krone (Vorlage 26.11.): die Punkte jeder Perle werden
-    so lange auf den Mittelwert ihrer Nachbarn gezogen, bis sie wie eine weiche Haut über dem Rand der Perle liegen
-    (folgt der Wölbung der Kappe, keine flachen Platten oder Kanten; Kommentar 26.11.)"""
+def flatten_pearls(body, pearls=SLIME_PEARLS):
+    """Die drei Goldperlen des Grundmodells weichen der neuen Krone (Vorlage 26.11.) und verschwinden ganz in der
+    Kappe (Kommentar 26.11.: auch weiche Wölbungen neben der Krone störten): Perlenflächen an ihrer Goldfarbe
+    erkennen, ihre Punkte als glatte Haut zwischen den Rand rundherum spannen (jeder Punkt = Mittel seiner Nachbarn,
+    als Gleichungssystem gelöst) und den Übergang nachglätten"""
+    m, tex, img, px = body_texture(body)
+    h, w = px.shape[:2]
     me = body.data; mw = body.matrix_world
+    uvl = me.uv_layers.active.data
     bm = bmesh.new(); bm.from_mesh(me)
+    lay = bm.faces.layers.int.new("perle")
+    bm.faces.ensure_lookup_table()
+    for pl in me.polygons:
+        q = mw @ pl.center
+        if not any((q - Vector(c)).length < r * 1.7 for c, r in pearls):
+            continue
+        u = float(np.mean([uvl[li].uv.x for li in pl.loop_indices])); v = float(np.mean([uvl[li].uv.y for li in pl.loop_indices]))
+        t = px[int(np.clip(v * h, 0, h - 1)), int(np.clip(u * w, 0, w - 1)), :3]
+        gold = t[0] > 0.5 and t[1] > 0.4 and t[2] < 0.36 and t[0] - t[2] > 0.25 and t[1] > 0.55 * t[0]
+        if gold or any((q - Vector(c)).length < r * 1.05 for c, r in pearls):
+            bm.faces[pl.index][lay] = 1
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)      # Teilstücke der Haut verbinden (UV bleibt je Ecke)
-    bm.verts.ensure_lookup_table()
+    bm.verts.ensure_lookup_table(); bm.faces.ensure_lookup_table()
+    nv = len(bm.verts)
     co = np.array([tuple(mw @ v.co) for v in bm.verts], np.float64)
-    region = np.zeros(len(co), bool)
-    for c, r in pearls:
-        region |= np.linalg.norm(co - np.asarray(c), axis=1) < r * 1.12
-    idx = np.nonzero(region)[0]
-    nbrs = [[e.other_vert(bm.verts[i]).index for e in bm.verts[i].link_edges] for i in idx]
-    for _ in range(iters):
+    nbrs = [[e.other_vert(v).index for e in v.link_edges] for v in bm.verts]
+    def grow(mask, rings):
+        for _ in range(rings):
+            add = [j for i in np.nonzero(mask)[0] for j in nbrs[i]]
+            mask = mask.copy(); mask[add] = True
+        return mask
+    region = np.zeros(nv, bool)
+    for f in bm.faces:
+        if f[lay]:
+            for v in f.verts:
+                region[v.index] = True
+    region = grow(region, 2)
+    idx = np.nonzero(region)[0]; pos = {int(i): k for k, i in enumerate(idx)}
+    A = np.zeros((len(idx), len(idx))); Bv = np.zeros((len(idx), 3))
+    for k, i in enumerate(idx):
+        A[k, k] = len(nbrs[i]) + 1e-6; Bv[k] = 1e-6 * co[i]
+        for j in nbrs[i]:
+            if j in pos:
+                A[k, pos[j]] -= 1.0
+            else:
+                Bv[k] += co[j]
+    co[idx] = np.linalg.solve(A, Bv)
+    blend = np.nonzero(grow(region, 4))[0]                        # Übergang zur Kappe nachglätten
+    for _ in range(30):
         new = co.copy()
-        for i, nb in zip(idx, nbrs):
-            if nb:
-                new[i] = co[nb].mean(axis=0)
+        for i in blend:
+            if nbrs[i]:
+                new[i] = 0.5 * co[i] + 0.5 * co[nbrs[i]].mean(axis=0)
         co = new
     inv = mw.inverted()
-    for i in idx:
+    inreg = set(int(i) for i in blend)
+    for i in blend:
         bm.verts[i].co = inv @ Vector(co[i])
+    for f in bm.faces:                                           # Flächen der früheren Perlen: später Schleimfarbe
+        f[lay] = 1 if any(v.index in inreg for v in f.verts) else 0
     bm.to_mesh(me); bm.free(); me.update()
-    att = me.attributes.new("perle", 'INT', 'FACE')                # Flächen der früheren Perlen: später Schleimfarbe
-    inreg = set(int(i) for i in idx)
-    for pl in me.polygons:
-        att.data[pl.index].value = 1 if any(v in inreg for v in pl.vertices) else 0
 
 def repaint_pearls(body, pearls=SLIME_PEARLS):
     """Goldfarbe der eingeebneten Perlen in der Textur durch die Schleimfarbe rundherum ersetzen"""
@@ -1777,25 +1810,11 @@ def closed_tube(name, pts, normals, r, segs=10):
             bm.faces.new([a_[j], b_[j], b_[(j + 1) % segs], a_[(j + 1) % segs]])
     return finish(name, bm, smooth=True)
 
-def slime_drape(name, pts, slime):
-    """Weicher, welliger Schleimüberlauf aus Metaballs (Kugeln verschmelzen zu einer fließenden Form): pts = [(Mitte, Radius)]"""
-    mb = bpy.data.metaballs.new(name); mb.resolution = 0.006; mb.render_resolution = 0.006; mb.threshold = 0.6
-    o = bpy.data.objects.new(name, mb); bpy.context.scene.collection.objects.link(o)
-    for c, r in pts:
-        e = mb.elements.new(type='BALL'); e.co = c; e.radius = r * 1.65; e.stiffness = 2.0
-    dg = bpy.context.evaluated_depsgraph_get()
-    me = bpy.data.meshes.new_from_object(o.evaluated_get(dg))
-    m = bpy.data.objects.new(name + "_Netz", me); bpy.context.scene.collection.objects.link(m)
-    bpy.data.objects.remove(o, do_unlink=True)
-    for pl in m.data.polygons:
-        pl.use_smooth = True
-    return give(m, slime)
-
-def slime_crown(c, up, golds, gem_m, slime, R=0.2, band=0.095):
+def slime_crown(c, up, golds, gem_m, R=0.2, band=0.095):
     """Goldkrone nach Vorlage (26.11.): breiter Reif mit Wulst unten und Zierlinie, sechs breite runde Zacken, jede
     mit fest angesetzter Goldkugel, vorn die höhere Zacke mit großem violettem Stein in runder Fassung; ein heller
-    Goldrand umrahmt die Zacken, Nieten zwischen den Zacken; innen dunkleres Gold (Schattierung); vorn fließt ein
-    welliger Schleimüberlauf über den unteren Reif. golds = (außen, innen, Kanten); c = Mitte unten, up = Achse"""
+    Goldrand umrahmt die Zacken, Nieten zwischen den Zacken; innen dunkleres Gold (Schattierung). Kein
+    Schleimüberlauf (Kommentar 26.11.). golds = (außen, innen, Kanten); c = Mitte unten, up = Achse"""
     gold, gold_in, gold_hi = golds
     lobes = [(k * 2 * math.pi / 6, 0.14 if k == 0 else 0.095) for k in range(6)]     # sechs breite, runde Zacken
     wid = math.pi / 6 * 0.9
@@ -1853,16 +1872,6 @@ def slime_crown(c, up, golds, gem_m, slime, R=0.2, band=0.095):
         pl.use_smooth = False
     parts.append(give(st, gem_m))
     parts.append(give(torus("Steinfassung", tuple(gc + Vector((0, 0.004, 0))), 0.043, 0.01, rot=(90, 0, 0), segs=40), gold_hi))
-    # welliger Schleimüberlauf vorn rechts der Mitte über dem unteren Reif, mit hängendem Tropfen
-    drape = []
-    for a, z, r in ((-0.42, 0.034, 0.02), (-0.3, 0.042, 0.026), (-0.17, 0.036, 0.024), (-0.04, 0.046, 0.03), (0.08, 0.04, 0.027),
-                    (0.2, 0.03, 0.022), (0.3, 0.024, 0.017)):
-        rr_ = rad(z) + 0.012
-        drape.append(((rr_ * math.sin(-a), -rr_ * math.cos(a), z), r))   # wie in der Vorlage etwas rechts der Mitte
-    for a, z, r in ((-0.06, 0.0, 0.026), (-0.07, -0.032, 0.03), (0.16, 0.002, 0.018)):   # Tropfen laufen in die Kappe
-        rr_ = rad(0.0) + 0.02
-        drape.append(((rr_ * math.sin(-a), -rr_ * math.cos(a), z), r))   # wie in der Vorlage etwas rechts der Mitte
-    parts.append(slime_drape("Schleimueberlauf", drape, slime))
     obj = join_parts(parts, "Kroenchen")
     q = Vector((0, 0, 1)).rotation_difference(up)
     obj.data.transform(Matrix.Translation(c) @ q.to_matrix().to_4x4())
@@ -1871,8 +1880,8 @@ def slime_crown(c, up, golds, gem_m, slime, R=0.2, band=0.095):
 @variante("schleimmutter_krone", "schleimmutter")
 def schleimmutter_krone(arm, body):
     """Schleim-Welt (Welt 1): Schleimmutter mit mehr Details – Goldkrone nach der Vorlage vom 26.11. (runde Zacken mit
-    Kugeln, großer violetter Stein, Schleim läuft über den Reif) statt der drei Perlen, Bläschen im Schleim, zwei
-    Schleimkinder auf ihr, glänzende Schleimpfütze"""
+    Kugeln, großer violetter Stein), die bündig oben auf dem Kopf sitzt, statt der drei Perlen; Bläschen im Schleim,
+    zwei Schleimkinder auf ihr, glänzende Schleimpfütze"""
     slime = look("SchleimGlanz", (0.2, 0.9, 0.84), rough=0.06, emit=(0.08, 0.55, 0.5), strength=0.35, alpha=0.88)
     bubble = look("Blaeschen", (0.7, 1.0, 0.96), rough=0.03, emit=(0.35, 0.85, 0.8), strength=0.35)
     gold = look("Gold", (1.0, 0.78, 0.3), rough=0.25, metal=0.9)
@@ -1889,13 +1898,25 @@ def schleimmutter_krone(arm, body):
     repaint_pearls(body)
     if body.data.attributes.get("perle"):
         body.data.attributes.remove(body.data.attributes["perle"])
-    # Krone nach Vorlage (Schleimmutter_Neuentwurf_v1): sitzt oben vorn auf der Kappe, der Wölbung nach vorn und
-    # leicht schief geneigt, der untere Reif in den Schleim eingesunken; Breite etwa 40 % der Pfütze
-    p, n = surface(body, (-0.02, -0.1, 1.5), (0, 0, -1))
-    up = (Matrix.Rotation(math.radians(-7), 3, 'Y') @ (n + Vector((0, 0, 1.6)))).normalized()
+    # Krone sitzt direkt oben auf dem Kopf (Kommentar 26.11.): Achse senkrecht auf der Kappe unter dem Reif
+    # (Ebene durch die Haut entlang des Reifs), der untere Reif rundum leicht eingesunken – keine Lücke, kein Schleim davor
+    CROWN_XY, CROWN_R = (0.0, -0.05), 0.2
+    ring = []
+    for k in range(24):
+        a = 2 * math.pi * k / 24
+        q, _ = surface(body, (CROWN_XY[0] + CROWN_R * math.cos(a), CROWN_XY[1] + CROWN_R * math.sin(a), 1.5), (0, 0, -1))
+        if q is not None:
+            ring.append(q)
+    P = np.array([tuple(q) for q in ring]); cen = P.mean(axis=0)
+    up = Vector(np.linalg.svd(P - cen)[2][2]).normalized()
+    if up.z < 0:
+        up = -up
+    up = (up + Vector((0, 0, 0.6))).normalized()                  # folgt der Kappe, bleibt aber eher aufrecht
+    low = min(float((Vector(q) - Vector(cen)).dot(up)) for q in P)
+    base = Vector(cen) + up * (low - 0.012)
     golds = (look("Kronengold", (1.0, 0.7, 0.18), rough=0.32, metal=0.55), look("Kronengold_innen", (0.6, 0.34, 0.07), rough=0.45, metal=0.4),
              look("Kronengold_hell", (1.0, 0.84, 0.38), rough=0.2, metal=0.7))
-    crown = slime_crown(p - up * 0.018, up, golds, look("Kronstein", (0.55, 0.2, 0.95), rough=0.08, emit=(0.45, 0.15, 0.85), strength=0.8), slime)
+    crown = slime_crown(base, up, golds, look("Kronstein", (0.55, 0.2, 0.95), rough=0.08, emit=(0.45, 0.15, 0.85), strength=0.8), R=CROWN_R)
     attach(crown, arm, "Top")
     # keine zusätzlichen Tropfen: frei hängend wirkten sie wie Stäbe und Striche (Kommentar 24.11.), die Kappe hat eigene Tropfenformen
     # Bläschen im Schleim der Kappe
@@ -1904,8 +1925,8 @@ def schleimmutter_krone(arm, body):
     for i in range(16):
         x, y = rnd.uniform(-0.36, 0.36), rnd.uniform(-0.05, 0.3)
         p, n = surface(body, (x, y, 1.5), (0, 0, -1))
-        if p is None or p.z < 0.2:
-            continue
+        if p is None or p.z < 0.2 or math.hypot(x - CROWN_XY[0], y - CROWN_XY[1]) < CROWN_R + 0.07:
+            continue                                  # nicht am Boden und nicht direkt an der Krone
         bub.append(give(sphere("Blase%d" % i, tuple(p + n * 0.005), rnd.uniform(0.018, 0.04)), bubble))
     attach(join_parts(bub, "Blaeschen"), arm, "Top")
     # zwei Schleimkinder wie in der Vorlage: je eins links und rechts hinten auf der Kappe
@@ -2193,8 +2214,8 @@ def kristall_kaefer(arm, body):
              (-0.26, 0.1, 0.08, 0.03), (0.27, 0.1, 0.08, 0.03)]
     for i, (x, y, h, r) in enumerate(spots):
         p, n = surface(body, (x, y, 2.0), (0, 0, -1))
-        if p is None or p.z < 0.2:
-            continue
+        if p is None or p.z < 0.2 or math.hypot(x - CROWN_XY[0], y - CROWN_XY[1]) < CROWN_R + 0.07:
+            continue                                  # nicht am Boden und nicht direkt an der Krone
         for j in range(3 if h > 0.1 else 2):
             tilt = (rnd.uniform(-25, 25) + math.degrees(-n.y) * 0.8, rnd.uniform(-25, 25) + math.degrees(n.x) * 0.8, rnd.uniform(0, 60))
             off = Vector((rnd.uniform(-0.025, 0.025), rnd.uniform(-0.025, 0.025), 0))
