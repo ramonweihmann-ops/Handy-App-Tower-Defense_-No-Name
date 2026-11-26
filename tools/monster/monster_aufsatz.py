@@ -660,7 +660,7 @@ def giftkaulquappe(arm, body):
     Eigene Figur auf dem Skelett des Schleimlings (hüpft wie er)."""
     M = gift_mats()
     skin = look("KaulquappenHaut", (1.0, 1.0, 1.0), rough=0.25)
-    green = look("Quappengruen", (0.3, 0.72, 0.22), rough=0.3)
+    green = look("Quappengruen", (0.16, 0.62, 0.3), rough=0.3)
     pale = look("Quappenbauch", (0.88, 0.95, 0.6), rough=0.3)
     prof = [(0.46, 0.0), (0.455, 0.08), (0.43, 0.16), (0.385, 0.23), (0.32, 0.28), (0.24, 0.3), (0.16, 0.295), (0.09, 0.27), (0.04, 0.21), (0.01, 0.12), (0.0, 0.0)]
     g = lathe("Kaulquappe", prof, segs=56)
@@ -669,16 +669,48 @@ def giftkaulquappe(arm, body):
         v.co.x *= 0.92
     H_, W_ = 1024, 1024
     uu, vv = lathe_uv_grid(H_, W_)
-    grad = np.clip((vv - 0.38) / 0.14, 0, 1)
-    col = np.asarray((0.88, 0.95, 0.6)) * (1 - grad[..., None]) + np.asarray((0.3, 0.72, 0.22)) * grad[..., None]
-    # klare runde violette Punkte (versetztes Raster), oben dichter, mit sanftem Rand
-    rows, cols = 7, 16
-    ry = vv * rows; ri = np.floor(ry); fx = (uu * cols + 0.5 * (ri % 2)) % 1.0 - 0.5; fy = (ry - ri) - 0.5
-    d = np.hypot(fx * 1.0, fy * 1.6)
-    rad = 0.22 + 0.08 * np.sin(ri * 2.1 + np.floor(uu * cols + 0.5 * (ri % 2)) * 1.7)
-    dot = np.clip((rad - d) / 0.04, 0, 1) * np.clip((vv - 0.5) / 0.08, 0, 1)
-    col = col * (1 - dot[..., None]) + np.asarray((0.62, 0.22, 0.78)) * dot[..., None]
-    col = col * (1.0 - 0.12 * (1 - vv))[..., None]
+    # Kommentar 26.11.: Farben fließender. Lage jedes Bildpunkts auf dem Körper, damit Verlauf, Schlieren und Flecken
+    # rundum ohne Naht ineinanderlaufen.
+    pz = np.asarray([q[0] for q in prof][::-1]); pr = np.asarray([q[1] for q in prof][::-1])
+    t_ = vv * (len(prof) - 1)
+    Zs = np.interp(t_, np.arange(len(prof)), pz); Rs = np.interp(t_, np.arange(len(prof)), pr)
+    ang = uu * 2 * math.pi
+    P = np.stack([Rs * np.cos(ang) * 0.92, Rs * np.sin(ang) * 1.22, Zs], -1).astype(np.float32)
+    h = Zs / 0.46
+    # weiche Wellen statt gerader Kante: der Verlauf vom Bauch zum Rücken wandert um den Körper
+    warp = (fbm3(P, 3.0, 41, 3) - 0.5) * 0.3 + 0.05 * np.sin(ang * 3 + 0.6)
+    hh = np.clip(h + warp, 0, 1)
+    stops = [(0.0, (0.93, 0.97, 0.66)), (0.3, (0.82, 0.95, 0.46)), (0.48, (0.5, 0.86, 0.26)), (0.68, (0.22, 0.7, 0.26)), (0.86, (0.1, 0.52, 0.34)), (1.0, (0.07, 0.4, 0.36))]
+    col = np.zeros((H_, W_, 3), np.float32)
+    for (a0, c0), (a1, c1) in zip(stops, stops[1:]):
+        k = np.clip((hh - a0) / (a1 - a0), 0, 1); k = k * k * (3 - 2 * k)
+        col = np.where((hh >= a0)[..., None], np.asarray(c0, np.float32) * (1 - k[..., None]) + np.asarray(c1, np.float32) * k[..., None], col)
+    # Schlieren, die nach hinten zum Schwanz ziehen (gelbgrün und türkis), wie verlaufene Farbe
+    flow = fbm3(P * np.asarray((1.0, 0.35, 1.6), np.float32) + (fbm3(P, 2.0, 7, 2)[..., None] - 0.5) * 0.5, 4.5, 23, 3)
+    streak = np.clip((flow - 0.52) / 0.2, 0, 1) * np.clip((h - 0.25) / 0.2, 0, 1)
+    col = col * (1 - 0.45 * streak[..., None]) + np.asarray((0.62, 0.92, 0.3), np.float32) * 0.45 * streak[..., None]
+    deep = np.clip((0.44 - flow) / 0.2, 0, 1) * np.clip((h - 0.4) / 0.2, 0, 1)
+    col = col * (1 - 0.4 * deep[..., None]) + np.asarray((0.05, 0.42, 0.42), np.float32) * 0.4 * deep[..., None]
+    # violette Flecken: verschieden groß, mit hellem Kern und weichem Hof, der ins Grün ausläuft
+    rs = random.Random(77); spots = []
+    while len(spots) < 22:
+        a = rs.uniform(0, 2 * math.pi); t = rs.uniform(0.52, 0.97)
+        z = float(np.interp(t * (len(prof) - 1), np.arange(len(prof)), pz)); r = float(np.interp(t * (len(prof) - 1), np.arange(len(prof)), pr))
+        c = np.asarray((r * math.cos(a) * 0.92, r * math.sin(a) * 1.22, z), np.float32)
+        if c[1] < -0.2 and c[2] < 0.3:
+            continue                                               # Gesicht frei halten
+        size = rs.uniform(0.022, 0.05)
+        if all(np.linalg.norm(c - q) > size + w + 0.025 for q, w in spots):
+            spots.append((c, size))
+    for c, size in spots:
+        d = np.linalg.norm(P - c, axis=-1) * (1 + 0.25 * (fbm3(P, 14.0, 5, 2) - 0.5))
+        halo = np.clip(1 - d / (size * 2.3), 0, 1) ** 2
+        col = col * (1 - 0.55 * halo[..., None]) + np.asarray((0.4, 0.3, 0.72), np.float32) * 0.55 * halo[..., None]
+        core = np.clip((size - d) / (size * 0.35), 0, 1)
+        inner = np.clip(1 - d / size, 0, 1)[..., None]
+        ccol = np.asarray((0.5, 0.17, 0.72), np.float32) * (1 - inner) + np.asarray((0.86, 0.46, 0.95), np.float32) * inner
+        col = col * (1 - core[..., None]) + ccol * core[..., None]
+    col = col * (1.0 - 0.1 * (1 - vv))[..., None]
     arr = np.ones((H_, W_, 4), np.float32); arr[..., :3] = col
     lathe_texture(skin, arr)
     give(g, skin)
@@ -1849,7 +1881,7 @@ def snail(name, length, height, G, body_m, shell_m, band_m, gem_mats, rnd, gems=
         head_parts.append(gem(name + "Auge%d" % s_, st[-1] + Vector((0, -L * 0.01, L * 0.02)), (0, -1, 0.4), L * 0.05, gem_mats[0]))
     return [foot, head], shell_parts, head_parts
 
-@variante("rosen_schleimling", "schleimling")
+@variante("rosen_schleimling_alt", "schleimling")      # alter geschliffener Stein; neu: tools/monster/glitzerling.py
 def glitzerling(arm, body):
     """Kristallplanet, leicht: Glitzerling – kleiner, schwebender Edelstein (Kommentar 25.11.: keine Schnecke, kleiner und
     leichter): ein geschliffener Rosenquarz mit Gesicht auf der Tafel, zwei kleine goldene Flügel und zwei winzige
@@ -2078,7 +2110,7 @@ def jaw_set(name, mc, a, b, socket_m, throat_m, rnd, enamel_col=(0.97, 0.95, 0.9
             out.append(give(tube(name + "Zahn%s%d" % ("O" if top else "U", i), [tuple(p_) for p_ in pts], [r0, r0 * 0.9, r0 * 0.55, r0 * 0.08], segs=10), enamel))
     return out
 
-@variante("juwelen_schnecke", "schleimmutter")
+@variante("juwelen_schnecke_alt", "schleimmutter")     # alte Röhrenschnecke; neu: tools/monster/juwelenschnecke.py
 def juwelenschnecke(arm, body):
     """Rosenkristalle (Welt 15), Boss: Juwelenschnecke – riesige, bedrohliche Schnecke (Kommentar 25.11.: zu harmlos):
     dunkelrosa Fuß mit Rubinstacheln an den Seiten, eingerolltes Gehäuse aus Rosenquarz mit Goldwulst, eingesetzten
