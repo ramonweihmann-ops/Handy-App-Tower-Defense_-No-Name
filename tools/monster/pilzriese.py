@@ -515,12 +515,25 @@ def pilz_mouth(tbvh, M):
     for k in range(40):
         x = -MOUTH_A * 0.97 * math.cos(math.pi * k / 40)
         loop.append((x, edge_z(x, False)))
-    lp = []
+    lp, ln = [], []
     for x, z in loop:
         h, n = front_hit(tbvh, x * 1.02, zc + (z - zc) * 1.03)
-        lp.append(h + Vector((0, 0.004, 0)))
-    lip = closed_tube("Lippe", lp, 0.017, M["lip"], segs=10)
-    smooth_obj(lip, 70); parts.append(lip)
+        lp.append(h); ln.append(n)
+    # durchgängiger Wulst ohne Knicke und Lücken (Kommentar 26.11.): Schleife glätten, gleichmäßig verteilen, überall
+    # gleich weit aus der Haut heben; der Querschnitt richtet sich nach der Hautnormalen (verdreht sich nicht)
+    for _ in range(6):
+        lp = [(lp[k - 1] + lp[k] * 2 + lp[(k + 1) % len(lp)]) / 4 for k in range(len(lp))]
+        ln = [(ln[k - 1] + ln[k] * 2 + ln[(k + 1) % len(ln)]).normalized() for k in range(len(ln))]
+    seg = [(lp[(k + 1) % len(lp)] - lp[k]).length for k in range(len(lp))]
+    total = sum(seg); pts2, nrm2 = [], []
+    for j in range(96):
+        d = total * j / 96; k = 0
+        while d > seg[k]:
+            d -= seg[k]; k += 1
+        t = d / seg[k]
+        pts2.append(lp[k].lerp(lp[(k + 1) % len(lp)], t)); nrm2.append(ln[k].lerp(ln[(k + 1) % len(ln)], t).normalized())
+    lip = loop_ring("Lippe", [q + n * 0.009 for q, n in zip(pts2, nrm2)], nrm2, 0.019, segs=12)
+    smooth_obj(lip, 70); parts.append(give(lip, M["lip"]))
     TY = yf + 0.07                                   # Zahnreihen deutlich hinter der Lippe
     for nm, top in (("Oben", True), ("Unten", False)):
         pts = []
