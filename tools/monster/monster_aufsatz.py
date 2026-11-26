@@ -3218,7 +3218,11 @@ def wolkeneule(arm, body):
     golds = (look("Kronengold", (1.0, 0.7, 0.18), rough=0.32, metal=0.55), look("Kronengold_innen", (0.6, 0.34, 0.07), rough=0.45, metal=0.4),
              look("Kronengold_hell", (1.0, 0.84, 0.38), rough=0.2, metal=0.7))
     crown = slime_crown(Vector((0, 0, 0)), Vector((0, 0, 1)), golds, look("Himmelsstein", (0.35, 0.75, 1.0), rough=0.08, emit=(0.3, 0.7, 1.0), strength=0.9))
-    crown.data.transform(Matrix.Translation((0.0, -0.02, 1.1)) @ Matrix.Rotation(math.radians(7), 4, 'Y') @ Matrix.Scale(0.95, 4))
+    # gerade und mittig aufsetzen (Rückmeldung 26.11.: schief schnitt sie seitlich in die Kontur): der untere Reif
+    # liegt rundum gleich tief knapp in der Kopfwölbung
+    KR = 0.2 * 0.9
+    zs = [surface(g, (KR * math.cos(2 * math.pi * k / 16), KR * math.sin(2 * math.pi * k / 16), 3.0), (0, 0, -1))[0].z for k in range(16)]
+    crown.data.transform(Matrix.Translation((0.0, 0.0, min(zs) - 0.012)) @ Matrix.Scale(0.9, 4))
     parts.append(crown)
     attach(join_parts(parts, "Eule_Kopf"), arm, "Top")
     wings = []
