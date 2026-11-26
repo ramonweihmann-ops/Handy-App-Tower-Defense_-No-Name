@@ -3095,8 +3095,10 @@ def owl_face(g, zc, k, M):
         parts.append(give(disc, M["feather"]))
         parts.append(give(sphere("Auge%d" % s_, tuple(c + Vector((0, -0.035 * k, 0))), 0.07 * k, (1, 0.6, 1)), M["eye"]))
         parts.append(give(sphere("Pupille%d" % s_, tuple(c + Vector((0, -0.075 * k, 0))), 0.035 * k, (1, 0.5, 1)), M["dark"]))
-        parts.append(give(tube("Braue%d" % s_, [tuple(c + Vector((s_ * 0.12 * k, -0.03 * k, 0.11 * k))), tuple(c + Vector((0, -0.07 * k, 0.1 * k))),
-                                               tuple(c + Vector((-s_ * 0.09 * k, -0.08 * k, 0.05 * k)))], [0.022 * k, 0.026 * k, 0.018 * k]), M["feather2"]))
+        bp = [c + Vector((s_ * 0.12 * k, -0.03 * k, 0.11 * k)), c + Vector((0, -0.07 * k, 0.1 * k)), c + Vector((-s_ * 0.09 * k, -0.08 * k, 0.05 * k))]
+        ends = [bp[0] + (bp[0] - bp[1]).normalized() * 0.02 * k, bp[2] + (bp[2] - bp[1]).normalized() * 0.016 * k]     # runde, geschlossene Enden
+        parts.append(give(tube("Braue%d" % s_, [tuple(ends[0]), tuple(bp[0]), tuple(bp[1]), tuple(bp[2]), tuple(ends[1])],
+                               [0.0, 0.022 * k, 0.026 * k, 0.018 * k, 0.0]), M["feather2"]))
         q, m = surface(g, (s_ * 0.18 * k / 0.75, 0.0, 3.0), (0, 0, -1))
         if q is not None:
             parts.append(fin("Federohr%d" % s_, q - m * 0.02, (s_ * 0.5, 0.1, 1.0), 0.18 * k, 0.06 * k, M["feather2"], curl=-0.2))
@@ -3146,26 +3148,92 @@ def turmpanzer(arm, body):
             tw += feather_fan("Seitenfedern%d" % s_, q - m * 0.02, (s_ * 1.0, 0.4, 0.2), (0, 0, 1), 4, 0.14, 0.04, (M["feather"], M["feather2"]), spread=50)
     attach(join_parts(tw, "Turm"), arm, "Body")
 
+def soft_feather_tex(top, belly, rows=11, cols=14, seed=1, H_=1024, W_=1024):
+    """Weiches Federkleid für Drehkörper (Kommentar 26.11.: Farben sollen ineinanderfließen): Himmelblau auf Rücken
+    und Kopf geht fließend in den hellen Bauch vorn über, die Federreihen sind nur sanft schattierte Bögen"""
+    uu, vv = lathe_uv_grid(H_, W_)
+    def smoothstep(a, b, x):
+        t = np.clip((x - a) / (b - a), 0, 1)
+        return t * t * (3 - 2 * t)
+    front = 0.5 + 0.5 * np.cos(2 * math.pi * (uu - 0.75))                 # 1 = vorn (-y)
+    bl = smoothstep(0.35, 0.95, front) * smoothstep(0.86, 0.5, vv) * smoothstep(0.02, 0.2, vv)
+    hi = smoothstep(0.55, 1.0, vv)                                        # Kopf oben etwas kräftiger
+    col = np.asarray(top, np.float32) * (1.0 - 0.1 * hi[..., None])
+    col = col * (1 - bl[..., None]) + np.asarray(belly, np.float32) * bl[..., None]
+    r = vv * rows; row = np.floor(r); loc = r - row
+    sc = 0.5 + 0.5 * np.abs(np.sin(math.pi * (uu * cols + row * 0.5)))
+    arc = smoothstep(0.0, 0.5, loc - sc * 0.3)                            # weicher Bogen je Feder
+    col = col * (0.94 + 0.06 * arc[..., None]) * (0.97 + (fbm(H_, W_, 24, seed, 2) - 0.5)[..., None] * 0.06)
+    arr = np.ones((H_, W_, 4), np.float32); arr[..., :3] = np.clip(col, 0, 1)
+    return arr
+
+def round_feather(name, base, d, flat, length, width, mat, thick=0.22):
+    """Runde, weiche Comicfeder: flach gedrücktes Ei von base in Richtung d (flat = Richtung der dünnen Seite)"""
+    d = Vector(d).normalized(); flat = Vector(flat); flat = (flat - d * flat.dot(d)).normalized(); w = flat.cross(d)
+    o = sphere(name, (0, 0, 0), 1.0, (1, 1, 1), segs=(32, 20))
+    for v in o.data.vertices:                             # stumpfe, runde Spitze; zum Ansatz hin etwas schmaler
+        k = 1.0 - 0.25 * max(0.0, -v.co.z)
+        v.co.x *= k; v.co.y *= k
+        v.co.z = math.copysign(abs(v.co.z) ** 0.8, v.co.z)
+    Mx = Matrix((w * width, flat * width * thick, d * length * 0.5)).transposed().to_4x4()
+    Mx.translation = Vector(base) + d * length * 0.42
+    o.data.transform(Mx)
+    for pl in o.data.polygons:
+        pl.use_smooth = True
+    return give(o, mat)
+
 @variante("wolken_eule", "schleimmutter")
 def wolkeneule(arm, body):
-    """Goldene Türme (Welt 22), Boss: Wolkeneule – riesige, runde Eule mit Federkleid in Weiß und Himmelblau, großen
-    golden leuchtenden Augen, goldenem Schnabel, Federohren, ausgebreiteten Federflügeln, goldenen Krallen und einer
-    Federkrone. Eigene Figur auf dem Skelett der Schleimmutter."""
+    """Goldene Türme (Welt 22), Boss: Wolkeneule – riesige, runde Eule mit weichem Federkleid (Himmelblau, das vorn
+    fließend in einen hellen Bauch übergeht), großen golden leuchtenden Augen, goldenem Schnabel, runden Federohren,
+    Flügeln aus runden Federn von Blau nach Weiß, goldenen Füßen direkt am Körper und einer runden Comic-Goldkrone
+    mit Kugeln und himmelblauem Stein (Kommentar 26.11.). Eigene Figur auf dem Skelett der Schleimmutter."""
     M = sky_mats()
     skin = look("Eulenfedern", (1, 1, 1), rough=0.7)
+    blue = look("EulenBlau", (0.5, 0.72, 1.0), rough=0.7)
+    mid = look("EulenHellblau", (0.72, 0.86, 1.0), rough=0.7)
     prof = [(1.15, 0.0), (1.14, 0.14), (1.1, 0.28), (1.02, 0.4), (0.9, 0.5), (0.74, 0.56), (0.56, 0.58), (0.38, 0.56), (0.22, 0.5), (0.1, 0.4), (0.03, 0.26), (0.0, 0.0)]
-    g = lathe("Wolkeneule", prof, segs=64)
-    lathe_texture(skin, feather_tex((0.55, 0.75, 1.0), (0.98, 0.98, 1.0), rows=14, cols=18, seed=671))
+    fine = []                                             # Profil verfeinern: glatte Rundung ohne Querstreifen im Licht
+    for i in range(len(prof) - 1):
+        p0, p1, p2, p3 = (Vector(prof[min(max(i + j, 0), len(prof) - 1)]) for j in (-1, 0, 1, 2))
+        for t in (0.0, 0.25, 0.5, 0.75):
+            q = 0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t + (-p0 + 3 * p1 - 3 * p2 + p3) * t ** 3)
+            fine.append((q.x, max(q.y, 0.0)))
+    fine[0] = prof[0]; fine.append(prof[-1])
+    g = lathe("Wolkeneule", fine, segs=64)
+    lathe_texture(skin, soft_feather_tex((0.5, 0.72, 1.0), (0.97, 0.98, 1.0), seed=671))
     give(g, skin)
     bpy.context.view_layer.update()
-    parts = owl_face(g, 0.78, 1.5, M)
-    q, m = surface(g, (0, 0.0, 3.0), (0, 0, -1))
-    parts += feather_fan("Krone", q - m * 0.03, (0, 0.3, 1.0), (1, 0, 0), 7, 0.3, 0.07, (M["gold"], M["feather2"]), spread=90)
+    parts = []
+    for o in owl_face(g, 0.78, 1.5, M):
+        if o.name.startswith("Federohr"):                 # spitze Ohrfedern weichen den runden
+            bpy.data.objects.remove(o, do_unlink=True)
+        else:
+            parts.append(o)
+    for s_ in (-1, 1):                                    # runde Federohren aus je zwei Federn
+        q, m = surface(g, (s_ * 0.36, 0.0, 3.0), (0, 0, -1))
+        parts.append(round_feather("Ohr%d" % s_, q - m * 0.05, (s_ * 0.5, 0.05, 1.0), (0, 1, 0), 0.27, 0.11, blue, thick=0.55))
+        parts.append(round_feather("OhrInnen%d" % s_, q - m * 0.05 + Vector((-s_ * 0.015, -0.045, 0)), (s_ * 0.45, -0.05, 1.0), (0, 1, 0), 0.19, 0.065, mid, thick=0.55))
+    # runde Comic-Krone (wie bei der Schleimmutter): Goldreif mit Wulst, runde Zacken mit Kugeln, himmelblauer Stein
+    golds = (look("Kronengold", (1.0, 0.7, 0.18), rough=0.32, metal=0.55), look("Kronengold_innen", (0.6, 0.34, 0.07), rough=0.45, metal=0.4),
+             look("Kronengold_hell", (1.0, 0.84, 0.38), rough=0.2, metal=0.7))
+    crown = slime_crown(Vector((0, 0, 0)), Vector((0, 0, 1)), golds, look("Himmelsstein", (0.35, 0.75, 1.0), rough=0.08, emit=(0.3, 0.7, 1.0), strength=0.9))
+    crown.data.transform(Matrix.Translation((0.0, -0.02, 1.1)) @ Matrix.Rotation(math.radians(7), 4, 'Y') @ Matrix.Scale(0.95, 4))
+    parts.append(crown)
     attach(join_parts(parts, "Eule_Kopf"), arm, "Top")
     wings = []
     for s_ in (-1, 1):
-        p, n = surface(g, (s_ * 2.0, 0.05, 0.55), (-s_, 0, 0))
-        wings += feather_fan("Fluegel%d_" % s_, p - n * 0.04, (s_ * 1.0, 0.2, -0.3), (0, 0, 1), 8, 0.55, 0.12, (M["feather2"], M["feather"]), spread=100)
+        p, n = surface(g, (s_ * 2.0, 0.05, 0.6), (-s_, 0, 0))
+        root = p - n * 0.06
+        for k in range(5):                                # hintere Reihe: lange blaue Federn, runder Fächer
+            a = math.radians(38 - 24 * k)
+            d = Vector((s_ * math.cos(a), 0.12, math.sin(a)))
+            wings.append(round_feather("Fluegel%d_%d" % (s_, k), root + Vector((0, 0.03, 0)), d, (0, 1, 0), 0.5 - 0.03 * abs(k - 1.5), 0.13, blue if k % 2 == 0 else mid, thick=0.3))
+        for k in range(4):                                # vordere Reihe: kürzere helle Federn
+            a = math.radians(26 - 22 * k)
+            d = Vector((s_ * math.cos(a), -0.02, math.sin(a)))
+            wings.append(round_feather("Deckfeder%d_%d" % (s_, k), root + Vector((0, -0.03, 0)), d, (0, 1, 0), 0.33, 0.105, M["feather"] if k % 2 == 0 else mid, thick=0.3))
+        wings.append(give(sphere("Schulter%d" % s_, tuple(root + Vector((s_ * 0.03, 0, 0.02))), 0.13, (0.8, 0.9, 1.0)), blue))
         # Füße direkt an der Unterseite (Kommentar 26.11.: standen zu weit vom Körper ab), etwas größer
         fp, fn = surface(g, (s_ * 0.17, -0.27, -2.0), (0, 0, 1))
         wings.append(give(sphere("Fussballen%d" % s_, tuple(fp + Vector((0, -0.02, 0.012))), 0.07, (1.0, 1.15, 0.55)), M["gold"]))
