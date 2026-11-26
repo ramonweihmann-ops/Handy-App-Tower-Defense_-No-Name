@@ -1764,11 +1764,11 @@ def repaint_pearls(body, pearls=SLIME_PEARLS):
         base[(np.array(mk2) > 0)[::-1], :3] = col
     tex.image = new_image(body.name + "_Farbe", base)
 
-def slime_crown(c, up, gold, gem_m, slime, R=0.165, band=0.085):
+def slime_crown(c, up, gold, gem_m, slime, R=0.2, band=0.095):
     """Goldkrone nach Vorlage (26.11.): breiter Reif mit acht runden Zacken, auf den Zacken Goldkugeln, vorn eine
     höhere Zacke mit großem violettem Stein in Fassung, unten ein Wulst, vorn läuft etwas Schleim über den Reif.
     c = Mitte unten, up = Achse der Krone"""
-    lobes = [(k * 2 * math.pi / 6, 0.13 if k == 0 else 0.088) for k in range(6)]     # sechs breite, runde Zacken
+    lobes = [(k * 2 * math.pi / 6, 0.14 if k == 0 else 0.095) for k in range(6)]     # sechs breite, runde Zacken
     wid = math.pi / 6 * 0.9
     def top(a):
         hh = 0.0
@@ -1840,9 +1840,10 @@ def schleimmutter_krone(arm, body):
     fix_slime_eye(body)          # erst danach das rechte Auge nachmalen (auf der neuen Textur)
     fill_black_spots(body, keep=lambda c: c.y < -0.15 and -0.2 < c.x < 0.25 and 0.06 < c.z < 0.3)   # Gesicht vorn bleibt
     repaint_pearls(body)
-    # Krone nach Vorlage (26.11.): sitzt oben vorn auf der Kappe, leicht der Wölbung nach vorn geneigt
-    p, n = surface(body, (-0.02, -0.12, 1.5), (0, 0, -1))
-    up = (n + Vector((0, 0, 1.6))).normalized()
+    # Krone nach Vorlage (Schleimmutter_Neuentwurf_v1): sitzt oben vorn auf der Kappe, der Wölbung nach vorn und
+    # leicht schief geneigt, der untere Reif in den Schleim eingesunken; Breite etwa 40 % der Pfütze
+    p, n = surface(body, (-0.02, -0.1, 1.5), (0, 0, -1))
+    up = (Matrix.Rotation(math.radians(-7), 3, 'Y') @ (n + Vector((0, 0, 1.6)))).normalized()
     crown = slime_crown(p - up * 0.018, up, look("Kronengold", (1.0, 0.7, 0.18), rough=0.32, metal=0.55), look("Kronstein", (0.55, 0.2, 0.95), rough=0.08, emit=(0.45, 0.15, 0.85), strength=0.8), slime)
     attach(crown, arm, "Top")
     # keine zusätzlichen Tropfen: frei hängend wirkten sie wie Stäbe und Striche (Kommentar 24.11.), die Kappe hat eigene Tropfenformen
@@ -1856,12 +1857,12 @@ def schleimmutter_krone(arm, body):
             continue
         bub.append(give(sphere("Blase%d" % i, tuple(p + n * 0.005), rnd.uniform(0.018, 0.04)), bubble))
     attach(join_parts(bub, "Blaeschen"), arm, "Top")
-    # zwei Schleimkinder: eins oben links auf der Kappe, eins seitlich rechts
-    for i, (x, y, r, bone) in enumerate(((-0.3, 0.12, 0.075, "Top"), (0.36, 0.02, 0.065, "Body"))):
+    # zwei Schleimkinder wie in der Vorlage: je eins links und rechts hinten auf der Kappe
+    for i, (x, y, r, bone) in enumerate(((-0.3, 0.12, 0.075, "Top"), (0.3, 0.12, 0.075, "Top"))):   # je eins links und rechts hinten auf der Kappe
         p, n = surface(body, (x * 3, y, 0.3) if bone == "Body" else (x, y, 1.5), (-1, 0, 0) if bone == "Body" else (0, 0, -1))
         c = p + n * r * 0.6
         kid = [give(sphere("Kind%d" % i, tuple(c), r, (1, 1, 0.8)), baby)]
-        kid += googly_eyes("Kind%d" % i, c, Vector((0.25 if i == 0 else 0.4, -1, 0.1)), r, white, black)
+        kid += googly_eyes("Kind%d" % i, c, Vector((0.25 if i == 0 else -0.25, -1, 0.1)), r, white, black)
         attach(join_parts(kid, "Schleimkind%d" % i), arm, bone)
     # glänzende Pfütze am Boden
     hem = lambda a: (0.0, 0.05 * math.cos(5 * a + 0.4) + 0.03 * math.cos(9 * a))
