@@ -201,7 +201,8 @@ def pilz_mats():
         "morel": morel(),
         "eye": eye(),
         "tooth": look("Pilzzahn", (0.96, 0.92, 0.8), rough=0.35),
-        "gum": look("Zahnfleisch", (0.86, 0.42, 0.44), rough=0.5),
+        "gum": look("Zahnfleisch", (0.62, 0.3, 0.3), rough=0.55),
+        "lip": look("Lippe", (0.27, 0.165, 0.125), rough=0.6),
         "tongue": look("Zunge", (0.93, 0.5, 0.52), rough=0.45),
         "throat": look("Mundhoehle", (0.12, 0.03, 0.04), rough=0.8),
         "crack": look("Hautriss", (0.25, 0.8, 0.75), rough=0.4, emit=(0.2, 0.85, 0.8), strength=0.8),
@@ -505,37 +506,53 @@ def pilz_mouth(tbvh, M):
     def edge_z(x, top):
         a = MOUTH_A; u = min(1.0, abs(x) / a)
         return zc + (MOUTH_BU * (1 - u ** 2.6) ** 0.35 if top else -MOUTH_BL * (1 - u ** 1.9) ** 0.53)
+    # braune Lippe rund um die ganze Maulöffnung (Rückmeldung 26.11.: Lippe endete an den Fangzähnen und war zu rosa):
+    # geschlossener Wulst auf der Haut, die Zähne sitzen dahinter im Maul
+    loop = []
+    for k in range(40):
+        x = MOUTH_A * 0.97 * math.cos(math.pi * k / 40)
+        loop.append((x, edge_z(x, True)))
+    for k in range(40):
+        x = -MOUTH_A * 0.97 * math.cos(math.pi * k / 40)
+        loop.append((x, edge_z(x, False)))
+    lp = []
+    for x, z in loop:
+        h, n = front_hit(tbvh, x * 1.02, zc + (z - zc) * 1.03)
+        lp.append(h + Vector((0, 0.004, 0)))
+    lip = closed_tube("Lippe", lp, 0.017, M["lip"], segs=10)
+    smooth_obj(lip, 70); parts.append(lip)
+    TY = yf + 0.07                                   # Zahnreihen deutlich hinter der Lippe
     for nm, top in (("Oben", True), ("Unten", False)):
         pts = []
         for k in range(17):
-            x = -0.19 + 0.38 * k / 16 if top else -0.22 + 0.44 * k / 16
-            z = edge_z(x, top) + (-0.012 if top else 0.012)
-            pts.append(Vector((x, yf + 0.05, z)))
-        rr = [0.022 * math.sqrt(max(0.0, math.sin(math.pi * k / (len(pts) - 1)))) for k in range(len(pts))]   # etwas dickere Lippen
+            x = -0.2 + 0.4 * k / 16
+            z = edge_z(x, top) + (-0.004 if top else 0.004)
+            pts.append(Vector((x, TY + 0.012, z)))
+        rr = [0.016 * math.sqrt(max(0.0, math.sin(math.pi * k / (len(pts) - 1)))) for k in range(len(pts))]
         g = tube("Zahnfleisch" + nm, pts, rr, segs=12)
         smooth_obj(g, 70); parts.append(give(g, M["gum"]))
     def tooth(name, x, top, length, w, fang):
         sg = -1 if top else 1
-        if fang:                                     # Fangzahn wächst aus der Lippe/dem Zahnfleisch, ganz im Maul
-            z0 = edge_z(x, top) + (-0.008 if top else 0.008)
-            base = Vector((x, yf + 0.05, z0))
-            inward = -0.012 if x > 0 else 0.012
-            pts = [base + Vector((0, 0, -sg * 0.012)), base, base + Vector((inward * 0.5, -0.006, sg * length * 0.55)), base + Vector((inward, -0.004, sg * length))]
+        if fang:                                     # Fangzahn wächst hinter der Lippe aus dem Zahnfleisch, ganz im Maul
+            z0 = edge_z(x, top) + (-0.004 if top else 0.004)
+            base = Vector((x, TY, z0))
+            inward = -0.01 if x > 0 else 0.01
+            pts = [base + Vector((0, 0.004, -sg * 0.014)), base, base + Vector((inward * 0.5, -0.004, sg * length * 0.55)), base + Vector((inward, -0.002, sg * length))]
             o = tube(name, pts, [w * 1.05, w, w * 0.7, 0.0], segs=14)
             smooth_obj(o, 60)
             return give(o, M["tooth"])
-        z0 = edge_z(x, top) + (-0.03 if top else 0.03)
-        base = Vector((x, yf + 0.035, z0))
+        z0 = edge_z(x, top) + (-0.022 if top else 0.022)
+        base = Vector((x, TY, z0))
         o = rbox(name, base + Vector((0, 0, sg * length * 0.5)), (w, w * 0.6, length * 0.5), w * 0.75, M["tooth"])
         smooth_obj(o, 60)
         return give(o, M["tooth"])
-    for k, x in enumerate((-0.1, -0.034, 0.034, 0.1)):
-        parts.append(tooth("ZahnOben%d" % k, x, True, 0.05, 0.029, False))
+    for k, x in enumerate((-0.09, -0.03, 0.03, 0.09)):
+        parts.append(tooth("ZahnOben%d" % k, x, True, 0.05, 0.027, False))
     for s_ in (1, -1):
-        parts.append(tooth("FangOben%d" % s_, 0.162 * s_, True, 0.1, 0.033, True))      # innerhalb der Maulecken
-        parts.append(tooth("FangUnten%d" % s_, 0.138 * s_, False, 0.088, 0.031, True))
-    for k, x in enumerate((-0.078, -0.026, 0.026, 0.078)):
-        parts.append(tooth("ZahnUnten%d" % k, x, False, 0.04, 0.025, False))
+        parts.append(tooth("FangOben%d" % s_, 0.15 * s_, True, 0.1, 0.031, True))       # klar innerhalb der Maulecken
+        parts.append(tooth("FangUnten%d" % s_, 0.128 * s_, False, 0.088, 0.03, True))
+    for k, x in enumerate((-0.072, -0.024, 0.024, 0.072)):
+        parts.append(tooth("ZahnUnten%d" % k, x, False, 0.04, 0.023, False))
     parts.append(give(sphere("Zunge", tuple(Vector((0, yf + 0.13, zc - 0.11))), 1.0, (0.16, 0.12, 0.06), segs=(28, 14)), M["tongue"]))
     return parts
 

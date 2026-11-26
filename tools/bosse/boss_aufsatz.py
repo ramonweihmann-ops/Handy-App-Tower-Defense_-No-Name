@@ -1797,7 +1797,7 @@ def repaint_pearls(body, pearls=SLIME_PEARLS):
         base[(np.array(mk2) > 0)[::-1], :3] = col
     tex.image = new_image(body.name + "_Farbe", base)
 
-def closed_tube(name, pts, normals, r, segs=10):
+def loop_ring(name, pts, normals, r, segs=10):
     """Geschlossener, nahtloser Reif entlang einer Punkteschleife (ohne überlappende Enden)"""
     bm = bmesh.new(); n = len(pts); rings = []
     for k in range(n):
@@ -1852,7 +1852,7 @@ def slime_crown(c, up, golds, gem_m, R=0.2, band=0.095):
     for i in range(160):
         a = 2 * math.pi * i / 160; z = top(a)
         rim.append((rad(z) * math.sin(a), -rad(z) * math.cos(a), z - 0.004)); rn.append((math.sin(a), -math.cos(a), 0.0))
-    parts.append(give(closed_tube("Kronrahmen", rim, rn, 0.0095), gold_hi))
+    parts.append(give(loop_ring("Kronrahmen", rim, rn, 0.0095), gold_hi))
     for k, (ak, H) in enumerate(lobes):
         z = band + H
         parts.append(give(sphere("Kronkugel%d" % k, ((rad(z) - 0.011) * math.sin(ak), -(rad(z) - 0.011) * math.cos(ak), z + 0.014), 0.036 if k == 0 else 0.034), gold_hi))
