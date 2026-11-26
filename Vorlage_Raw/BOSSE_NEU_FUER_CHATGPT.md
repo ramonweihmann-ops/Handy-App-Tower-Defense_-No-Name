@@ -24,6 +24,8 @@ Direkte Bildlinks:
 - Fabrikmutter: https://raw.githubusercontent.com/ramonweihmann-ops/Handy-App-Tower-Defense_-No-Name/claude/amazing-hypatia-yl59v4/Vorlage_Raw/Bosse_Neu_Referenz/fabrikmutter.png
 - Schrottkoloss: https://raw.githubusercontent.com/ramonweihmann-ops/Handy-App-Tower-Defense_-No-Name/claude/amazing-hypatia-yl59v4/Vorlage_Raw/Bosse_Neu_Referenz/schrottkoloss.png
 - Pilzriese: https://raw.githubusercontent.com/ramonweihmann-ops/Handy-App-Tower-Defense_-No-Name/claude/amazing-hypatia-yl59v4/Vorlage_Raw/Bosse_Neu_Referenz/pilzriese.png
+- Schleimmutter (B7): https://raw.githubusercontent.com/ramonweihmann-ops/Handy-App-Tower-Defense_-No-Name/claude/amazing-hypatia-yl59v4/Vorlage_Raw/Bosse_Neu_Referenz/schleimmutter.png
+- Juwelenschnecke (B8): https://raw.githubusercontent.com/ramonweihmann-ops/Handy-App-Tower-Defense_-No-Name/claude/amazing-hypatia-yl59v4/Vorlage_Raw/Bosse_Neu_Referenz/juwelenschnecke.png
 
 ---
 
@@ -190,4 +192,69 @@ Bau (muss so bleiben, die Figur wird in Blender nachgebaut und auf ein vorhanden
 Stil: stilisiertes 3D-Spielmodell mit großen, ruhigen Formen und runden Kanten (wenig Kleinteile), deutliche Oberflächenstruktur, weiches Studiolicht.
 
 Ausgabe: Bild 1 ist ein Charakter-Turnaround: vorn, schräg vorn, Seite, hinten. Ganzer Körper in neutraler A-Pose, einfarbig grauer Hintergrund, kein Text. Danach Bild 2: Nahaufnahme von Kopf und Maul plus die Angriffspose.
+~~~~
+
+## B7: Schleimmutter (Kommentar 26.11.2026)
+
+Bei der Schleimmutter (Welt 1, Schleim-Welt) wirkt vor allem die Krone noch komisch: drei lose Goldkugeln mit
+dünnem Goldband und zwei kleinen Spitzen, die nicht wie eine echte Krone lesbar sind. Blatt:
+`Bosse_Neu_Referenz/schleimmutter.png`.
+
+~~~~text
+Referenzblatt „Schleimmutter“ aus meinem 3D-Tower-Defense-Spiel fürs Handy, bitte öffnen und genau ansehen:
+https://raw.githubusercontent.com/ramonweihmann-ops/Handy-App-Tower-Defense_-No-Name/claude/amazing-hypatia-yl59v4/Vorlage_Raw/Bosse_Neu_Referenz/schleimmutter.png
+
+Oben siehst du den aktuellen Boss der ersten Welt „Schleim-Welt“, unten rechts die Monster dieser Welt (Schleimling, Tentakler, Panzerkäfer) als Stilvorlage. Die Grundidee gefällt mir: eine große, glänzende türkise Schleimmutter mit böse grinsendem Gesicht, zwei kleinen Schleimkindern auf ihr und einer glänzenden Schleimpfütze. Was komisch aussieht, ist die Krone: drei lose goldene Kugeln mit einem dünnen Goldband und zwei kleinen Spitzen – das liest sich nicht als Krone.
+
+Aufgabe: Überarbeite die „Schleimmutter“ mit einer neuen, klar lesbaren Krone. Schlage zuerst 3 unterschiedliche Kronen-Konzepte in je 2 Sätzen vor (z. B. eine kleine, schief sitzende Goldkrone, halb im Schleim versunken; eine Krone aus erstarrtem Schleim mit eingeschlossenen Edelsteinen; ein Diadem, das sich in den Schleim drückt) und zeichne dann das stärkste.
+
+Krone: Sie muss auf den ersten Blick als Krone erkennbar sein – geschlossener Reif mit wenigen großen, runden Zacken (keine dünnen Spitzen), 1–3 große gefasste Edelsteine. Sie sitzt fest oben auf dem Schleim oder ist leicht in ihn eingesunken, der Schleim läuft ein wenig über den Reif. Nichts schwebt, keine losen Kugeln. Proportion: deutlich kleiner als der Körper, aber groß genug, dass man sie im Spiel von schräg oben erkennt.
+
+Gesicht und Körper: Das freche, böse Grinsen und die Augen mit schweren Brauen bleiben erkennbar, gern etwas ausdrucksstärker. Weicher, glänzender Schleim in Türkis mit hellen Bläschen; die zwei Schleimkinder (violett, Kulleraugen) sitzen fest auf ihr. Alles in einem Guss, keine Kanten, die wie zusammengesteckte Teile aussehen.
+
+Bau (muss so bleiben, die Figur wird in Blender nachgebaut und auf ein vorhandenes Skelett gesetzt):
+- Ein Schleimklumpen ohne Arme und Beine: unten breit mit Pfütze, oben eine Kappe. Er gleitet vorwärts und quetscht sich dabei; beim Angriff bäumt er sich auf und klatscht nach vorn.
+- Alles sitzt fest am Körper: Nichts schwebt, keine dünnen, weit abstehenden Teile.
+- Bedrohlich, aber im freundlichen Comic-Stil, nicht eklig.
+- Im Spiel ist er klein und schräg von oben vorn zu sehen. Er braucht eine klare Silhouette, ein gut lesbares Gesicht und 2–3 Hauptfarben plus einen Leuchtakzent.
+- Eigenständiges Design, keine bekannte Figur aus Spielen oder Filmen.
+
+Stil: stilisiertes 3D-Spielmodell mit großen, ruhigen Formen und runden Kanten (wenig Kleinteile), glänzender Schleim, weiches Studiolicht.
+
+Ausgabe: Bild 1 ist ein Turnaround: vorn, schräg vorn, Seite, hinten. Ganze Figur, einfarbig grauer Hintergrund, kein Text. Danach Bild 2: Nahaufnahme von Gesicht und Krone plus die Angriffspose.
+~~~~
+
+## B8: Juwelenschnecke (Chat 26.11.2026)
+
+Die Idee der Schnecke (Welt 15, Rosenkristalle) gefällt dem Nutzer, die Umsetzung wirkt aber billig und nicht
+sauber. ChatGPT soll eine neue Schnecke entwerfen: im Comic-Stil des Spiels, mit genug Details, dass sie hochwertig
+und eindeutig wie eine Schnecke aussieht, und so aufgebaut, dass Claude sie in Blender sauber nachbauen kann.
+Blatt: `Bosse_Neu_Referenz/juwelenschnecke.png`.
+
+~~~~text
+Referenzblatt „Juwelenschnecke“ aus meinem 3D-Tower-Defense-Spiel fürs Handy, bitte öffnen und genau ansehen:
+https://raw.githubusercontent.com/ramonweihmann-ops/Handy-App-Tower-Defense_-No-Name/claude/amazing-hypatia-yl59v4/Vorlage_Raw/Bosse_Neu_Referenz/juwelenschnecke.png
+
+Oben siehst du den aktuellen Boss der Welt „Rosenkristalle“, unten rechts die Monster dieser Welt (Glitzerling, Rosenritter, Juwelenkäfer) als Stilvorlage. Die Idee einer Juwelen-Schnecke gefällt mir, aber der aktuelle Boss wirkt billig und unsauber: glatter rosa Schlauch ohne Struktur, ein Gehäuse aus einer einfachen Röhre, lose wirkende Stacheln und Steine.
+
+Aufgabe: Entwirf die „Juwelenschnecke“ neu – es bleibt eine Schnecke. Schlage zuerst 3 unterschiedliche Konzepte in je 2 Sätzen vor und zeichne dann das stärkste.
+
+Thema: Eine riesige, bedrohliche Schnecke aus einer Höhle voller Rosenquarz und Edelsteine. Das Schneckenhaus ist ihr Schatz: ein klar eingerolltes Spiralgehäuse aus Rosenquarz mit sauber abgesetzten Windungen, einer Goldkante entlang der Spirale und wenigen großen, gefassten Edelsteinen (z. B. Rubin, Diamant), die fest im Gehäuse sitzen. Der weiche Schneckenkörper hat eine erkennbare Haut (feine Rillen oder Muster, hellere Unterseite, Kriechsohle mit Saum) – kein glatter Plastikschlauch. Farben: Rosa und Rosenquarz mit Gold und einem kräftigen Akzent (Rubinrot oder Türkis), passend zu den Monstern.
+
+Gesicht: eindeutig eine Schnecke mit zwei Augenstielen (Augen oben auf den Fühlern) und zwei kurzen unteren Fühlern, dazu ein gut lesbares, böses Gesicht am Kopf – Brauenwülste und ein breites Maul im Comic-Stil (z. B. mit kleinen Kristallzähnen), nicht wie ein echtes Gebiss. Gern eine kleine Krone oder ein Diadem, fest auf dem Kopf.
+
+Nachbau in Blender (sehr wichtig, die Figur wird nachgebaut und auf ein vorhandenes Skelett gesetzt):
+- Aufbau aus klaren, großen Grundformen: Körper als eine durchgehende, weiche Form; Gehäuse als eine saubere Spirale. Details sind wenige, klar abgegrenzte Elemente (Goldkante, Fassungen, Rillen, Muster), keine Unmengen kleiner Teile.
+- Edelsteine sitzen in Fassungen, die fest mit dem Gehäuse verbunden sind (eingelassen, nichts aufgesteckt oder schwebend), keine dünnen, weit abstehenden Stacheln.
+- Keine durchsichtigen oder gläsernen Körperteile, keine Partikel, kein Rauch, keine Flüssigkeit, die frei fliegt.
+- Sie gleitet langsam vorwärts und staucht sich dabei leicht; beim Angriff bäumt sie sich auf und schlägt mit dem Kopf nach vorn.
+
+Weitere Vorgaben:
+- Bedrohlich, aber im freundlichen Comic-Stil, nicht eklig.
+- Im Spiel ist sie klein und schräg von oben vorn zu sehen. Sie braucht eine klare Silhouette (Spiralgehäuse + Augenstiele), ein gut lesbares Gesicht und 2–3 Hauptfarben plus einen Leuchtakzent.
+- Eigenständiges Design, keine bekannte Figur aus Spielen oder Filmen.
+
+Stil: stilisiertes 3D-Spielmodell mit großen, ruhigen Formen und runden Kanten, hochwertige Oberflächen (Rosenquarz mit sanftem Glanz, poliertes Gold, geschliffene Steine), weiches Studiolicht.
+
+Ausgabe: Bild 1 ist ein Turnaround: vorn, schräg vorn, Seite, hinten. Ganze Figur, einfarbig grauer Hintergrund, kein Text. Danach Bild 2: Nahaufnahme von Kopf und Gesicht plus die Angriffspose.
 ~~~~
