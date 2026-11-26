@@ -236,25 +236,26 @@ def golem_body(arm):
 
 TORSO_BONES = (("Hips", 0.55), ("Spine", 0.72), ("Spine1", 0.9), ("Spine2", 1.1))
 
-def torso_weights(body, tbvh):
+def torso_weights(body, tbvh, bones=None, zmin=0.42):
     """Rumpfhaut gleichmäßig nach der Höhe auf Becken und Wirbel verteilen (Bone Heat faltet den runden Bauch beim
     Gehen); Übergang zu Armen und Beinen über den Abstand zur reinen Rumpfform"""
-    groups = {b: body.vertex_groups.get("mixamorig:" + b) or body.vertex_groups.new(name="mixamorig:" + b) for b, _ in TORSO_BONES}
+    bones = bones or TORSO_BONES
+    groups = {b: body.vertex_groups.get("mixamorig:" + b) or body.vertex_groups.new(name="mixamorig:" + b) for b, _ in bones}
     names = {g.index: g.name for g in body.vertex_groups}
     for v in body.data.vertices:
         h = tbvh.find_nearest(v.co)
         dist = (h[0] - v.co).length if h[0] is not None else 1.0
-        t = smooth01((0.045 - dist) / 0.045) * smooth01((v.co.z - 0.42) / 0.1)
+        t = smooth01((0.045 - dist) / 0.045) * smooth01((v.co.z - zmin) / 0.1)
         if t <= 0:
             continue
         grad = {}
         z = v.co.z
-        if z <= TORSO_BONES[0][1]:
-            grad[TORSO_BONES[0][0]] = 1.0
-        elif z >= TORSO_BONES[-1][1]:
-            grad[TORSO_BONES[-1][0]] = 1.0
+        if z <= bones[0][1]:
+            grad[bones[0][0]] = 1.0
+        elif z >= bones[-1][1]:
+            grad[bones[-1][0]] = 1.0
         else:
-            for (b0, z0), (b1, z1) in zip(TORSO_BONES, TORSO_BONES[1:]):
+            for (b0, z0), (b1, z1) in zip(bones, bones[1:]):
                 if z0 <= z <= z1:
                     f = smooth01((z - z0) / (z1 - z0)); grad[b0] = 1 - f; grad[b1] = f
         old = {names[g.group]: g.weight for g in v.groups if names[g.group].startswith("mixamorig:")}

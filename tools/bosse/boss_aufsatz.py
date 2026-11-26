@@ -1764,10 +1764,39 @@ def repaint_pearls(body, pearls=SLIME_PEARLS):
         base[(np.array(mk2) > 0)[::-1], :3] = col
     tex.image = new_image(body.name + "_Farbe", base)
 
-def slime_crown(c, up, gold, gem_m, slime, R=0.2, band=0.095):
-    """Goldkrone nach Vorlage (26.11.): breiter Reif mit acht runden Zacken, auf den Zacken Goldkugeln, vorn eine
-    höhere Zacke mit großem violettem Stein in Fassung, unten ein Wulst, vorn läuft etwas Schleim über den Reif.
-    c = Mitte unten, up = Achse der Krone"""
+def closed_tube(name, pts, normals, r, segs=10):
+    """Geschlossener, nahtloser Reif entlang einer Punkteschleife (ohne überlappende Enden)"""
+    bm = bmesh.new(); n = len(pts); rings = []
+    for k in range(n):
+        p = Vector(pts[k]); t = (Vector(pts[(k + 1) % n]) - Vector(pts[k - 1])).normalized()
+        u = Vector(normals[k]); u = (u - t * u.dot(t)).normalized(); w = t.cross(u)
+        rings.append([bm.verts.new(p + (u * math.cos(2 * math.pi * j / segs) + w * math.sin(2 * math.pi * j / segs)) * r) for j in range(segs)])
+    for k in range(n):
+        a_, b_ = rings[k], rings[(k + 1) % n]
+        for j in range(segs):
+            bm.faces.new([a_[j], b_[j], b_[(j + 1) % segs], a_[(j + 1) % segs]])
+    return finish(name, bm, smooth=True)
+
+def slime_drape(name, pts, slime):
+    """Weicher, welliger Schleimüberlauf aus Metaballs (Kugeln verschmelzen zu einer fließenden Form): pts = [(Mitte, Radius)]"""
+    mb = bpy.data.metaballs.new(name); mb.resolution = 0.006; mb.render_resolution = 0.006; mb.threshold = 0.6
+    o = bpy.data.objects.new(name, mb); bpy.context.scene.collection.objects.link(o)
+    for c, r in pts:
+        e = mb.elements.new(type='BALL'); e.co = c; e.radius = r * 1.65; e.stiffness = 2.0
+    dg = bpy.context.evaluated_depsgraph_get()
+    me = bpy.data.meshes.new_from_object(o.evaluated_get(dg))
+    m = bpy.data.objects.new(name + "_Netz", me); bpy.context.scene.collection.objects.link(m)
+    bpy.data.objects.remove(o, do_unlink=True)
+    for pl in m.data.polygons:
+        pl.use_smooth = True
+    return give(m, slime)
+
+def slime_crown(c, up, golds, gem_m, slime, R=0.2, band=0.095):
+    """Goldkrone nach Vorlage (26.11.): breiter Reif mit Wulst unten und Zierlinie, sechs breite runde Zacken, jede
+    mit fest angesetzter Goldkugel, vorn die höhere Zacke mit großem violettem Stein in runder Fassung; ein heller
+    Goldrand umrahmt die Zacken, Nieten zwischen den Zacken; innen dunkleres Gold (Schattierung); vorn fließt ein
+    welliger Schleimüberlauf über den unteren Reif. golds = (außen, innen, Kanten); c = Mitte unten, up = Achse"""
+    gold, gold_in, gold_hi = golds
     lobes = [(k * 2 * math.pi / 6, 0.14 if k == 0 else 0.095) for k in range(6)]     # sechs breite, runde Zacken
     wid = math.pi / 6 * 0.9
     def top(a):
@@ -1790,17 +1819,30 @@ def slime_crown(c, up, gold, gem_m, slime, R=0.2, band=0.095):
     for i in range(segs):
         a_, b_ = cols[i], cols[(i + 1) % segs]
         for j in range(n):
-            bm.faces.new([a_[j], b_[j], b_[(j + 1) % n], a_[(j + 1) % n]])
+            f = bm.faces.new([a_[j], b_[j], b_[(j + 1) % n], a_[(j + 1) % n]])
+            f.material_index = 1 if j > J else 0                       # Innenseite: dunkleres Gold
     crown = finish("Krone", bm, smooth=True)
+    crown.data.materials.append(gold); crown.data.materials.append(gold_in)
     md = crown.modifiers.new("Rund", 'SUBSURF'); md.levels = 2
     bpy.context.view_layer.objects.active = crown; bpy.ops.object.modifier_apply(modifier=md.name)
-    parts = [give(crown, gold)]
-    parts.append(give(torus("Kronwulst", (0, 0, 0.01), R + 0.004, 0.014, rot=(0, 0, 0), segs=64), gold))
+    parts = [crown]
+    parts.append(give(torus("Kronwulst", (0, 0, 0.012), R + 0.005, 0.016, rot=(0, 0, 0), segs=64), gold_hi))
+    parts.append(give(torus("Zierlinie", (0, 0, band * 0.82), rad(band * 0.82) + 0.002, 0.007, rot=(0, 0, 0), segs=64), gold_hi))
+    # heller Rahmen entlang der Oberkante (folgt den Zacken)
+    rim, rn = [], []
+    for i in range(160):
+        a = 2 * math.pi * i / 160; z = top(a)
+        rim.append((rad(z) * math.sin(a), -rad(z) * math.cos(a), z - 0.004)); rn.append((math.sin(a), -math.cos(a), 0.0))
+    parts.append(give(closed_tube("Kronrahmen", rim, rn, 0.0095), gold_hi))
     for k, (ak, H) in enumerate(lobes):
-        if k == 0:
-            continue
         z = band + H
-        parts.append(give(sphere("Kronkugel%d" % k, (rad(z) * math.sin(ak) - 0.011 * math.sin(ak), -(rad(z) - 0.011) * math.cos(ak), z + 0.012), 0.034), gold))
+        parts.append(give(sphere("Kronkugel%d" % k, ((rad(z) - 0.011) * math.sin(ak), -(rad(z) - 0.011) * math.cos(ak), z + 0.014), 0.036 if k == 0 else 0.034), gold_hi))
+    for k in range(6):                                               # Nieten zwischen den Zacken (nicht vorn)
+        a = k * 2 * math.pi / 6 + math.pi / 6
+        if abs((a + math.pi) % (2 * math.pi) - math.pi) < 0.8:
+            continue
+        zn = band * 0.45
+        parts.append(give(sphere("Niete%d" % k, (rad(zn) * math.sin(a), -rad(zn) * math.cos(a), zn), 0.014), gold_hi))
     # großer Stein vorn in der hohen Zacke
     zg = band + 0.035
     gc = Vector((0, -rad(zg) - 0.006, zg))
@@ -1810,12 +1852,17 @@ def slime_crown(c, up, gold, gem_m, slime, R=0.2, band=0.095):
     for pl in st.data.polygons:
         pl.use_smooth = False
     parts.append(give(st, gem_m))
-    parts.append(give(torus("Steinfassung", tuple(gc + Vector((0, 0.004, 0))), 0.043, 0.009, rot=(90, 0, 0), segs=40), gold))
-    # Schleim läuft vorn über den Reif
-    r0 = rad(band)
-    drip = tube("Schleimtropfen", [(0.0, -(r0 - 0.012), band + 0.006), (0.0, -(r0 + 0.012), band - 0.012), (0.004, -(r0 + 0.016), band * 0.45), (0.006, -(r0 + 0.018), 0.012)],
-                [0.02, 0.019, 0.018, 0.024], segs=16)
-    parts.append(give(drip, slime))
+    parts.append(give(torus("Steinfassung", tuple(gc + Vector((0, 0.004, 0))), 0.043, 0.01, rot=(90, 0, 0), segs=40), gold_hi))
+    # welliger Schleimüberlauf vorn rechts der Mitte über dem unteren Reif, mit hängendem Tropfen
+    drape = []
+    for a, z, r in ((-0.42, 0.034, 0.02), (-0.3, 0.042, 0.026), (-0.17, 0.036, 0.024), (-0.04, 0.046, 0.03), (0.08, 0.04, 0.027),
+                    (0.2, 0.03, 0.022), (0.3, 0.024, 0.017)):
+        rr_ = rad(z) + 0.012
+        drape.append(((rr_ * math.sin(-a), -rr_ * math.cos(a), z), r))   # wie in der Vorlage etwas rechts der Mitte
+    for a, z, r in ((-0.06, 0.0, 0.026), (-0.07, -0.032, 0.03), (0.16, 0.002, 0.018)):   # Tropfen laufen in die Kappe
+        rr_ = rad(0.0) + 0.02
+        drape.append(((rr_ * math.sin(-a), -rr_ * math.cos(a), z), r))   # wie in der Vorlage etwas rechts der Mitte
+    parts.append(slime_drape("Schleimueberlauf", drape, slime))
     obj = join_parts(parts, "Kroenchen")
     q = Vector((0, 0, 1)).rotation_difference(up)
     obj.data.transform(Matrix.Translation(c) @ q.to_matrix().to_4x4())
@@ -1844,7 +1891,9 @@ def schleimmutter_krone(arm, body):
     # leicht schief geneigt, der untere Reif in den Schleim eingesunken; Breite etwa 40 % der Pfütze
     p, n = surface(body, (-0.02, -0.1, 1.5), (0, 0, -1))
     up = (Matrix.Rotation(math.radians(-7), 3, 'Y') @ (n + Vector((0, 0, 1.6)))).normalized()
-    crown = slime_crown(p - up * 0.018, up, look("Kronengold", (1.0, 0.7, 0.18), rough=0.32, metal=0.55), look("Kronstein", (0.55, 0.2, 0.95), rough=0.08, emit=(0.45, 0.15, 0.85), strength=0.8), slime)
+    golds = (look("Kronengold", (1.0, 0.7, 0.18), rough=0.32, metal=0.55), look("Kronengold_innen", (0.6, 0.34, 0.07), rough=0.45, metal=0.4),
+             look("Kronengold_hell", (1.0, 0.84, 0.38), rough=0.2, metal=0.7))
+    crown = slime_crown(p - up * 0.018, up, golds, look("Kronstein", (0.55, 0.2, 0.95), rough=0.08, emit=(0.45, 0.15, 0.85), strength=0.8), slime)
     attach(crown, arm, "Top")
     # keine zusätzlichen Tropfen: frei hängend wirkten sie wie Stäbe und Striche (Kommentar 24.11.), die Kappe hat eigene Tropfenformen
     # Bläschen im Schleim der Kappe

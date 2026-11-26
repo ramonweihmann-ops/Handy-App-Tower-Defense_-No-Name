@@ -212,9 +212,11 @@ def pilz_mats():
 def pilz_body(arm):
     T = mb_family("Rumpf")
     mb_ell(T, V(282, 345, 1290), (0.3, 0.2, 0.2))                  # Brust
-    mb_ell(T, V(284, 396, 1262), (0.26, 0.215, 0.165))             # runder Bauch, steht vorn heraus (Seitenansicht der Vorlage)
-    mb_ell(T, V(284, 362, 1290), (0.24, 0.19, 0.1))                # Taille zwischen Brust und Bauch
-    mb_ell(T, V(283, 432, 1305), (0.22, 0.17, 0.1))                # schmales Becken
+    mb_ell(T, V(284, 392, 1268), (0.27, 0.215, 0.19))              # runder Bauch, eine glatte Masse von der Brust bis
+    mb_ell(T, V(283, 430, 1300), (0.23, 0.17, 0.12))               # zum Becken (keine Taille: wirkte wie Speckrollen)
+    for side, s in (("Left", 1), ("Right", -1)):
+        kn = B(arm, side + "Leg")
+        mb_ell(T, (0.14 * s, kn.y + 0.02, kn.z + 0.1), (0.13, 0.14, 0.13))   # weicher Hüftansatz: Beine fließen in den Körper
     mb_ell(T, V(285, 298, 1280), (0.33, 0.2, 0.1))                 # Schultern
     mb_ell(T, V(285, 282, 1245), (0.21, 0.19, 0.12))               # kurzer Hals
     mb_ell(T, HEAD_C2, HEAD_S2)                                    # Kopf
@@ -318,6 +320,10 @@ def bind_pilz(body, arm, tbvh):
     bpy.ops.object.parent_set(type='ARMATURE_AUTO')
     for b in arm.data.bones:
         b.use_deform = saved[b.name]
+    # Rumpf gleichmäßig nach der Höhe auf Becken und Wirbel verteilen: Bone Heat allein faltete den Bauch beim Gehen
+    # (Kommentar 26.11.: wirkte wie ein schwabbelnder Fettleib)
+    torso_weights(body, tbvh, bones=[(b, B(arm, b).z) for b in ("Hips", "Spine", "Spine1", "Spine2")],
+                  zmin=B(arm, "LeftLeg").z + 0.05)
     head = body.vertex_groups.get("mixamorig:Head") or body.vertex_groups.new(name="mixamorig:Head")
     for v in body.data.vertices:
         q = v.co - HEAD_C2
