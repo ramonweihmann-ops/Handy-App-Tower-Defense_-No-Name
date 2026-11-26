@@ -333,7 +333,8 @@ def bind_pilz(body, arm, tbvh):
     # Rumpf gleichmäßig nach der Höhe auf Becken und Wirbel verteilen: Bone Heat allein faltete den Bauch beim Gehen
     # (Kommentar 26.11.: wirkte wie ein schwabbelnder Fettleib)
     torso_weights(body, tbvh, bones=[(b, B(arm, b).z) for b in ("Hips", "Spine", "Spine1", "Spine2")],
-                  zmin=B(arm, "LeftLeg").z + 0.05)
+                  zmin=B(arm, "LeftLeg").z + 0.05, zmax=B(arm, "Neck").z + 0.02)   # Kopf und Kiefer bleiben am Kopfknochen
+    # (ohne Obergrenze hing die Gesichtshaut am Rumpf und riss beim Ausholen vom Kopf ab, Kommentar 26.11.)
     head = body.vertex_groups.get("mixamorig:Head") or body.vertex_groups.new(name="mixamorig:Head")
     for v in body.data.vertices:
         q = v.co - HEAD_C2

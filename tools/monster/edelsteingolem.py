@@ -236,7 +236,7 @@ def golem_body(arm):
 
 TORSO_BONES = (("Hips", 0.55), ("Spine", 0.72), ("Spine1", 0.9), ("Spine2", 1.1))
 
-def torso_weights(body, tbvh, bones=None, zmin=0.42):
+def torso_weights(body, tbvh, bones=None, zmin=0.42, zmax=None):
     """Rumpfhaut gleichmäßig nach der Höhe auf Becken und Wirbel verteilen (Bone Heat faltet den runden Bauch beim
     Gehen); Übergang zu Armen und Beinen über den Abstand zur reinen Rumpfform"""
     bones = bones or TORSO_BONES
@@ -246,6 +246,8 @@ def torso_weights(body, tbvh, bones=None, zmin=0.42):
         h = tbvh.find_nearest(v.co)
         dist = (h[0] - v.co).length if h[0] is not None else 1.0
         t = smooth01((0.045 - dist) / 0.045) * smooth01((v.co.z - zmin) / 0.1)
+        if zmax is not None:                             # oberhalb (Hals, Kopf) bleibt die Gewichtung, wie sie ist
+            t *= smooth01((zmax - v.co.z) / 0.08)
         if t <= 0:
             continue
         grad = {}
