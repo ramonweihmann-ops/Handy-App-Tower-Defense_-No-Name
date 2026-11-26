@@ -3415,7 +3415,7 @@ def schwammbrecher(arm, body):
             parts += glow_shroom("Kopfpilz%d" % k, p - n * 0.01, (n + Vector((x * 2, 0, 0.3))).normalized(), h, r, M, cap="bracket2", spots=False)
     attach(join_parts(parts, "Kopfpilze"), arm, "mixamorig:Head")
 
-@variante("pilz_riese", "koloss")
+@variante("pilz_riese_alt", "koloss")
 def pilzriese(arm, body):
     """Sporennebel (Welt 24), Boss: Pilzriese – riesiger, von Myzel überwucherter Waldgeist mit erdbrauner Haut, großen
     Baumpilzen in Orange und Türkis auf Schultern und Rücken, einer Kappe aus Leuchtpilzen auf dem Kopf, türkis
