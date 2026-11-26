@@ -1724,6 +1724,20 @@ def facet_paint(T, mask, seed, cols, freq=14.0, lead=None, glow_k=0.4):
         paint(T, mask * np.clip(1 - edge / 0.004, 0, 1), lead, keep_shading=0.2)
     glow(T, mask * (glow_k * 0.5 + glint), (0.9, 0.8, 1.0))
 
+def loop_tube(name, pts, normals, r, segs=12):
+    """Geschlossener, nahtloser Reif entlang einer Punkteschleife (ohne Enden, die sich überlappen und eine Kerbe zeigen)"""
+    bm = bmesh.new(); n = len(pts); rings = []
+    for k in range(n):
+        p = Vector(pts[k]); t = (Vector(pts[(k + 1) % n]) - Vector(pts[k - 1])).normalized()
+        u = Vector(normals[k]); u = (u - t * u.dot(t)).normalized(); w = t.cross(u)
+        rings.append([bm.verts.new(p + (u * math.cos(2 * math.pi * j / segs) + w * math.sin(2 * math.pi * j / segs)) * r) for j in range(segs)])
+    for k in range(n):
+        a_, b_ = rings[k], rings[(k + 1) % n]
+        for j in range(segs):
+            bm.faces.new([a_[j], b_[j], b_[(j + 1) % segs], a_[(j + 1) % segs]])
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    return finish(name, bm, smooth=True)
+
 def snail(name, length, height, G, body_m, shell_m, band_m, gem_mats, rnd, gems=6, spike=1.0, spike_m=None):
     """Juwelenschnecke: Schneckenfuß (flach, vorn mit Kopf und Fühleraugen) und ein eingerolltes Gehäuse aus
     Rosenquarz mit Goldband und eingesetzten Edelsteinen. Liefert (Fußteile, Gehäuseteile, Kopfteile)."""
@@ -1748,6 +1762,39 @@ def snail(name, length, height, G, body_m, shell_m, band_m, gem_mats, rnd, gems=
     shell = give(tube(name + "Gehaeuse", pts, rr, segs=28), shell_m)
     for v in shell.data.vertices:
         v.co.x *= 1.1
+    shell.data.update()
+    def tube_gem(gname, i, s_, gr, gm):
+        """Edelstein seitlich auf der Gehäuseröhre; die Goldfassung folgt der Röhre (Ellipse im Querschnitt) und liegt
+        rundum gleich hoch auf, statt als flacher Ring kantig hineinzuschneiden (Kommentar 26.11.)"""
+        P = Vector(pts[i]); T = (Vector(pts[min(i + 1, 39)]) - Vector(pts[max(i - 1, 0)])).normalized()
+        X = Vector((1, 0, 0)); W = T.cross(X).normalized()
+        ax, aw = rr[i] * 1.1, rr[i]
+        def on(v):
+            t, vx, vw = v.dot(T), v.dot(X), v.dot(W)
+            k = 1.0 / math.sqrt((vx / ax) ** 2 + (vw / aw) ** 2 + 1e-12)
+            return P + T * t + X * (vx * k) + W * (vw * k), (X * (vx * k / ax ** 2) + W * (vw * k / aw ** 2)).normalized()
+        d = Vector((s_, 0, 0.2)); d -= T * d.dot(T)
+        base, sn = on(d * rr[i])
+        out = [gem(gname, base + sn * gr * -0.05, sn, gr, gm)]
+        e1 = (T - sn * T.dot(sn)).normalized(); e2 = sn.cross(e1)
+        ring, rnorm = [], []
+        for k in range(48):
+            a = 2 * math.pi * k / 48
+            q, qn = on(base - P + (e1 * math.cos(a) + e2 * math.sin(a)) * gr * 1.04)
+            # auf die sichtbare Haut legen: von außen auf die Röhre zielen, äußerste Fläche nehmen
+            h = sbvh.ray_cast(q + qn * 0.3, -qn, 0.6)
+            if h[0] is None or (h[0] - q).length > gr * 0.5:        # Haut springt (andere Windung): Stein anderswo
+                for o in out:
+                    bpy.data.objects.remove(o, do_unlink=True)
+                return None
+            hn = h[1] if h[1].dot(qn) > 0 else -h[1]
+            ring.append(h[0] + hn * gr * 0.13)                  # liegt ganz auf der Haut, steckt nicht darin
+            rnorm.append(hn)
+        out.append(give(loop_tube(gname + "Fassung", ring, rnorm, gr * 0.14), G["gold"]))
+        return out
+    from mathutils.bvhtree import BVHTree
+    bpy.context.view_layer.update()
+    sbvh = BVHTree.FromObject(shell, bpy.context.evaluated_depsgraph_get())
     # Goldband als eigener schmaler Wulst auf dem Rücken der Röhre (Kommentar 25.11.: das übergestülpte Band flackerte)
     band_pts, band_r = [], []
     for (x, y, z), r_ in zip(pts, rr):
@@ -1768,8 +1815,12 @@ def snail(name, length, height, G, body_m, shell_m, band_m, gem_mats, rnd, gems=
         for s_ in (-1, 1):
             if g_ % 2 == (0 if s_ > 0 else 1):
                 continue
-            c = Vector((s_ * r_ * 1.05, y, z))
-            shell_parts += set_gem(name + "Stein%d_%d" % (g_, s_), c, (s_, 0, 0.2), r_ * 0.45, gem_mats[g_ % len(gem_mats)], G)
+            for di in (0, 1, -1, 2, -2, 3, -3, 4):      # Stein entlang der Spirale verschieben, bis die Fassung frei liegt
+                j = min(max(i + di, 2), 36)
+                got = tube_gem(name + "Stein%d_%d" % (g_, s_), j, s_, rr[j] * 0.45, gem_mats[g_ % len(gem_mats)])
+                if got:
+                    shell_parts += got
+                    break
     # Fühler mit Edelsteinaugen
     head_parts = []
     hp = Vector(path[-1])
@@ -3115,10 +3166,13 @@ def wolkeneule(arm, body):
     for s_ in (-1, 1):
         p, n = surface(g, (s_ * 2.0, 0.05, 0.55), (-s_, 0, 0))
         wings += feather_fan("Fluegel%d_" % s_, p - n * 0.04, (s_ * 1.0, 0.2, -0.3), (0, 0, 1), 8, 0.55, 0.12, (M["feather2"], M["feather"]), spread=100)
+        # Füße direkt an der Unterseite (Kommentar 26.11.: standen zu weit vom Körper ab), etwas größer
+        fp, fn = surface(g, (s_ * 0.17, -0.27, -2.0), (0, 0, 1))
+        wings.append(give(sphere("Fussballen%d" % s_, tuple(fp + Vector((0, -0.02, 0.012))), 0.07, (1.0, 1.15, 0.55)), M["gold"]))
         for k in range(3):
-            a = math.radians(-25 + 25 * k)
-            b0 = Vector((s_ * 0.18 + math.sin(a) * 0.05, -0.42, 0.04))
-            wings.append(give(horn("Kralle%d_%d" % (s_, k), tuple(b0), tuple(b0 + Vector((math.sin(a) * 0.05, -0.06, -0.01))), tuple(b0 + Vector((math.sin(a) * 0.06, -0.1, -0.04))), 0.03, n=7), M["gold"]))
+            a = math.radians(-28 + 28 * k)
+            b0 = fp + Vector((math.sin(a) * 0.05, -0.05 - 0.02 * math.cos(a), 0.0))
+            wings.append(give(horn("Kralle%d_%d" % (s_, k), tuple(b0), tuple(b0 + Vector((math.sin(a) * 0.05, -0.07, -0.015))), tuple(b0 + Vector((math.sin(a) * 0.07, -0.125, -0.05))), 0.04, n=7), M["gold"]))
     attach(join_parts(wings, "Eule_Fluegel"), arm, "Body")
     skin_to(g, arm, lambda c: {"Top": smooth01((c.z - 0.25) / 0.5), "Body": 1 - smooth01((c.z - 0.25) / 0.5)})
     dampen_scale(arm, ("Body", "Top"), 0.4)

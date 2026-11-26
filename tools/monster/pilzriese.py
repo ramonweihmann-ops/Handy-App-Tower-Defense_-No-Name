@@ -221,7 +221,7 @@ def pilz_body(arm):
     mb_ell(T, V(285, 256, 1222), (0.285, 0.22, 0.175))             # breiter, tiefer Kiefer (Maul hängt tief)
     for s in (1, -1):
         bc = V(285 + 25 * s, 178); bc.y = -0.35
-        mb_ell(T, tuple(bc), (0.09, 0.06, 0.042), Quaternion((0, 1, 0), math.radians(24 * s)))   # schwerer Brauenwulst, innen tief
+        mb_ell(T, tuple(bc), (0.09, 0.06, 0.042), Quaternion((0, 1, 0), math.radians(-24 * s)))  # schwerer Brauenwulst, innen tief (V: böse, Kommentar 26.11.)
     fb = V(285, 184); fb.y = -0.36
     mb_ell(T, tuple(fb), (0.03, 0.04, 0.035))                      # Stirnfalte zwischen den Brauen
     nz = V(285, 204); nz.y = -0.39
@@ -473,8 +473,8 @@ def pilz_eyes(bvh, M):
         out.append(give(e, M["eye"]))
         # Lidwulst aus Haut über der oberen Augenhälfte, innen tiefer gezogen: böser Blick wie in der Vorlage
         lid = sphere("Lid%d" % s, (0, 0, 0), 1.0, (1, 1, 1), segs=(28, 14))
-        rot = Matrix.Rotation(math.radians(-30), 3, nn)
-        lx, lz = rot @ inner, rot @ up
+        lx = (inner - up * math.tan(math.radians(30))).normalized()   # innen tiefer, auf beiden Seiten gleich (vorher
+        lz = (up + inner * math.tan(math.radians(30))).normalized()   # war eine Seite gespiegelt und wirkte müde)
         Fl = Matrix((lx * a * 1.25, nn * 0.03, lz * b * 0.85)).transposed().to_4x4()
         Fl.translation = cen + up * b * 0.95 + inner * a * 0.1 + nn * 0.008
         lid.data.transform(Fl)

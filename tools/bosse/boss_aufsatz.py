@@ -366,8 +366,9 @@ def nebelgeist(arm, body):
             (0.32, 0.35), (0.25, 0.365), (0.19, 0.385), (0.14, 0.405), (0.1, 0.42)]
     hem = lambda a: (-0.12 * (0.5 + 0.5 * math.cos(7 * a + 0.3)) ** 1.5, 0.025 * math.cos(7 * a + 0.3))
     g = lathe("Geistkoerper", prof, segs=64, hem=hem)
-    # Boden des Saums: nach innen gewölbt, damit er von unten hohl wirkt
-    inner = lathe("Saumboden", [(0.08, 0.41), (0.15, 0.3), (0.2, 0.0)], segs=64)
+    # Boden des Saums: nach innen gewölbt, damit er von unten hohl wirkt; liegt ganz innen über den höchsten
+    # Saumbögen, sonst ragt sein Rand zwischen den Bögen als weißer Ring heraus (Kommentar 26.11.)
+    inner = lathe("Saumboden", [(0.15, 0.385), (0.2, 0.3), (0.24, 0.0)], segs=64)
     # Textur: oben weiß, nach unten lavendel bis violett, mit hellen Nebelschlieren
     H_, W_ = 512, 512
     v = np.linspace(0, 1, H_)[:, None] * np.ones((1, W_))   # Bildzeile 0 ist unten (v = 0)
@@ -381,8 +382,7 @@ def nebelgeist(arm, body):
     nt = ghost.node_tree
     ti = nt.nodes.new("ShaderNodeTexImage"); ti.image = gimg
     nt.links.new(ti.outputs["Color"], nt.nodes["Principled BSDF"].inputs["Base Color"])
-    for o in (g, inner):
-        give(o, ghost)
+    give(g, ghost); give(inner, ghost_shade)                      # Innenseite dunkler: wirkt hohl
     for o in (g, inner):
         skin_to(o, arm, lambda c: {"Top": smooth01((c.z - 0.3) / 0.45), "Body": 1 - smooth01((c.z - 0.3) / 0.45)})
     # Gesicht (am Kopfknochen): schräge Augen, offenes Maul
@@ -1684,10 +1684,148 @@ def fix_slime_eye(body):
                         base[yy, xx, :3] = col
     tex.image = new_image(body.name + "_Farbe", base)
 
+SLIME_PEARLS = (((-0.191, -0.158, 0.41), 0.075), ((-0.022, -0.188, 0.44), 0.09), ((0.155, -0.178, 0.41), 0.08))
+
+def flatten_pearls(body, pearls=SLIME_PEARLS):
+    """Die drei Goldperlen des Grundmodells in die Kappe einebnen (die neue Krone ersetzt sie, Vorlage 26.11.): die
+    Kappe unter jeder Perle wird aus dem Ring rundherum geschätzt (nur nach oben weisende Haut), die Punkte der Perle
+    darauf gelegt und der Übergang geglättet"""
+    from mathutils.kdtree import KDTree
+    me = body.data; mw = body.matrix_world; inv = mw.inverted()
+    co = np.array([tuple(mw @ v.co) for v in me.vertices], np.float64)
+    nz = np.array([(mw.to_3x3() @ v.normal).normalized().z for v in me.vertices])
+    region = np.zeros(len(co), bool)
+    for c, r in pearls:
+        c = np.asarray(c)
+        dxy = np.hypot(co[:, 0] - c[0], co[:, 1] - c[1])
+        ring = (dxy > r * 1.25) & (dxy < r * 2.6) & (nz > 0.55) & (np.abs(co[:, 2] - c[2]) < 0.16)
+        x, y, z = co[ring, 0] - c[0], co[ring, 1] - c[1], co[ring, 2]
+        A = np.stack([np.ones_like(x), x, y], 1)          # Ebene: schätzt auch an der Vorderkante der Kappe ruhig
+        k = np.linalg.lstsq(A, z, rcond=None)[0]
+        d3 = np.linalg.norm(co - c, axis=1)
+        sel = d3 < r * 1.15
+        X, Y = co[sel, 0] - c[0], co[sel, 1] - c[1]
+        fit = np.maximum(k[0] + k[1] * X + k[2] * Y, c[2] - r)
+        co[sel, 2] = np.minimum(co[sel, 2], fit - 0.003)
+        region |= d3 < r * 1.6
+    idx = np.nonzero(region)[0]
+    for _ in range(6):                                    # Übergang glätten (nach Lage, die Haut besteht aus vielen Stücken)
+        kd = KDTree(len(idx))
+        for j, i in enumerate(idx):
+            kd.insert(co[i], j)
+        kd.balance()
+        new = co.copy()
+        for i in idx:
+            nb = [co[idx[j]] for _, j, _ in kd.find_range(co[i], 0.022)]
+            if len(nb) > 2:
+                new[i] = 0.5 * co[i] + 0.5 * np.mean(nb, axis=0)
+        co = new
+    for i in idx:
+        me.vertices[i].co = inv @ Vector(co[i])
+    me.update()
+
+def repaint_pearls(body, pearls=SLIME_PEARLS):
+    """Goldfarbe der eingeebneten Perlen in der Textur durch die Schleimfarbe rundherum ersetzen"""
+    from PIL import Image as _Img, ImageDraw as _Draw
+    m, tex, img, px = body_texture(body)
+    h, w = px.shape[:2]
+    base = px.copy()
+    uvl = body.data.uv_layers.active.data
+    mw = body.matrix_world
+    def uvpoly(poly):
+        return [(uvl[li].uv.x * w, (1 - uvl[li].uv.y) * h) for li in poly.loop_indices]
+    gold = (px[..., 0] > 0.55) & (px[..., 1] > 0.5) & (px[..., 2] < 0.32) & (px[..., 1] > 0.62 * px[..., 0])   # Gold, nicht das Rosa des Gesichts
+    for c, r in pearls:
+        c = Vector(c); inner, ring = [], []
+        for poly in body.data.polygons:
+            q = mw @ poly.center
+            d = math.hypot(q.x - c.x, q.y - c.y)
+            if d < r * 2.0 and q.z > c.z - 0.18:
+                inner.append(poly)
+            elif r * 1.6 < d < r * 2.4 and q.z > c.z - 0.1 and (mw.to_3x3() @ poly.normal).z > 0.5:
+                ring.append(poly)
+        cols = []
+        for poly in ring:
+            u, v = np.mean(uvpoly(poly), axis=0)
+            cols.append(px[int(np.clip((h - 1) - v, 0, h - 1)), int(np.clip(u, 0, w - 1)), :3])
+        if not cols:
+            continue
+        col = np.median(np.array(cols), axis=0)
+        mk = _Img.new("L", (w, h), 0); dr = _Draw.Draw(mk)
+        for poly in inner:
+            dr.polygon(uvpoly(poly), fill=255)
+        sel = (np.array(mk) > 0)[::-1]
+        base[sel & gold, :3] = col                        # Goldreste der Perlen rundherum übermalen
+        mk2 = _Img.new("L", (w, h), 0); dr2 = _Draw.Draw(mk2)
+        for poly in inner:
+            q = mw @ poly.center
+            if math.hypot(q.x - c.x, q.y - c.y) < r * 1.2 and q.z > c.z - 0.06:
+                dr2.polygon(uvpoly(poly), fill=255)
+        base[(np.array(mk2) > 0)[::-1], :3] = col
+    tex.image = new_image(body.name + "_Farbe", base)
+
+def slime_crown(c, up, gold, gem_m, slime, R=0.165, band=0.085):
+    """Goldkrone nach Vorlage (26.11.): breiter Reif mit acht runden Zacken, auf den Zacken Goldkugeln, vorn eine
+    höhere Zacke mit großem violettem Stein in Fassung, unten ein Wulst, vorn läuft etwas Schleim über den Reif.
+    c = Mitte unten, up = Achse der Krone"""
+    lobes = [(k * 2 * math.pi / 6, 0.13 if k == 0 else 0.088) for k in range(6)]     # sechs breite, runde Zacken
+    wid = math.pi / 6 * 0.9
+    def top(a):
+        hh = 0.0
+        for ak, H in lobes:
+            da = (a - ak + math.pi) % (2 * math.pi) - math.pi
+            hh = max(hh, H * max(0.0, 1 - (da / wid) ** 2) ** 0.38)       # breite, oben runde Zacken
+        return band + hh
+    def rad(z):
+        return R + 0.03 * z
+    bm = bmesh.new(); segs = 128; J = 8; th = 0.022
+    def ring_pts(a, ztop):
+        sa, ca = math.sin(a), -math.cos(a)
+        outer = [(rad(ztop * j / J) * sa, rad(ztop * j / J) * ca, ztop * j / J) for j in range(J + 1)]
+        capp = [((rad(ztop) - th * 0.5) * sa, (rad(ztop) - th * 0.5) * ca, ztop + 0.009)]
+        inner = [((rad(ztop * j / J) - th) * sa, (rad(ztop * j / J) - th) * ca, ztop * j / J) for j in range(J, -1, -1)]
+        return outer + capp + inner
+    cols = [[bm.verts.new(p) for p in ring_pts(2 * math.pi * i / segs, top(2 * math.pi * i / segs))] for i in range(segs)]
+    n = len(cols[0])
+    for i in range(segs):
+        a_, b_ = cols[i], cols[(i + 1) % segs]
+        for j in range(n):
+            bm.faces.new([a_[j], b_[j], b_[(j + 1) % n], a_[(j + 1) % n]])
+    crown = finish("Krone", bm, smooth=True)
+    md = crown.modifiers.new("Rund", 'SUBSURF'); md.levels = 2
+    bpy.context.view_layer.objects.active = crown; bpy.ops.object.modifier_apply(modifier=md.name)
+    parts = [give(crown, gold)]
+    parts.append(give(torus("Kronwulst", (0, 0, 0.01), R + 0.004, 0.014, rot=(0, 0, 0), segs=64), gold))
+    for k, (ak, H) in enumerate(lobes):
+        if k == 0:
+            continue
+        z = band + H
+        parts.append(give(sphere("Kronkugel%d" % k, (rad(z) * math.sin(ak) - 0.011 * math.sin(ak), -(rad(z) - 0.011) * math.cos(ak), z + 0.012), 0.034), gold))
+    # großer Stein vorn in der hohen Zacke
+    zg = band + 0.035
+    gc = Vector((0, -rad(zg) - 0.006, zg))
+    st = lathe("Kronstein", [(0.014, 0.0), (0.014, 0.026), (0.0, 0.04), (-0.022, 0.0)], segs=8)
+    st.data.transform(Matrix.Rotation(math.radians(90), 4, 'X') @ Matrix.Rotation(math.radians(22.5), 4, 'Z'))
+    st.data.transform(Matrix.Translation(gc))
+    for pl in st.data.polygons:
+        pl.use_smooth = False
+    parts.append(give(st, gem_m))
+    parts.append(give(torus("Steinfassung", tuple(gc + Vector((0, 0.004, 0))), 0.043, 0.009, rot=(90, 0, 0), segs=40), gold))
+    # Schleim läuft vorn über den Reif
+    r0 = rad(band)
+    drip = tube("Schleimtropfen", [(0.0, -(r0 - 0.012), band + 0.006), (0.0, -(r0 + 0.012), band - 0.012), (0.004, -(r0 + 0.016), band * 0.45), (0.006, -(r0 + 0.018), 0.012)],
+                [0.02, 0.019, 0.018, 0.024], segs=16)
+    parts.append(give(drip, slime))
+    obj = join_parts(parts, "Kroenchen")
+    q = Vector((0, 0, 1)).rotation_difference(up)
+    obj.data.transform(Matrix.Translation(c) @ q.to_matrix().to_4x4())
+    return obj
+
 @variante("schleimmutter_krone", "schleimmutter")
 def schleimmutter_krone(arm, body):
-    """Schleim-Welt (Welt 1): Schleimmutter mit mehr Details – goldenes Krönchen mit Edelsteinen um die drei Perlen,
-    Bläschen im Schleim, zwei Schleimkinder auf ihr, glänzende Schleimpfütze"""
+    """Schleim-Welt (Welt 1): Schleimmutter mit mehr Details – Goldkrone nach der Vorlage vom 26.11. (runde Zacken mit
+    Kugeln, großer violetter Stein, Schleim läuft über den Reif) statt der drei Perlen, Bläschen im Schleim, zwei
+    Schleimkinder auf ihr, glänzende Schleimpfütze"""
     slime = look("SchleimGlanz", (0.2, 0.9, 0.84), rough=0.06, emit=(0.08, 0.55, 0.5), strength=0.35, alpha=0.88)
     bubble = look("Blaeschen", (0.7, 1.0, 0.96), rough=0.03, emit=(0.35, 0.85, 0.8), strength=0.35)
     gold = look("Gold", (1.0, 0.78, 0.3), rough=0.25, metal=0.9)
@@ -1697,22 +1835,16 @@ def schleimmutter_krone(arm, body):
     baby = look("Schleimkind", (0.55, 0.3, 1.0), rough=0.1, emit=(0.4, 0.15, 0.8), strength=0.4)
     pad_texture(body)            # schwarze Lücken der alten Textur füllen, damit beim Übertragen nichts Schwarzes mitkommt
     fix_flipped_faces(body)      # verkehrt herum eingesetzte Flächen umdrehen (schwarzes Dreieck auf dem Rücken)
+    flatten_pearls(body)         # die drei Goldperlen weichen der neuen Krone
     reproject_texture(body)      # Haut neu abwickeln: wenige große Stücke statt Hunderter kleiner (keine Nahtlinien)
     fix_slime_eye(body)          # erst danach das rechte Auge nachmalen (auf der neuen Textur)
     fill_black_spots(body, keep=lambda c: c.y < -0.15 and -0.2 < c.x < 0.25 and 0.06 < c.z < 0.3)   # Gesicht vorn bleibt
-    # Krönchen: Goldband über die Basis der drei Perlen, Fassungen, Edelsteine dazwischen
-    band = []
-    for x, y in ((-0.3, -0.1), (-0.19, -0.15), (-0.1, -0.18), (-0.02, -0.19), (0.07, -0.19), (0.155, -0.17), (0.27, -0.1)):
-        p, n = surface(body, (x, y, 1.5), (0, 0, -1))
-        band.append(tuple(p + n * 0.012))
-    parts = [give(tube("Kronband", band, [0.02] * len(band), segs=10), gold)]
-    for i, (c, rr) in enumerate((((-0.191, -0.158, 0.41), 0.075), ((-0.022, -0.188, 0.44), 0.09), ((0.155, -0.178, 0.41), 0.08))):
-        parts.append(give(torus("Fassung%d" % i, c, rr, 0.016, rot=(0, 0, 0)), gold))
-    for i, x in enumerate((-0.105, 0.065)):
-        p, n = surface(body, (x, -0.19, 1.5), (0, 0, -1))
-        parts.append(give(crystal("Stein%d" % i, tuple(p + n * 0.01), 0.05, 0.03, (0, 0, 0)), gem))
-        parts.append(give(torus("SteinFassung%d" % i, tuple(p + n * 0.012), 0.032, 0.008, rot=(0, 0, 0)), gold))
-    attach(join_parts(parts, "Kroenchen"), arm, "Top")
+    repaint_pearls(body)
+    # Krone nach Vorlage (26.11.): sitzt oben vorn auf der Kappe, leicht der Wölbung nach vorn geneigt
+    p, n = surface(body, (-0.02, -0.12, 1.5), (0, 0, -1))
+    up = (n + Vector((0, 0, 1.6))).normalized()
+    crown = slime_crown(p - up * 0.018, up, look("Kronengold", (1.0, 0.7, 0.18), rough=0.32, metal=0.55), look("Kronstein", (0.55, 0.2, 0.95), rough=0.08, emit=(0.45, 0.15, 0.85), strength=0.8), slime)
+    attach(crown, arm, "Top")
     # keine zusätzlichen Tropfen: frei hängend wirkten sie wie Stäbe und Striche (Kommentar 24.11.), die Kappe hat eigene Tropfenformen
     # Bläschen im Schleim der Kappe
     rnd = random.Random(17)
