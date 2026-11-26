@@ -34,6 +34,8 @@ Bitte nacheinander abschicken, jeweils erst den nächsten, wenn der vorige gelie
 | B6 | Magma-Golem komplett neu entwerfen | `BOSSE_NEU_FUER_CHATGPT.md`, B6 | keine | **geliefert 26.11.2026** (`Magmagolem_Neuentwurf_v1`), in Blender nachgebaut (`tools/monster/magmagolem.py`), Mockup zur Prüfung |
 | B7 | Schleimmutter überarbeiten: neue, klar lesbare Krone (Kommentar 26.11.) | `BOSSE_NEU_FUER_CHATGPT.md`, B7 | keine | **geliefert 26.11.2026** (`Schleimmutter_Neuentwurf_v1`), Krone in Blender übernommen (`tools/bosse/boss_aufsatz.py`), **vom Nutzer freigegeben 26.11.2026**; kommt mit den anderen neuen Bossen ins Spiel |
 | B8 | Juwelenschnecke neu entwerfen (Schnecke bleibt, wirkt billig und unsauber; in Blender sauber nachbaubar) | `BOSSE_NEU_FUER_CHATGPT.md`, B8 | keine | **geliefert 26.11.2026** (`Juwelenschnecke_Neuentwurf_v1`), in Blender nachgebaut (`tools/monster/juwelenschnecke.py`), Mockup zur gemeinsamen Prüfung |
+| B9 | Schlangenkönigin (violette gekrönte Schlange, Vorlage vom Nutzer) | – | keine | **geliefert 26.11.2026** (`Schlangenkoenigin_Vorlage_v1`), in Blender nachgebaut (`tools/monster/schlangenkoenigin.py`) mit eigener Kriech- und Angriffsbewegung, Mockup zur Prüfung; Spielname und Welt offen |
+| B10 | Schlangenzauberin (Oberkörper mit Armen, Haarschlangen, Schlangenschwanz) | – | keine | **geliefert 26.11.2026** (`Schlangenzauberin_Vorlage_v1`), in Blender nachgebaut (`tools/monster/schlangenzauberin.py`) mit eigenen Bewegungen, Mockup zur Prüfung; Spielname und Welt offen |
 
 ## Gemerkt für später (noch kein Auftrag)
 
