@@ -1298,7 +1298,7 @@ def golem_body(arm, body, rock_m, rock2_m, joint_m, flat=False, subdiv=2, fist_m
     remove_body(body)
     return {"chest": chest, "head": head, "neck": neck}
 
-@variante("magma_golem", "koloss")
+@variante("magma_golem_alt", "koloss")
 def magma_golem(arm, body):
     """Lava-Kolonie (Welt 4): Magma-Golem – riesiger Golem aus dunklen Basaltblöcken, zwischen denen glühendes Magma
     leuchtet (Gelenke, Brustkern), Kopf mit Glutaugen und Glutmaul, Basaltstacheln mit Glutspitzen auf dem Rücken,
