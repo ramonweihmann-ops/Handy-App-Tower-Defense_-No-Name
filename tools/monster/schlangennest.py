@@ -112,7 +112,7 @@ def fan(name, center, ring, flip):
         bm.faces.new(f[::-1] if flip else f)
     return finish(name, bm)
 
-def snake_face(M, bvh, H, k, eye=(0.123, 0.0), eye_size=(0.066, 0.074), mouth=MOUTH, fang_x=0.078, fang_len=0.06, tongue=True):
+def snake_face(M, bvh, H, k, eye=(0.123, 0.0), eye_size=(0.066, 0.074), mouth=MOUTH, fang_x=0.078, fang_len=0.06, tongue=True, teeth=False):
     """Gesicht einer Schlange an der Kopfmitte H (Größe k): runde Leuchtaugen mit schmaler Schlitzpupille in dunkler
     Augenhöhle, darüber runde Brauenwülste (außen hoch, innen tief), Nasenlöcher, Maul als dunkle Sichel mit zwei
     Zähnen an der Oberlippe und gespaltener Zunge aus der Mitte. Alles liegt mit Abstand auf der Haut (kein Flimmern)."""
@@ -170,6 +170,14 @@ def snake_face(M, bvh, H, k, eye=(0.123, 0.0), eye_size=(0.066, 0.074), mouth=MO
         base = on(fang_x * s, zu + 0.004, 0.012)[0]
         pts = [base + Vector((0, 0.012, 0.014)) * k, base, base + Vector((-0.004 * s, -0.004, -0.55 * fang_len)) * k, base + Vector((-0.012 * s, 0.002, -fang_len)) * k]
         parts.append(give(tube("Zahn%d" % s, [tuple(q) for q in pts], [0.02 * k, 0.021 * k, 0.014 * k, 0.0], segs=12), M["fang"]))
+    if teeth:                                                       # Zahnreihe (breites Grinsen): heller Streifen unter der Oberlippe
+        bm = bmesh.new(); cols = []
+        for xv in np.linspace(-mouth[2] * 0.86, mouth[2] * 0.86, 22):
+            zu, zl = lip(float(xv))
+            cols.append([bm.verts.new(on(float(xv), zu - (zu - zl) * t, 0.012)[0]) for t in (0.04, 0.5)])
+        for c0, c1 in zip(cols, cols[1:]):
+            bm.faces.new([c0[0], c0[1], c1[1], c1[0]])
+        parts.append(give(finish("Zahnreihe", bm), M["fang"]))
     if tongue:
         zu, zl = lip(0.0)
         # Zungengrund füllt die Mitte des Mauls, zwei Spitzen hängen gekreuzt über die Unterlippe

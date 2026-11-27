@@ -146,6 +146,11 @@ const LOOK_DATA := {
 	"nest_schleimling": {"height": 1.15},
 	"nest_tentakler": {"height": 1.5},
 	"nest_panzerkaefer": {"height": 1.05},
+	# Thron der Zauberin (tools/monster/zauberthron.py): Haubenwicht etwa ein Drittel so hoch wie die Zauberin,
+	# Zirkelzischer gut halb so hoch, Thronwächter etwas höher und sehr breit
+	"thron_krabbler": {"height": 1.3},
+	"thron_zombie": {"height": 1.85},
+	"thron_brecher": {"height": 1.75},
 	"schlangen_zauberin": {"height": 3.4},
 	"edelstein_golem": {"height": 3.3},
 	"sturm_wolke": {"height": 2.9, "lift": 0.5},
