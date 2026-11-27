@@ -1,0 +1,237 @@
+{
+  "bildgroesse_px": [
+    780,
+    1688
+  ],
+  "farbmodus": "RGB",
+  "soll_ecken_px": [
+    [
+      280,
+      294
+    ],
+    [
+      500,
+      294
+    ],
+    [
+      716,
+      1158
+    ],
+    [
+      64,
+      1158
+    ]
+  ],
+  "verfahren": "Zeilenweise geometrische Korrektur des freigegebenen Entwurfs; vom Nutzer am 27.11.2026 erlaubt.",
+  "plattform_ab_y": 1169,
+  "anzeigen_ab_y": 1410,
+  "symbol": {
+    "groesse_px": [
+      512,
+      512
+    ],
+    "farbmodus": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "motivbereich_px": [
+      46,
+      51,
+      472,
+      471
+    ]
+  },
+  "sha256": {
+    "snake_cave.png": "ef99b9c54719cf237d8317b17db752180c17055fc28572d2c80bab07c0309a97",
+    "icon_snake_cave.png": "86e99b64b235a2ceed0f5c98a3457d60ffdcdd8097e2512ab265d98cd5915072"
+  },
+  "sichtkanten_stichproben": [
+    {
+      "y": 298,
+      "soll_links_rechts": [
+        279.0,
+        501.0
+      ],
+      "sichtkante_links_rechts": [
+        279,
+        501
+      ],
+      "abweichung_px": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "y": 350,
+      "soll_links_rechts": [
+        266.0,
+        514.0
+      ],
+      "sichtkante_links_rechts": [
+        265,
+        515
+      ],
+      "abweichung_px": [
+        -1.0,
+        1.0
+      ]
+    },
+    {
+      "y": 400,
+      "soll_links_rechts": [
+        253.5,
+        526.5
+      ],
+      "sichtkante_links_rechts": [
+        253,
+        527
+      ],
+      "abweichung_px": [
+        -0.5,
+        0.5
+      ]
+    },
+    {
+      "y": 500,
+      "soll_links_rechts": [
+        228.5,
+        551.5
+      ],
+      "sichtkante_links_rechts": [
+        227,
+        554
+      ],
+      "abweichung_px": [
+        -1.5,
+        2.5
+      ]
+    },
+    {
+      "y": 600,
+      "soll_links_rechts": [
+        203.5,
+        576.5
+      ],
+      "sichtkante_links_rechts": [
+        205,
+        577
+      ],
+      "abweichung_px": [
+        1.5,
+        0.5
+      ]
+    },
+    {
+      "y": 700,
+      "soll_links_rechts": [
+        178.5,
+        601.5
+      ],
+      "sichtkante_links_rechts": [
+        176,
+        602
+      ],
+      "abweichung_px": [
+        -2.5,
+        0.5
+      ]
+    },
+    {
+      "y": 800,
+      "soll_links_rechts": [
+        153.5,
+        626.5
+      ],
+      "sichtkante_links_rechts": [
+        152,
+        627
+      ],
+      "abweichung_px": [
+        -1.5,
+        0.5
+      ]
+    },
+    {
+      "y": 900,
+      "soll_links_rechts": [
+        128.5,
+        651.5
+      ],
+      "sichtkante_links_rechts": [
+        126,
+        653
+      ],
+      "abweichung_px": [
+        -2.5,
+        1.5
+      ]
+    },
+    {
+      "y": 1000,
+      "soll_links_rechts": [
+        103.5,
+        676.5
+      ],
+      "sichtkante_links_rechts": [
+        103,
+        677
+      ],
+      "abweichung_px": [
+        -0.5,
+        0.5
+      ]
+    },
+    {
+      "y": 1100,
+      "soll_links_rechts": [
+        78.5,
+        701.5
+      ],
+      "sichtkante_links_rechts": [
+        77,
+        703
+      ],
+      "abweichung_px": [
+        -1.5,
+        1.5
+      ]
+    },
+    {
+      "y": 1140,
+      "soll_links_rechts": [
+        68.5,
+        711.5
+      ],
+      "sichtkante_links_rechts": [
+        67,
+        713
+      ],
+      "abweichung_px": [
+        -1.5,
+        1.5
+      ]
+    }
+  ],
+  "maximale_stichprobenabweichung_px": 2.5,
+  "ecken_sichtpruefung": {
+    "oben_links": [
+      280,
+      294
+    ],
+    "oben_rechts": [
+      500,
+      294
+    ],
+    "unten_links": [
+      64,
+      1158
+    ],
+    "unten_rechts": [
+      716,
+      1158
+    ],
+    "ablesegenauigkeit_px": 3
+  },
+  "pruefhinweis": "Sollgeometrie exakt gesetzt; gemalte, geglaettete Sichtkanten per Farbgrenze an 11 Hoehen gemessen. Ecken und Plattform visuell am Kontrollbild geprueft. Kein Test in Godot ausgefuehrt."
+}
