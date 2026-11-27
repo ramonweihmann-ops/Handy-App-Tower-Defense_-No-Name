@@ -144,13 +144,9 @@ def snake_face(M, bvh, H, k, eye=(0.123, 0.0), eye_size=(0.066, 0.074), mouth=MO
                 q = [r0[i], r1[i], r1[(i + 1) % n], r0[(i + 1) % n]]
                 bm.faces.new(q if s > 0 else q[::-1])
         parts.append(give(finish("Auge%d" % s, bm), M["eye"]))
-        # Schlitzpupille (Schlangenblick): schmal, senkrecht, oben leicht nach außen geneigt; daneben ein Glanzpunkt
-        pup = []
-        for q in range(20):
-            ang = q * 2 * math.pi / 20
-            pu = 0.27 * math.cos(ang) * (1 - 0.6 * abs(math.sin(ang))); pw = 0.74 * math.sin(ang)
-            pup.append(at(-0.08 + pu - 0.14 * pw, -0.12 + pw, 0.05))
-        parts.append(give(fan("Pupille%d" % s, at(-0.08, -0.12, 0.052), pup, s < 0), M["pupil"]))
+        # Pupille: kleines, weiches Oval zur Augenmitte hin (Schlangenblick, aber nicht übertrieben)
+        pup = [at(-0.04 + 0.2 * math.cos(q * math.pi / 10), -0.06 + 0.4 * math.sin(q * math.pi / 10), 0.05) for q in range(20)]
+        parts.append(give(fan("Pupille%d" % s, at(-0.04, -0.06, 0.052), pup, s < 0), M["pupil"]))
         parts.append(give(fan("Glanz%d" % s, at(0.38, 0.36, 0.054), [at(0.38 + 0.2 * math.cos(q * math.pi / 6), 0.36 + 0.19 * math.sin(q * math.pi / 6), 0.052) for q in range(12)], s < 0), M["eyecore"]))
         # Brauenwulst mit runden Enden
         parts.append(give(tube("Braue%d" % s, [tuple(on(x * s, w, 0.03)[0]) for x, w, r in BROW_PTS], [r * k for x, w, r in BROW_PTS], segs=14), M["brow"]))
@@ -190,7 +186,7 @@ def snake_mats(size=1024):
         "skin": image_material("Schlangenhaut", size, color=(0.27, 0.13, 0.5), rough=0.38),
         "eye": look("Leuchtauge", (0.78, 0.64, 1.0), rough=0.18, emit=(0.72, 0.52, 1.0), strength=0.9),
         "eyecore": look("Glanzpunkt", (1.0, 0.98, 1.0), rough=0.18, emit=(1.0, 0.96, 1.0), strength=1.4),
-        "pupil": look("Pupille", (0.05, 0.015, 0.1), rough=0.3),
+        "pupil": look("Pupille", (0.1, 0.03, 0.2), rough=0.3),
         "mouth": look("Maul", (0.12, 0.035, 0.2), rough=0.6),
         "rim": look("Augenhoehle", (0.13, 0.05, 0.28), rough=0.5),
         "brow": look("Braue", (0.32, 0.155, 0.58), rough=0.38),
@@ -581,6 +577,9 @@ def flutter_weights(c):
     if a < 0.15 or c.z < 0.5:                                       # Körper und Schwanz
         return {"Bone_001": 1.0}
     t = smooth01((a - 0.15) / 0.2)                                  # der ganze Flügel hängt an einem Knochen: er knickt nicht ein
+    hd = Vector(((c.x - FH.x) / (0.3 * FK), (c.y - FH.y) / (0.38 * FK), (c.z - FH.z) / (0.28 * FK))).length
+    if hd < 1.1:                                                    # Kopf mit Wangen und Gesicht bleibt beim Körper; nur ganz
+        t *= smooth01((c.y - 0.03) / 0.1)                           # hinten, wo der Flügelrand ansetzt, geht es weich über
     w = {"Bone_001": 1 - t, WING_BONES[1 if c.x > 0 else -1][0]: t}
     return {n: v for n, v in w.items() if v > 1e-4}
 
@@ -595,7 +594,7 @@ def flutter_motion(arm):
                 keys = []
                 for f in fr:
                     ph = 2 * math.pi * f / f1
-                    keys.append((f, (0.0, -s * 7.0 * math.sin(ph - 0.7), -s * (9.0 + 13.0 * math.sin(ph)))))
+                    keys.append((f, (0.0, -s * 10.0 * math.sin(ph - 0.7), -s * (10.0 + 18.0 * math.sin(ph)))))
                 key_rot(act, arm, bone, keys)
             elif act.name.startswith("Attack"):
                 key_rot(act, arm, bone, [(0, (0, 0, 0)), (7, (0, -s * 6, s * 12)), (10, (0, -s * 6, s * 12)), (13, (0, s * 4, -s * 30)), (17, (0, 0, -s * 14)), (f1, (0, 0, 0))])
@@ -735,32 +734,54 @@ def paint_armor(g):
     col = col * (1 - bel[..., None]) + bcol * bel[..., None]
     col = mix(col, (0.1, 0.03, 0.18), mouth)
     col = mix(col, (0.6, 0.42, 0.95), 0.35 * head_light(P, N, H, k) * head)
-    # Platten: glänzendes Violett, oben heller, dunkle Unterkante
+    # Platten: glänzendes Violett, oben heller, dunkle Unterkante; dazu Wachstumsringe und feine Schraffur zum Rand
     pcol = gradient((0.25, 0.11, 0.5), (0.42, 0.22, 0.72), np.clip(N[..., 2] * 0.6 + 0.45, 0, 1))
     inner = np.zeros(P.shape[:-1], bool)
     for i in range(3):
         c, rad, rot, cut = plate_frame(i)
         L = (P - f3(c)) @ np.asarray(rot, np.float32)               # in die Lage der Platte gedreht
         e = np.linalg.norm(L / f3(rad), axis=-1)
-        inner |= (part == i + 1) & (e < 0.93)
+        mine = part == i + 1
+        inner |= mine & (e < 0.93)
+        rr = np.sqrt((L[..., 0] / rad[0]) ** 2 + (L[..., 1] / rad[1]) ** 2)       # 0 = Scheitel der Platte, 1 = Rand
+        ang = np.arctan2(L[..., 1] / rad[1], L[..., 0] / rad[0])
+        wob = rr + 0.035 * np.sin(ang * 3 + i * 1.7) + 0.05 * (fbm3(P, 5.0, 31 + i) - 0.5)
+        ph = (wob * 3.4) % 1.0
+        groove_ = smoothstep(0.7, 0.84, ph) * smoothstep(1.0, 0.9, ph) * smoothstep(0.2, 0.32, rr)   # dunkle Rille je Wachstumsring
+        ridge = smoothstep(0.0, 0.12, ph) * smoothstep(0.42, 0.16, ph) * smoothstep(0.2, 0.32, rr)   # heller Grat daneben
+        hatch = (0.5 + 0.5 * np.sin(ang * 22 + 5.0 * fbm3(P, 3.0, 57 + i))) ** 2 * smoothstep(0.4, 0.85, rr)   # Schraffur zum Rand
+        cap = smoothstep(0.34, 0.1, rr)                                             # helleres Feld auf dem Scheitel
+        pc = mix(pcol, (0.15, 0.06, 0.34), 0.5 * groove_)
+        pc = mix(pc, (0.6, 0.4, 0.9), 0.5 * ridge)
+        pc = mix(pc, (0.17, 0.07, 0.38), 0.42 * hatch * (1 - ridge))
+        pc = mix(pc, (0.55, 0.35, 0.86), 0.4 * cap)
+        pcol = np.where(mine[..., None], pc, pcol)
     pcol = np.where(inner[..., None], f3((0.16, 0.07, 0.34)), pcol)
     col = np.where(is_plate[..., None], pcol, col)
-    # Leuchtrisse: je Platte ein breiter Zickzack, Bänder an den Beinen, Zeichen auf der hinteren Platte
-    crack = np.zeros(P.shape[:-1], np.float32)
+    # Leuchtrisse: je Platte ein breiter Zickzack mit hellem Kern und weichem Schein, Bänder an den Beinen, Zeichen hinten
+    crack = np.zeros(P.shape[:-1], np.float32); core = np.zeros(P.shape[:-1], np.float32); halo = np.zeros(P.shape[:-1], np.float32)
     zig = [[(-0.96, -0.25), (-0.6, 0.1), (-0.34, -0.16), (0.02, 0.18), (0.3, -0.08), (0.62, 0.26), (0.95, 0.05)],
            [(-0.95, 0.1), (-0.52, -0.16), (-0.22, 0.14), (0.15, -0.14), (0.48, 0.16), (0.94, -0.08)],
            [(-0.6, 0.5), (-0.35, 0.72), (0.0, 0.6), (0.35, 0.72), (0.6, 0.5)]]
     for i, pts in enumerate(zig):
         line = [plate_point(i, dx, dy) for dx, dy in pts]
-        crack = np.maximum(crack, crack_mask(P, [(line, 1.0, 0.8)], 0.03 if i < 2 else 0.024) * (part == i + 1) * (~inner))
-    crack = np.maximum(crack, np.clip(1.5 * (1 - np.abs(lt - 0.4) / 0.11), 0, 1) * (leg > 0.6) * (1 - toes))
+        on_plate = (part == i + 1) * (~inner)
+        w = 0.042 if i < 2 else 0.032
+        crack = np.maximum(crack, crack_mask(P, [(line, 1.0, 0.8)], w) * on_plate)
+        core = np.maximum(core, crack_mask(P, [(line, 1.0, 0.8)], w * 0.55) * on_plate)
+        halo = np.maximum(halo, np.clip(1 - seg_dist(P, line) / (w * 3.2), 0, 1) ** 1.6 * on_plate)
+    band = np.clip(1.5 * (1 - np.abs(lt - 0.4) / 0.11), 0, 1) * (leg > 0.6) * (1 - toes)
+    crack = np.maximum(crack, band)
+    core = np.maximum(core, np.clip(2.0 * (1 - np.abs(lt - 0.4) / 0.045), 0, 1) * (leg > 0.6) * (1 - toes))
+    col = mix(col, (0.8, 0.25, 0.9), 0.45 * halo * (1 - crack))                     # Schein färbt die Platte um den Riss
     col = mix(col, CRACK, crack)
-    em += f3(CRACK_EM) * crack[..., None]
+    col = mix(col, (1.0, 0.82, 1.0), 0.8 * core)                                     # heller, fast weißer Kern
+    em += f3(CRACK_EM) * (crack + 0.38 * halo * (1 - crack))[..., None] + f3((1.0, 0.7, 1.0)) * (0.8 * core)[..., None]
     occ = np.clip(AO * 1.7, 0, 1)
     col = mix(col, (0.14, 0.06, 0.3), 0.3 * occ * (1 - crack) * (1 - 0.7 * bel))
     T["out"][..., :3] = np.where(cov[..., None], np.clip(col, 0, 1), T["out"][..., :3])
     T["em"][..., :3] = np.where(cov[..., None], np.clip(em, 0, 1), 0)
-    commit(T, strength=1.3)
+    commit(T, strength=1.8)
 
 STUDS = ((0, 0.78, -0.56), (1, 0.97, 0.22))      # Befestigungen: Platte, seitlich, nach hinten (vorn ganz vorn, hinten eher mittig)
 
