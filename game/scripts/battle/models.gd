@@ -139,6 +139,9 @@ const LOOK_DATA := {
 	"blitz_zombie": {"height": 1.77},
 	"blitz_panzerkaefer": {"height": 1.39},
 	"juwelen_schnecke": {"height": 2.45},
+	# Schlangen (Vorlagen vom 26.11.2026, noch keiner Welt zugeordnet): als Boss deutlich größer als die Monster der Welt
+	"schlangen_koenigin": {"height": 3.0},
+	"schlangen_zauberin": {"height": 3.4},
 	"edelstein_golem": {"height": 3.3},
 	"sturm_wolke": {"height": 2.9, "lift": 0.5},
 	"donner_riese": {"height": 3.4},
