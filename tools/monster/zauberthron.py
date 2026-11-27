@@ -31,7 +31,8 @@ def surf(bvh, outer, target, lift=0.0):
 
 def bind_biped(body, arm, rigid, core=None):
     """Bone Heat nur mit den Hauptknochen; rigid(Punkt) -> Knochen für starre Bereiche (Kopf mit Haube und Gesicht);
-    core(Punkt) -> True für die Rumpfmitte: dort ziehen keine Arm- oder Schulterknochen (Bauchschild bleibt glatt)"""
+    core(Punkt) -> 0…1 für die Rumpfmitte: dort ziehen Arm- und Schulterknochen entsprechend weniger (1 = gar nicht),
+    mit weichem Übergang, damit Bauchschild und Flanken in der Bewegung glatt bleiben"""
     keep = {"mixamorig:" + b for b in MAIN_BONES}
     saved = {b.name: b.use_deform for b in arm.data.bones}
     for b in arm.data.bones:
@@ -54,16 +55,18 @@ def bind_biped(body, arm, rigid, core=None):
         armg = [g for g in body.vertex_groups if any(k in g.name for k in ("Arm", "Shoulder", "Hand"))]
         names = {g.index: g for g in body.vertex_groups}
         for v in body.data.vertices:
-            if not core(v.co):
+            f = float(core(v.co))
+            if f <= 0.0:
                 continue
-            keepw = [(names[e.group], e.weight) for e in v.groups if names[e.group] not in armg]
-            tot = sum(w for _, w in keepw)
-            if tot < 1e-4 or tot > 0.999:
+            ws = [(names[e.group], e.weight * ((1 - f) if names[e.group] in armg else 1.0)) for e in v.groups]
+            tot = sum(w for _, w in ws)
+            if tot < 1e-4:
                 continue
-            for g in armg:
-                g.remove([v.index])
-            for g, w in keepw:
-                g.add([v.index], w / tot, 'REPLACE')
+            for g, w in ws:
+                if w / tot < 1e-4:
+                    g.remove([v.index])
+                else:
+                    g.add([v.index], w / tot, 'REPLACE')
 
 def uv_ball(name, center, radii, segs=(20, 14)):
     return sphere(name, tuple(center), 1.0, tuple(radii), segs=segs)
@@ -135,8 +138,13 @@ def comic_hand(name, arm, side, k=1.0, n=3, curl=0.3, slim=1.0, reach=1.0, roll=
     """Schlichte, glatte Comic-Hand (wie die Hände der Monster im Spiel und der Vorlage): Handfläche, n dicke Finger
     und ein Daumen, weich zu einer Haut verschmolzen, ohne Knöchel oder Knubbel. Im Rahmen des Handknochens gebaut
     (Finger entlang +Y, Daumen auf der +X-Seite, Handfläche nach -Z), daher gerade am Arm. curl 0 = offen … 1 = Faust."""
-    parts = [sphere(name + "Ballen", (0.0, 0.09, 0.0), 0.1, (1.0, 1.0, 0.56), segs=(24, 14)),
-             sphere(name + "Gelenk", (0.0, 0.025, 0.0), 0.076, (1.0, 1.0, 0.78), segs=(20, 12))]
+    fist = curl > 0.6
+    if fist:                                                        # Faust wie in der Vorlage: ein runder, glatter Körper, das Handgelenk läuft ohne Absatz hinein
+        parts = [sphere(name + "Faust", (0.0, 0.1, -0.012), 0.1, (1.06, 1.2, 0.9), segs=(28, 18))]
+        parts += round_tube(name + "Gelenk", [(0, -0.04, 0), (0, 0.0, 0), (0, 0.05, -0.004), (0, 0.09, -0.008)], [0.078, 0.082, 0.092, 0.098])
+    else:
+        parts = [sphere(name + "Ballen", (0.0, 0.09, 0.0), 0.1, (1.0, 1.0, 0.56), segs=(24, 14)),
+                 sphere(name + "Gelenk", (0.0, 0.025, 0.0), 0.076, (1.0, 1.0, 0.78), segs=(20, 12))]
     xs, r, splay = (((-0.062, 0.0, 0.062), 0.036, (-12, 0, 12)) if n == 3 else ((-0.078, -0.026, 0.026, 0.078), 0.03 + 0.008 * curl, (-13, -4, 4, 13)))
     L = 0.115 * reach
     for i, (x, sp) in enumerate(zip(xs, splay)):
@@ -146,14 +154,18 @@ def comic_hand(name, arm, side, k=1.0, n=3, curl=0.3, slim=1.0, reach=1.0, roll=
         p1 = p0 + Vector((sx, math.cos(a1), -math.sin(a1))) * (0.55 * L)
         p2 = p1 + Vector((sx, math.cos(a2), -math.sin(a2))) * (0.5 * L)
         parts += round_tube("%sFinger%d" % (name, i), [p0 - Vector((0, 0.03, 0)), p0, p1, p2], [r, r, r * 0.97, r * 0.9])
-    t0 = Vector((0.07, 0.05, -0.005)); t1 = Vector((0.124, 0.09, -0.02 - 0.03 * curl)); t2 = Vector((0.148 - 0.07 * curl, 0.14, -0.045 - 0.06 * curl))
-    parts += round_tube(name + "Daumen", [t0 - (t1 - t0) * 0.5, t0, t1, t2], [0.038, 0.038, 0.036, 0.032])
+    if fist:                                                        # kurzer, dicker Daumen liegt vorn an
+        t0 = Vector((0.07, 0.07, -0.03)); t1 = Vector((0.104, 0.12, -0.062)); t2 = Vector((0.07, 0.17, -0.092))
+        parts += round_tube(name + "Daumen", [t0 - (t1 - t0) * 0.5, t0, t1, t2], [0.042, 0.044, 0.042, 0.038])
+    else:
+        t0 = Vector((0.07, 0.05, -0.005)); t1 = Vector((0.124, 0.09, -0.02 - 0.03 * curl)); t2 = Vector((0.148 - 0.07 * curl, 0.14, -0.045 - 0.06 * curl))
+        parts += round_tube(name + "Daumen", [t0 - (t1 - t0) * 0.5, t0, t1, t2], [0.038, 0.038, 0.036, 0.032])
     o = join_parts(parts, name)
     o.data.transform(Matrix.Rotation(roll, 4, 'Y') @ Matrix.Diagonal((k * slim, k, k, 1.0)))
     if side == "Right":                                             # Spiegelbild (bei diesen Skeletten zeigt X rechts andersherum)
         o.data.transform(Matrix.Diagonal((-1.0, 1.0, 1.0, 1.0))); o.data.flip_normals()
     remesh(o, 0.0055 * k * min(1.0, slim + 0.2))
-    md = o.modifiers.new("Glatt", 'SMOOTH'); md.factor = 0.5; md.iterations = 3; apply_mod(o, md)
+    md = o.modifiers.new("Glatt", 'SMOOTH'); md.factor = 0.5; md.iterations = 8 if fist else 3; apply_mod(o, md)
     md = o.modifiers.new("Weniger", 'DECIMATE'); md.ratio = 0.15; apply_mod(o, md)
     for pl in o.data.polygons:
         pl.use_smooth = True
@@ -376,8 +388,8 @@ def wicht_shape(arm):
     for s, side in ((1, "Left"), (-1, "Right")):
         el, wr = B(arm, side + "ForeArm"), B(arm, side + "Hand")
         limb(R, [(0.16 * s, 0.0, 0.83), el, wr + (wr - el).normalized() * 0.02], [0.062, 0.07])
-        hip, kn, an = Vector((0.12 * s, 0.02, 0.44)), Vector((0.21 * s, 0.01, 0.3)), Vector((0.29 * s, 0.01, 0.17))
-        limb(R, [hip, kn, an], [0.1, 0.165])                                        # Beine stehen weit und werden nach unten breiter
+        hip, kn, an = Vector((0.12 * s, 0.02, 0.44)), Vector((0.2 * s, 0.01, 0.3)), Vector((0.29 * s, 0.01, 0.17))
+        limb(R, [hip, kn, an], [0.095, 0.155])                                        # Beine stehen weit und werden nach unten breiter
     parts = [mb_to_mesh(R)]
     for s in (1, -1):
         parts += paw("Pfote%d" % s, W_FOOT[0] * s, W_FOOT[1], W_FOOT[2])
@@ -433,7 +445,7 @@ def haubenwicht(arm, body):
     finish_skin(g, 0.011, 0.3, smooth_it=6)
     reduce(g, 0.2)
     tag(g, 0)
-    bind_biped(g, arm, lambda c: "Head" if c.z > 0.985 else None, core=lambda c: abs(c.x) < 0.19 and 0.4 < c.z < 0.8)
+    bind_biped(g, arm, lambda c: "Head" if c.z > 0.985 else None, core=lambda c: smooth01((0.25 - abs(c.x)) / 0.08) * smooth01((0.86 - c.z) / 0.08) * smooth01((c.z - 0.34) / 0.08))
     fbvh = BVHTree.FromObject(g, bpy.context.evaluated_depsgraph_get())
     brows, brow_lines = eye_brows(fbvh, WH, WK, W_EYE, W_EYE_SIZE, 0.02)
     rigid_parts(brows, "Head")
@@ -460,8 +472,9 @@ Z_EYE, Z_EYE_SIZE = (0.123, 0.004), (0.08, 0.062)
 Z_NECK = [(0.0, 0.0, 1.16), (0.0, 0.03, 1.28), (0.0, 0.04, 1.4), (0.0, 0.0, 1.5), (0.0, -0.05, 1.56)]
 Z_FOOT = (0.19, 0.04, 0.195)                    # Pfote: x, y (Knöchel), Größe
 # Jacke: Höhe -> halbe Breite, halbe Tiefe (liegt mit Abstand über dem Körper, unten ausgestellt)
-VEST = [(1.175, 0.095, 0.09), (1.15, 0.115, 0.102), (1.12, 0.14, 0.116), (1.07, 0.166, 0.134), (1.0, 0.18, 0.144), (0.93, 0.174, 0.14), (0.82, 0.162, 0.132),
-        (0.75, 0.172, 0.138), (0.69, 0.195, 0.156), (0.635, 0.225, 0.18)]
+VEST = [(1.175, 0.09, 0.085), (1.15, 0.105, 0.098), (1.12, 0.122, 0.11), (1.07, 0.138, 0.126), (1.0, 0.142, 0.132), (0.93, 0.132, 0.128), (0.87, 0.126, 0.122),
+        (0.8, 0.126, 0.12), (0.74, 0.13, 0.122), (0.7, 0.136, 0.128), (0.66, 0.144, 0.134)]
+# (so schmal wie der Rumpf des Grundmodells: die Arme schwingen in allen Bewegungen außen an der Jacke vorbei)
 VEST_TOP, VEST_V = 1.175, 0.83                   # Kragen; hier endet der Ausschnitt vorn
 VEST_HOLE = 0.098                               # Armausschnitt: weit genug, dass der Arm in jeder Bewegung frei bleibt
 
@@ -473,7 +486,7 @@ def vest_open(z):
     return 0.068 * max(0.0, (z - VEST_V) / (VEST_TOP - VEST_V)) ** 0.9
 
 def vest_hem(phi):
-    return 0.64 - 0.045 * math.exp(-(math.degrees(min(phi, 2 * math.pi - phi)) / 28) ** 2)          # Spitze vorn in der Mitte
+    return 0.685 - 0.04 * math.exp(-(math.degrees(min(phi, 2 * math.pi - phi)) / 28) ** 2)          # Spitze vorn in der Mitte
 
 def loop_tube(name, pts, r, segs=10):
     """Geschlossener Wulst entlang einer Linie (Anfang und Ende überlappen)"""
@@ -593,13 +606,13 @@ def vest_parts(arm):
 
 def zischer_shape(arm):
     R = mb_family("Zischer")
-    mb_ell(R, (0, 0.0, 1.0), (0.165, 0.12, 0.17))                                  # schmale Brust
-    mb_ell(R, (0, 0.0, 0.82), (0.14, 0.11, 0.16))                                  # Taille
-    mb_ell(R, (0, 0.0, 0.68), (0.16, 0.115, 0.1))                                  # Becken
+    mb_ell(R, (0, 0.0, 1.0), (0.122, 0.112, 0.17))                                 # schmale Brust
+    mb_ell(R, (0, 0.0, 0.82), (0.106, 0.1, 0.16))                                  # Taille
+    mb_ell(R, (0, 0.0, 0.68), (0.118, 0.104, 0.1))                                 # Becken
     for s, side in ((1, "Left"), (-1, "Right")):
         sh, el, wr = B(arm, side + "Arm"), B(arm, side + "ForeArm"), B(arm, side + "Hand")
         mb_ball(R, (sh.x, sh.y, sh.z), 0.06)                                        # Schulter
-        limb(R, [sh, el, wr + (wr - el).normalized() * 0.015], [0.05, 0.047])
+        limb(R, [sh, el, wr + (wr - el).normalized() * 0.015], [0.046, 0.043])
         hip, kn, an = B(arm, side + "UpLeg"), B(arm, side + "Leg"), B(arm, side + "Foot")
         fx = Z_FOOT[0] * s
         limb(R, [hip, kn, (fx * 0.95, an.y, 0.24), (fx, an.y, 0.13)], [0.085, 0.072, 0.1])   # Unterschenkel wird zum Fuß hin breiter
@@ -628,7 +641,7 @@ def paint_zischer(g, arm, brow_lines):
     em = np.zeros(P.shape, np.float32)
     torso = (np.abs(x) < 0.2) & (z > 0.64) & (z < 1.19) & ~head
     # heller Bauch: Brust im Ausschnitt der Jacke, Vorderseite des Halses, Unterkiefer
-    chest = smoothstep(0.012, -0.012, np.abs(x) - 0.095) * smoothstep(-0.05, -0.3, N[..., 1]) * (z > 0.78) * (z < 1.2) * torso * skin
+    chest = smoothstep(0.012, -0.012, np.abs(x) - 0.08) * smoothstep(-0.05, -0.3, N[..., 1]) * (z > 0.78) * (z < 1.2) * torso * skin
     cy = np.interp(z, np.asarray(Z_NECK)[:, 2], np.asarray(Z_NECK)[:, 1])
     nfront = -(y - cy) / np.maximum(np.sqrt((y - cy) ** 2 + x * x), 1e-4)
     neck = (z > 1.2) * smoothstep(H.z - 0.1 * k, H.z - 0.19 * k, z) * (np.abs(x) < 0.13)
@@ -672,7 +685,7 @@ def zirkelzischer(arm, body):
     bind_biped(g, arm, lambda c: "Head" if c.z > 1.3 else None)
     axes = [(B(arm, side + "Arm"), (B(arm, side + "ForeArm") - B(arm, side + "Arm")).normalized()) for side in ("Left", "Right")]
     def under_vest(c):                                              # Haut, die unter der Jacke liegt (nicht die Schultern in den Armausschnitten)
-        if not (0.66 < c.z < 1.165):
+        if not (0.69 < c.z < 1.165):
             return False
         rx, ry = vest_at(c.z)
         if (c.x / (rx - 0.004)) ** 2 + (c.y / (ry - 0.004)) ** 2 > 1:
@@ -682,7 +695,7 @@ def zirkelzischer(arm, body):
     fbvh = BVHTree.FromObject(g, bpy.context.evaluated_depsgraph_get())
     brows, brow_lines = eye_brows(fbvh, ZH, ZK, Z_EYE, Z_EYE_SIZE, 0.022)
     rigid_parts(brows, "Head")
-    hands = [comic_hand("Hand" + side, arm, side, k=0.82, n=4, curl=0.25, slim=0.82, reach=1.25, roll=math.radians(HAND_ROLL["zombie"])) for side in ("Left", "Right")]
+    hands = [comic_hand("Hand" + side, arm, side, k=0.76, n=4, curl=0.25, slim=0.82, reach=1.25, roll=math.radians(HAND_ROLL["zombie"])) for side in ("Left", "Right")]
     cloth, trim = vest_parts(arm)
     g = join_parts([g] + hands + brows + cloth + trim, "Zirkelzischer")
     for p in g.data.polygons:
@@ -760,9 +773,9 @@ def gem_sleeve(name, a, b, r0, r1, bulge, n=8):
 
 def guard_shape(arm):
     R = mb_family("Waechter")
-    mb_ell(R, (0, 0.04, 1.1), (0.5, 0.33, 0.3))                                    # breite, gewölbte Brust
-    mb_ell(R, (0, 0.03, 0.84), (0.4, 0.31, 0.26))                                  # Bauch, nach unten schmaler
-    mb_ell(R, (0, 0.03, 0.64), (0.33, 0.27, 0.16))                                 # Becken
+    mb_ell(R, (0, 0.04, 1.12), (0.44, 0.33, 0.28))                                 # breite, gewölbte Brust
+    mb_ell(R, (0, 0.03, 0.84), (0.29, 0.31, 0.26))                                 # Bauch: schmal genug, dass Unterarme und Armschienen außen vorbeigehen
+    mb_ell(R, (0, 0.03, 0.64), (0.26, 0.26, 0.16))                                 # Becken
     mb_ell(R, (0, 0.08, 1.32), (0.28, 0.27, 0.2))                                  # Nacken: der Kopf wächst oben aus dem Rumpf
     mb_caps(R, (0, 0.02, 1.3), (0, -0.14, 1.37), 0.2)                              # dicker Hals trägt den Kopf nach vorn
     for s in (1, -1):
@@ -771,8 +784,8 @@ def guard_shape(arm):
     for s, side in ((1, "Left"), (-1, "Right")):
         sh, el, wr = B(arm, side + "Arm"), B(arm, side + "ForeArm"), B(arm, side + "Hand")
         mb_ball(R, (sh.x, sh.y, sh.z), 0.23)                                        # runde Schulter (darauf sitzt die Kristallkappe)
-        limb(R, [sh, el, wr + (wr - el).normalized() * 0.03], [0.17, 0.175])
-        limb(R, [(0.2 * s, 0.0, 0.58), (0.27 * s, 0.0, 0.4), (0.32 * s, 0.03, 0.22)], [0.205, 0.22])
+        limb(R, [sh, el, wr + (wr - el).normalized() * 0.03], [0.165, 0.15])
+        limb(R, [(0.16 * s, 0.0, 0.58), (0.24 * s, 0.0, 0.4), (0.31 * s, 0.03, 0.22)], [0.165, 0.2])     # Hüfte schmal, die Fäuste schwingen frei daneben
     parts = [mb_to_mesh(R)]
     for s in (1, -1):
         parts += paw("Pfote%d" % s, T_FOOT[0] * s, T_FOOT[1], T_FOOT[2])
@@ -800,9 +813,9 @@ def guard_armor(arm, M):
         rigid_parts([cap, band], side + "Shoulder")
         crystal.append(cap); gold.append(band)
         ax = (wr - el).normalized(); L = (wr - el).length
-        a, b = el + ax * (0.2 * L), el + ax * (0.86 * L)
-        sleeve = facet(gem_sleeve("Armkristall%d" % s, a, b, 0.2, 0.205, 0.045), 5)
-        bands = [give(gold_band("Armreif%d%d" % (s, i), q, ax, 0.2, 0.2, 0.04, 0.066, n=28), M["gold"]) for i, q in enumerate((a, b))]
+        a, b = el + ax * (0.32 * L), el + ax * (0.88 * L)
+        sleeve = facet(gem_sleeve("Armkristall%d" % s, a, b, 0.168, 0.168, 0.03), 5)
+        bands = [give(gold_band("Armreif%d%d" % (s, i), q, ax, 0.168, 0.168, 0.034, 0.06, n=28), M["gold"]) for i, q in enumerate((a, b))]
         for o in bands:
             for pl in o.data.polygons:
                 pl.use_smooth = True
@@ -824,9 +837,9 @@ def paint_guard(g, arm, brow_lines):
     em = np.zeros(P.shape, np.float32)
     # Bauchschild: oben breit unter dem Kiefer, nach unten spitz, mit geschwungenen Querlinien
     tz = np.clip((z - 0.6) / 0.62, 0, 1)
-    wz = 0.34 * tz ** 0.6
+    wz = 0.26 * tz ** 0.6
     edge = np.abs(x) - wz
-    plate = smoothstep(0.014, -0.014, edge) * (z > 0.6) * (z < 1.22) * smoothstep(-0.05, -0.32, N[..., 1]) * (~head) * (np.abs(x) < 0.36) * (~gem)
+    plate = smoothstep(0.014, -0.014, edge) * (z > 0.6) * (z < 1.22) * smoothstep(-0.05, -0.32, N[..., 1]) * (~head) * (np.abs(x) < 0.29) * (~gem)
     bel = np.clip(np.maximum(plate, jaw * head), 0, 1)
     bcol = belly_col(N)
     lines = np.zeros(P.shape[:-1], np.float32)
@@ -848,8 +861,8 @@ def paint_guard(g, arm, brow_lines):
     lines3 = []
     for s in (1, -1):
         lines3.append(([surf(bvh, (s * dx * k, -2.0, H.z + dz * k), (s * dx * k, 1.0, H.z + dz * k)) for dx, dz in ((0.04, 0.112), (0.09, 0.132), (0.14, 0.143), (0.185, 0.135))], 0.022))
-        lines3.append([surf(bvh, (s * dx, -1.5, dz), (s * dx, 1.0, dz)) for dx, dz in ((0.4, 0.98), (0.4, 0.88), (0.365, 0.78), (0.31, 0.7))])
-        lines3.append([surf(bvh, (s * (0.26 + dx), -1.5, 0.43 + dz), (s * (0.26 + dx), 1.0, 0.43 + dz)) for dx, dz in ((-0.13, 0.13), (-0.055, 0.08), (0.03, 0.0), (0.1, -0.1))])
+        lines3.append([surf(bvh, (s * dx, -1.5, dz), (s * dx, 1.0, dz)) for dx, dz in ((0.25, 1.0), (0.245, 0.9), (0.225, 0.8), (0.19, 0.72))])   # auf der Flanke, nicht in der Achselfalte
+        lines3.append([surf(bvh, (s * (0.23 + dx), -1.5, 0.43 + dz), (s * (0.23 + dx), 1.0, 0.43 + dz)) for dx, dz in ((-0.13, 0.13), (-0.055, 0.08), (0.03, 0.0), (0.1, -0.1))])
         lines3.append([surf(bvh, (s * dx, 1.5, dz), (s * dx, -1.0, dz)) for dx, dz in ((0.2, 1.0), (0.26, 0.9), (0.26, 0.78), (0.2, 0.68))])
     fields = glow_stripes(P, lines3, 0.04, bvh)
     keep = (1 - bel) * (1 - (head & (z < H.z + 0.08 * k))) * (~gem)
@@ -868,11 +881,11 @@ def thronwaechter(arm, body):
     def rigid(c):
         q = Vector(((c.x - TH.x) / (0.3 * TK), (c.y - TH.y) / (0.38 * TK), (c.z - TH.z) / (0.28 * TK)))
         return "Head" if q.length < 1.0 and c.y < TH.y + 0.16 else None
-    bind_biped(g, arm, rigid, core=lambda c: abs(c.x) < 0.3 and 0.6 < c.z < 1.15 and c.y < 0.0)
+    bind_biped(g, arm, rigid, core=lambda c: smooth01((0.38 - abs(c.x)) / 0.14) * smooth01((1.22 - c.z) / 0.1) * smooth01((c.z - 0.52) / 0.08))
     fbvh = BVHTree.FromObject(g, bpy.context.evaluated_depsgraph_get())
     brows, brow_lines = eye_brows(fbvh, TH, TK, T_EYE, T_EYE_SIZE, 0.024)
     rigid_parts(brows, "Head")
-    hands = [comic_hand("Hand" + side, arm, side, k=1.75, n=4, curl=0.8, roll=math.radians(HAND_ROLL["brecher"])) for side in ("Left", "Right")]
+    hands = [comic_hand("Hand" + side, arm, side, k=1.6, n=4, curl=0.9, roll=math.radians(HAND_ROLL["brecher"])) for side in ("Left", "Right")]
     crystal, gold = guard_armor(arm, M)
     g = join_parts([g] + hands + brows + crystal, "Thronwaechter")
     for p in g.data.polygons:
