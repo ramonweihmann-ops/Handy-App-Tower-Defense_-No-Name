@@ -40,6 +40,11 @@ const FIELDS := {
 		"desc": "Uralte Tempel in einer goldenen Schlucht. Was sie wohl bewachen?"},
 	"black_hole": {"name": "Schwarzes Loch", "file": "res://fields/black_hole.webp", "fallback": "nebula_portal", "rim": Color(0.85, 0.5, 1.0), "accent": Color("#b98cff"), "dark": Color("#5a2ad0"),
 		"desc": "Die letzte Verteidigungslinie am Rand des Schwarzen Lochs. Hier wartet der stärkste Boss."},
+	# Schlangenhöhle (Vorlage_Raw/Schlangenhoehle_v1, geliefert 27.11.2026): Bild, Symbol und Mauer liegen bereit.
+	# Planet 16 (Level 151–160) wird sie, sobald Welten, Monster und Abstimmung fertig sind; bis dahin steht sie
+	# nicht in ADVENTURE und ist nur über die Testkarte und den Labor-Schalter --feld=snake_cave zu sehen.
+	"snake_cave": {"name": "Schlangenhöhle", "file": "res://fields/snake_cave.webp", "fallback": "black_hole", "rim": Color(1.0, 0.45, 0.9), "accent": Color("#e86ae0"), "dark": Color("#7a2a8a"),
+		"desc": "Tief im Dunkelkristall winden sich steinerne Schlangen. Hier herrschen Königin und Zauberin."},
 	# Arenen (Vorlage Arena_Karten_v1, 977 × 1610): auf 1688 hoch skaliert, links und rechts je 122 Punkte
 	# Tribüne abgeschnitten; Brücke und Plattform liegen dann wie bei den Planeten.
 	"universums_arena": {"name": "Universums-Arena", "file": "res://fields/universums_arena.webp", "rim": Color(0.85, 0.55, 1.0)},
@@ -49,6 +54,8 @@ const FIELDS := {
 const ADVENTURE := ["space_dock", "ice_world", "desert_outpost", "lava_asteroid", "nebula_portal",
 	"jungle_moon", "ocean_world", "crystal_planet", "storm_giant", "scrap_world",
 	"cloud_city", "spore_world", "ghost_moon", "temple_planet", "black_hole"]
+## Fertige Felder, deren Planet noch nicht geöffnet ist (Auswahl in der Testkarte)
+const PREVIEW := ["snake_cave"]
 ## Felder der Spielmodi („universe“: Universumsode, sobald es den Modus gibt)
 const MODES := {"mp": "multiplayer_arena", "universe": "universums_arena"}
 

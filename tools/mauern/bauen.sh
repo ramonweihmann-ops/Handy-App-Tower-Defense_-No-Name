@@ -10,7 +10,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 TMP=$(mktemp -d)
-FELDER=${*:-"space_dock ice_world desert_outpost lava_asteroid nebula_portal jungle_moon ocean_world crystal_planet storm_giant scrap_world cloud_city spore_world ghost_moon temple_planet black_hole universums_arena multiplayer_arena"}
+FELDER=${*:-"space_dock ice_world desert_outpost lava_asteroid nebula_portal jungle_moon ocean_world crystal_planet storm_giant scrap_world cloud_city spore_world ghost_moon temple_planet black_hole snake_cave universums_arena multiplayer_arena"}
 for F in $FELDER; do
   STIL=form
   [ "$F" = lava_asteroid ] && STIL=detail

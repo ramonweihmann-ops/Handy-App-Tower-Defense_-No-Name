@@ -472,7 +472,13 @@ const BOSS_LOOKS_LIVE := false
 static var test_boss_looks := false
 
 
+## Labor (--boss-aussehen=<look>): dieses Aussehen für jeden Boss, auch wenn es noch keiner Welt zugeordnet ist
+static var test_boss_look := ""
+
+
 static func boss_look(level: int, kind: String) -> String:
+	if test_boss_look != "" and ENEMIES[kind]["tier"] == "boss":
+		return test_boss_look
 	if not (BOSS_LOOKS_LIVE or test_boss_looks):
 		return ""
 	return str(WORLDS[world_of(level)].get("boss_looks", {}).get(kind, ""))

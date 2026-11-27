@@ -71,6 +71,7 @@ var _menu_shot := ""
 var _squad := ""
 ## Labor: Kamera-Aussparung nachstellen (--kamera=26 = 26 Mockup-Punkte oben frei) und Goldstand fürs Bild (--gold=16684)
 var _cam_test := -1.0
+var _field_test := ""   # Labor: --feld=<id> zeigt dieses Schlachtfeld statt dem des Levels
 ## Labor: Kampf mit festem Tempo (--tempo=2) und dauerhaft entladenem Energiekern (--dauerboost) für Prüfbilder
 var _test_tempo := 0
 var _test_boost := false
@@ -368,6 +369,10 @@ func _parse_args() -> void:
 			mp = true
 		elif arg == "--pull":
 			_auto_pull = true
+		elif arg.begins_with("--boss-aussehen="):
+			GameData.test_boss_look = arg.get_slice("=", 1)   # Labor: Boss mit diesem Aussehen (Prüfbilder)
+		elif arg.begins_with("--feld="):
+			_field_test = arg.get_slice("=", 1)   # Labor: dieses Schlachtfeld statt dem des Levels (Prüfbilder)
 		elif arg.begins_with("--level="):
 			level = clampi(int(arg.get_slice("=", 1)), 1, GameData.LEVEL_COUNT)
 		elif arg.begins_with("--seed="):
@@ -995,7 +1000,11 @@ func _start(n: int, hard_mode: bool, multi: bool, found: MpMatch = null) -> void
 	if not test_run.is_empty():
 		battle.test_wave = clampi(int(test_run["wave"]), 1, battle.total_waves)
 		battle.test_god = bool(test_run.get("god", false))
-	_set_field(Battlefields.for_mode("mp", n) if mp else Battlefields.for_level(n))
+	var field := Battlefields.for_mode("mp", n) if mp else Battlefields.for_level(n)
+	var wish := str(test_run.get("field", _field_test))   # Testkarte oder Labor: anderes Schlachtfeld ansehen
+	if wish != "" and Battlefields.FIELDS.has(wish):
+		field = wish
+	_set_field(field)
 	battle.hp_scale = 1.5 if hard else 1.0
 	battle.bonus_crit = float(bonus["crit"])
 	battle.bonus_reload = float(bonus["reload"])

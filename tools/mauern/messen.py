@@ -2,7 +2,7 @@
 import json, sys, numpy as np, colorsys
 from PIL import Image
 F = ["space_dock","ice_world","desert_outpost","lava_asteroid","nebula_portal","jungle_moon","ocean_world","crystal_planet",
-     "storm_giant","scrap_world","cloud_city","spore_world","ghost_moon","temple_planet","black_hole","universums_arena","multiplayer_arena"]
+     "storm_giant","scrap_world","cloud_city","spore_world","ghost_moon","temple_planet","black_hole","snake_cave","universums_arena","multiplayer_arena"]
 out = {}
 for n in F:
     a = np.asarray(Image.open('/home/user/Handy-App-Tower-Defense_-No-Name/game/fields/%s.webp' % n).convert('RGB')).astype(float) / 255

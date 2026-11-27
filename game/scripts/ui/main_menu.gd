@@ -575,6 +575,13 @@ func open_test_map() -> void:
 	v.add_child(UiKit.secondary(UiKit.button("Station unverwundbar: %s" % ("an" if god else "aus"), func() -> void:
 		cfg["god"] = not god
 		open_test_map(), 420)))
+	# Schlachtfeld: wie im Level oder ein fertiges Feld, dessen Planet noch nicht geöffnet ist
+	var fields: Array = [""] + Battlefields.PREVIEW
+	var fi := maxi(0, fields.find(str(cfg.get("field", ""))))
+	var fname := "wie im Level" if fi == 0 else str(Battlefields.FIELDS[fields[fi]]["name"])
+	v.add_child(UiKit.secondary(UiKit.button("Schlachtfeld: %s" % fname, func() -> void:
+		cfg["field"] = fields[(fi + 1) % fields.size()]
+		open_test_map(), 420)))
 	var start := UiKit.button("Testkarte starten", func() -> void:
 		if chosen.is_empty():
 			toast("Bitte mindestens einen Champion wählen.")
