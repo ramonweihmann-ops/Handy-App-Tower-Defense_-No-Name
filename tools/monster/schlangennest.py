@@ -706,7 +706,7 @@ def leg_coords(P):
     return m, tt
 
 def paint_armor(g):
-    ao = vertex_ao(g, rays=14, dist=0.2)
+    ao = vertex_ao(g, rays=18, dist=0.3)
     part_v = np.zeros(len(g.data.vertices), np.float32)
     g.data.attributes["teil"].data.foreach_get("value", part_v)
     T = texels(g); P, N, cov = T["P"], T["N"], T["cov"]
@@ -719,7 +719,9 @@ def paint_armor(g):
     jaw = jaw * (~is_plate); mouth = mouth * (~is_plate)
     leg, lt = leg_coords(P)
     leg = leg * (~is_plate)
-    col = gradient(SKIN_LO, SKIN_HI, np.clip(N[..., 2] * 0.5 + 0.55, 0, 1))
+    # Haut mit klarem Verlauf: oben hell, zur Seite satt violett, unten dunkel
+    tz = np.clip(N[..., 2] * 0.5 + 0.5, 0, 1)
+    col = np.where((tz < 0.5)[..., None], gradient((0.1, 0.035, 0.27), (0.24, 0.095, 0.5), tz * 2), gradient((0.24, 0.095, 0.5), (0.46, 0.26, 0.84), smoothstep(0.5, 1.0, tz)))
     em = np.zeros(P.shape, np.float32)
     # heller Bauch: Unterseite des Rumpfes und ein Streifen an den Flanken, dazu Unterkiefer und Zehen
     under = smoothstep(0.31, 0.27, z + 0.1 * np.clip(N[..., 2], -1, 0)) * (y > -0.3) * (1 - leg) * (~is_plate) * (y < 0.56)
@@ -728,14 +730,14 @@ def paint_armor(g):
         for q in toe_points(c):
             toes = np.maximum(toes, smoothstep(0.066, 0.052, np.linalg.norm(P - f3(q), axis=-1)))
     bel = np.clip(np.maximum(np.maximum(under, jaw), toes), 0, 1)
-    bcol = gradient(BELLY_LO, BELLY_HI, np.clip(0.55 + N[..., 2] * 0.3 - N[..., 1] * 0.3, 0, 1))
+    bcol = gradient((0.48, 0.37, 0.8), (0.86, 0.8, 1.0), smoothstep(0.1, 0.9, np.clip(0.55 + N[..., 2] * 0.35 - N[..., 1] * 0.35, 0, 1)))
     band = np.abs(((y / 0.07) % 1.0) - 0.5) * 2
     bcol = mix(bcol, (0.45, 0.33, 0.76), 0.6 * smoothstep(0.78, 0.94, band) * under * (1 - jaw))
     col = col * (1 - bel[..., None]) + bcol * bel[..., None]
     col = mix(col, (0.1, 0.03, 0.18), mouth)
     col = mix(col, (0.6, 0.42, 0.95), 0.35 * head_light(P, N, H, k) * head)
     # Platten: glänzendes Violett, oben heller, dunkle Unterkante; dazu Wachstumsringe und feine Schraffur zum Rand
-    pcol = gradient((0.25, 0.11, 0.5), (0.42, 0.22, 0.72), np.clip(N[..., 2] * 0.6 + 0.45, 0, 1))
+    pcol = np.zeros(P.shape, np.float32)
     inner = np.zeros(P.shape[:-1], bool)
     for i in range(3):
         c, rad, rot, cut = plate_frame(i)
@@ -745,16 +747,21 @@ def paint_armor(g):
         inner |= mine & (e < 0.93)
         rr = np.sqrt((L[..., 0] / rad[0]) ** 2 + (L[..., 1] / rad[1]) ** 2)       # 0 = Scheitel der Platte, 1 = Rand
         ang = np.arctan2(L[..., 1] / rad[1], L[..., 0] / rad[0])
-        wob = rr + 0.035 * np.sin(ang * 3 + i * 1.7) + 0.05 * (fbm3(P, 5.0, 31 + i) - 0.5)
-        ph = (wob * 3.4) % 1.0
-        groove_ = smoothstep(0.7, 0.84, ph) * smoothstep(1.0, 0.9, ph) * smoothstep(0.2, 0.32, rr)   # dunkle Rille je Wachstumsring
-        ridge = smoothstep(0.0, 0.12, ph) * smoothstep(0.42, 0.16, ph) * smoothstep(0.2, 0.32, rr)   # heller Grat daneben
+        wob = rr + 0.02 * np.sin(ang * 3 + i * 1.7)
+        ph = (wob * 2.6) % 1.0
+        groove_ = smoothstep(0.86, 0.92, ph) * smoothstep(1.0, 0.95, ph) * smoothstep(0.25, 0.35, rr)   # dunkle Rille je Wachstumsring
+        ridge = smoothstep(0.0, 0.03, ph) * smoothstep(0.1, 0.04, ph) * smoothstep(0.25, 0.35, rr)   # heller Grat daneben
         hatch = (0.5 + 0.5 * np.sin(ang * 22 + 5.0 * fbm3(P, 3.0, 57 + i))) ** 2 * smoothstep(0.4, 0.85, rr)   # Schraffur zum Rand
-        cap = smoothstep(0.34, 0.1, rr)                                             # helleres Feld auf dem Scheitel
-        pc = mix(pcol, (0.15, 0.06, 0.34), 0.5 * groove_)
-        pc = mix(pc, (0.6, 0.4, 0.9), 0.5 * ridge)
-        pc = mix(pc, (0.17, 0.07, 0.38), 0.42 * hatch * (1 - ridge))
-        pc = mix(pc, (0.55, 0.35, 0.86), 0.4 * cap)
+        # Verlauf je Platte: Scheitel hell, zur Mitte sattes Violett, zum Rand dunkel; vorn oben ein Glanzfeld
+        hz = np.clip((L[..., 2] / rad[2] - cut) / (1 - cut), 0, 1)
+        tp = np.clip(0.6 * hz + 0.4 * (N[..., 2] * 0.5 + 0.5), 0, 1)
+        base = np.where((tp < 0.5)[..., None], gradient((0.09, 0.03, 0.26), (0.24, 0.09, 0.52), smoothstep(0.0, 0.5, tp)), gradient((0.24, 0.09, 0.52), (0.47, 0.27, 0.86), smoothstep(0.5, 1.0, tp)))
+        gl = np.sqrt(((L[..., 0] / rad[0] + 0.22) / 0.34) ** 2 + ((L[..., 1] / rad[1] + 0.3) / 0.26) ** 2)
+        gloss = smoothstep(1.0, 0.25, gl) * (L[..., 2] > 0)
+        pc = mix(base, (0.74, 0.58, 1.0), 0.5 * gloss)
+        pc = mix(pc, (0.09, 0.03, 0.26), 0.45 * groove_ * (1 - gloss))               # zwei feine, klare Ringlinien je Platte
+        pc = mix(pc, (0.62, 0.42, 0.94), 0.35 * ridge * (1 - gloss))
+        pc = mix(pc, (0.1, 0.04, 0.26), 0.6 * smoothstep(0.9, 1.0, rr) * (hz < 0.25))      # dunkle Unterkante
         pcol = np.where(mine[..., None], pc, pcol)
     pcol = np.where(inner[..., None], f3((0.16, 0.07, 0.34)), pcol)
     col = np.where(is_plate[..., None], pcol, col)
@@ -769,16 +776,16 @@ def paint_armor(g):
         w = 0.042 if i < 2 else 0.032
         crack = np.maximum(crack, crack_mask(P, [(line, 1.0, 0.8)], w) * on_plate)
         core = np.maximum(core, crack_mask(P, [(line, 1.0, 0.8)], w * 0.55) * on_plate)
-        halo = np.maximum(halo, np.clip(1 - seg_dist(P, line) / (w * 3.2), 0, 1) ** 1.6 * on_plate)
+        halo = np.maximum(halo, np.clip(1 - seg_dist(P, line) / (w * 2.3), 0, 1) ** 1.8 * on_plate)
     band = np.clip(1.5 * (1 - np.abs(lt - 0.4) / 0.11), 0, 1) * (leg > 0.6) * (1 - toes)
     crack = np.maximum(crack, band)
     core = np.maximum(core, np.clip(2.0 * (1 - np.abs(lt - 0.4) / 0.045), 0, 1) * (leg > 0.6) * (1 - toes))
-    col = mix(col, (0.8, 0.25, 0.9), 0.45 * halo * (1 - crack))                     # Schein färbt die Platte um den Riss
+    col = mix(col, (0.8, 0.25, 0.9), 0.3 * halo * (1 - crack))                     # Schein färbt die Platte um den Riss
     col = mix(col, CRACK, crack)
     col = mix(col, (1.0, 0.82, 1.0), 0.8 * core)                                     # heller, fast weißer Kern
     em += f3(CRACK_EM) * (crack + 0.38 * halo * (1 - crack))[..., None] + f3((1.0, 0.7, 1.0)) * (0.8 * core)[..., None]
-    occ = np.clip(AO * 1.7, 0, 1)
-    col = mix(col, (0.14, 0.06, 0.3), 0.3 * occ * (1 - crack) * (1 - 0.7 * bel))
+    occ = np.clip(AO * 2.3, 0, 1) ** 0.85                           # gemalte Schatten: unter den Platten, zwischen Beinen und Zehen
+    col = mix(col, (0.08, 0.03, 0.2), 0.62 * occ * (1 - crack) * (1 - 0.45 * bel))
     T["out"][..., :3] = np.where(cov[..., None], np.clip(col, 0, 1), T["out"][..., :3])
     T["em"][..., :3] = np.where(cov[..., None], np.clip(em, 0, 1), 0)
     commit(T, strength=1.8)
@@ -856,7 +863,7 @@ def armor_motion(arm):
 @variante("nest_panzerkaefer", "panzerkaefer")
 def schuppenpanzer(arm, body):
     remove_body(body)
-    M = snake_mats(1024)
+    M = snake_mats(2048)                                            # größere Textur: klare Verläufe auf den Platten
     g = armor_shape()
     finish_skin(g, 0.009, 0.3)
     k = PK; H = PH
