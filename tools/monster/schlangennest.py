@@ -63,11 +63,35 @@ def groove(g, depth_fn):
             v.co -= v.normal * d
     g.data.update()
 
-# Augenform wie in der Vorlage (rechtes Auge; u nach außen, w nach oben, in halben Augenbreiten/-höhen): unten rund,
-# innen zur Nase hin spitz und tief, außen hoch; die Oberkante läuft schräg unter der Braue entlang
-EYE_OUTLINE = [(-1.0, -0.5), (-0.72, -0.86), (-0.25, -1.0), (0.3, -0.9), (0.76, -0.56), (1.0, -0.02), (0.98, 0.5), (0.72, 0.86),
-               (0.3, 0.74), (-0.2, 0.4), (-0.66, -0.06)]
-BROW_LINE = [(-0.86, -0.22, 0.014), (-0.74, 0.08, 0.03), (-0.3, 0.68, 0.038), (0.3, 1.2, 0.04), (0.9, 1.46, 0.036), (1.3, 1.4, 0.026), (1.5, 1.2, 0.012)]
+# Gesicht nach der Vorlage vermessen (02_schluepfling.png, Ansicht von vorn; Maße in Kopfgrößen k, Kopf 0,5 k breit):
+# Auge 0,13 breit und 0,15 hoch bei x = ±0,123, außen rund, innen unten zur Nase spitz; die Braue liegt als runder
+# Wulst darüber, beginnt außen oben an der Schläfe und endet tief am inneren Augenwinkel. Maul: breite Sichel von
+# x = ±0,167, Oberlippe fast gerade, Unterlippe tief; zwei Zähne hängen an der Oberlippe, die Zunge kommt aus der Mitte.
+EYE_OUTLINE = [(-0.95, -0.75), (-0.45, -1.0), (0.2, -0.98), (0.75, -0.7), (1.0, -0.1), (0.9, 0.55), (0.45, 0.95), (-0.1, 0.9),
+               (-0.55, 0.45), (-0.85, -0.15)]
+BROW_PTS = [(0.212, 0.062, 0.0), (0.202, 0.08, 0.02), (0.172, 0.104, 0.027), (0.135, 0.098, 0.029), (0.104, 0.068, 0.029), (0.082, 0.032, 0.027),
+            (0.066, 0.0, 0.02), (0.06, -0.016, 0.0)]
+MOUTH = (-0.103, -0.151, 0.167)                 # Oberlippe Mitte, Unterlippe Mitte, halbe Breite
+PMOUTH = (-0.098, -0.132, 0.2)                  # Schuppenpanzer: breiter, schmalere Sichel
+
+def lip_curves(xk, m):
+    """Oberlippe, Unterlippe und Kante des hellen Unterkiefers (außerhalb des Mauls zur Wange hin ansteigend), in k"""
+    u = np.abs(xk) / m[2]
+    corner = m[0] + 0.017
+    up = m[0] + 0.017 * u * u
+    lo = m[1] + (corner - m[1]) * u * u
+    edge = np.where(u < 1, lo, corner + 0.6 * (np.abs(xk) - m[2]))
+    return up, lo, edge
+
+def face_masks(P, H, k, m):
+    """Bemalung im Gesicht: heller Unterkiefer unter der Unterlippe bis zu den Wangen, dunkles Maul zwischen den Lippen"""
+    x, y, z = P[..., 0], P[..., 1], P[..., 2]
+    xk = (x - H.x) / k; wk = (z - H.z) / k
+    up, lo, edge = lip_curves(xk, m)
+    hd = np.linalg.norm((P - f3(H)) / (f3((0.3, 0.38, 0.28)) * k), axis=-1)
+    jaw = smoothstep(1.0, 0.9, hd) * smoothstep(H.y + 0.12 * k, H.y + 0.03 * k, y) * smoothstep(0.006, -0.006, wk - edge) * smoothstep(0.28, 0.23, np.abs(xk))
+    mouth = (hd < 1.0) * (y < H.y - 0.03 * k) * (np.abs(xk) < m[2]) * smoothstep(-0.004, 0.004, wk - lo) * smoothstep(0.004, -0.004, wk - up)
+    return jaw, mouth, hd
 
 def closed_curve(pts, n):
     """Geschlossene, weich gerundete Linie durch die Punkte (n Punkte)"""
@@ -80,77 +104,95 @@ def closed_curve(pts, n):
     idx = np.linspace(0, len(out), n, endpoint=False).astype(int)
     return out[idx]
 
-def snake_face(M, bvh, H, k, eye=(0.125, 0.012), eye_size=(0.095, 0.085), fangs=(0.08, -0.07, 0.085), tongue=0.1):
-    """Gesicht einer Schlange an der Kopfmitte H (Größe k): runde Leuchtaugen mit dunklem Rand, oben in kräftige
-    Brauenwülste eingebettet (innen tief, außen hoch und nach hinten auslaufend), zwei Zähne, flache gegabelte
-    Schlangenzunge, Nasenlöcher. Alles liegt auf der Haut oder steckt im Maul."""
+def fan(name, center, ring, flip):
+    bm = bmesh.new()
+    c = bm.verts.new(center); r = [bm.verts.new(q) for q in ring]
+    for i in range(len(r)):
+        f = [c, r[i], r[(i + 1) % len(r)]]
+        bm.faces.new(f[::-1] if flip else f)
+    return finish(name, bm)
+
+def snake_face(M, bvh, H, k, eye=(0.123, 0.0), eye_size=(0.066, 0.074), mouth=MOUTH, fang_x=0.078, fang_len=0.06, tongue=True):
+    """Gesicht einer Schlange an der Kopfmitte H (Größe k): runde Leuchtaugen mit schmaler Schlitzpupille in dunkler
+    Augenhöhle, darüber runde Brauenwülste (außen hoch, innen tief), Nasenlöcher, Maul als dunkle Sichel mit zwei
+    Zähnen an der Oberlippe und gespaltener Zunge aus der Mitte. Alles liegt mit Abstand auf der Haut (kein Flimmern)."""
     parts = []
     def on(x, z, lift=0.0):
         """Punkt auf dem Kopf von vorn; seitlich außen zielt der Strahl etwas zur Kopfmitte, damit er noch trifft"""
         o = Vector((H.x + x * k, H.y - 2.0, H.z + z * k))
-        aim = Vector((H.x + x * k * 0.55, H.y + 0.02 * k, H.z + z * k * 0.9))
-        d = (aim - o).normalized()
-        hit, n, _, _ = bvh.ray_cast(o, d, 6.0)
-        if hit is None:
-            hit, n, _, _ = bvh.ray_cast(o, (H - o).normalized(), 6.0)
-        return hit + n * lift, n
+        hit, n, _, _ = bvh.ray_cast(o, Vector((0, 1, 0)), 6.0)
+        if hit is None or hit.y > H.y + 0.05 * k:                    # seitlich am Kopf vorbei: schräg zur Kopfmitte zielen
+            hit, n, _, _ = bvh.ray_cast(o, (H + Vector((0, 0.05 * k, z * k * 0.8)) - o).normalized(), 6.0)
+        return hit + n * (lift * k), n
     a, b = eye_size
     O = closed_curve(EYE_OUTLINE, 36)
     for s in (1, -1):
         def at(du, dw, lift):
-            return on((eye[0] + du * a) * s, eye[1] + dw * b, lift * k)[0]
-        # dunkler Rand: etwas größere Fläche unter dem Auge
+            return on((eye[0] + du * a) * s, eye[1] + dw * b, lift)[0]
+        # dunkle Augenhöhle: größer als das Auge, zur Nase hin breiter
+        parts.append(give(fan("Augenhoehle%d" % s, at(-0.1, -0.05, 0.009), [at(u * 1.24 - 0.1, w * 1.2 - 0.03, 0.008) for u, w in O], s < 0), M["rim"]))
+        # Auge: gewölbt, einfarbig leuchtend
+        cu, cw = 0.0, -0.05
         bm = bmesh.new()
-        c = bm.verts.new(at(0.0, -0.05, 0.004))
-        ring = [bm.verts.new(at(u * 1.2, w * 1.2 - 0.02, 0.003)) for u, w in O]
-        for i in range(len(ring)):
-            f = [c, ring[i], ring[(i + 1) % len(ring)]]
-            bm.faces.new(f if s > 0 else f[::-1])
-        parts.append(give(finish("Augenrand%d" % s, bm), M["rim"]))
-        # Auge: leicht gewölbt, heller Kern unten innen
-        cu, cw = -0.12, -0.3
-        bm = bmesh.new()
-        c = bm.verts.new(at(cu, cw, 0.03))
-        rings = []
-        for t in (0.28, 0.52, 0.78, 1.0):
-            rings.append([bm.verts.new(at(cu + t * (u - cu), cw + t * (w - cw), 0.006 + 0.024 * (1 - t * t) ** 0.7)) for u, w in O])
+        c = bm.verts.new(at(cu, cw, 0.04))
+        rings = [[bm.verts.new(at(cu + t * (u - cu), cw + t * (w - cw), 0.016 + 0.024 * (1 - t * t) ** 0.7)) for u, w in O] for t in (0.35, 0.68, 0.9, 1.0)]
         n = len(O)
         for i in range(n):
-            f = bm.faces.new([c, rings[0][i], rings[0][(i + 1) % n]] if s > 0 else [c, rings[0][(i + 1) % n], rings[0][i]])
-            f.material_index = 1
-        for j, (r0, r1) in enumerate(zip(rings, rings[1:])):
+            bm.faces.new([c, rings[0][i], rings[0][(i + 1) % n]] if s > 0 else [c, rings[0][(i + 1) % n], rings[0][i]])
+        for r0, r1 in zip(rings, rings[1:]):
             for i in range(n):
                 q = [r0[i], r1[i], r1[(i + 1) % n], r0[(i + 1) % n]]
-                f = bm.faces.new(q if s > 0 else q[::-1])
-                f.material_index = 1 if j == 0 else 0
-        parts.append(give(finish("Auge%d" % s, bm), M["eye"], M["eyecore"]))
-        # Brauenwulst: von der Nasenwurzel schräg nach oben außen, hinter dem Auge nach hinten auslaufend
-        pts = [tuple(at(u, w, 0.0)) for u, w, r in BROW_LINE]
-        parts.append(give(tube("Braue%d" % s, pts, [r * k * 0.86 for u, w, r in BROW_LINE], segs=12), M["brow"]))
-        if fangs:
-            fb, bn = on(fangs[0] * s, fangs[1])
-            fb = fb + Vector((0, -0.008 * k, 0.014 * k))
-            parts.append(give(tube("Zahn%d" % s, [tuple(fb + Vector((0, 0.006 * k, 0.012 * k))), tuple(fb), tuple(fb + Vector((0, 0.002 * k, -fangs[2] * 0.5 * k))), tuple(fb + Vector((0, 0.01 * k, -fangs[2] * k)))],
-                                   [0.032 * k, 0.032 * k, 0.022 * k, 0.0], segs=12), M["fang"]))
-        parts.append(give(sphere("Nase%d" % s, tuple(on(0.03 * s, -0.04)[0]), 0.009 * k, (1, 0.6, 1)), M["dark"]))
+                bm.faces.new(q if s > 0 else q[::-1])
+        parts.append(give(finish("Auge%d" % s, bm), M["eye"]))
+        # Schlitzpupille (Schlangenblick): schmal, senkrecht, oben leicht nach außen geneigt; daneben ein Glanzpunkt
+        pup = []
+        for q in range(20):
+            ang = q * 2 * math.pi / 20
+            pu = 0.27 * math.cos(ang) * (1 - 0.6 * abs(math.sin(ang))); pw = 0.74 * math.sin(ang)
+            pup.append(at(-0.08 + pu - 0.14 * pw, -0.12 + pw, 0.05))
+        parts.append(give(fan("Pupille%d" % s, at(-0.08, -0.12, 0.052), pup, s < 0), M["pupil"]))
+        parts.append(give(fan("Glanz%d" % s, at(0.38, 0.36, 0.054), [at(0.38 + 0.2 * math.cos(q * math.pi / 6), 0.36 + 0.19 * math.sin(q * math.pi / 6), 0.052) for q in range(12)], s < 0), M["eyecore"]))
+        # Brauenwulst mit runden Enden
+        parts.append(give(tube("Braue%d" % s, [tuple(on(x * s, w, 0.03)[0]) for x, w, r in BROW_PTS], [r * k for x, w, r in BROW_PTS], segs=14), M["brow"]))
+        parts.append(give(sphere("Nase%d" % s, tuple(on(0.022 * s, -0.07, 0.002)[0]), 0.008 * k, (1.3, 0.6, 0.7)), M["dark"]))
+    # Maul: dunkle Sichel zwischen Ober- und Unterlippe
+    nx = 28
+    xs = np.linspace(-mouth[2], mouth[2], nx)
+    up, lo, _ = lip_curves(xs, mouth)
+    bm = bmesh.new(); cols = []
+    for i in range(nx):
+        cols.append([bm.verts.new(on(float(xs[i]), float(lo[i] + (up[i] - lo[i]) * t), 0.009)[0]) for t in (0.0, 0.5, 1.0)])
+    for c0, c1 in zip(cols, cols[1:]):
+        for j in range(2):
+            bm.faces.new([c0[j], c1[j], c1[j + 1], c0[j + 1]])
+    parts.append(give(finish("Maul", bm), M["mouth"]))
+    def lip(xk):
+        u_, l_, _ = lip_curves(np.asarray([xk]), mouth)
+        return float(u_[0]), float(l_[0])
+    for s in (1, -1):                                               # Zähne: breit an der Oberlippe, spitz, leicht nach innen gebogen
+        zu = lip(fang_x)[0]
+        base = on(fang_x * s, zu + 0.004, 0.012)[0]
+        pts = [base + Vector((0, 0.012, 0.014)) * k, base, base + Vector((-0.004 * s, -0.004, -0.55 * fang_len)) * k, base + Vector((-0.012 * s, 0.002, -fang_len)) * k]
+        parts.append(give(tube("Zahn%d" % s, [tuple(q) for q in pts], [0.02 * k, 0.021 * k, 0.014 * k, 0.0], segs=12), M["fang"]))
     if tongue:
-        # flaches Band aus dem Maul, im Bogen nach unten, vorn in zwei dünne, nach außen schwingende Spitzen gespalten
-        t0 = on(0.0, (fangs[1] if fangs else -0.07) - 0.012)[0] + Vector((0, 0.03 * k, 0))
-        L = tongue
-        stem, _ = smooth3([tuple(t0 + Vector(q) * k) for q in ((0, 0.0, 0.0), (0, -0.045, -0.004), (0, -0.075, -0.3 * L), (0, -0.082, -0.62 * L), (0, -0.076, -0.9 * L))], 14, passes=2)
-        parts.append(give(ring_tube("Zunge", stem, np.linspace(0.024, 0.02, 14) * k, segs=10, depth=0.36), M["tongue"]))
-        end = Vector(stem[-1])
+        zu, zl = lip(0.0)
+        # Zungengrund füllt die Mitte des Mauls, zwei Spitzen hängen gekreuzt über die Unterlippe
+        root = [on(x_, zl + (zu - zl) * t_, 0.013)[0] for x_, t_ in ((-0.045, 0.1), (0.0, 0.0), (0.045, 0.1), (0.04, 0.55), (0.0, 0.62), (-0.04, 0.55))]
+        parts.append(give(fan("Zungengrund", on(0.0, zl + (zu - zl) * 0.3, 0.014)[0], root, False), M["tongue"]))
+        t0 = on(0.0, zl + 0.012, 0.018)[0]
         for s in (1, -1):
-            pr, _ = smooth3([tuple(end + Vector(q) * k) for q in ((0.006 * s, 0.002, 0.014), (0.012 * s, -0.003, -0.16 * L), (0.024 * s, -0.008, -0.36 * L), (0.04 * s, -0.014, -0.55 * L))], 10, passes=2)
-            parts.append(give(ring_tube("Zungenspitze%d" % s, pr, np.linspace(0.013, 0.005, 10) * k, segs=8, depth=0.5), M["tongue"]))
+            pr, _ = smooth3([tuple(t0 + Vector(q) * k) for q in ((-0.016 * s, 0.006, 0.012), (-0.012 * s, -0.012, -0.012), (0.004 * s, -0.016, -0.04), (0.022 * s, -0.012, -0.066), (0.032 * s, -0.006, -0.082))], 12, passes=2)
+            parts.append(give(ring_tube("Zungenspitze%d" % s, pr, np.linspace(0.016, 0.006, 12) * k, segs=8, depth=0.55), M["tongue"]))
     return parts
 
 def snake_mats(size=1024):
     return {
         "skin": image_material("Schlangenhaut", size, color=(0.27, 0.13, 0.5), rough=0.38),
-        "eye": look("Leuchtauge", (0.66, 0.5, 0.98), rough=0.18, emit=(0.6, 0.4, 1.0), strength=0.8),
-        "eyecore": look("Augenkern", (0.9, 0.84, 1.0), rough=0.18, emit=(0.86, 0.78, 1.0), strength=1.15),
-        "rim": look("Augenrand", (0.09, 0.03, 0.2), rough=0.5),
+        "eye": look("Leuchtauge", (0.78, 0.64, 1.0), rough=0.18, emit=(0.72, 0.52, 1.0), strength=0.9),
+        "eyecore": look("Glanzpunkt", (1.0, 0.98, 1.0), rough=0.18, emit=(1.0, 0.96, 1.0), strength=1.4),
+        "pupil": look("Pupille", (0.05, 0.015, 0.1), rough=0.3),
+        "mouth": look("Maul", (0.12, 0.035, 0.2), rough=0.6),
+        "rim": look("Augenhoehle", (0.13, 0.05, 0.28), rough=0.5),
         "brow": look("Braue", (0.32, 0.155, 0.58), rough=0.38),
         "fang": look("Zahn", (0.97, 0.96, 1.0), rough=0.15),
         "tongue": look("Zunge", (0.98, 0.42, 0.85), rough=0.3, emit=(0.8, 0.2, 0.65), strength=0.35),
@@ -244,10 +286,6 @@ def hatchling_shape():
         mb_ell(R, H + Vector((0.15 * s, -0.04, -0.05)) * k, (0.09 * k, 0.12 * k, 0.09 * k))                            # Wange
     return mb_to_mesh(R)
 
-def hatch_mouth_z(x):
-    """Maullinie: breites Grinsen, zu den Wangen hin ansteigend"""
-    return SH.z + (MZ + 1.5 * (x / SK) ** 2) * SK
-
 def hatch_neck_at(z):
     P = np.asarray(HATCH_NECK)
     return float(np.interp(z, P[:, 2], P[:, 1]))
@@ -276,18 +314,14 @@ def paint_hatchling(g):
     neck = (z > 0.29) & ~shell
     neck = neck * smoothstep(H.z - 0.11 * k, H.z - 0.2 * k, z)
     belly = smoothstep(0.34, 0.5, front) * neck
-    zm = H.z + (MZ + 1.5 * (x / k) ** 2) * k
-    hd = np.linalg.norm((P - f3(H)) / (f3((0.3, 0.38, 0.28)) * k), axis=-1)
-    jaw = smoothstep(1.0, 0.9, hd) * (~shell) * smoothstep(0.004, -0.012, z - zm) * smoothstep(H.y + 0.12 * k, H.y + 0.03 * k, y)
-    jaw = jaw * smoothstep(0.25 * k, 0.19 * k, np.abs(x))
+    jaw, mouth, hd = face_masks(P, H, k, MOUTH)
+    jaw = jaw * (~shell)
     bel = np.clip(np.maximum(belly, jaw), 0, 1)
     bcol = gradient(BELLY_LO, BELLY_HI, np.clip(0.5 - N[..., 1] * 0.6, 0, 1))
     band = np.abs((((z + 1.2 * x * x) / 0.052) % 1.0) - 0.5) * 2                  # Querbänder am Hals
     bline = smoothstep(0.72, 0.92, band) * belly * (1 - jaw)
     bcol = mix(bcol, (0.45, 0.33, 0.76), 0.75 * bline)
     col = mix(col, (0, 0, 0), np.zeros_like(bel)); col = col * (1 - bel[..., None]) + bcol * bel[..., None]
-    # Maul: dunkle Linie in der Rille
-    mouth = np.clip(1.8 * (1 - np.abs(z - zm) / (0.019 * k * np.clip(1 - (x / (0.2 * k)) ** 2, 0.05, 1))), 0, 1) * head * (y < H.y - 0.03 * k) * (np.abs(x) < 0.2 * k)
     col = mix(col, (0.1, 0.03, 0.18), mouth)
     # dunkler Rand um die Augen, damit sie sich abheben
     col = mix(col, (0.6, 0.42, 0.95), 0.35 * head_light(P, N, H, k) * head)
@@ -327,12 +361,6 @@ def schluepfling(arm, body):
     g = hatchling_shape()
     finish_skin(g, 0.009, 0.3)
     k = SK; H = SH
-    def mouth_depth(co, n):
-        if n.y > 0.2 or abs(co.x) > 0.2 * k or co.y > H.y - 0.03 * k or abs(co.z - H.z) > 0.2 * k:
-            return 0.0
-        d = abs(co.z - hatch_mouth_z(co.x)) / (0.018 * k)
-        return 0.012 * k * (1 - d * d) * smooth01((0.2 * k - abs(co.x)) / (0.04 * k)) if d < 1 else 0.0
-    groove(g, mouth_depth)
     reduce(g, 0.13)
     shell = egg_shell()
     g = join_parts([g, shell], "Schluepfling")
@@ -342,7 +370,7 @@ def schluepfling(arm, body):
     smart_uv(g)
     paint_hatchling(g)
     bvh = BVHTree.FromObject(g, bpy.context.evaluated_depsgraph_get())
-    parts = snake_face(M, bvh, H, k, fangs=(0.085, MZ + 0.016, 0.085), tongue=0.1)
+    parts = snake_face(M, bvh, H, k)
     g = join_parts([g] + parts, "Schluepfling")
     def weights(c):
         t = smooth01((c.z - 0.44) / 0.2)                            # Schale und Windung folgen dem Körper, Hals und Kopf dem Oberteil
@@ -462,15 +490,6 @@ def tube_coords(P, CL, RAD, front=(0, -1, 0)):
     sh = P.shape[:-1]
     return (idx / (n - 1.0)).reshape(sh).astype(np.float32), (dist / RAD[idx]).reshape(sh).astype(np.float32), bel.reshape(sh).astype(np.float32)
 
-def jaw_mask(P, H, k, shellfree=None):
-    x, y, z = P[..., 0], P[..., 1], P[..., 2]
-    zm = H.z + (MZ + 1.5 * ((x - H.x) / k) ** 2) * k
-    hd = np.linalg.norm((P - f3(H)) / (f3((0.3, 0.38, 0.28)) * k), axis=-1)
-    jaw = smoothstep(1.0, 0.9, hd) * smoothstep(0.004, -0.012, z - zm) * smoothstep(H.y + 0.12 * k, H.y + 0.03 * k, y)
-    jaw = jaw * smoothstep(0.25 * k, 0.19 * k, np.abs(x - H.x))
-    mouth = np.clip(1.8 * (1 - np.abs(z - zm) / (0.019 * k * np.clip(1 - ((x - H.x) / (0.2 * k)) ** 2, 0.05, 1))), 0, 1) * (hd < 1.0) * (y < H.y - 0.03 * k) * (np.abs(x - H.x) < 0.2 * k)
-    return jaw, mouth, hd
-
 def eye_rims(P, col, H, k, eye, size, keep):
     for s in (1, -1):
         d = np.linalg.norm((P - f3(H + Vector((eye[0] * s, -0.2, eye[1])) * k)) / (f3((size[0] * 1.45, 0.14, size[1] * 1.45)) * k), axis=-1)
@@ -485,7 +504,7 @@ def paint_flutter(g):
     x, y, z = P[..., 0], P[..., 1], P[..., 2]
     k = FK; H = FH
     U, D, B = tube_coords(P, FL_CL, FL_RAD)
-    jaw, mouth, hd = jaw_mask(P, H, k)
+    jaw, mouth, hd = face_masks(P, H, k, MOUTH)
     head = hd < 1.0
     body = (D < 1.25) & ~head                                      # Schlangenkörper (nicht Flügelrand)
     col = gradient(SKIN_LO, SKIN_HI, np.clip(N[..., 2] * 0.5 + 0.55, 0, 1))
@@ -590,18 +609,12 @@ def haubenflatterer(arm, body):
     g = join_parts([flutter_shape(), ring_tube("Koerper", FL_CL, FL_RAD, depth=0.9), wing_rim(1), wing_rim(-1)], "Haubenflatterer")
     finish_skin(g, 0.011, 0.3)
     k = FK; H = FH
-    def mouth_depth(co, n):
-        if n.y > 0.2 or abs(co.x) > 0.2 * k or co.y > H.y - 0.03 * k or abs(co.z - H.z) > 0.2 * k:
-            return 0.0
-        d = abs(co.z - (H.z + (MZ + 1.5 * (co.x / k) ** 2) * k)) / (0.018 * k)
-        return 0.012 * k * (1 - d * d) * smooth01((0.2 * k - abs(co.x)) / (0.04 * k)) if d < 1 else 0.0
-    groove(g, mouth_depth)
     reduce(g, 0.13)
     g.data.materials.clear(); g.data.materials.append(M["skin"])
     smart_uv(g)
     paint_flutter(g)
     bvh = BVHTree.FromObject(g, bpy.context.evaluated_depsgraph_get())
-    parts = snake_face(M, bvh, H, k, fangs=(0.085, MZ + 0.016, 0.085), tongue=0.12)
+    parts = snake_face(M, bvh, H, k)
     for s in (1, -1):
         parts += wing_membrane(s, M["membrane"], M["rib"])
     g = join_parts([g] + parts, "Haubenflatterer")
@@ -702,11 +715,9 @@ def paint_armor(g):
     x, y, z = P[..., 0], P[..., 1], P[..., 2]
     k = PK; H = PH
     is_plate = part > 0
-    zm = H.z + (PMZ + 1.5 * (x / k) ** 2) * k
-    hd = np.linalg.norm((P - f3(H)) / (f3((0.3, 0.38, 0.27)) * k), axis=-1)
+    jaw, mouth, hd = face_masks(P, H, k, PMOUTH)
     head = (hd < 1.0) & ~is_plate
-    jaw = smoothstep(1.0, 0.9, hd) * smoothstep(0.004, -0.012, z - zm) * smoothstep(H.y + 0.14 * k, H.y + 0.05 * k, y) * smoothstep(0.26 * k, 0.2 * k, np.abs(x)) * (~is_plate)
-    mouth = np.clip(1.8 * (1 - np.abs(z - zm) / (0.019 * k * np.clip(1 - (x / (0.21 * k)) ** 2, 0.05, 1))), 0, 1) * head * (y < H.y - 0.03 * k) * (np.abs(x) < 0.21 * k)
+    jaw = jaw * (~is_plate); mouth = mouth * (~is_plate)
     leg, lt = leg_coords(P)
     leg = leg * (~is_plate)
     col = gradient(SKIN_LO, SKIN_HI, np.clip(N[..., 2] * 0.5 + 0.55, 0, 1))
@@ -828,12 +839,6 @@ def schuppenpanzer(arm, body):
     g = armor_shape()
     finish_skin(g, 0.009, 0.3)
     k = PK; H = PH
-    def mouth_depth(co, n):
-        if n.y > 0.2 or abs(co.x) > 0.21 * k or co.y > H.y - 0.03 * k or abs(co.z - H.z) > 0.2 * k:
-            return 0.0
-        d = abs(co.z - (H.z + (PMZ + 1.5 * (co.x / k) ** 2) * k)) / (0.018 * k)
-        return 0.012 * k * (1 - d * d) * smooth01((0.21 * k - abs(co.x)) / (0.04 * k)) if d < 1 else 0.0
-    groove(g, mouth_depth)
     reduce(g, 0.13)
     tag(g, 0)
     g = join_parts([g] + [tag(plate(i), i + 1) for i in range(3)], "Schuppenpanzer")
@@ -843,7 +848,7 @@ def schuppenpanzer(arm, body):
     smart_uv(g)
     paint_armor(g)
     bvh = BVHTree.FromObject(g, bpy.context.evaluated_depsgraph_get())
-    parts = snake_face(M, bvh, H, k, eye=(0.128, 0.0), fangs=(0.105, PMZ + 0.016, 0.085), tongue=0)
+    parts = snake_face(M, bvh, H, k, mouth=PMOUTH, fang_x=0.11, fang_len=0.065, tongue=False)
     studs = []
     for i, dx, dy in STUDS:                                         # goldene Befestigungen fest auf den Platten
         for s in (1, -1):
