@@ -112,7 +112,7 @@ def fan(name, center, ring, flip):
         bm.faces.new(f[::-1] if flip else f)
     return finish(name, bm)
 
-def snake_face(M, bvh, H, k, eye=(0.123, 0.0), eye_size=(0.066, 0.074), mouth=MOUTH, fang_x=0.078, fang_len=0.06, tongue=True, teeth=False):
+def snake_face(M, bvh, H, k, eye=(0.123, 0.0), eye_size=(0.066, 0.074), mouth=MOUTH, fang_x=0.078, fang_len=0.06, tongue=True, teeth=False, brows=True, eyes=True, fangs=True):
     """Gesicht einer Schlange an der Kopfmitte H (Größe k): runde Leuchtaugen mit schmaler Schlitzpupille in dunkler
     Augenhöhle, darüber runde Brauenwülste (außen hoch, innen tief), Nasenlöcher, Maul als dunkle Sichel mit zwei
     Zähnen an der Oberlippe und gespaltener Zunge aus der Mitte. Alles liegt mit Abstand auf der Haut (kein Flimmern)."""
@@ -129,27 +129,29 @@ def snake_face(M, bvh, H, k, eye=(0.123, 0.0), eye_size=(0.066, 0.074), mouth=MO
     for s in (1, -1):
         def at(du, dw, lift):
             return on((eye[0] + du * a) * s, eye[1] + dw * b, lift)[0]
-        # dunkle Augenhöhle: größer als das Auge, zur Nase hin breiter
-        parts.append(give(fan("Augenhoehle%d" % s, at(-0.1, -0.05, 0.009), [at(u * 1.24 - 0.1, w * 1.2 - 0.03, 0.008) for u, w in O], s < 0), M["rim"]))
-        # Auge: gewölbt, einfarbig leuchtend
-        cu, cw = 0.0, -0.05
-        bm = bmesh.new()
-        c = bm.verts.new(at(cu, cw, 0.04))
-        rings = [[bm.verts.new(at(cu + t * (u - cu), cw + t * (w - cw), 0.016 + 0.024 * (1 - t * t) ** 0.7)) for u, w in O] for t in (0.35, 0.68, 0.9, 1.0)]
-        n = len(O)
-        for i in range(n):
-            bm.faces.new([c, rings[0][i], rings[0][(i + 1) % n]] if s > 0 else [c, rings[0][(i + 1) % n], rings[0][i]])
-        for r0, r1 in zip(rings, rings[1:]):
+        if eyes:
+            # dunkle Augenhöhle: größer als das Auge, zur Nase hin breiter
+            parts.append(give(fan("Augenhoehle%d" % s, at(-0.1, -0.05, 0.009), [at(u * 1.24 - 0.1, w * 1.2 - 0.03, 0.008) for u, w in O], s < 0), M["rim"]))
+            # Auge: gewölbt, einfarbig leuchtend
+            cu, cw = 0.0, -0.05
+            bm = bmesh.new()
+            c = bm.verts.new(at(cu, cw, 0.04))
+            rings = [[bm.verts.new(at(cu + t * (u - cu), cw + t * (w - cw), 0.016 + 0.024 * (1 - t * t) ** 0.7)) for u, w in O] for t in (0.35, 0.68, 0.9, 1.0)]
+            n = len(O)
             for i in range(n):
-                q = [r0[i], r1[i], r1[(i + 1) % n], r0[(i + 1) % n]]
-                bm.faces.new(q if s > 0 else q[::-1])
-        parts.append(give(finish("Auge%d" % s, bm), M["eye"]))
-        # Pupille: kleines, weiches Oval zur Augenmitte hin (Schlangenblick, aber nicht übertrieben)
-        pup = [at(-0.04 + 0.2 * math.cos(q * math.pi / 10), -0.06 + 0.4 * math.sin(q * math.pi / 10), 0.05) for q in range(20)]
-        parts.append(give(fan("Pupille%d" % s, at(-0.04, -0.06, 0.052), pup, s < 0), M["pupil"]))
-        parts.append(give(fan("Glanz%d" % s, at(0.38, 0.36, 0.054), [at(0.38 + 0.2 * math.cos(q * math.pi / 6), 0.36 + 0.19 * math.sin(q * math.pi / 6), 0.052) for q in range(12)], s < 0), M["eyecore"]))
-        # Brauenwulst mit runden Enden
-        parts.append(give(tube("Braue%d" % s, [tuple(on(x * s, w, 0.03)[0]) for x, w, r in BROW_PTS], [r * k for x, w, r in BROW_PTS], segs=14), M["brow"]))
+                bm.faces.new([c, rings[0][i], rings[0][(i + 1) % n]] if s > 0 else [c, rings[0][(i + 1) % n], rings[0][i]])
+            for r0, r1 in zip(rings, rings[1:]):
+                for i in range(n):
+                    q = [r0[i], r1[i], r1[(i + 1) % n], r0[(i + 1) % n]]
+                    bm.faces.new(q if s > 0 else q[::-1])
+            parts.append(give(finish("Auge%d" % s, bm), M["eye"]))
+            # Pupille: kleines, weiches Oval zur Augenmitte hin (Schlangenblick, aber nicht übertrieben)
+            pup = [at(-0.04 + 0.2 * math.cos(q * math.pi / 10), -0.06 + 0.4 * math.sin(q * math.pi / 10), 0.05) for q in range(20)]
+            parts.append(give(fan("Pupille%d" % s, at(-0.04, -0.06, 0.052), pup, s < 0), M["pupil"]))
+            parts.append(give(fan("Glanz%d" % s, at(0.38, 0.36, 0.054), [at(0.38 + 0.2 * math.cos(q * math.pi / 6), 0.36 + 0.19 * math.sin(q * math.pi / 6), 0.052) for q in range(12)], s < 0), M["eyecore"]))
+            # Brauenwulst mit runden Enden
+            if brows:
+                parts.append(give(tube("Braue%d" % s, [tuple(on(x * s, w, 0.03)[0]) for x, w, r in BROW_PTS], [r * k for x, w, r in BROW_PTS], segs=14), M["brow"]))
         parts.append(give(sphere("Nase%d" % s, tuple(on(0.022 * s, -0.07, 0.002)[0]), 0.008 * k, (1.3, 0.6, 0.7)), M["dark"]))
     # Maul: dunkle Sichel zwischen Ober- und Unterlippe
     nx = 28
@@ -165,7 +167,7 @@ def snake_face(M, bvh, H, k, eye=(0.123, 0.0), eye_size=(0.066, 0.074), mouth=MO
     def lip(xk):
         u_, l_, _ = lip_curves(np.asarray([xk]), mouth)
         return float(u_[0]), float(l_[0])
-    for s in (1, -1):                                               # Zähne: breit an der Oberlippe, spitz, leicht nach innen gebogen
+    for s in ((1, -1) if fangs else ()):                            # Zähne: breit an der Oberlippe, spitz, leicht nach innen gebogen
         zu = lip(fang_x)[0]
         base = on(fang_x * s, zu + 0.004, 0.012)[0]
         pts = [base + Vector((0, 0.012, 0.014)) * k, base, base + Vector((-0.004 * s, -0.004, -0.55 * fang_len)) * k, base + Vector((-0.012 * s, 0.002, -fang_len)) * k]
