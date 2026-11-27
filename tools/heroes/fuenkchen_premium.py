@@ -16,8 +16,9 @@ STUFE = os.environ.get("STUFE", "voll")
 # ---------------------------------------------------------------- Maße (Blender: x rechts/links, -y vorn, z oben)
 
 H0 = Vector((0.0, -0.22, 1.40))                 # Kopfmitte
-HINGE = Vector((0.0, -0.2, 1.165))              # Kiefergelenk (Drehachse quer)
-JAW_OPEN = 9.0                                 # Grad: so weit steht das Maul in der Ruhehaltung offen (Lächeln)
+YH = H0.y - 0.05                                # hier endet der Unterkiefer nach hinten
+HINGE = Vector((0.0, YH, H0.z - 0.04))          # Kiefergelenk (Drehachse quer), auf Höhe der Mundwinkel
+LIP = H0.z - 0.115                              # Oberlippe: Höhe der Mundlinie in der Mitte
 NECK = (Vector((0.0, -0.14, 0.82)), Vector((0.0, -0.2, 1.1)))
 TAIL = [(0.0, 0.4, 0.56), (0.0, 0.62, 0.49), (0.0, 0.84, 0.41), (0.0, 1.04, 0.35), (0.0, 1.22, 0.31), (0.0, 1.38, 0.3)]
 TAIL_R = [0.215, 0.185, 0.15, 0.115, 0.082, 0.055]
@@ -27,10 +28,10 @@ WING_ROOT = Vector((0.15, 0.2, 0.86))           # Flügelansatz auf dem Rücken,
 WING_A = Vector((0.74, 0.67, 0.0)).normalized() # Spannrichtung: nach außen und hinten
 WING_B = Vector((0.0, 0.0, 1.0))                # nach oben
 WING_N = WING_A.cross(WING_B)                   # Flächennormale (zeigt nach vorn außen)
-WRIST = (0.3, 0.37)                             # Handgelenk in Flügelmaßen (entlang A, entlang B)
-FINGERS = [((0.72, 0.36), (1.02, -0.06)),       # je Finger: Stützpunkt, Spitze (Flügelmaße)
-           ((0.58, 0.02), (0.66, -0.42)),
-           ((0.3, 0.0), (0.27, -0.36))]
+WRIST = (0.4, 0.33)                             # Handgelenk in Flügelmaßen (entlang A, entlang B)
+FINGERS = [((0.78, 0.34), (1.03, -0.06)),       # je Finger: Stützpunkt, Spitze (Flügelmaße)
+           ((0.64, 0.0), (0.7, -0.42)),
+           ((0.4, -0.02), (0.34, -0.37))]
 
 def wing_pt(a, b, n=0.0, side=1):
     p = WING_ROOT + WING_A * a + WING_B * b + WING_N * n
@@ -122,44 +123,89 @@ def body_shape():
 
 # ---------------------------------------------------------------- Kopf und Unterkiefer
 
+def lip_up(x, y):
+    """Mundlinie (Unterkante der Oberlippe): in der Mitte flach, zu den Mundwinkeln hin ansteigend = Lächeln"""
+    return LIP + 0.1 * smoothstep(0.16, 0.4, np.abs(x)) ** 1.2
+
+def lip_gap(x, y):
+    """Öffnung zwischen den Lippen: vorn in der Mitte weit, zu den Mundwinkeln und nach hinten geschlossen"""
+    return 0.128 * np.clip(1 - (x / 0.235) ** 2, 0, 1) ** 0.75 * smoothstep(-0.28, -0.5, y)
+
+def palate(x, y):
+    """Gaumen: hinter der Oberlippe wölbt sich das Maul nach oben"""
+    return lip_up(x, y) + 0.045 * np.clip(1 - (x / 0.22) ** 2, 0, 1) * smoothstep(-0.69, -0.56, y) * smoothstep(-0.3, -0.42, y)
+
+def lip_low(x, y):
+    return lip_up(x, y) - lip_gap(x, y)
+
+def mouth_solid():
+    """Schnittkörper für das Maul: der Raum zwischen Unterlippe/Mundboden und Oberlippe/Gaumen. An den Mundwinkeln
+    und hinten läuft er auf null aus, dort bleibt die Haut geschlossen."""
+    xs = np.linspace(-0.235, 0.235, 41); ys = np.linspace(-1.0, -0.28, 49)
+    X, Y = np.meshgrid(xs, ys); T = palate(X, Y); Bt = lip_low(X, Y)
+    bm = bmesh.new(); ny, nx = len(ys), len(xs)
+    top = [[bm.verts.new((X[j, i], Y[j, i], T[j, i])) for i in range(nx)] for j in range(ny)]
+    bot = [[bm.verts.new((X[j, i], Y[j, i], min(Bt[j, i], T[j, i]))) for i in range(nx)] for j in range(ny)]
+    for j in range(ny - 1):
+        for i in range(nx - 1):
+            bm.faces.new([top[j][i], top[j][i + 1], top[j + 1][i + 1], top[j + 1][i]])
+            bm.faces.new([bot[j][i], bot[j + 1][i], bot[j + 1][i + 1], bot[j][i + 1]])
+    for i in range(nx - 1):
+        bm.faces.new([top[0][i], bot[0][i], bot[0][i + 1], top[0][i + 1]])
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
+    return finish("Maulschnitt", bm, smooth=False)
+
+def cut(o, cutter, op):
+    md = o.modifiers.new("Schnitt", 'BOOLEAN'); md.operation = op; md.object = cutter; md.solver = 'EXACT'
+    apply_mod(o, md)
+    bpy.data.objects.remove(cutter, do_unlink=True)
+    return o
+
 def head_shape():
+    """Kopf als eine runde Form: Schädel, Wangen, breites Untergesicht mit Kinn, darauf die kleine Schnauze.
+    Das Maul wird danach als lächelnde Höhle herausgeschnitten; an den Mundwinkeln bleibt die Haut geschlossen."""
     R = mb_family("Kopf")
     mb_ell(R, H0, (0.395, 0.33, 0.33))                                              # Schädel
+    mb_ell(R, H0 + Vector((0, -0.2, -0.17)), (0.3, 0.3, 0.165))                     # Untergesicht und Kinn
+    mb_ell(R, H0 + Vector((0, -0.36, 0.0)), (0.185, 0.2, 0.115))                    # Schnauze mit der Nase
     for s in (1, -1):
-        mb_ell(R, H0 + Vector((0.2 * s, -0.13, -0.15)), (0.2, 0.2, 0.165))          # Wangen
-        mb_ell(R, H0 + Vector((0.1 * s, -0.46, -0.035)), (0.078, 0.075, 0.052))     # Nasenhöcker
-    mb_ell(R, H0 + Vector((0, -0.34, -0.118)), (0.25, 0.215, 0.125))                # Schnauze, sitzt im Schädel
-    mb_ell(R, H0 + Vector((0, -0.37, -0.262)), (0.17, 0.17, 0.045), neg=True)       # Gaumen: flache Mulde
-    for s in (1, -1):
-        mb_ell(R, H0 + Vector((0.105 * s, -0.535, -0.02)), (0.03, 0.03, 0.024), neg=True)   # Nasenloch
+        mb_ell(R, H0 + Vector((0.21 * s, -0.14, -0.13)), (0.2, 0.2, 0.17))          # Wangen
+        mb_ell(R, H0 + Vector((0.095 * s, -0.47, 0.085)), (0.072, 0.07, 0.05))      # Nasenhöcker
+        mb_ell(R, H0 + Vector((0.1 * s, -0.545, 0.1)), (0.03, 0.03, 0.024), neg=True)   # Nasenloch
     g = mb_to_mesh(R)
     finish_skin(g, 0.012, 1.0, smooth_it=6)
+    cut(g, mouth_solid(), 'DIFFERENCE')
+    finish_skin(g, 0.011, 1.0, smooth_it=3)                                         # Lippen rund, Maulhöhle sauber vernetzt
     return g
 
-def jaw_shape():
-    """Unterkiefer, geschlossen gebaut und dann um das Gelenk aufgeklappt"""
-    R = mb_family("Kiefer")
-    mb_ell(R, (0, -0.385, 1.076), (0.2, 0.235, 0.096))                              # Kinn: sitzt unter der Schnauze, etwas kürzer
-    mb_ell(R, (0, -0.26, 1.09), (0.22, 0.15, 0.095))                                # Kinnbacke hinten, steckt im Kopf
-    mb_ell(R, (0, -0.4, 1.205), (0.12, 0.15, 0.036), neg=True)                      # Mundboden: flache Mulde für die Zunge
-    g = mb_to_mesh(R)
-    finish_skin(g, 0.011, 1.0, smooth_it=6)
-    g.data.transform(Matrix.Translation(HINGE) @ Matrix.Rotation(math.radians(JAW_OPEN), 4, 'X') @ Matrix.Translation(-HINGE))
-    g.data.update()
-    return g
+def head_weights(o):
+    """Der Kopf ist eine Haut; alles unter der Mundlinie folgt weich dem Kiefer, nach hinten zum Gelenk hin immer weniger"""
+    gh = o.vertex_groups.new(name="Head"); gj = o.vertex_groups.new(name="Jaw")
+    for v in o.data.vertices:
+        x, y, z = v.co
+        xa, ya = np.float32(x), np.float32(y)
+        up = float(lip_up(xa, ya)); gap = float(lip_gap(xa, ya)); roof = float(palate(xa, ya))
+        low = ramp(up - z, 0.0, 0.07)
+        inside = 1.0 if z < 0.5 * (up - gap + roof) else 0.0
+        k = ramp(gap, 0.0, 0.03)
+        w = (low * (1 - k) + inside * k) * ramp(YH - y, -0.02, 0.14)
+        if w > 0.002:
+            gj.add([v.index], w, 'REPLACE')
+        if w < 0.998:
+            gh.add([v.index], 1 - w, 'REPLACE')
 
 HORN_N = 16
 
 def horn_pts(side):
-    p0 = H0 + Vector((0.225 * side, 0.02, 0.22)); p1 = H0 + Vector((0.52 * side, 0.05, 0.43)); p2 = H0 + Vector((0.25 * side, 0.2, 0.61))
+    p0 = H0 + Vector((0.235 * side, 0.05, 0.225)); p1 = H0 + Vector((0.53 * side, 0.07, 0.43)); p2 = H0 + Vector((0.26 * side, 0.21, 0.61))
     return [qbez(p0, p1, p2, i / (HORN_N - 1)) for i in range(HORN_N)]
 
 def horn(side):
-    p0 = H0 + Vector((0.225 * side, 0.02, 0.22)); p1 = H0 + Vector((0.52 * side, 0.05, 0.43)); p2 = H0 + Vector((0.25 * side, 0.2, 0.61))
+    Q = horn_pts(side)
     n = HORN_N; pts = []; rad = []
     for i in range(n):
         t = i / (n - 1)
-        pts.append(qbez(p0, p1, p2, t))
+        pts.append(Q[i])
         r = 0.128 * (1 - t) ** 0.8 + 0.022
         rad.append(r * (1 + 0.045 * math.cos(t * 2 * math.pi * 4.2 + 0.6) * (1 - t)))     # sanfte Ringe
     return sweep("Horn%d" % side, pts, rad, segs=12)
@@ -219,7 +265,7 @@ def finger_curve(i, t):
 
 def arm_curve(t):
     """vom Ansatz zum Handgelenk, leicht nach oben gewölbt"""
-    return qbez(Vector((0, 0, 0)), Vector((0.06, 0.24, 0)), Vector((WRIST[0], WRIST[1], 0)), t)
+    return qbez(Vector((0, 0, 0)), Vector((0.17, 0.22, 0)), Vector((WRIST[0], WRIST[1], 0)), t)
 
 def wing(side):
     """Ein Flügel: Arm vom Rücken zum Handgelenk, drei Finger, dazwischen die dünne Haut mit geschwungenem Rand.
@@ -229,7 +275,7 @@ def wing(side):
     for i, (r0, r1) in enumerate(((0.044, 0.014), (0.032, 0.011), (0.03, 0.011))):
         bones.append(sweep("Finger%d_%d" % (side, i), [W(finger_curve(i, t)) for t in np.linspace(0, 1, 9)], list(np.linspace(r0, r1, 9)), segs=8))
     bones.append(sphere("Handgelenk%d" % side, tuple(W(Vector((WRIST[0], WRIST[1], 0)))), 0.056, segs=(10, 7)))
-    bones.append(sphere("Schulter%d" % side, tuple(W(Vector((0.0, -0.01, 0)))), 0.082, segs=(12, 8)))
+    bones.append(sphere("Schulter%d" % side, tuple(W(Vector((-0.01, -0.03, 0)))), 0.074, segs=(12, 8)))
     # Flughaut: Felder zwischen den Fingern und zwischen innerem Finger und Arm
     curves = [lambda t, i=i: finger_curve(i, t) for i in range(3)] + [lambda t: arm_curve(1 - t)]
     bm = bmesh.new(); ns, nt = 6, 7; cache = {}
@@ -295,7 +341,7 @@ def line_param(P, pts):
 # ---------------------------------------------------------------- Bauchschilde
 
 SEG = 0.118                                     # Länge eines Bauchschilds entlang des Bauchs
-BELLY_W = ([0.0, 0.2, 0.55, 1.1, 1.45, 1.95, 2.3], [0.1, 0.165, 0.185, 0.175, 0.11, 0.06, 0.03])
+BELLY_W = ([0.0, 0.2, 0.55, 1.1, 1.45, 1.95, 2.3], [0.12, 0.185, 0.2, 0.185, 0.115, 0.062, 0.03])
 
 def belly_line(bvh):
     """Mittellinie der hellen Unterseite: Kehle, Brust, Bauch, Schwanzunterseite (auf der Haut)"""
@@ -311,8 +357,11 @@ def belly_fields(P, N, line):
     d, par = line_param(P, line)
     x = P[..., 0]
     w = np.interp(par, BELLY_W[0], BELLY_W[1]).astype(np.float32)
-    inward = N[..., 0] * np.sign(x)
-    m = smoothstep(w + 0.012, w - 0.012, np.abs(x)) * smoothstep(0.27, 0.2, d) * smoothstep(-0.55, -0.15, inward)
+    ax_ = np.abs(x); y = P[..., 1]; z = P[..., 2]
+    legf = np.hypot(ax_ - FRONT[0], y - FRONT[1]) / 0.158                                    # Vorderbein: Kreis um die Beinachse
+    legh = np.hypot((ax_ - 0.275) / 0.185, (y - HIND[1] + 0.02) / 0.235)                    # Oberschenkel: Ellipse
+    free = np.maximum(smoothstep(1.0, 1.1, np.minimum(legf, legh)), smoothstep(0.5, 0.6, z))
+    m = smoothstep(w + 0.008, w - 0.008, ax_) * smoothstep(0.36, 0.31, d) * free
     frac = ((par + 1.5 * x * x) / SEG) % 1.0
     return m, frac, np.abs(x) / np.maximum(w, 1e-3)
 
@@ -327,8 +376,8 @@ def belly_bulge(body, line):
 
 # ---------------------------------------------------------------- Gesicht
 
-EYE = (0.2, 0.09)                               # Augenmitte: x, z ab Kopfmitte
-EYE_R = (0.108, 0.075, 0.13)                    # halbe Breite, Tiefe, halbe Höhe des Augapfels
+EYE = (0.222, 0.108)                               # Augenmitte: x, z ab Kopfmitte
+EYE_R = (0.118, 0.08, 0.142)                    # halbe Breite, Tiefe, halbe Höhe des Augapfels
 EYES = []                                       # je Auge: Mitte, Achse rechts, Achse oben, Blickachse
 
 def eye_material():
@@ -339,7 +388,7 @@ def eye_material():
     r = np.hypot(x, y)
     col = np.zeros((n, n, 3), np.float32) + f3((0.98, 0.98, 1.0))
     col = mix(col, (0.66, 0.62, 0.9), 0.6 * smoothstep(0.1, 0.95, y) + 0.25 * smoothstep(0.55, 0.95, r))
-    ix, iy = x / 0.7, (y + 0.06) / 0.6
+    ix, iy = x / 0.76, (y - 0.07) / 0.62                 # große Iris, oben vom Lid angeschnitten: freundlicher Blick
     ir = np.hypot(ix, iy)
     iris = gradient((0.99, 0.84, 0.28), (0.2, 0.84, 0.84), smoothstep(-0.75, -0.05, iy))
     iris = mix(iris, (0.08, 0.5, 0.74), 0.85 * smoothstep(0.1, 0.9, iy))
@@ -400,39 +449,38 @@ def brows(bvh):
     parts = []; a, dep, b = EYE_R
     for (c, e1, e2, d), s in zip(EYES, (1, -1)):
         pts = []
-        for u, w in ((-0.62, 1.2), (-0.25, 1.36), (0.2, 1.4), (0.62, 1.3), (0.95, 1.08)):
+        for u, w in ((-0.55, 1.04), (-0.2, 1.15), (0.2, 1.17), (0.6, 1.1), (0.92, 0.92)):
             o = c + e1 * (u * a * s) + e2 * (w * b) + d * 0.5
             hit, n, _, _ = bvh.ray_cast(o, -d, 2.0)
             pts.append(hit + n * 0.006)
         Q, _ = smooth3([tuple(q) for q in pts], 9, passes=2)
-        parts.append(sweep("Braue%d" % s, [Vector(q) for q in Q], [0.012, 0.02, 0.025, 0.026, 0.025, 0.023, 0.019, 0.014, 0.008], segs=8))
+        parts.append(sweep("Braue%d" % s, [Vector(q) for q in Q], [0.016, 0.026, 0.031, 0.032, 0.031, 0.028, 0.023, 0.017, 0.01], segs=8, flat=0.6))
     return parts
 
-def unjaw(p):
-    """Punkt des aufgeklappten Kiefers zurück in die geschlossene Lage"""
-    return Matrix.Rotation(math.radians(-JAW_OPEN), 4, 'X') @ (Vector(p) - HINGE) + HINGE
-
-def rejaw(p):
-    return Matrix.Rotation(math.radians(JAW_OPEN), 4, 'X') @ (Vector(p) - HINGE) + HINGE
-
-def teeth_tongue(bvh_head, bvh_jaw):
-    """Zwei kleine Fangzähne oben, vier runde Zähne unten, Zunge in der Mulde des Unterkiefers.
+def teeth_tongue(bvh):
+    """Zwei kleine Fangzähne an der Oberlippe, zwei runde Zähnchen unten nahe den Mundwinkeln, große Zunge.
     Liefert (oben, unten, Zunge)."""
     up, low = [], []
     for s in (1, -1):
-        hit = bvh_head.ray_cast(Vector((0.125 * s, H0.y - 0.47, 0.6)), Vector((0, 0, 1)), 3.0)[0]
-        up.append(sweep("Fang%d" % s, [hit + Vector((0, 0, 0.012)), hit + Vector((0, 0, -0.022)), hit + Vector((0, 0.004, -0.05))], [0.024, 0.02, 0.006], segs=8))
-        for j, (dx, dy) in enumerate(((0.045, -0.585), (0.118, -0.55))):
-            o = rejaw((dx * s, dy, 1.6))
-            hit = bvh_jaw.ray_cast(o, rejaw((dx * s, dy, 0.6)) - o, 3.0)[0]
-            ax = (rejaw((0, 0, 1)) - rejaw((0, 0, 0))).normalized()
-            low.append(sweep("Zahn%d_%d" % (s, j), [hit - ax * 0.012, hit + ax * 0.016, hit + ax * 0.036], [0.021, 0.018, 0.007], segs=8))
-    o = rejaw((0, -0.4, 1.6)); hit = bvh_jaw.ray_cast(o, rejaw((0, -0.4, 0.6)) - o, 3.0)[0]
+        x = 0.125 * s
+        yl = bvh.ray_cast(Vector((x, -2.0, LIP + 0.02)), Vector((0, 1, 0)), 6.0)[0].y
+        hit = bvh.ray_cast(Vector((x, yl + 0.036, LIP - 0.04)), Vector((0, 0, 1)), 1.0)[0]
+        up.append(sweep("Fang%d" % s, [hit + Vector((0, 0, 0.012)), hit + Vector((0, 0, -0.022)), hit + Vector((0, 0.003, -0.05))], [0.025, 0.02, 0.006], segs=8))
+        x = 0.15 * s
+        zl = float(lip_low(np.float32(x), np.float32(-0.6)))
+        yl = bvh.ray_cast(Vector((x, -2.0, zl - 0.02)), Vector((0, 1, 0)), 6.0)[0].y
+        hit = bvh.ray_cast(Vector((x, yl + 0.038, LIP - 0.012)), Vector((0, 0, -1)), 1.0)[0]
+        low.append(sweep("Zahn%d" % s, [hit + Vector((0, 0, -0.012)), hit + Vector((0, 0, 0.01)), hit + Vector((0, 0, 0.026))], [0.02, 0.017, 0.007], segs=8))
+    a = bvh.ray_cast(Vector((0, -0.62, LIP - 0.006)), Vector((0, 0, -1)), 1.0)[0]; b = bvh.ray_cast(Vector((0, -0.42, LIP + 0.01)), Vector((0, 0, -1)), 1.0)[0]
+    along = (a - b).normalized(); upv = Vector((1, 0, 0)).cross(along)
+    if upv.z < 0:
+        upv = -upv
+    c = a.lerp(b, 0.42)
     tongue = sphere("Zunge", (0, 0, 0), 1.0, segs=(14, 8))
-    R = Matrix.Rotation(math.radians(JAW_OPEN), 3, 'X')
     for v in tongue.data.vertices:
-        q = Vector((v.co.x * 0.098, v.co.y * 0.135 - 0.01, v.co.z * 0.03 + 0.012 - 0.01 * abs(v.co.x) ** 2))
-        v.co = hit + R @ q
+        sx, sy, sz = v.co
+        wide = 0.112 * (1 - 0.25 * max(sy, 0) ** 2)                                  # vorn rund, hinten breit
+        v.co = c + Vector((1, 0, 0)) * (sx * wide) + along * (sy * 0.15) + upv * (sz * 0.032 + 0.016 - 0.016 * sx * sx * (sz > 0))
     return up, low, [tongue]
 
 # ---------------------------------------------------------------- Schmuck
@@ -446,33 +494,31 @@ def collar_frame():
     return Vector((0, -math.cos(t), -math.sin(t))), Vector((1, 0, 0)), Vector((0, -math.sin(t), math.cos(t)))    # vorn, quer, Achse
 
 def collar(bvh):
-    """Goldener Halsreif: breites Band mit zwei runden Wülsten, liegt rundum auf der Haut auf"""
+    """Goldener Halsreif: breites Band mit zwei runden Wülsten; folgt in jeder Höhe der Haut, liegt also rundum auf.
+    Liefert (Teil, Punkt vorn außen auf dem Band)."""
     fwd, ex, axis = collar_frame(); n = 36
-    rad = []
+    prof = [(-0.012, -0.04), (0.012, -0.048), (0.03, -0.042), (0.034, -0.028), (0.026, -0.018), (0.026, 0.018), (0.034, 0.028),
+            (0.03, 0.042), (0.012, 0.048), (-0.012, 0.04)]
+    hs = (-0.045, 0.0, 0.045); rad = np.zeros((len(hs), n))
     for k in range(n):
         ph = k * 2 * math.pi / n
         r = fwd * math.cos(ph) + ex * math.sin(ph)
-        best = 0.0
-        for h in (-0.04, 0.0, 0.04):
+        for i, h in enumerate(hs):
             hit = bvh.ray_cast(COLLAR_C + axis * h + r * 1.2, -r, 2.0)[0]
-            best = max(best, (hit - COLLAR_C - axis * h).dot(r) if hit is not None else 0.2)
-        rad.append(best)
-    rad = np.array(rad)
-    for _ in range(3):
-        rad = np.maximum(rad, 0.25 * np.roll(rad, 1) + 0.5 * rad + 0.25 * np.roll(rad, -1))
-    prof = [(-0.012, -0.04), (0.012, -0.048), (0.03, -0.042), (0.034, -0.028), (0.026, -0.018), (0.026, 0.018), (0.034, 0.028),
-            (0.03, 0.042), (0.012, 0.048), (-0.012, 0.04)]
+            rad[i, k] = (hit - COLLAR_C - axis * h).dot(r) if hit is not None else 0.2
+    for _ in range(2):
+        rad = 0.25 * np.roll(rad, 1, 1) + 0.5 * rad + 0.25 * np.roll(rad, -1, 1)
     bm = bmesh.new(); rings = []
     for k in range(n):
         ph = k * 2 * math.pi / n
         r = fwd * math.cos(ph) + ex * math.sin(ph)
-        rings.append([bm.verts.new(COLLAR_C + r * (rad[k] + 0.004 + pr) + axis * ph_) for pr, ph_ in prof])
+        rings.append([bm.verts.new(COLLAR_C + r * (float(np.interp(h, hs, rad[:, k])) + 0.005 + pr) + axis * h) for pr, h in prof])
     m = len(prof)
     for k in range(n):
         a, b = rings[k], rings[(k + 1) % n]
         for j in range(m):
             bm.faces.new([a[j], a[(j + 1) % m], b[(j + 1) % m], b[j]])
-    return finish("Halsreif", bm), float(rad[0])
+    return finish("Halsreif", bm), COLLAR_C + fwd * (float(rad[1, 0]) + 0.036)
 
 def star_solid(name, center, normal, up, R, r, depth, apex, inset=0.86, back=0.0):
     """Fünfzackiger Stern mit geschliffener Vorderseite (Spitze in der Mitte)"""
@@ -492,14 +538,17 @@ def star_solid(name, center, normal, up, R, r, depth, apex, inset=0.86, back=0.0
     o = finish(name, bm, smooth=False)
     return o
 
-def pendant(front_r):
-    """Sternanhänger vorn am Halsreif: goldene Fassung, darin der türkise Sternstein"""
-    fwd, ex, axis = collar_frame()
-    c = COLLAR_C + fwd * (front_r + 0.06) - axis * 0.085
-    n = (Vector((0, -1, 0.22))).normalized()
-    STAR.update(c=c, n=n)
-    frame = star_solid("Sternfassung", c - n * 0.02, n, (0, 0, 1), 0.14, 0.074, 0.034, 0.004, inset=0.9)
-    gem = star_solid("Sternstein", c + n * 0.012, n, (0, 0, 1), 0.106, 0.052, 0.008, 0.034, inset=0.94)
+def pendant(front, bvh):
+    """Sternanhänger: hängt vorn am Halsreif und liegt unten auf der Brust; goldene Fassung, darin der türkise Stein"""
+    low = bvh.ray_cast(Vector((0, -2.0, front.z - 0.21)), Vector((0, 1, 0)), 6.0)[0] + Vector((0, -0.014, 0))
+    top = front + Vector((0, -0.004, 0.02))
+    up = (top - low).normalized(); n = Vector((1, 0, 0)).cross(up).normalized()
+    if n.y > 0:
+        n = -n
+    c = low.lerp(top, 0.5) + n * 0.012
+    STAR.update(c=c + n * 0.03, n=n)
+    frame = star_solid("Sternfassung", c, n, up, 0.142, 0.074, 0.03, 0.006, inset=0.88)
+    gem = star_solid("Sternstein", c + n * 0.03, n, up, 0.098, 0.047, 0.006, 0.032, inset=0.95)
     return frame, gem
 
 def tail_gem():
@@ -529,10 +578,10 @@ SK_D, SK_M, SK_L = (0.33, 0.13, 0.58), (0.5, 0.25, 0.79), (0.7, 0.45, 0.94)
 SK_SHADOW = (0.2, 0.07, 0.4)
 PL_D, PL_M, PL_L = (0.4, 0.1, 0.62), (0.62, 0.22, 0.86), (0.84, 0.52, 0.98)
 BEL_D, BEL_M, BEL_L = (0.27, 0.62, 0.66), (0.5, 0.84, 0.82), (0.72, 0.96, 0.92)
-HORN_D, HORN_M, HORN_L = (0.76, 0.56, 0.31), (0.96, 0.84, 0.6), (1.0, 0.95, 0.8)
+HORN_D, HORN_M, HORN_L = (0.84, 0.68, 0.44), (0.98, 0.88, 0.66), (1.0, 0.96, 0.84)
 MEM_T, MEM_M, MEM_B = (0.43, 0.38, 0.84), (0.3, 0.76, 0.86), (0.5, 0.93, 0.93)
 GOLD_D, GOLD_M, GOLD_L = (0.7, 0.42, 0.09), (0.93, 0.69, 0.2), (1.0, 0.9, 0.5)
-GEM_D, GEM_M, GEM_L = (0.14, 0.6, 0.7), (0.42, 0.9, 0.88), (0.86, 1.0, 0.97)
+GEM_D, GEM_M, GEM_L = (0.08, 0.5, 0.64), (0.3, 0.84, 0.84), (0.66, 0.98, 0.94)
 
 def three(a, b, c, t):
     """Verlauf über drei Farben, t = 0..1"""
@@ -585,10 +634,10 @@ def wing_stars(a, b):
             i = i0 + di; j = j0 + dj
             h = [ma._hash(i, j, zero, 31 + k) for k in range(4)]
             ca = (i + 0.15 + 0.7 * h[0]) * cs; cb = (j + 0.15 + 0.7 * h[1]) * cs
-            r = 0.0045 + 0.007 * h[3]
+            r = 0.0035 + 0.0095 * h[3] ** 2
             da = np.abs(a - ca); db = np.abs(b - cb)
-            dot = np.exp(-(da * da + db * db) / (r * r)) * (h[2] < 0.7)
-            ray = np.clip(1 - (np.minimum(da, db) * 9 + np.maximum(da, db)) / (r * 3.6), 0, 1) * (h[2] < 0.22)
+            dot = np.exp(-(da * da + db * db) / (r * r)) * (h[2] < 0.52)
+            ray = np.clip(1 - (np.minimum(da, db) * 9 + np.maximum(da, db)) / (r * 3.6), 0, 1) * (h[2] < 0.5) * (h[3] > 0.72)
             out = np.maximum(out, np.maximum(dot, ray)); big = np.maximum(big, ray)
     return out, big
 
@@ -605,9 +654,9 @@ def paint(g, line, sparks):
     # ---- Haut: Verlauf, Schuppen, Schatten
     hd, jw, bd, wa = sel(T_HEAD), sel(T_JAW), sel(T_BODY), sel(T_WARM)
     skin = three(SK_D, SK_M, SK_L, smoothstep(0.08, 0.95, tz))
-    front = smoothstep(-0.08, -0.3, y - H0.y) * smoothstep(-0.32, -0.12, z - H0.z)          # Gesicht: glatt
+    front = smoothstep(-0.08, -0.3, y - H0.y)                                              # Gesicht und Kinn: glatt
     k_sc = bd * smoothstep(0.05, 0.16, z) + hd * (1 - 0.88 * front) + 0.0 * jw
-    sc = np.where(hd > 0, scales(P, N, 0.05), scales(P, N, 0.064)) * k_sc
+    sc = np.where(hd > 0, scales(P, N, 0.052), scales(P, N, 0.074)) * k_sc
     skin = np.clip(skin * (1 + 0.95 * sc)[..., None] + f3((0.1, 0.08, 0.05)) * np.clip(sc, 0, 1)[..., None], 0, 1)
     skin = mix(skin, SK_L, 0.22 * hd * front * smoothstep(-0.2, 0.25, N[..., 2]))        # Schnauze und Wangen etwas heller
     skin = mix(skin, (0.56, 0.24, 0.8), 0.5 * wa)                                          # Flügelarme: eine Spur röter
@@ -617,22 +666,25 @@ def paint(g, line, sparks):
     # ---- helle Unterseite mit Schilden
     bel, frac, edge = belly_fields(P, N, line)
     bel = bel * bd
-    bcol = gradient(BEL_L, BEL_M, frac ** 1.2)
-    bcol = mix(bcol, BEL_D, 0.75 * smoothstep(0.84, 0.985, frac) + 0.3 * smoothstep(0.7, 1.0, edge))
+    bcol = three(BEL_L, BEL_M, (0.36, 0.72, 0.74), frac ** 1.15)
+    bcol = mix(bcol, (0.14, 0.44, 0.54), np.clip(0.95 * smoothstep(0.86, 0.95, frac) * smoothstep(1.0, 0.975, frac), 0, 1))    # Fuge
+    bcol = mix(bcol, BEL_D, 0.45 * smoothstep(0.72, 1.0, edge))
     bcol = bcol * (0.86 + 0.14 * tz)[..., None]
     bcol = mix(bcol, (0.16, 0.36, 0.5), 0.45 * occ)
     col = col * (1 - bel[..., None]) + bcol * bel[..., None]
     # ---- Maul: Gaumen und Mundboden, Nasenlöcher, Lidrand
-    roof = hd * smoothstep(-0.2, -0.6, N[..., 2]) * smoothstep(0.225, 0.19, np.abs(x)) * (y < H0.y - 0.1) * (z < H0.z - 0.19)
-    col = mix(col, (0.46, 0.12, 0.34), roof)
-    col = mix(col, (0.2, 0.04, 0.2), roof * smoothstep(-0.52, -0.2, y - H0.y))
-    Rm = np.array(Matrix.Rotation(math.radians(-JAW_OPEN), 3, 'X'), np.float32)
-    Pj = (P - f3(HINGE)) @ Rm.T + f3(HINGE); Nj = N @ Rm.T
-    floor = jw * smoothstep(0.25, 0.7, Nj[..., 2]) * smoothstep(1.15, 0.85, (Pj[..., 0] / 0.165) ** 2 + ((Pj[..., 1] + 0.4) / 0.2) ** 2)
-    col = mix(col, (0.56, 0.16, 0.38), floor)
-    col = mix(col, (0.24, 0.05, 0.22), floor * smoothstep(-0.5, -0.24, Pj[..., 1]))
+    inm = (y < YH + 0.03)
+    roof = hd * smoothstep(-0.25, -0.6, N[..., 2]) * smoothstep(0.03, 0.012, np.abs(z - palate(x, y))) * inm
+    deep = smoothstep(-0.68, -0.4, y)                                               # nach hinten dunkler
+    col = mix(col, (0.5, 0.13, 0.33), roof)
+    col = mix(col, (0.24, 0.05, 0.22), roof * deep)
+    floor = hd * smoothstep(0.25, 0.6, N[..., 2]) * smoothstep(0.03, 0.012, np.abs(z - lip_low(x, y))) * inm * smoothstep(0.004, 0.02, lip_gap(x, y))
+    crease = hd * smoothstep(0.011, 0.003, np.abs(z - lip_up(x, y))) * smoothstep(0.2, 0.25, np.abs(x)) * smoothstep(0.41, 0.33, np.abs(x)) * (y < H0.y - 0.1)
+    col = mix(col, (0.26, 0.09, 0.44), 0.7 * crease)                                # Lachfalte vom Mundwinkel zur Wange
+    col = mix(col, (0.56, 0.16, 0.36), floor)
+    col = mix(col, (0.27, 0.06, 0.23), floor * deep)
     for c, n in sparks["nose"]:
-        col = mix(col, (0.17, 0.05, 0.3), hd * 0.92 * np.exp(-(np.linalg.norm(P - f3(c), axis=-1) / 0.024) ** 2))
+        col = mix(col, (0.17, 0.05, 0.3), hd * 0.92 * np.exp(-(np.linalg.norm(P - f3(c), axis=-1) / 0.02) ** 2))
     a, dep, b = EYE_R
     for c, e1, e2, d in EYES:
         L = P - f3(c)
@@ -689,9 +741,9 @@ def paint(g, line, sparks):
     br = sel(T_BROW)
     col = col * (1 - br[..., None]) + gradient((0.11, 0.05, 0.2), (0.27, 0.15, 0.42), tz) * br[..., None]
     tg = sel(T_TONGUE)
-    tc = gradient((0.7, 0.24, 0.42), (0.97, 0.5, 0.62), smoothstep(0.2, 0.9, Nj[..., 2]))
-    tc = mix(tc, (0.72, 0.26, 0.44), 0.45 * np.exp(-(Pj[..., 0] / 0.008) ** 2) * (Pj[..., 1] > -0.5))
-    tc = mix(tc, (0.4, 0.1, 0.3), 0.5 * smoothstep(-0.44, -0.3, Pj[..., 1]))
+    tc = gradient((0.72, 0.26, 0.44), (0.98, 0.52, 0.64), smoothstep(0.1, 0.85, N[..., 2]))
+    tc = mix(tc, (0.74, 0.28, 0.46), 0.4 * np.exp(-(x / 0.008) ** 2) * (y > -0.62))
+    tc = mix(tc, (0.42, 0.1, 0.3), 0.55 * smoothstep(-0.55, -0.4, y))
     col = col * (1 - tg[..., None]) + tc * tg[..., None]
     th = sel(T_TOOTH)
     col = col * (1 - th[..., None]) + mix(np.zeros(P.shape, np.float32) + f3((1.0, 0.98, 0.92)), (0.86, 0.74, 0.6), 0.6 * occ) * th[..., None]
@@ -709,11 +761,11 @@ def paint(g, line, sparks):
     # ---- Steine: geschliffenes Türkis, Stern mit goldenem Herz
     ge = sel(T_GEM)
     lgt = np.clip(N @ f3(Vector((-0.35, -0.55, 0.76)).normalized()), -1, 1) * 0.5 + 0.5
-    cg = three(GEM_D, GEM_M, GEM_L, smoothstep(0.15, 0.95, lgt))
+    cg = three(GEM_D, GEM_M, GEM_L, smoothstep(0.2, 1.0, lgt))
     ds = np.linalg.norm(P - f3(STAR["c"]), axis=-1)
-    cg = mix(cg, (1.0, 0.95, 0.5), 0.8 * smoothstep(0.075, 0.0, ds))
+    cg = mix(cg, (1.0, 0.93, 0.42), 0.85 * smoothstep(0.07, 0.01, ds))
     col = col * (1 - ge[..., None]) + cg * ge[..., None]
-    em += cg * (0.5 * ge)[..., None]
+    em += cg * (0.22 * ge)[..., None]
     # ---- Glitzersterne auf der Haut
     for c, n, size in sparks["skin"]:
         s_ = sparkle(P, c, n, size) * m_skin * (1 - bel)
@@ -811,7 +863,7 @@ def add_muzzle(arm, bone, world_pos):
     update()
     return m
 
-MUZZLE = Vector((0.0, -0.74, 1.125))            # Sternenatem: zwischen den geöffneten Kiefern, vorn
+MUZZLE = Vector((0.0, -0.75, 1.215))            # Sternenatem: zwischen den geöffneten Kiefern, vorn
 
 def skeleton():
     wr = wing_pt(WRIST[0], WRIST[1]); tip = wing_pt(*FINGERS[0][1])
@@ -821,7 +873,7 @@ def skeleton():
         ("Root", (0, 0, 0), (0, 0, 0.4), None),
         ("Body", (0, 0.1, 0.55), (0, -0.12, 0.9), "Root"),
         ("Head", (0, -0.2, 1.04), (0, -0.22, 1.7), "Body"),
-        ("Jaw", tuple(HINGE), (0, -0.62, 1.07), "Head"),
+        ("Jaw", tuple(HINGE), (0, -0.68, 1.12), "Head"),
         ("Wing.L", tuple(WING_ROOT), tuple(wr), "Body"), ("WingTip.L", tuple(wr), tuple(tip), "Wing.L"),
         ("Wing.R", tuple(mir(WING_ROOT)), tuple(mir(wr)), "Body"), ("WingTip.R", tuple(mir(wr)), tuple(mir(tip)), "Wing.R"),
         ("Tail", TAIL[0], TAIL[2], "Root"), ("Tail2", TAIL[2], TAIL[4], "Tail"), ("Tail3", TAIL[4], tuple(t5), "Tail2"),
@@ -831,14 +883,14 @@ def animate(arm):
     nl = WING_N; nr = Vector((-WING_N.x, WING_N.y, WING_N.z)) * -1.0        # Flügel heben: Drehung um die Flächennormale
 
     def pose(flap=0.0, fold=0.0, sweep=0.0, pitch=0.0, fwd=0.0, jaw=0.0, tail=0.0, tail2=0.0, tail3=0.0, lift=0.0, hop=0.0,
-             bob=0.0, lean=0.0, turn=0.0):
+             bob=0.0, lean=0.0, turn=0.0, up=0.0):
         reset_pose(arm)
         for nm, n, sg in ((".L", nl, 1), (".R", nr, -1)):
             rot_world(arm, "Wing" + nm, (0, 0, 1), sweep * sg)
             rot_world(arm, "Wing" + nm, n, flap)
             rot_world(arm, "WingTip" + nm, n, fold)
         rot_world(arm, "Head", (1, 0, 0), -pitch); rot_world(arm, "Head", (0, 0, 1), turn)
-        move_world(arm, "Head", (0, -fwd, 0.25 * fwd))
+        move_world(arm, "Head", (0, -fwd, up))
         rot_world(arm, "Jaw", (1, 0, 0), jaw)
         rot_world(arm, "Tail", (0, 0, 1), tail); rot_world(arm, "Tail", (1, 0, 0), lift)
         rot_world(arm, "Tail2", (0, 0, 1), tail2); rot_world(arm, "Tail3", (0, 0, 1), tail3)
@@ -846,28 +898,33 @@ def animate(arm):
         move_world(arm, "Body", (0, 0, bob)); move_world(arm, "Root", (0, 0, hop))
 
     S = lambda t, ph=0.0: math.sin((t - ph) * 2 * math.pi)
-    idle = [(i * 8, (lambda t=i / 8.0: pose(flap=5 + 7 * S(t), fold=5 * S(t, 0.12), pitch=1.5 + 2.2 * S(t, 0.05), jaw=1.5 + 1.5 * S(t, 0.3),
+    idle = [(i * 8, (lambda t=i / 8.0: pose(flap=5 + 7 * S(t), fold=5 * S(t, 0.12), pitch=1.5 + 2.2 * S(t, 0.05), jaw=1.2 + 1.2 * S(t, 0.3),
                                             tail=7 * S(t), tail2=9 * S(t, 0.12), tail3=11 * S(t, 0.24), lift=2 + 2 * S(t, 0.1),
                                             bob=0.012 * S(t, 0.02), turn=1.5 * S(t * 0.5)))) for i in range(9)]
-    aim = dict(flap=24, fold=6, sweep=5, pitch=7, fwd=0.05, jaw=20, lift=9, tail2=0, lean=1.5)
+    aim = dict(flap=13, fold=13, sweep=9, pitch=9, fwd=0.05, up=0.025, jaw=9, lift=9, lean=1.5)
     shoot = [(0, lambda: pose(**aim)),
-             (3, lambda: pose(flap=37, fold=13, sweep=9, pitch=3, fwd=0.11, jaw=29, lift=14, lean=3.5, bob=-0.012)),
-             (7, lambda: pose(flap=19, fold=1, sweep=3, pitch=8.5, fwd=0.035, jaw=17, lift=7, lean=0.8)),
+             (3, lambda: pose(flap=23, fold=22, sweep=14, pitch=11, fwd=0.11, up=0.035, jaw=16, lift=14, lean=3.5, bob=-0.012)),
+             (7, lambda: pose(flap=10, fold=8, sweep=7, pitch=9.5, fwd=0.035, up=0.022, jaw=7, lift=7, lean=0.8)),
              (12, lambda: pose(**aim))]
-    win = [(i * 6, (lambda t=i / 8.0: pose(flap=16 + 22 * S(t * 2), fold=10 * S(t * 2, 0.1), pitch=9 + 3 * S(t * 2), jaw=13 + 5 * S(t * 2),
+    win = [(i * 6, (lambda t=i / 8.0: pose(flap=10 + 18 * S(t * 2), fold=6 + 12 * S(t * 2, 0.1), sweep=8, pitch=9 + 3 * S(t * 2), up=0.02, jaw=5 + 4 * S(t * 2),
                                            tail=14 * S(t), tail2=14 * S(t, 0.1), tail3=16 * S(t, 0.2), lift=10,
                                            hop=0.13 * abs(S(t)), lean=2 + 2 * S(t * 2), turn=4 * S(t)))) for i in range(9)]
     make_actions(arm, [("Idle", idle), ("Shoot", shoot), ("Victory", win)])
 
 def clearance(arm, g):
-    """Prüfschritt C: kleinster Abstand zwischen Teilen, die sich nicht berühren dürfen, über alle Bewegungen.
-    Negative Werte bedeuten: ein Punkt steckt im anderen Teil."""
+    """Prüfschritt C: kleinster Abstand zwischen Teilen, die sich nicht berühren dürfen, über alle Bewegungen, und wie
+    viele Punkte dabei im anderen Teil stecken (Strahl nach außen trifft dessen Oberfläche ungerade oft)."""
     grp = np.zeros(len(g.data.vertices), np.float32); g.data.attributes["gruppe"].data.foreach_get("value", grp)
     grp = np.rint(grp).astype(int)
-    pairs = [("Flügel – Kopf", (G_WL, G_WR), (G_HEAD,)), ("Flügel – Flügel", (G_WL,), (G_WR,)), ("Kiefer – Halsreif", (G_JAW,), (G_NECK,)),
+    pairs = [("Flügel – Kopf", (G_WL, G_WR), (G_HEAD,)), ("Flügel – Flügel", (G_WL,), (G_WR,)),
              ("Kopf – Halsreif", (G_HEAD,), (G_NECK,)), ("Flügel – Schwanz", (G_WL, G_WR), (G_TAIL,))]
     polys = [tuple(p.vertices) for p in g.data.polygons]
-    worst = {}
+    sets = []
+    for name, A, Bg in pairs:
+        tris = [p for p in polys if grp[p[0]] in Bg]
+        idx = sorted({i for p in tris for i in p}); remap = {i: k for k, i in enumerate(idx)}
+        sets.append((name, np.where(np.isin(grp, A))[0], idx, [tuple(remap[i] for i in p) for p in tris]))
+    worst = {}; ray = Vector((0.31, 0.52, 0.8)).normalized()
     arm.animation_data_create()
     for act in bpy.data.actions:
         arm.animation_data.action = act
@@ -876,22 +933,28 @@ def clearance(arm, g):
             bpy.context.scene.frame_set(f)
             dg = bpy.context.evaluated_depsgraph_get(); me = g.evaluated_get(dg).data
             co = [v.co.copy() for v in me.vertices]
-            for name, A, Bg in pairs:
-                tris = [p for p in polys if grp[p[0]] in Bg]
-                idx = sorted({i for p in tris for i in p}); remap = {i: k for k, i in enumerate(idx)}
-                bvh = BVHTree.FromPolygons([co[i] for i in idx], [tuple(remap[i] for i in p) for p in tris])
-                best = 9.0
-                for i in np.where(np.isin(grp, A))[0]:
-                    loc, nrm, _, dist = bvh.find_nearest(co[i], 0.3)
-                    if loc is not None:
-                        d = dist if (co[i] - loc).dot(nrm) >= 0 else -dist
-                        best = min(best, d)
+            for name, A, idx, tris in sets:
+                bvh = BVHTree.FromPolygons([co[i] for i in idx], tris)
+                best = 9.0; inside = 0
+                for i in A:
+                    loc, nrm, _, dist = bvh.find_nearest(co[i], 0.25)
+                    if loc is None:
+                        continue
+                    best = min(best, dist)
+                    if dist < 0.12:
+                        o = co[i]; hits = 0
+                        while hits < 20:
+                            h = bvh.ray_cast(o, ray, 5.0)[0]
+                            if h is None:
+                                break
+                            hits += 1; o = h + ray * 1e-4
+                        inside += hits % 2
                 key = (name, act.name)
-                if best < worst.get(key, (9.0, 0))[0]:
-                    worst[key] = (best, f)
+                if (inside, -best) > (worst.get(key, (0, -9.0, 0))[0], worst.get(key, (0, -9.0, 0))[1]):
+                    worst[key] = (inside, -best, f)
     arm.animation_data.action = None; reset_pose(arm); bpy.context.scene.frame_set(0)
-    for (name, an), (d, f) in sorted(worst.items()):
-        print("ABSTAND %-18s %-8s %6.3f (Bild %d)" % (name, an, d, f))
+    for (name, an), (ins, d, f) in sorted(worst.items()):
+        print("ABSTAND %-18s %-8s %6.3f, %d Punkte stecken drin (Bild %d)" % (name, an, -d, ins, f))
 
 # ---------------------------------------------------------------- Ablauf
 
@@ -903,11 +966,12 @@ def build(out, form=False):
     body = body_shape()
     line = belly_line(BVHTree.FromObject(body, bpy.context.evaluated_depsgraph_get()))
     belly_bulge(body, line)
-    to_tris(body, 5000); head = to_tris(head_shape(), 3400); jaw = to_tris(jaw_shape(), 700)
+    to_tris(body, 5000); head = to_tris(head_shape(), 4400)
     dg = bpy.context.evaluated_depsgraph_get()
-    bvh_b = BVHTree.FromObject(body, dg); bvh_h = BVHTree.FromObject(head, dg); bvh_j = BVHTree.FromObject(jaw, dg)
+    bvh_b = BVHTree.FromObject(body, dg); bvh_h = BVHTree.FromObject(head, dg)
     mark(body, T_BODY, G_BODY); body_weights(body)
-    parts = [body, mark(head, T_HEAD, G_HEAD, "Head"), mark(jaw, T_JAW, G_JAW, "Jaw")]
+    mark(head, T_HEAD, G_HEAD); head_weights(head)
+    parts = [body, head]
     parts += [mark(o, T_PLATE, G_HEAD, "Head") for o in head_plates()] + [mark(horn(s), T_HORN, G_HEAD, "Head") for s in (1, -1)]
     for o in spine_plates(bvh_b):
         yy = sum(v.co.y for v in o.data.vertices) / len(o.data.vertices)
@@ -922,11 +986,11 @@ def build(out, form=False):
     eye_m = eye_material()
     eye_parts = [mark(o, 20, G_HEAD, "Head") for o in eyes(bvh_h, eye_m)]
     parts += [mark(o, T_BROW, G_HEAD, "Head") for o in brows(bvh_h)]
-    up, low, tongue = teeth_tongue(bvh_h, bvh_j)
+    up, low, tongue = teeth_tongue(bvh_h)
     parts += [mark(o, T_TOOTH, G_HEAD, "Head") for o in up] + [mark(o, T_TOOTH, G_JAW, "Jaw") for o in low]
     parts += [mark(o, T_TONGUE, G_JAW, "Jaw") for o in tongue]
-    ring, front_r = collar(bvh_b)
-    frame, gem = pendant(front_r)
+    ring, front = collar(bvh_b)
+    frame, gem = pendant(front, bvh_b)
     tgem, tring = tail_gem()
     parts += [mark(ring, T_GOLD, G_NECK, "Body"), frame, gem, tgem, tring]
     for o, t, grp, bone in ((frame, T_GOLD, G_NECK, "Body"), (gem, T_GEM, G_NECK, "Body"), (tgem, T_GEM, G_TAIL, "Tail3"), (tring, T_GOLD, G_TAIL, "Tail3")):
@@ -936,7 +1000,7 @@ def build(out, form=False):
     # Glitzersterne und Nasenlöcher: Stellen auf der Haut
     sparks = {"skin": [], "nose": []}
     for s in (1, -1):
-        hit, n, _, _ = bvh_h.ray_cast(Vector((0.105 * s, H0.y - 2.0, H0.z - 0.02)), Vector((0, 1, 0)), 6.0)
+        hit, n, _, _ = bvh_h.ray_cast(Vector((0.1 * s, H0.y - 2.0, H0.z + 0.1)), Vector((0, 1, 0)), 6.0)
         sparks["nose"].append((tuple(hit), tuple(n)))
         for bv, o, d, size in ((bvh_h, (0.9 * s, -0.42, 1.27), (-1 * s, 0.25, 0), 0.04), (bvh_h, (0.9 * s, -0.3, 1.2), (-1 * s, 0.1, 0), 0.024),
                                (bvh_b, (0.9 * s, 0.18, 0.56), (-1 * s, 0, 0), 0.045), (bvh_b, (0.9 * s, 0.34, 0.4), (-1 * s, 0, 0), 0.026),
