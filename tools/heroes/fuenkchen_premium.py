@@ -25,7 +25,7 @@ TAIL_R = [0.215, 0.185, 0.15, 0.115, 0.082, 0.055]
 FRONT = (0.235, -0.3)                           # Vorderbein: x, y am Boden
 HIND = (0.285, 0.3)                             # Hinterbein
 WING_ROOT = Vector((0.15, 0.2, 0.86))           # Flügelansatz auf dem Rücken, hinter den Schultern
-WING_A = Vector((0.74, 0.67, 0.0)).normalized() # Spannrichtung: nach außen und hinten
+WING_A = Vector((0.8, 0.6, 0.0)).normalized()   # Spannrichtung: nach außen und hinten
 WING_B = Vector((0.0, 0.0, 1.0))                # nach oben
 WING_N = WING_A.cross(WING_B)                   # Flächennormale (zeigt nach vorn außen)
 WRIST = (0.4, 0.33)                             # Handgelenk in Flügelmaßen (entlang A, entlang B)
@@ -341,7 +341,7 @@ def line_param(P, pts):
 # ---------------------------------------------------------------- Bauchschilde
 
 SEG = 0.118                                     # Länge eines Bauchschilds entlang des Bauchs
-BELLY_W = ([0.0, 0.2, 0.55, 1.1, 1.45, 1.95, 2.3], [0.12, 0.185, 0.2, 0.185, 0.115, 0.062, 0.03])
+BELLY_W = ([0.0, 0.2, 0.42, 0.6, 0.8, 1.0, 1.2, 1.45, 1.95, 2.3], [0.12, 0.17, 0.155, 0.105, 0.105, 0.15, 0.115, 0.095, 0.05, 0.024])
 
 def belly_line(bvh):
     """Mittellinie der hellen Unterseite: Kehle, Brust, Bauch, Schwanzunterseite (auf der Haut)"""
@@ -361,7 +361,7 @@ def belly_fields(P, N, line):
     legf = np.hypot(ax_ - FRONT[0], y - FRONT[1]) / 0.158                                    # Vorderbein: Kreis um die Beinachse
     legh = np.hypot((ax_ - 0.275) / 0.185, (y - HIND[1] + 0.02) / 0.235)                    # Oberschenkel: Ellipse
     free = np.maximum(smoothstep(1.0, 1.1, np.minimum(legf, legh)), smoothstep(0.5, 0.6, z))
-    m = smoothstep(w + 0.008, w - 0.008, ax_) * smoothstep(0.36, 0.31, d) * free
+    m = smoothstep(w + 0.003, w - 0.003, ax_) * smoothstep(0.36, 0.31, d) * free * smoothstep(0.4, 0.1, N[..., 2])
     frac = ((par + 1.5 * x * x) / SEG) % 1.0
     return m, frac, np.abs(x) / np.maximum(w, 1e-3)
 
@@ -574,7 +574,7 @@ def tail_gem():
 
 # ---------------------------------------------------------------- Bemalung
 
-SK_D, SK_M, SK_L = (0.33, 0.13, 0.58), (0.5, 0.25, 0.79), (0.7, 0.45, 0.94)
+SK_D, SK_M, SK_L = (0.3, 0.11, 0.55), (0.46, 0.2, 0.76), (0.61, 0.34, 0.89)
 SK_SHADOW = (0.2, 0.07, 0.4)
 PL_D, PL_M, PL_L = (0.4, 0.1, 0.62), (0.62, 0.22, 0.86), (0.84, 0.52, 0.98)
 BEL_D, BEL_M, BEL_L = (0.27, 0.62, 0.66), (0.5, 0.84, 0.82), (0.72, 0.96, 0.92)
@@ -657,7 +657,7 @@ def paint(g, line, sparks):
     front = smoothstep(-0.08, -0.3, y - H0.y)                                              # Gesicht und Kinn: glatt
     k_sc = bd * smoothstep(0.05, 0.16, z) + hd * (1 - 0.88 * front) + 0.0 * jw
     sc = np.where(hd > 0, scales(P, N, 0.052), scales(P, N, 0.074)) * k_sc
-    skin = np.clip(skin * (1 + 0.95 * sc)[..., None] + f3((0.1, 0.08, 0.05)) * np.clip(sc, 0, 1)[..., None], 0, 1)
+    skin = np.clip(skin * (1 + 0.95 * sc)[..., None] + f3((0.07, 0.05, 0.04)) * np.clip(sc, 0, 1)[..., None], 0, 1)
     skin = mix(skin, SK_L, 0.22 * hd * front * smoothstep(-0.2, 0.25, N[..., 2]))        # Schnauze und Wangen etwas heller
     skin = mix(skin, (0.56, 0.24, 0.8), 0.5 * wa)                                          # Flügelarme: eine Spur röter
     skin = mix(skin, SK_SHADOW, 0.55 * occ)
@@ -666,8 +666,8 @@ def paint(g, line, sparks):
     # ---- helle Unterseite mit Schilden
     bel, frac, edge = belly_fields(P, N, line)
     bel = bel * bd
-    bcol = three(BEL_L, BEL_M, (0.36, 0.72, 0.74), frac ** 1.15)
-    bcol = mix(bcol, (0.14, 0.44, 0.54), np.clip(0.95 * smoothstep(0.86, 0.95, frac) * smoothstep(1.0, 0.975, frac), 0, 1))    # Fuge
+    bcol = three(BEL_L, BEL_M, (0.3, 0.66, 0.7), frac ** 1.1)
+    bcol = mix(bcol, (0.1, 0.38, 0.5), np.clip(smoothstep(0.82, 0.93, frac) * smoothstep(1.0, 0.985, frac), 0, 1))               # Fuge
     bcol = mix(bcol, BEL_D, 0.45 * smoothstep(0.72, 1.0, edge))
     bcol = bcol * (0.86 + 0.14 * tz)[..., None]
     bcol = mix(bcol, (0.16, 0.36, 0.5), 0.45 * occ)
@@ -901,10 +901,10 @@ def animate(arm):
     idle = [(i * 8, (lambda t=i / 8.0: pose(flap=5 + 7 * S(t), fold=5 * S(t, 0.12), pitch=1.5 + 2.2 * S(t, 0.05), jaw=1.2 + 1.2 * S(t, 0.3),
                                             tail=7 * S(t), tail2=9 * S(t, 0.12), tail3=11 * S(t, 0.24), lift=2 + 2 * S(t, 0.1),
                                             bob=0.012 * S(t, 0.02), turn=1.5 * S(t * 0.5)))) for i in range(9)]
-    aim = dict(flap=13, fold=13, sweep=9, pitch=9, fwd=0.05, up=0.025, jaw=9, lift=9, lean=1.5)
+    aim = dict(flap=12, fold=10, sweep=-7, pitch=9, fwd=0.05, up=0.025, jaw=9, lift=9, lean=1.5)
     shoot = [(0, lambda: pose(**aim)),
-             (3, lambda: pose(flap=23, fold=22, sweep=14, pitch=11, fwd=0.11, up=0.035, jaw=16, lift=14, lean=3.5, bob=-0.012)),
-             (7, lambda: pose(flap=10, fold=8, sweep=7, pitch=9.5, fwd=0.035, up=0.022, jaw=7, lift=7, lean=0.8)),
+             (3, lambda: pose(flap=24, fold=20, sweep=-2, pitch=11, fwd=0.11, up=0.035, jaw=16, lift=14, lean=3.5, bob=-0.012)),
+             (7, lambda: pose(flap=8, fold=5, sweep=-8, pitch=9.5, fwd=0.035, up=0.022, jaw=7, lift=7, lean=0.8)),
              (12, lambda: pose(**aim))]
     win = [(i * 6, (lambda t=i / 8.0: pose(flap=10 + 18 * S(t * 2), fold=6 + 12 * S(t * 2, 0.1), sweep=8, pitch=9 + 3 * S(t * 2), up=0.02, jaw=5 + 4 * S(t * 2),
                                            tail=14 * S(t), tail2=14 * S(t, 0.1), tail3=16 * S(t, 0.2), lift=10,
