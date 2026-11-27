@@ -1,6 +1,6 @@
 # Monster der Welt „Thron der Zauberin“ (Planet Schlangenhöhle, Boss Schlangenzauberin),
 # Vorlage_Raw/Thron_der_Zauberin_Monster_v1 (vier Bilder vom Nutzer, 27.11.2026). Alle drei haben zwei Arme und zwei Beine.
-#   thron_krabbler   Haubenwicht: kleiner Wicht als Kobra (Kopf frei vorn, Haube wächst hinter Hals und Kopf auf), Skelett Krabbler
+#   thron_krabbler   Haubenwicht: kleiner Wicht mit einfachem Schlangenkopf (ohne Haube, Wunsch 27.11.), Skelett Krabbler
 #   thron_zombie     Zirkelzischer: schlanker Schlangenpriester mit langem Hals, Weste und Goldreif, Skelett Zombie
 #   thron_brecher    Thronwächter: breiter Beschützer mit Kristall-Schulterplatten und Goldrand, Skelett Brecher
 # Farben und Gesicht wie bei den Schlangennest-Monstern (tools/monster/schlangennest.py): dunkelviolett mit klarem
@@ -357,87 +357,27 @@ def fangs(M, bvh, H, k, mouth, x, length, r=0.02):
 
 # ================================================================ Haubenwicht (leicht, Krabbler)
 
-WH = Vector((0.0, -0.07, 1.36))                 # Gesichtsmitte
-WK = 1.42                                       # Gesichtsgröße (Augen, Maul): der Kopf ist groß gegenüber dem Körper
+WH = Vector((0.0, -0.06, 1.28))                 # Kopfmitte
+WK = 1.42                                       # Kopfgröße: groß gegenüber dem kleinen Körper
 WMOUTH = (-0.1, -0.142, 0.118)
 W_EYE, W_EYE_SIZE = (0.105, 0.03), (0.072, 0.07)
-# Kobra (Wunsch 27.11.: „Schlangenoberkörper, hinten ein größerer Hohlraum, der wie bei einer Kobra nach oben geht“):
-# Der Schlangenhals steigt aus dem Halsreif auf und trägt den Kopf frei vorn. Dahinter wächst die Haube wie bei einer
-# aufgerichteten Kobra aus dem Körper nach oben: unten schmal am Hals, auf Augenhöhe am breitesten, oben rund; eine
-# dünne, nach vorn hohle Schale hinter Hals und Kopf (kein Deckel auf dem Kopf).
-HOOD_C, HOOD_R = Vector((0.0, 0.1, 1.42)), Vector((0.62, 0.3, 0.37))      # Mitte auf Augenhöhe; Halbachsen (Höhe nach oben)
-HOOD_DOWN = 0.5                                 # Höhe nach unten: die Haube läuft bis in den Hals am Halsreif
-HOOD_TILT = math.radians(8)                     # oben neigt sie sich leicht nach vorn
-HOOD_N = Vector((0.0, -math.cos(HOOD_TILT), -math.sin(HOOD_TILT)))
-HOOD_P = 0.2                                    # so weit vorn ist die Schale abgeschnitten (Kosinus des Öffnungswinkels)
-HOOD_WALL = 0.87                                # Innenseite = Außenseite mal diesem Faktor (dünne Haut)
 W_FOOT = (0.31, 0.03, 0.27)                     # Pfote: x, y (Knöchel), Größe
-
-def hood_base(n):
-    """Punkt der Haube außen in Richtung n (von der Mitte aus): oben runde Kuppel, nach unten läuft sie wie ein Blatt
-    spitz zum Hals zu (aufgerichtete Kobra von hinten)"""
-    nz = max(-1.0, min(1.0, n.z)); p = 2.0 if nz >= 0 else 1.45
-    lat = (1 - abs(nz) ** p) ** (1 / p)
-    h = math.hypot(n.x, n.y)
-    dx, dy = (n.x / h, n.y / h) if h > 1e-6 else (0.0, 0.0)
-    return Vector((HOOD_C.x + HOOD_R.x * lat * dx, HOOD_C.y + HOOD_R.y * lat * dy, HOOD_C.z + (HOOD_R.z if nz >= 0 else HOOD_DOWN) * nz))
-
-def hood_dir(theta, phi):
-    """Richtung im Rahmen der Öffnung: theta = Winkel zur Öffnungsachse, phi rundum"""
-    e2 = Vector((0.0, -math.sin(HOOD_TILT), math.cos(HOOD_TILT)))
-    return HOOD_N * math.cos(theta) + (Vector((1, 0, 0)) * math.cos(phi) + e2 * math.sin(phi)) * math.sin(theta)
-
-def hood_pt(deg, elev, inside=False):
-    a = math.radians(deg); e = math.radians(elev)
-    p = hood_base(Vector((math.cos(e) * math.sin(a), -math.cos(e) * math.cos(a), math.sin(e))))
-    return tuple(HOOD_C + (p - HOOD_C) * (HOOD_WALL - 0.004)) if inside else tuple(p)
-
-def cobra_hood(nphi=60, nth=20):
-    """Kobrahaube als dünne Schale: Außenhaut, Innenhaut und ein runder Rand, als ein geschlossener Körper"""
-    th0 = math.acos(HOOD_P)
-    bm = bmesh.new()
-    inner = lambda u: HOOD_C + (hood_base(u) - HOOD_C) * HOOD_WALL
-    ring = lambda f, th: [bm.verts.new(f(hood_dir(th, i * 2 * math.pi / nphi))) for i in range(nphi)]
-    ths = [th0 + (math.pi - th0) * j / nth for j in range(nth)]
-    outer = [ring(hood_base, th) for th in ths]; inn = [ring(inner, th) for th in ths]
-    lip = []
-    for t in (0.2, 0.5, 0.8):                                       # runder Rand zwischen Außen- und Innenhaut
-        r = []
-        for i in range(nphi):
-            a, b = outer[0][i].co, inn[0][i].co
-            fwd = (hood_base(hood_dir(th0 - 0.06, i * 2 * math.pi / nphi)) - a).normalized()
-            r.append(bm.verts.new(a.lerp(b, t) + fwd * (0.55 * (a - b).length * math.sin(math.pi * t))))
-        lip.append(r)
-    rings = outer[::-1] + lip + inn
-    for r0, r1 in zip(rings, rings[1:]):
-        for i in range(nphi):
-            bm.faces.new([r0[i], r0[(i + 1) % nphi], r1[(i + 1) % nphi], r1[i]])
-    for pole, r in ((bm.verts.new(hood_base(-HOOD_N)), rings[0]), (bm.verts.new(inner(-HOOD_N)), rings[-1])):
-        for i in range(nphi):
-            bm.faces.new([pole, r[i], r[(i + 1) % nphi]])
-    return finish("Haube", bm)
-
-def wicht_head(R):
-    H = WH
-    mb_ell(R, H, (0.34, 0.32, 0.26))                                                # Schlangenkopf, frei vor der Haube
-    mb_ell(R, H + Vector((0, -0.02, 0.1)), (0.29, 0.29, 0.13))                      # flacher Schädel
-    mb_ell(R, H + Vector((0, -0.2, -0.07)), (0.23, 0.16, 0.115))                    # Schnauze
-    mb_ell(R, H + Vector((0, -0.14, -0.19)), (0.25, 0.21, 0.11))                    # Unterkiefer
-    for s in (1, -1):
-        mb_ell(R, H + Vector((0.19 * s, -0.07, -0.08)), (0.14, 0.18, 0.14))         # Wange
+HAND_ROLL = {"krabbler": -115, "zombie": -110, "brecher": -97}   # Grad um die Armachse: Handfläche zeigt in Schlagrichtung
+# (gemessen an der Angriffsbewegung der Skelette; in der Laufhaltung zeigt sie damit zum Körper, der Daumen nach vorn)
 
 def wicht_shape(arm):
+    """Einfach gehalten (Wunsch 27.11.): ein ganz normaler Schlangenkopf auf kurzem Hals, keine Haube dahinter"""
     R = mb_family("Wicht")
-    mb_caps(R, (0, 0.01, 0.8), (0, -0.03, 1.2), 0.13)                               # Schlangenhals steigt aus dem Halsreif auf
+    mb_caps(R, (0, 0.01, 0.8), (0, -0.02, 1.14), 0.125)                             # kurzer, kräftiger Schlangenhals
     mb_ell(R, (0, 0.0, 0.79), (0.2, 0.15, 0.12))                                    # schmale Schultern
     mb_ell(R, (0, -0.01, 0.65), (0.2, 0.17, 0.17))                                  # Bauch
     mb_ell(R, (0, 0.01, 0.5), (0.2, 0.15, 0.13))                                    # schmale Hüfte: die Arme schwingen frei daneben
-    wicht_head(R)
+    snake_head(R, WH, WK)
     for s, side in ((1, "Left"), (-1, "Right")):
         el, wr = B(arm, side + "ForeArm"), B(arm, side + "Hand")
         limb(R, [(0.16 * s, 0.0, 0.83), el, wr + (wr - el).normalized() * 0.02], [0.062, 0.07])
         hip, kn, an = Vector((0.12 * s, 0.02, 0.44)), Vector((0.21 * s, 0.01, 0.3)), Vector((0.29 * s, 0.01, 0.17))
-        limb(R, [hip, kn, an], [0.1, 0.165])                                      # Beine stehen weit und werden nach unten breiter
+        limb(R, [hip, kn, an], [0.1, 0.165])                                        # Beine stehen weit und werden nach unten breiter
     parts = [mb_to_mesh(R)]
     for s in (1, -1):
         parts += paw("Pfote%d" % s, W_FOOT[0] * s, W_FOOT[1], W_FOOT[2])
@@ -448,51 +388,37 @@ def paint_wicht(g, arm, brow_lines):
     ao = vertex_ao(g, rays=18, dist=0.3)
     T = texels(g); P, N, cov = T["P"], T["N"], T["cov"]
     AO = texel_values(T, ao)
-    hoodm = texel_values(T, part_tags(g)) > 0.5                     # Haube (eigenes Teil), sonst Haut
     x, y, z = P[..., 0], P[..., 1], P[..., 2]
     k = WK; H = WH
     jaw, mouth, hd = face_masks(P, H, k, WMOUTH)
-    head = (~hoodm) & (z > 0.985)
-    face = head & (hd < 1.0) & (y < H.y + 0.15)
+    head = z > 0.985
+    face = head & (hd < 1.0)
     col = violet(N)
     em = np.zeros(P.shape, np.float32)
-    # Haube: außen wie die Haut, innen heller und zur Tiefe hin dunkler (man sieht den Hohlraum), heller Rand
-    inner = hoodm & (np.sum(N * (f3(HOOD_C) - P), axis=-1) > 0)
-    q = (P - f3(HOOD_C)) / f3(HOOD_R)
-    cosr = (q / np.maximum(np.linalg.norm(q, axis=-1, keepdims=True), 1e-6)) @ f3(HOOD_N)
-    col = mix(col, (0.52, 0.27, 0.78), 0.8 * inner)
-    col = mix(col, SKIN_D, 0.55 * inner * smoothstep(HOOD_P - 0.1, HOOD_P - 0.95, cosr))
-    col = mix(col, SKIN_L, 0.45 * hoodm * np.exp(-((cosr - HOOD_P) / 0.06) ** 2))
-    # heller Bauch: Schild am Rumpf, Vorderseite des Schlangenhalses bis zum Unterkiefer
+    # heller Bauch: Schild am Rumpf, Vorderseite des Halses bis zum Unterkiefer
     sh = (np.abs(x) / 0.165) ** 2.6 + (np.abs(z - 0.7) / 0.235) ** 2.6
-    plate = smoothstep(1.06, 0.94, sh) * smoothstep(-0.05, -0.32, N[..., 1]) * (~head) * (~hoodm)
-    throat = smoothstep(0.014, -0.014, np.abs(x) - 0.09) * smoothstep(-0.15, -0.5, N[..., 1]) * (z > 0.93) * (z < H.z - 0.17 * k) * (~hoodm)
+    plate = smoothstep(1.06, 0.94, sh) * smoothstep(-0.05, -0.32, N[..., 1]) * (~head)
+    throat = smoothstep(0.014, -0.014, np.abs(x) - 0.09) * smoothstep(-0.15, -0.5, N[..., 1]) * (z > 0.93) * (z < H.z - 0.17 * k)
     bel = np.clip(np.maximum(np.maximum(plate, throat), jaw * face), 0, 1)
     bcol = belly_col(N)
     lines = np.zeros(P.shape[:-1], np.float32)
-    for zl in (0.585, 0.695, 0.805, 0.99, 1.05, 1.11):
+    for zl in (0.585, 0.695, 0.805, 0.985, 1.04):
         lines = np.maximum(lines, np.clip(1.4 * (1 - np.abs(z - 0.9 * x * x - zl) / 0.009), 0, 1))
     bcol = mix(bcol, BELLY_LINE, 0.7 * lines * np.maximum(plate, throat * (1 - jaw)))
     bcol = mix(bcol, BELLY_LINE, 0.5 * smoothstep(0.8, 1.02, sh) * plate)        # Rand des Schilds etwas dunkler
     col = col * (1 - bel[..., None]) + bcol * bel[..., None]
     col = mix(col, (0.16, 0.05, 0.26), mouth * face)
-    col = brow_shade(P, col, brow_lines, 0.02 * k) if brow_lines else col
+    col = brow_shade(P, col, brow_lines, 0.02 * k)
     col = paw_paint(P, N, col, [(W_FOOT[0] * s, W_FOOT[1], W_FOOT[2], 3) for s in (1, -1)])
-    # Leuchtstreifen: außen zwei Sicheln von vorn über die Haube, je eine seitlich und hinten; innen eine Sichel neben
-    # jeder Wange; eine schräg über jeden Oberschenkel
-    lo, li, lt = [], [], []
-    lh = []
+    # Leuchtstreifen: zwei kurze Sicheln auf der Stirn, zwei längere über den Hinterkopf, eine schräg über jeden Oberschenkel
+    lt, lh = [], []
     for s in (1, -1):
-        lo.append([hood_pt(s * d, el) for d, el in ((170, 56), (155, 38), (147, 14), (150, -12), (160, -34))])
-        lo.append([hood_pt(s * d, el) for d, el in ((128, 50), (118, 32), (113, 12), (114, -8))])
-        li.append([hood_pt(s * d, el, True) for d, el in ((138, 56), (124, 46), (113, 33), (106, 18))])
-        li.append([hood_pt(s * d, el, True) for d, el in ((105, 2), (108, -14), (115, -30), (126, -45))])
         lt.append([surf(bvh, (s * dx, -1.5, dz), (s * dx, 1.0, dz)) for dx, dz in ((0.17, 0.56), (0.235, 0.5), (0.29, 0.42), (0.3, 0.33))])
         lh.append([surf(bvh, (s * dx * k, -2.0, H.z + dz * k), (s * dx * k, 1.0, H.z + dz * k)) for dx, dz in ((0.035, 0.128), (0.08, 0.148), (0.13, 0.158), (0.175, 0.148))])
+        lh.append([surf(bvh, (s * dx * k, 2.0, H.z + dz * k), (s * dx * k, -1.0, H.z + dz * k)) for dx, dz in ((0.05, 0.16), (0.11, 0.1), (0.14, 0.02), (0.12, -0.07))])
     fields = [np.zeros(P.shape[:-1], np.float32) for _ in range(3)]
-    for lines3, keep, width, bv in ((lo, hoodm & ~inner, 0.046, None), (li, inner, 0.042, None), (lt, (1 - bel) * (~hoodm) * (z < 0.75), 0.046, bvh),
-                                    (lh, head * (1 - bel), 0.024, bvh)):
-        for i, f in enumerate(glow_stripes(P, lines3, width, bv)):
+    for lines3, keep, width in ((lt, (1 - bel) * (z < 0.75), 0.046), (lh, head * (1 - bel), 0.026)):
+        for i, f in enumerate(glow_stripes(P, lines3, width, bvh)):
             fields[i] = np.maximum(fields[i], f * keep)
     col = shade(col, AO, (1 - fields[0]) * (1 - 0.5 * bel))
     col, em = paint_glow(col, em, fields)
@@ -501,18 +427,17 @@ def paint_wicht(g, arm, brow_lines):
 @variante("thron_krabbler", "krabbler")
 def haubenwicht(arm, body):
     remove_body(body)
-    M = throne_mats(2048)
-    hands = [comic_hand("Hand" + side, arm, side, k=1.05, n=3, curl=0.35) for side in ("Left", "Right")]
+    M = throne_mats(1024)
+    hands = [comic_hand("Hand" + side, arm, side, k=1.05, n=3, curl=0.35, roll=math.radians(HAND_ROLL["krabbler"])) for side in ("Left", "Right")]
     g = join_parts(wicht_shape(arm), "Haubenwicht")
     finish_skin(g, 0.011, 0.3, smooth_it=6)
     reduce(g, 0.2)
     tag(g, 0)
     bind_biped(g, arm, lambda c: "Head" if c.z > 0.985 else None, core=lambda c: abs(c.x) < 0.19 and 0.4 < c.z < 0.8)
-    fbvh = BVHTree.FromObject(g, bpy.context.evaluated_depsgraph_get())      # Gesicht wird auf den Kopf gesetzt, nicht auf die Haube
+    fbvh = BVHTree.FromObject(g, bpy.context.evaluated_depsgraph_get())
     brows, brow_lines = eye_brows(fbvh, WH, WK, W_EYE, W_EYE_SIZE, 0.02)
-    hood = tag(cobra_hood(), 1)
-    rigid_parts(brows + [hood], "Head")
-    g = join_parts([g] + hands + brows + [hood], "Haubenwicht")
+    rigid_parts(brows, "Head")
+    g = join_parts([g] + hands + brows, "Haubenwicht")
     for p in g.data.polygons:
         p.use_smooth = True
     g.data.materials.clear(); g.data.materials.append(M["skin"])
@@ -535,9 +460,10 @@ Z_EYE, Z_EYE_SIZE = (0.123, 0.004), (0.08, 0.062)
 Z_NECK = [(0.0, 0.0, 1.16), (0.0, 0.03, 1.28), (0.0, 0.04, 1.4), (0.0, 0.0, 1.5), (0.0, -0.05, 1.56)]
 Z_FOOT = (0.19, 0.04, 0.195)                    # Pfote: x, y (Knöchel), Größe
 # Jacke: Höhe -> halbe Breite, halbe Tiefe (liegt mit Abstand über dem Körper, unten ausgestellt)
-VEST = [(1.175, 0.1, 0.09), (1.15, 0.15, 0.108), (1.12, 0.194, 0.126), (1.07, 0.208, 0.14), (1.0, 0.198, 0.146), (0.93, 0.18, 0.14), (0.82, 0.162, 0.132),
+VEST = [(1.175, 0.095, 0.09), (1.15, 0.115, 0.102), (1.12, 0.14, 0.116), (1.07, 0.166, 0.134), (1.0, 0.18, 0.144), (0.93, 0.174, 0.14), (0.82, 0.162, 0.132),
         (0.75, 0.172, 0.138), (0.69, 0.195, 0.156), (0.635, 0.225, 0.18)]
 VEST_TOP, VEST_V = 1.175, 0.83                   # Kragen; hier endet der Ausschnitt vorn
+VEST_HOLE = 0.098                               # Armausschnitt: weit genug, dass der Arm in jeder Bewegung frei bleibt
 
 def vest_at(z):
     zs = [v[0] for v in VEST][::-1]
@@ -561,13 +487,19 @@ def frame_of(axis):
     x = x.normalized() if x.length > 1e-3 else Vector((1, 0, 0))
     return x, z.cross(x).normalized(), z
 
-def spine_weights(o, arm, bones=("Hips", "Spine", "Spine1", "Spine2")):
+def spine_weights(o, arm, bones=("Hips", "Spine", "Spine1", "Spine2"), only=None):
     """Kleidung am Rumpf: Gewichte weich nach der Höhe zwischen den Wirbelknochen verteilt (keine Arm- oder Beinknochen).
-    So bleiben Stoff und Kanten in der Bewegung glatt, statt dass jede Stelle an einem anderen Knochen zieht."""
+    So bleiben Stoff und Kanten in der Bewegung glatt, statt dass jede Stelle an einem anderen Knochen zieht.
+    only(Punkt): nur diese Punkte (für die Haut unter der Kleidung, damit sie genau wie der Stoff läuft)."""
     heads = [B(arm, b).z for b in bones]
     mids = [(a + b) / 2 for a, b in zip(heads, heads[1:])] + [heads[-1] + 0.06]
-    groups = [o.vertex_groups.new(name="mixamorig:" + b) for b in bones]
+    groups = [o.vertex_groups.get("mixamorig:" + b) or o.vertex_groups.new(name="mixamorig:" + b) for b in bones]
     for v in o.data.vertices:
+        if only:
+            if not only(v.co):
+                continue
+            for g in o.vertex_groups:
+                g.remove([v.index])
         z = v.co.z
         if z <= mids[0]:
             w = [1.0] + [0.0] * (len(bones) - 1)
@@ -611,7 +543,7 @@ def vest_parts(arm):
     parts = []; holes = []; cloth = []
     for s, side in ((1, "Left"), (-1, "Right")):                   # Armlöcher: mit einem Zylinder sauber ausgeschnitten
         sh, el = B(arm, side + "Arm"), B(arm, side + "ForeArm")
-        d = (el - sh).normalized(); x, y, _ = frame_of(d); Rh = 0.086
+        d = (el - sh).normalized(); x, y, _ = frame_of(d); Rh = VEST_HOLE
         cyl = tube("Armloch", [tuple(sh - d * 0.1), tuple(sh - d * 0.09), tuple(sh + d * 0.3), tuple(sh + d * 0.31)], [0.0, Rh, Rh, 0.0], segs=40)
         md = o.modifiers.new("Loch", 'BOOLEAN'); md.operation = 'DIFFERENCE'; md.object = cyl; md.solver = 'EXACT'
         apply_mod(o, md)
@@ -738,10 +670,19 @@ def zirkelzischer(arm, body):
     reduce(g, 0.16)
     tag(g, 0)
     bind_biped(g, arm, lambda c: "Head" if c.z > 1.3 else None)
+    axes = [(B(arm, side + "Arm"), (B(arm, side + "ForeArm") - B(arm, side + "Arm")).normalized()) for side in ("Left", "Right")]
+    def under_vest(c):                                              # Haut, die unter der Jacke liegt (nicht die Schultern in den Armausschnitten)
+        if not (0.66 < c.z < 1.165):
+            return False
+        rx, ry = vest_at(c.z)
+        if (c.x / (rx - 0.004)) ** 2 + (c.y / (ry - 0.004)) ** 2 > 1:
+            return False
+        return all(((c - a) - d * max(-0.03, (c - a).dot(d))).length > VEST_HOLE - 0.012 for a, d in axes)
+    spine_weights(g, arm, only=under_vest)
     fbvh = BVHTree.FromObject(g, bpy.context.evaluated_depsgraph_get())
     brows, brow_lines = eye_brows(fbvh, ZH, ZK, Z_EYE, Z_EYE_SIZE, 0.022)
     rigid_parts(brows, "Head")
-    hands = [comic_hand("Hand" + side, arm, side, k=0.82, n=4, curl=0.25, slim=0.82, reach=1.25) for side in ("Left", "Right")]
+    hands = [comic_hand("Hand" + side, arm, side, k=0.82, n=4, curl=0.25, slim=0.82, reach=1.25, roll=math.radians(HAND_ROLL["zombie"])) for side in ("Left", "Right")]
     cloth, trim = vest_parts(arm)
     g = join_parts([g] + hands + brows + cloth + trim, "Zirkelzischer")
     for p in g.data.polygons:
@@ -931,7 +872,7 @@ def thronwaechter(arm, body):
     fbvh = BVHTree.FromObject(g, bpy.context.evaluated_depsgraph_get())
     brows, brow_lines = eye_brows(fbvh, TH, TK, T_EYE, T_EYE_SIZE, 0.024)
     rigid_parts(brows, "Head")
-    hands = [comic_hand("Hand" + side, arm, side, k=1.75, n=4, curl=0.8) for side in ("Left", "Right")]
+    hands = [comic_hand("Hand" + side, arm, side, k=1.75, n=4, curl=0.8, roll=math.radians(HAND_ROLL["brecher"])) for side in ("Left", "Right")]
     crystal, gold = guard_armor(arm, M)
     g = join_parts([g] + hands + brows + crystal, "Thronwaechter")
     for p in g.data.polygons:
