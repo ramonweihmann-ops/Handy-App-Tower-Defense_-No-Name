@@ -68,7 +68,7 @@ def sweep(name, pts, radii, segs=14, flat=1.0, flat_axis=None):
             bm.faces.new([a[k], a[(k + 1) % segs], b[(k + 1) % segs], b[k]])
     return finish(name, bm)
 
-def leaf(name, base, up, along, height, length, thick, lean=0.0, sink=0.35, segs=(12, 8), petal=False):
+def leaf(name, base, up, along, height, length, thick, lean=0.0, sink=0.35, segs=(10, 6), petal=False):
     """Weiche Platte (Rückenkamm, Kragenblatt): unten breit, oben eine runde Spitze; lean kippt die Spitze entlang
     'along'. Der untere Teil steckt im Körper. petal: Blattform, am breitesten ein Drittel über dem Ansatz."""
     up = Vector(up).normalized(); along = Vector(along); along = (along - up * along.dot(up)).normalized()
@@ -89,7 +89,7 @@ def claw(name, base, d, r, L, drop=0.35):
     """stumpfe, leicht nach unten gebogene Kralle"""
     d = Vector(d).normalized(); base = Vector(base)
     pts = [base + d * (L * t) + Vector((0, 0, -drop * L * t * t)) for t in (0.0, 0.3, 0.6, 0.85, 1.0)]
-    return sweep(name, pts, [r, r * 0.92, r * 0.72, r * 0.48, r * 0.26], segs=10)
+    return sweep(name, pts, [r, r * 0.92, r * 0.72, r * 0.48, r * 0.26], segs=8)
 
 # ---------------------------------------------------------------- Rumpf mit Hals, Beinen und Schwanz
 
@@ -130,6 +130,8 @@ def head_shape():
         mb_ell(R, H0 + Vector((0.1 * s, -0.46, -0.035)), (0.078, 0.075, 0.052))     # Nasenhöcker
     mb_ell(R, H0 + Vector((0, -0.34, -0.118)), (0.25, 0.215, 0.125))                # Schnauze, sitzt im Schädel
     mb_ell(R, H0 + Vector((0, -0.37, -0.262)), (0.17, 0.17, 0.045), neg=True)       # Gaumen: flache Mulde
+    for s in (1, -1):
+        mb_ell(R, H0 + Vector((0.105 * s, -0.535, -0.02)), (0.03, 0.03, 0.024), neg=True)   # Nasenloch
     g = mb_to_mesh(R)
     finish_skin(g, 0.012, 1.0, smooth_it=6)
     return g
@@ -137,24 +139,30 @@ def head_shape():
 def jaw_shape():
     """Unterkiefer, geschlossen gebaut und dann um das Gelenk aufgeklappt"""
     R = mb_family("Kiefer")
-    mb_ell(R, (0, -0.4, 1.078), (0.2, 0.245, 0.092))                                # Kinn: sitzt unter der Schnauze, etwas kürzer
+    mb_ell(R, (0, -0.385, 1.076), (0.2, 0.235, 0.096))                              # Kinn: sitzt unter der Schnauze, etwas kürzer
     mb_ell(R, (0, -0.26, 1.09), (0.22, 0.15, 0.095))                                # Kinnbacke hinten, steckt im Kopf
-    mb_ell(R, (0, -0.42, 1.2), (0.13, 0.165, 0.045), neg=True)                      # Mundboden: Mulde für die Zunge
+    mb_ell(R, (0, -0.4, 1.205), (0.12, 0.15, 0.036), neg=True)                      # Mundboden: flache Mulde für die Zunge
     g = mb_to_mesh(R)
     finish_skin(g, 0.011, 1.0, smooth_it=6)
     g.data.transform(Matrix.Translation(HINGE) @ Matrix.Rotation(math.radians(JAW_OPEN), 4, 'X') @ Matrix.Translation(-HINGE))
     g.data.update()
     return g
 
+HORN_N = 16
+
+def horn_pts(side):
+    p0 = H0 + Vector((0.225 * side, 0.02, 0.22)); p1 = H0 + Vector((0.52 * side, 0.05, 0.43)); p2 = H0 + Vector((0.25 * side, 0.2, 0.61))
+    return [qbez(p0, p1, p2, i / (HORN_N - 1)) for i in range(HORN_N)]
+
 def horn(side):
     p0 = H0 + Vector((0.225 * side, 0.02, 0.22)); p1 = H0 + Vector((0.52 * side, 0.05, 0.43)); p2 = H0 + Vector((0.25 * side, 0.2, 0.61))
-    n = 22; pts = []; rad = []
+    n = HORN_N; pts = []; rad = []
     for i in range(n):
         t = i / (n - 1)
         pts.append(qbez(p0, p1, p2, t))
         r = 0.128 * (1 - t) ** 0.8 + 0.022
         rad.append(r * (1 + 0.045 * math.cos(t * 2 * math.pi * 4.2 + 0.6) * (1 - t)))     # sanfte Ringe
-    return sweep("Horn%d" % side, pts, rad, segs=16)
+    return sweep("Horn%d" % side, pts, rad, segs=12)
 
 def head_plates():
     """Kamm auf dem Kopf (drei Blätter zwischen den Hörnern), Platten den Hinterkopf hinab, Kragenblätter seitlich"""
@@ -217,14 +225,14 @@ def wing(side):
     """Ein Flügel: Arm vom Rücken zum Handgelenk, drei Finger, dazwischen die dünne Haut mit geschwungenem Rand.
     Liefert (Arme und Finger, Flughaut)."""
     W = lambda q, n=0.0: wing_pt(q.x, q.y, n, side)
-    bones = [sweep("FluegelArm%d" % side, [W(arm_curve(t)) for t in np.linspace(0, 1, 9)], list(np.linspace(0.062, 0.046, 9)), segs=12)]
+    bones = [sweep("FluegelArm%d" % side, [W(arm_curve(t)) for t in np.linspace(0, 1, 9)], list(np.linspace(0.062, 0.046, 9)), segs=10)]
     for i, (r0, r1) in enumerate(((0.044, 0.014), (0.032, 0.011), (0.03, 0.011))):
-        bones.append(sweep("Finger%d_%d" % (side, i), [W(finger_curve(i, t)) for t in np.linspace(0, 1, 12)], list(np.linspace(r0, r1, 12)), segs=10))
-    bones.append(sphere("Handgelenk%d" % side, tuple(W(Vector((WRIST[0], WRIST[1], 0)))), 0.056, segs=(14, 10)))
-    bones.append(sphere("Schulter%d" % side, tuple(W(Vector((0.0, -0.01, 0)))), 0.082, segs=(14, 10)))
+        bones.append(sweep("Finger%d_%d" % (side, i), [W(finger_curve(i, t)) for t in np.linspace(0, 1, 9)], list(np.linspace(r0, r1, 9)), segs=8))
+    bones.append(sphere("Handgelenk%d" % side, tuple(W(Vector((WRIST[0], WRIST[1], 0)))), 0.056, segs=(10, 7)))
+    bones.append(sphere("Schulter%d" % side, tuple(W(Vector((0.0, -0.01, 0)))), 0.082, segs=(12, 8)))
     # Flughaut: Felder zwischen den Fingern und zwischen innerem Finger und Arm
     curves = [lambda t, i=i: finger_curve(i, t) for i in range(3)] + [lambda t: arm_curve(1 - t)]
-    bm = bmesh.new(); ns, nt = 9, 10; cache = {}
+    bm = bmesh.new(); ns, nt = 6, 7; cache = {}
     def vert(panel, si, ti):
         key = (panel, si, ti) if 0 < si < ns else ((panel if si == 0 else panel + 1), 0, ti)
         if ti == 0:
@@ -249,33 +257,737 @@ def wing(side):
         p.use_smooth = True
     return bones, skin
 
+# ---------------------------------------------------------------- Teile kennzeichnen
+
+T_BODY, T_PLATE, T_HORN, T_MEM, T_BROW, T_TONGUE, T_TOOTH, T_GEM, T_GOLD, T_JAW, T_HEAD, T_WARM, T_CLAW = range(13)
+G_BODY, G_HEAD, G_JAW, G_WL, G_WR, G_NECK, G_TAIL = range(7)       # Gruppen für die Prüfung auf Durchdringungen
+
+def mark(o, teil, grp, bone=None):
+    """Teilnummer (für die Bemalung) und Gruppe (für die Prüfung) je Punkt merken; bone: starr an diesem Knochen"""
+    tag(o, teil)
+    a = o.data.attributes.new("gruppe", 'FLOAT', 'POINT'); a.data.foreach_set("value", [float(grp)] * len(o.data.vertices))
+    if bone:
+        group_all(o, bone)
+    return o
+
+def to_tris(o, target):
+    """auf etwa target Dreiecke verringern"""
+    n = sum(len(p.vertices) - 2 for p in o.data.polygons)
+    if n > target:
+        reduce(o, target / n)
+    return o
+
+def ramp(x, a, b):
+    t = max(0.0, min(1.0, (x - a) / (b - a)))
+    return t * t * (3 - 2 * t)
+
+def line_param(P, pts):
+    """Abstand zur Linie durch pts und Lage entlang der Linie (Bogenlänge) für jeden Punkt in P"""
+    best = np.full(P.shape[:-1], 9.0, np.float32); par = np.zeros(P.shape[:-1], np.float32); cum = 0.0
+    for a, b in zip(pts, pts[1:]):
+        a = f3(a); b = f3(b); ab = b - a; L = float(np.linalg.norm(ab))
+        t = np.clip(((P - a) @ ab) / max(L * L, 1e-9), 0, 1)
+        d = np.linalg.norm(P - (a + t[..., None] * ab), axis=-1)
+        closer = d < best
+        par = np.where(closer, cum + t * L, par); best = np.where(closer, d, best); cum += L
+    return best, par
+
+# ---------------------------------------------------------------- Bauchschilde
+
+SEG = 0.118                                     # Länge eines Bauchschilds entlang des Bauchs
+BELLY_W = ([0.0, 0.2, 0.55, 1.1, 1.45, 1.95, 2.3], [0.1, 0.165, 0.185, 0.175, 0.11, 0.06, 0.03])
+
+def belly_line(bvh):
+    """Mittellinie der hellen Unterseite: Kehle, Brust, Bauch, Schwanzunterseite (auf der Haut)"""
+    pts = []
+    for zz in (1.0, 0.9, 0.8, 0.7, 0.6, 0.5):
+        pts.append(bvh.ray_cast(Vector((0, -2.0, zz)), Vector((0, 1, 0)), 6.0)[0])
+    for yy in (-0.27, -0.15, 0.0, 0.15, 0.3, 0.43, 0.56, 0.7, 0.85, 1.0, 1.15, 1.28):
+        pts.append(bvh.ray_cast(Vector((0, yy, -1.0)), Vector((0, 0, 1)), 6.0)[0])
+    return [tuple(p) for p in pts]
+
+def belly_fields(P, N, line):
+    """Maske der Unterseite (0..1) und Lage im Schild (0 = oberer Rand, 1 = unterer Rand)"""
+    d, par = line_param(P, line)
+    x = P[..., 0]
+    w = np.interp(par, BELLY_W[0], BELLY_W[1]).astype(np.float32)
+    inward = N[..., 0] * np.sign(x)
+    m = smoothstep(w + 0.012, w - 0.012, np.abs(x)) * smoothstep(0.27, 0.2, d) * smoothstep(-0.55, -0.15, inward)
+    frac = ((par + 1.5 * x * x) / SEG) % 1.0
+    return m, frac, np.abs(x) / np.maximum(w, 1e-3)
+
+def belly_bulge(body, line):
+    """Schilde leicht aufwölben, an den Fugen bleibt die Haut auf ihrer Höhe"""
+    me = body.data; n = len(me.vertices)
+    P = np.zeros(n * 3, np.float32); me.vertices.foreach_get("co", P); P = P.reshape(n, 3)
+    N = np.array([tuple(v.normal) for v in me.vertices], np.float32)
+    m, frac, _ = belly_fields(P, N, line)
+    P += N * (0.016 * m * np.sin(np.pi * np.clip(frac, 0, 1)) ** 0.6)[:, None]
+    me.vertices.foreach_set("co", P.ravel()); me.update()
+
+# ---------------------------------------------------------------- Gesicht
+
+EYE = (0.2, 0.09)                               # Augenmitte: x, z ab Kopfmitte
+EYE_R = (0.108, 0.075, 0.13)                    # halbe Breite, Tiefe, halbe Höhe des Augapfels
+EYES = []                                       # je Auge: Mitte, Achse rechts, Achse oben, Blickachse
+
+def eye_material():
+    """Großes Kulleraugen-Bild mit weichen Verläufen: Augenweiß mit Lidschatten, Iris oben türkis und unten golden,
+    große Pupille, zwei Glanzlichter, dunkler Lidrand. Bildmitte = Augenmitte."""
+    n = 256
+    ax = np.linspace(-1, 1, n, dtype=np.float32); x, y = np.meshgrid(ax, ax)
+    r = np.hypot(x, y)
+    col = np.zeros((n, n, 3), np.float32) + f3((0.98, 0.98, 1.0))
+    col = mix(col, (0.66, 0.62, 0.9), 0.6 * smoothstep(0.1, 0.95, y) + 0.25 * smoothstep(0.55, 0.95, r))
+    ix, iy = x / 0.7, (y + 0.06) / 0.6
+    ir = np.hypot(ix, iy)
+    iris = gradient((0.99, 0.84, 0.28), (0.2, 0.84, 0.84), smoothstep(-0.75, -0.05, iy))
+    iris = mix(iris, (0.08, 0.5, 0.74), 0.85 * smoothstep(0.1, 0.9, iy))
+    iris = mix(iris, (1.0, 0.97, 0.6), 0.5 * np.exp(-((ix) ** 2 + (iy + 0.72) ** 2) / 0.12))        # Schimmer unten
+    iris = mix(iris, (0.04, 0.2, 0.4), 0.9 * smoothstep(0.8, 1.0, ir))                               # dunkler Irisrand
+    iris = mix(iris, (0.03, 0.02, 0.08), smoothstep(0.6, 0.52, ir))                                  # Pupille
+    col = mix(col, iris, smoothstep(1.0, 0.95, ir))
+    col = mix(col, (1.0, 1.0, 1.0), smoothstep(0.26, 0.2, np.hypot(ix + 0.3, iy - 0.36)))            # großes Glanzlicht
+    col = mix(col, (1.0, 1.0, 1.0), 0.9 * smoothstep(0.11, 0.07, np.hypot(ix - 0.3, iy + 0.34)))     # kleines Glanzlicht
+    lid = smoothstep(0.78 - 0.1 * smoothstep(0.0, 0.8, y), 0.93, r)
+    col = mix(col, (0.13, 0.05, 0.25), 0.95 * lid)
+    arr = np.ones((n, n, 4), np.float32); arr[..., :3] = np.clip(col, 0, 1)
+    em = arr.copy(); em[..., :3] *= 0.22
+    m = bpy.data.materials.new("Auge"); m.use_nodes = True
+    nt = m.node_tree; pr = nt.nodes["Principled BSDF"]
+    pr.inputs["Roughness"].default_value = 0.14
+    tex = nt.nodes.new("ShaderNodeTexImage"); tex.image = new_image("Auge_Farbe", arr)
+    nt.links.new(tex.outputs["Color"], pr.inputs["Base Color"])
+    te = nt.nodes.new("ShaderNodeTexImage"); te.image = new_image("Auge_Leuchten", em)
+    nt.links.new(te.outputs["Color"], pr.inputs["Emission Color"])
+    pr.inputs["Emission Strength"].default_value = 1.0
+    return m
+
+def eyes(bvh, mat):
+    """Augäpfel: je eine glatte Kuppel, die im Kopf sitzt; die Haut bildet das Lid"""
+    parts = []; a, dep, b = EYE_R
+    for s in (1, -1):
+        hit, n, _, _ = bvh.ray_cast(Vector((EYE[0] * s, H0.y - 2.0, H0.z + EYE[1])), Vector((0, 1, 0)), 6.0)
+        d = (n * 0.5 + Vector((0, -1, 0)) * 0.5).normalized()
+        e1 = Vector((0, 0, 1)).cross(d).normalized(); e2 = d.cross(e1)
+        c = hit - d * (dep - 0.03)
+        EYES.append((c, e1, e2, d))
+        bm = bmesh.new(); uvl = bm.loops.layers.uv.new("UVMap"); uv = {}
+        top = bm.verts.new(c + d * dep); uv[top] = (0.5, 0.5)
+        rings = []; nphi = 28
+        for th in (10, 22, 35, 48, 61, 74, 87, 100):
+            t = math.radians(th); ring = []
+            for k in range(nphi):
+                ph = k * 2 * math.pi / nphi
+                v = bm.verts.new(c + e1 * (a * math.sin(t) * math.cos(ph)) + e2 * (b * math.sin(t) * math.sin(ph)) + d * (dep * math.cos(t)))
+                q = min(math.sin(t), 1.0) if th <= 90 else 1.0
+                uv[v] = (0.5 + 0.5 * q * math.cos(ph), 0.5 + 0.5 * q * math.sin(ph))
+                ring.append(v)
+            rings.append(ring)
+        for k in range(nphi):
+            bm.faces.new([top, rings[0][k], rings[0][(k + 1) % nphi]])
+        for r0, r1 in zip(rings, rings[1:]):
+            for k in range(nphi):
+                bm.faces.new([r0[k], r1[k], r1[(k + 1) % nphi], r0[(k + 1) % nphi]])
+        for f in bm.faces:
+            for l in f.loops:
+                l[uvl].uv = uv[l.vert]
+        parts.append(give(finish("Auge%d" % s, bm), mat))
+    return parts
+
+def brows(bvh):
+    """kurze, kräftige Brauen über den Augen, liegen auf der Stirn"""
+    parts = []; a, dep, b = EYE_R
+    for (c, e1, e2, d), s in zip(EYES, (1, -1)):
+        pts = []
+        for u, w in ((-0.62, 1.2), (-0.25, 1.36), (0.2, 1.4), (0.62, 1.3), (0.95, 1.08)):
+            o = c + e1 * (u * a * s) + e2 * (w * b) + d * 0.5
+            hit, n, _, _ = bvh.ray_cast(o, -d, 2.0)
+            pts.append(hit + n * 0.006)
+        Q, _ = smooth3([tuple(q) for q in pts], 9, passes=2)
+        parts.append(sweep("Braue%d" % s, [Vector(q) for q in Q], [0.012, 0.02, 0.025, 0.026, 0.025, 0.023, 0.019, 0.014, 0.008], segs=8))
+    return parts
+
+def unjaw(p):
+    """Punkt des aufgeklappten Kiefers zurück in die geschlossene Lage"""
+    return Matrix.Rotation(math.radians(-JAW_OPEN), 4, 'X') @ (Vector(p) - HINGE) + HINGE
+
+def rejaw(p):
+    return Matrix.Rotation(math.radians(JAW_OPEN), 4, 'X') @ (Vector(p) - HINGE) + HINGE
+
+def teeth_tongue(bvh_head, bvh_jaw):
+    """Zwei kleine Fangzähne oben, vier runde Zähne unten, Zunge in der Mulde des Unterkiefers.
+    Liefert (oben, unten, Zunge)."""
+    up, low = [], []
+    for s in (1, -1):
+        hit = bvh_head.ray_cast(Vector((0.125 * s, H0.y - 0.47, 0.6)), Vector((0, 0, 1)), 3.0)[0]
+        up.append(sweep("Fang%d" % s, [hit + Vector((0, 0, 0.012)), hit + Vector((0, 0, -0.022)), hit + Vector((0, 0.004, -0.05))], [0.024, 0.02, 0.006], segs=8))
+        for j, (dx, dy) in enumerate(((0.045, -0.585), (0.118, -0.55))):
+            o = rejaw((dx * s, dy, 1.6))
+            hit = bvh_jaw.ray_cast(o, rejaw((dx * s, dy, 0.6)) - o, 3.0)[0]
+            ax = (rejaw((0, 0, 1)) - rejaw((0, 0, 0))).normalized()
+            low.append(sweep("Zahn%d_%d" % (s, j), [hit - ax * 0.012, hit + ax * 0.016, hit + ax * 0.036], [0.021, 0.018, 0.007], segs=8))
+    o = rejaw((0, -0.4, 1.6)); hit = bvh_jaw.ray_cast(o, rejaw((0, -0.4, 0.6)) - o, 3.0)[0]
+    tongue = sphere("Zunge", (0, 0, 0), 1.0, segs=(14, 8))
+    R = Matrix.Rotation(math.radians(JAW_OPEN), 3, 'X')
+    for v in tongue.data.vertices:
+        q = Vector((v.co.x * 0.098, v.co.y * 0.135 - 0.01, v.co.z * 0.03 + 0.012 - 0.01 * abs(v.co.x) ** 2))
+        v.co = hit + R @ q
+    return up, low, [tongue]
+
+# ---------------------------------------------------------------- Schmuck
+
+COLLAR_C = Vector((0.0, -0.165, 0.9))           # Mitte des Halsreifs
+COLLAR_TILT = 12.0                              # Grad: vorn tiefer als hinten
+STAR = {}                                       # Mitte und Achsen des Sterns (für die Bemalung)
+
+def collar_frame():
+    t = math.radians(COLLAR_TILT)
+    return Vector((0, -math.cos(t), -math.sin(t))), Vector((1, 0, 0)), Vector((0, -math.sin(t), math.cos(t)))    # vorn, quer, Achse
+
+def collar(bvh):
+    """Goldener Halsreif: breites Band mit zwei runden Wülsten, liegt rundum auf der Haut auf"""
+    fwd, ex, axis = collar_frame(); n = 36
+    rad = []
+    for k in range(n):
+        ph = k * 2 * math.pi / n
+        r = fwd * math.cos(ph) + ex * math.sin(ph)
+        best = 0.0
+        for h in (-0.04, 0.0, 0.04):
+            hit = bvh.ray_cast(COLLAR_C + axis * h + r * 1.2, -r, 2.0)[0]
+            best = max(best, (hit - COLLAR_C - axis * h).dot(r) if hit is not None else 0.2)
+        rad.append(best)
+    rad = np.array(rad)
+    for _ in range(3):
+        rad = np.maximum(rad, 0.25 * np.roll(rad, 1) + 0.5 * rad + 0.25 * np.roll(rad, -1))
+    prof = [(-0.012, -0.04), (0.012, -0.048), (0.03, -0.042), (0.034, -0.028), (0.026, -0.018), (0.026, 0.018), (0.034, 0.028),
+            (0.03, 0.042), (0.012, 0.048), (-0.012, 0.04)]
+    bm = bmesh.new(); rings = []
+    for k in range(n):
+        ph = k * 2 * math.pi / n
+        r = fwd * math.cos(ph) + ex * math.sin(ph)
+        rings.append([bm.verts.new(COLLAR_C + r * (rad[k] + 0.004 + pr) + axis * ph_) for pr, ph_ in prof])
+    m = len(prof)
+    for k in range(n):
+        a, b = rings[k], rings[(k + 1) % n]
+        for j in range(m):
+            bm.faces.new([a[j], a[(j + 1) % m], b[(j + 1) % m], b[j]])
+    return finish("Halsreif", bm), float(rad[0])
+
+def star_solid(name, center, normal, up, R, r, depth, apex, inset=0.86, back=0.0):
+    """Fünfzackiger Stern mit geschliffener Vorderseite (Spitze in der Mitte)"""
+    normal = Vector(normal).normalized(); up = Vector(up); up = (up - normal * up.dot(normal)).normalized(); side = up.cross(normal)
+    bm = bmesh.new()
+    def ring(scale, off):
+        vs = []
+        for k in range(10):
+            a = k * math.pi / 5; rr = (R if k % 2 == 0 else r) * scale
+            vs.append(bm.verts.new(Vector(center) + (up * math.cos(a) + side * math.sin(a)) * rr + normal * off))
+        return vs
+    b = ring(1.0, back); f = ring(inset, depth); top = bm.verts.new(Vector(center) + normal * (depth + apex))
+    for k in range(10):
+        bm.faces.new([b[k], b[(k + 1) % 10], f[(k + 1) % 10], f[k]])
+        bm.faces.new([top, f[k], f[(k + 1) % 10]])
+    bm.faces.new(b[::-1])
+    o = finish(name, bm, smooth=False)
+    return o
+
+def pendant(front_r):
+    """Sternanhänger vorn am Halsreif: goldene Fassung, darin der türkise Sternstein"""
+    fwd, ex, axis = collar_frame()
+    c = COLLAR_C + fwd * (front_r + 0.06) - axis * 0.085
+    n = (Vector((0, -1, 0.22))).normalized()
+    STAR.update(c=c, n=n)
+    frame = star_solid("Sternfassung", c - n * 0.02, n, (0, 0, 1), 0.14, 0.074, 0.034, 0.004, inset=0.9)
+    gem = star_solid("Sternstein", c + n * 0.012, n, (0, 0, 1), 0.106, 0.052, 0.008, 0.034, inset=0.94)
+    return frame, gem
+
+def tail_gem():
+    """Schwanzspitze: geschliffene türkise Raute in einem kleinen goldenen Ring"""
+    e = Vector(TAIL[-1]); t = (Vector(TAIL[-1]) - Vector(TAIL[-2])).normalized()
+    ex = Vector((1, 0, 0)); ez = t.cross(ex).normalized()
+    bm = bmesh.new()
+    a = bm.verts.new(e - t * 0.02); b = bm.verts.new(e + t * 0.25)
+    mid = [bm.verts.new(e + t * 0.085 + ex * (0.075 * cx) + ez * (0.058 * cz)) for cx, cz in ((1, 0), (0, 1), (-1, 0), (0, -1))]
+    for k in range(4):
+        bm.faces.new([a, mid[(k + 1) % 4], mid[k]]); bm.faces.new([b, mid[k], mid[(k + 1) % 4]])
+    gem = finish("Schwanzstein", bm, smooth=False)
+    c = e + t * 0.012; bm = bmesh.new(); rings = []
+    for i in range(14):
+        a_ = i * 2 * math.pi / 14; out = ex * math.cos(a_) + ez * math.sin(a_)
+        rings.append([bm.verts.new(c + out * (0.05 + 0.016 * math.cos(q)) + t * (0.02 * math.sin(q))) for q in [j * 2 * math.pi / 6 for j in range(6)]])
+    for i in range(14):
+        r0, r1 = rings[i], rings[(i + 1) % 14]
+        for j in range(6):
+            bm.faces.new([r0[j], r1[j], r1[(j + 1) % 6], r0[(j + 1) % 6]])
+    ring = finish("Schwanzring", bm)
+    return gem, ring
+
+# ---------------------------------------------------------------- Bemalung
+
+SK_D, SK_M, SK_L = (0.33, 0.13, 0.58), (0.5, 0.25, 0.79), (0.7, 0.45, 0.94)
+SK_SHADOW = (0.2, 0.07, 0.4)
+PL_D, PL_M, PL_L = (0.4, 0.1, 0.62), (0.62, 0.22, 0.86), (0.84, 0.52, 0.98)
+BEL_D, BEL_M, BEL_L = (0.27, 0.62, 0.66), (0.5, 0.84, 0.82), (0.72, 0.96, 0.92)
+HORN_D, HORN_M, HORN_L = (0.76, 0.56, 0.31), (0.96, 0.84, 0.6), (1.0, 0.95, 0.8)
+MEM_T, MEM_M, MEM_B = (0.43, 0.38, 0.84), (0.3, 0.76, 0.86), (0.5, 0.93, 0.93)
+GOLD_D, GOLD_M, GOLD_L = (0.7, 0.42, 0.09), (0.93, 0.69, 0.2), (1.0, 0.9, 0.5)
+GEM_D, GEM_M, GEM_L = (0.14, 0.6, 0.7), (0.42, 0.9, 0.88), (0.86, 1.0, 0.97)
+
+def three(a, b, c, t):
+    """Verlauf über drei Farben, t = 0..1"""
+    return np.where((t < 0.5)[..., None], gradient(a, b, t * 2), gradient(b, c, t * 2 - 1))
+
+def scale_rows(a, b, size):
+    """Schuppen in Reihen (a quer, b in Richtung der freien Schuppenränder): jede Reihe ist um eine halbe Schuppe
+    versetzt und liegt über der folgenden. Liefert eine weiche Helligkeit (etwa -0.2 … 0.25), keine Umrisslinien."""
+    U = a / size; V = b / size; ROW = 0.62; R = 0.74
+    j0 = np.floor(V / ROW)
+    found = np.zeros(U.shape, bool); dv = np.zeros(U.shape, np.float32); dd = np.ones(U.shape, np.float32)
+    for dj in (-2, -1, 0, 1):                                    # obere Reihen zuerst: sie liegen oben
+        j = j0 + dj
+        off = 0.5 * (np.mod(j, 2))
+        i0 = np.round(U - off)
+        for di in (0, -1, 1):
+            cu = i0 + di + off; cv = j * ROW
+            d = np.hypot(U - cu, V - cv) / R
+            hit = (d < 1.0) & ~found
+            dv = np.where(hit, (V - cv) / R, dv); dd = np.where(hit, d, dd); found |= hit
+    shade = 0.26 * smoothstep(-0.45, 0.85, dv) - 0.12
+    shade += 0.14 * smoothstep(0.72, 0.93, dd) * smoothstep(0.0, 0.5, dv)        # heller Saum am freien Rand
+    shade -= 0.16 * smoothstep(0.93, 1.0, dd)                                     # weicher Schatten in der Fuge
+    return np.where(found, shade, -0.1).astype(np.float32)
+
+def scales(P, N, size):
+    """Schuppen auf beliebig gekrümmter Haut: aus drei Richtungen aufgetragen und nach der Flächenrichtung gemischt"""
+    w = np.abs(N) ** 4; w /= np.maximum(w.sum(-1, keepdims=True), 1e-6)
+    x, y, z = P[..., 0], P[..., 1], P[..., 2]
+    return w[..., 0] * scale_rows(y, -z + 0.3 * y, size) + w[..., 1] * scale_rows(x, -z, size) + w[..., 2] * scale_rows(x, y, size)
+
+def sparkle(P, c, n, size):
+    """kleiner Stern mit vier Strahlen auf der Haut um den Punkt c (Flächenrichtung n)"""
+    n = Vector(n); t1 = Vector((0, 0, 1)).cross(n)
+    t1 = t1.normalized() if t1.length > 0.2 else Vector((1, 0, 0)); t2 = n.cross(t1)
+    L = P - f3(c)
+    d1 = np.abs(L @ f3(t1)) / size; d2 = np.abs(L @ f3(t2)) / size; d3 = np.abs(L @ f3(n))
+    near = d3 < size * 2.0
+    ray = np.clip(1 - (np.minimum(d1, d2) * 8 + np.maximum(d1, d2)), 0, 1)
+    core = np.clip(1 - np.hypot(d1, d2) * 3.0, 0, 1)
+    return np.maximum(ray, core) * near
+
+def wing_stars(a, b):
+    """Sternpunkte auf der Flughaut (in Flügelmaßen): kleine weiche Lichter, einzelne mit Strahlen"""
+    import monster_aufsatz as ma
+    cs = 0.085; out = np.zeros(a.shape, np.float32); big = np.zeros(a.shape, np.float32)
+    i0 = np.floor(a / cs).astype(np.int64); j0 = np.floor(b / cs).astype(np.int64); zero = np.zeros_like(i0)
+    for di in (-1, 0, 1):
+        for dj in (-1, 0, 1):
+            i = i0 + di; j = j0 + dj
+            h = [ma._hash(i, j, zero, 31 + k) for k in range(4)]
+            ca = (i + 0.15 + 0.7 * h[0]) * cs; cb = (j + 0.15 + 0.7 * h[1]) * cs
+            r = 0.0045 + 0.007 * h[3]
+            da = np.abs(a - ca); db = np.abs(b - cb)
+            dot = np.exp(-(da * da + db * db) / (r * r)) * (h[2] < 0.7)
+            ray = np.clip(1 - (np.minimum(da, db) * 9 + np.maximum(da, db)) / (r * 3.6), 0, 1) * (h[2] < 0.22)
+            out = np.maximum(out, np.maximum(dot, ray)); big = np.maximum(big, ray)
+    return out, big
+
+def paint(g, line, sparks):
+    ao = vertex_ao(g, rays=16, dist=0.28)
+    T = texels(g); P, N, cov = T["P"], T["N"], T["cov"]
+    AO = texel_values(T, ao)
+    TG = np.rint(texel_values(T, part_tags(g))).astype(int)
+    x, y, z = P[..., 0], P[..., 1], P[..., 2]
+    tz = np.clip(N[..., 2] * 0.5 + 0.5, 0, 1)
+    occ = np.clip(AO * 2.2, 0, 1) ** 0.85
+    sel = lambda t: ((TG == t) & cov).astype(np.float32)
+    col = np.zeros(P.shape, np.float32); em = np.zeros(P.shape, np.float32)
+    # ---- Haut: Verlauf, Schuppen, Schatten
+    hd, jw, bd, wa = sel(T_HEAD), sel(T_JAW), sel(T_BODY), sel(T_WARM)
+    skin = three(SK_D, SK_M, SK_L, smoothstep(0.08, 0.95, tz))
+    front = smoothstep(-0.08, -0.3, y - H0.y) * smoothstep(-0.32, -0.12, z - H0.z)          # Gesicht: glatt
+    k_sc = bd * smoothstep(0.05, 0.16, z) + hd * (1 - 0.88 * front) + 0.0 * jw
+    sc = np.where(hd > 0, scales(P, N, 0.05), scales(P, N, 0.064)) * k_sc
+    skin = np.clip(skin * (1 + 0.95 * sc)[..., None] + f3((0.1, 0.08, 0.05)) * np.clip(sc, 0, 1)[..., None], 0, 1)
+    skin = mix(skin, SK_L, 0.22 * hd * front * smoothstep(-0.2, 0.25, N[..., 2]))        # Schnauze und Wangen etwas heller
+    skin = mix(skin, (0.56, 0.24, 0.8), 0.5 * wa)                                          # Flügelarme: eine Spur röter
+    skin = mix(skin, SK_SHADOW, 0.55 * occ)
+    m_skin = np.clip(hd + jw + bd + wa, 0, 1)
+    col = col * (1 - m_skin[..., None]) + skin * m_skin[..., None]
+    # ---- helle Unterseite mit Schilden
+    bel, frac, edge = belly_fields(P, N, line)
+    bel = bel * bd
+    bcol = gradient(BEL_L, BEL_M, frac ** 1.2)
+    bcol = mix(bcol, BEL_D, 0.75 * smoothstep(0.84, 0.985, frac) + 0.3 * smoothstep(0.7, 1.0, edge))
+    bcol = bcol * (0.86 + 0.14 * tz)[..., None]
+    bcol = mix(bcol, (0.16, 0.36, 0.5), 0.45 * occ)
+    col = col * (1 - bel[..., None]) + bcol * bel[..., None]
+    # ---- Maul: Gaumen und Mundboden, Nasenlöcher, Lidrand
+    roof = hd * smoothstep(-0.2, -0.6, N[..., 2]) * smoothstep(0.225, 0.19, np.abs(x)) * (y < H0.y - 0.1) * (z < H0.z - 0.19)
+    col = mix(col, (0.46, 0.12, 0.34), roof)
+    col = mix(col, (0.2, 0.04, 0.2), roof * smoothstep(-0.52, -0.2, y - H0.y))
+    Rm = np.array(Matrix.Rotation(math.radians(-JAW_OPEN), 3, 'X'), np.float32)
+    Pj = (P - f3(HINGE)) @ Rm.T + f3(HINGE); Nj = N @ Rm.T
+    floor = jw * smoothstep(0.25, 0.7, Nj[..., 2]) * smoothstep(1.15, 0.85, (Pj[..., 0] / 0.165) ** 2 + ((Pj[..., 1] + 0.4) / 0.2) ** 2)
+    col = mix(col, (0.56, 0.16, 0.38), floor)
+    col = mix(col, (0.24, 0.05, 0.22), floor * smoothstep(-0.5, -0.24, Pj[..., 1]))
+    for c, n in sparks["nose"]:
+        col = mix(col, (0.17, 0.05, 0.3), hd * 0.92 * np.exp(-(np.linalg.norm(P - f3(c), axis=-1) / 0.024) ** 2))
+    a, dep, b = EYE_R
+    for c, e1, e2, d in EYES:
+        L = P - f3(c)
+        q = (L @ f3(e1) / a) ** 2 + (L @ f3(e2) / b) ** 2 + (L @ f3(d) / dep) ** 2
+        rim = smoothstep(1.55, 1.02, q) * hd * (0.55 + 0.45 * smoothstep(-0.3, 0.6, L @ f3(e2) / b))
+        col = mix(col, (0.17, 0.06, 0.34), 0.85 * rim)
+    # ---- Kamm, Rückenplatten, Kragen: kräftiges Purpur, zur Spitze heller
+    pl = sel(T_PLATE)
+    pc = three(PL_D, PL_M, PL_L, smoothstep(0.1, 0.95, 0.6 * tz + 0.4 * (1 - occ)))
+    pc = mix(pc, PL_D, 0.55 * occ)
+    col = col * (1 - pl[..., None]) + pc * pl[..., None]
+    # ---- Hörner und Krallen: Elfenbein mit Verlauf, Hörner mit Ringen
+    hm = (TG == T_HORN) & cov
+    if hm.any():
+        Ph = P[hm]; Q = np.array([tuple(q) for q in horn_pts(1)], np.float32)
+        Pa = np.stack([np.abs(Ph[:, 0]), Ph[:, 1], Ph[:, 2]], 1)
+        d2 = ((Pa[:, None, :] - Q[None, :, :]) ** 2).sum(-1)
+        i = np.argmin(d2, 1); j = np.clip(i + np.where(np.take_along_axis(d2, np.clip(i + 1, 0, HORN_N - 1)[:, None], 1)[:, 0] <
+                                                         np.take_along_axis(d2, np.clip(i - 1, 0, HORN_N - 1)[:, None], 1)[:, 0], 1, -1), 0, HORN_N - 1)
+        qa, qb = Q[i], Q[j]; ab = qb - qa
+        f = np.clip(((Pa - qa) * ab).sum(1) / np.maximum((ab * ab).sum(1), 1e-9), 0, 1)
+        t = (i + f * (j - i)) / (HORN_N - 1)
+        hc = three(HORN_D, HORN_M, HORN_L, np.clip(0.12 + 0.95 * t, 0, 1))
+        hc = hc * (0.8 + 0.2 * tz[hm])[:, None]
+        ring = np.cos(t * 2 * np.pi * 4.2 + 0.6)
+        hc = mix(hc, (0.66, 0.44, 0.22), 0.5 * smoothstep(-0.55, -1.0, ring) * (1 - t))
+        hc = mix(hc, (0.5, 0.3, 0.2), 0.5 * occ[hm])
+        col[hm] = hc
+    cl = sel(T_CLAW)
+    cc = three(HORN_D, HORN_M, HORN_L, smoothstep(0.1, 0.9, tz))
+    col = col * (1 - cl[..., None]) + mix(cc, (0.5, 0.3, 0.2), 0.4 * occ) * cl[..., None]
+    # ---- Flughaut: oben blauviolett, unten helles Türkis, Sternennebel und Sternpunkte
+    mm = (TG == T_MEM) & cov
+    if mm.any():
+        Pm = P[mm]
+        A = np.array([WING_A.x, WING_A.y], np.float32)
+        wa_ = (np.abs(Pm[:, 0]) - WING_ROOT.x) * A[0] + (Pm[:, 1] - WING_ROOT.y) * A[1]; wb = Pm[:, 2] - WING_ROOT.z
+        mc = three(MEM_B, MEM_M, MEM_T, smoothstep(-0.42, 0.36, wb + 0.12 * wa_))
+        Pabs = np.stack([np.abs(Pm[:, 0]), Pm[:, 1], Pm[:, 2]], 1)
+        neb = fbm3(Pabs, 4.5, 5, 4); neb2 = fbm3(Pabs + 7.3, 3.2, 23, 3)
+        mc = mix(mc, (0.8, 0.5, 0.95), 0.5 * smoothstep(0.5, 0.72, neb))
+        mc = mix(mc, (0.24, 0.3, 0.78), 0.4 * smoothstep(0.52, 0.75, neb2))
+        dbone = np.full(len(Pm), 9.0, np.float32)
+        for i in range(3):
+            dbone = np.minimum(dbone, seg_dist(Pabs, [tuple(wing_pt(q.x, q.y)) for q in [finger_curve(i, t) for t in np.linspace(0, 1, 9)]]))
+        dbone = np.minimum(dbone, seg_dist(Pabs, [tuple(wing_pt(q.x, q.y)) for q in [arm_curve(t) for t in np.linspace(0, 1, 7)]]))
+        mc = mix(mc, (0.5, 0.3, 0.82), 0.6 * smoothstep(0.075, 0.02, dbone))
+        st, big = wing_stars(wa_, wb)
+        st = st * smoothstep(0.02, 0.05, dbone)
+        mc = mix(mc, (0.95, 1.0, 1.0), st)
+        col[mm] = mc
+        em[mm] = f3((0.75, 0.95, 1.0)) * (0.9 * st)[:, None] + mc * 0.12
+    # ---- Brauen, Zunge, Zähne
+    br = sel(T_BROW)
+    col = col * (1 - br[..., None]) + gradient((0.11, 0.05, 0.2), (0.27, 0.15, 0.42), tz) * br[..., None]
+    tg = sel(T_TONGUE)
+    tc = gradient((0.7, 0.24, 0.42), (0.97, 0.5, 0.62), smoothstep(0.2, 0.9, Nj[..., 2]))
+    tc = mix(tc, (0.72, 0.26, 0.44), 0.45 * np.exp(-(Pj[..., 0] / 0.008) ** 2) * (Pj[..., 1] > -0.5))
+    tc = mix(tc, (0.4, 0.1, 0.3), 0.5 * smoothstep(-0.44, -0.3, Pj[..., 1]))
+    col = col * (1 - tg[..., None]) + tc * tg[..., None]
+    th = sel(T_TOOTH)
+    col = col * (1 - th[..., None]) + mix(np.zeros(P.shape, np.float32) + f3((1.0, 0.98, 0.92)), (0.86, 0.74, 0.6), 0.6 * occ) * th[..., None]
+    # ---- Gold: Verlauf, Gravur im Band des Halsreifs
+    go = sel(T_GOLD)
+    gc = three(GOLD_D, GOLD_M, GOLD_L, smoothstep(0.05, 0.95, 0.75 * tz + 0.25 * np.clip(-N[..., 1], 0, 1)))
+    fwd, ex, axis = collar_frame()
+    L = P - f3(COLLAR_C); hh = L @ f3(axis); ph = np.arctan2(L @ f3(ex), L @ f3(fwd))
+    rad = L - hh[..., None] * f3(axis); rad /= np.maximum(np.linalg.norm(rad, axis=-1, keepdims=True), 1e-6)
+    band = smoothstep(0.02, 0.014, np.abs(hh)) * smoothstep(0.5, 0.8, (N * rad).sum(-1)) * (np.abs(hh) < 0.03)
+    wave = smoothstep(0.0052, 0.0028, np.abs(hh - 0.0085 * np.sin(ph * 16))) + smoothstep(0.004, 0.002, np.abs(np.abs(hh) - 0.0145))
+    gc = mix(gc, (0.56, 0.31, 0.06), 0.8 * np.clip(wave, 0, 1) * band)
+    gc = mix(gc, (0.45, 0.24, 0.08), 0.45 * occ)
+    col = col * (1 - go[..., None]) + gc * go[..., None]
+    # ---- Steine: geschliffenes Türkis, Stern mit goldenem Herz
+    ge = sel(T_GEM)
+    lgt = np.clip(N @ f3(Vector((-0.35, -0.55, 0.76)).normalized()), -1, 1) * 0.5 + 0.5
+    cg = three(GEM_D, GEM_M, GEM_L, smoothstep(0.15, 0.95, lgt))
+    ds = np.linalg.norm(P - f3(STAR["c"]), axis=-1)
+    cg = mix(cg, (1.0, 0.95, 0.5), 0.8 * smoothstep(0.075, 0.0, ds))
+    col = col * (1 - ge[..., None]) + cg * ge[..., None]
+    em += cg * (0.5 * ge)[..., None]
+    # ---- Glitzersterne auf der Haut
+    for c, n, size in sparks["skin"]:
+        s_ = sparkle(P, c, n, size) * m_skin * (1 - bel)
+        col = mix(col, (0.86, 1.0, 1.0), s_)
+        em += f3((0.6, 0.95, 1.0)) * (0.9 * s_)[..., None]
+    finish_paint(T, col, em, strength=1.0)
+
+# ---------------------------------------------------------------- Gewichte
+
+def body_weights(o):
+    gr = {n: o.vertex_groups.new(name=n) for n in ("Root", "Body", "Tail", "Tail2", "Tail3")}
+    for v in o.data.vertices:
+        p = v.co
+        tl = ramp(p.y, 0.42, 0.64) * (1 - (1 - ramp(p.y, 0.5, 0.6)) * ramp(abs(p.x), 0.15, 0.24))
+        t2 = ramp(p.y, TAIL[2][1] - 0.1, TAIL[2][1] + 0.1); t3 = ramp(p.y, TAIL[4][1] - 0.08, TAIL[4][1] + 0.08)
+        leg = 1 - ramp(p.z, 0.1, 0.42)
+        w = {"Tail3": tl * t3, "Tail2": tl * t2 * (1 - t3), "Tail": tl * (1 - t2), "Root": (1 - tl) * leg, "Body": (1 - tl) * (1 - leg)}
+        for n, x in w.items():
+            if x > 0.002:
+                gr[n].add([v.index], x, 'REPLACE')
+
+def wing_weights(o, side):
+    """Arm und innere Flughaut am Flügelknochen, Finger und äußere Haut weich an der Flügelspitze"""
+    nm = ".L" if side > 0 else ".R"
+    gw = o.vertex_groups.new(name="Wing" + nm); gt = o.vertex_groups.new(name="WingTip" + nm)
+    ang_f3 = math.degrees(math.atan2(FINGERS[2][1][1] - WRIST[1], FINGERS[2][1][0] - WRIST[0]))        # innerer Finger
+    ang_arm = math.degrees(math.atan2(-WRIST[1], -WRIST[0]))
+    for v in o.data.vertices:
+        p = Vector((v.co.x * side, v.co.y, v.co.z)) - WING_ROOT
+        a = p.dot(WING_A) - WRIST[0]; b = p.dot(WING_B) - WRIST[1]
+        d = math.hypot(a, b); ang = math.degrees(math.atan2(b, a))
+        tip = ramp(d, 0.03, 0.2) * (1 - ramp(-ang, -ang_f3 + 6, -ang_arm - 4)) if ang < 30 else 0.0
+        if tip > 0.002:
+            gt.add([v.index], tip, 'REPLACE')
+        if tip < 0.998:
+            gw.add([v.index], 1 - tip, 'REPLACE')
+
+# ---------------------------------------------------------------- Skelett und Bewegungen
+
+FPS = 30
+
+def update():
+    bpy.context.view_layer.update()
+
+def new_armature(bones):
+    """bones: [(name, head, tail, parent)] in Weltkoordinaten"""
+    data = bpy.data.armatures.new("Armature"); arm = bpy.data.objects.new("Armature", data)
+    bpy.context.scene.collection.objects.link(arm); bpy.context.view_layer.objects.active = arm
+    bpy.ops.object.mode_set(mode='EDIT'); eb = {}
+    for name, h, t, parent in bones:
+        bn = data.edit_bones.new(name); bn.head, bn.tail = Vector(h), Vector(t)
+        if parent:
+            bn.parent = eb[parent]
+        eb[name] = bn
+    bpy.ops.object.mode_set(mode='OBJECT')
+    return arm
+
+def reset_pose(arm):
+    for pb in arm.pose.bones:
+        pb.rotation_mode = 'QUATERNION'; pb.rotation_quaternion = Quaternion(); pb.location = (0, 0, 0)
+    update()
+
+def rot_world(arm, name, axis, deg):
+    """Knochen um eine Weltachse drehen (wirkt in jeder Haltung gleich)"""
+    bn = arm.data.bones[name]
+    local = (bn.matrix_local.to_3x3().inverted() @ Vector(axis)).normalized()
+    pb = arm.pose.bones[name]
+    pb.rotation_quaternion = Quaternion(local, math.radians(deg)) @ pb.rotation_quaternion
+
+def move_world(arm, name, vec):
+    arm.pose.bones[name].location = arm.data.bones[name].matrix_local.to_3x3().inverted() @ Vector(vec)
+
+def make_actions(arm, clips):
+    arm.animation_data_create()
+    for name, frames in clips:
+        act = bpy.data.actions.new(name); act.use_fake_user = True
+        arm.animation_data.action = act
+        for f, fn in frames:
+            fn(); update()
+            for pb in arm.pose.bones:
+                pb.keyframe_insert("rotation_quaternion", frame=f); pb.keyframe_insert("location", frame=f)
+    arm.animation_data.action = None
+    reset_pose(arm)
+
+def add_muzzle(arm, bone, world_pos):
+    """Muzzle starr an einen Knochen hängen: Blender +Y des Knotens zeigt nach vorn (Welt -Y), im glTF wird das -Z"""
+    m = bpy.data.objects.new("Muzzle", None); bpy.context.scene.collection.objects.link(m)
+    m.parent = arm; m.parent_type = 'BONE'; m.parent_bone = bone
+    pb = arm.pose.bones[bone]
+    tail = arm.matrix_world @ pb.matrix @ Matrix.Translation((0, pb.bone.length, 0))
+    m.matrix_parent_inverse = Matrix.Identity(4)
+    fwd = Vector((0, -1, 0)); up = Vector((0, 0, 1))
+    rot = Matrix((fwd.cross(up), fwd, up)).transposed()
+    m.matrix_basis = tail.inverted() @ (Matrix.Translation(world_pos) @ rot.to_4x4())
+    update()
+    return m
+
+MUZZLE = Vector((0.0, -0.74, 1.125))            # Sternenatem: zwischen den geöffneten Kiefern, vorn
+
+def skeleton():
+    wr = wing_pt(WRIST[0], WRIST[1]); tip = wing_pt(*FINGERS[0][1])
+    mir = lambda p: Vector((-p.x, p.y, p.z))
+    t5 = Vector(TAIL[5]) + (Vector(TAIL[5]) - Vector(TAIL[4])).normalized() * 0.2
+    return new_armature([
+        ("Root", (0, 0, 0), (0, 0, 0.4), None),
+        ("Body", (0, 0.1, 0.55), (0, -0.12, 0.9), "Root"),
+        ("Head", (0, -0.2, 1.04), (0, -0.22, 1.7), "Body"),
+        ("Jaw", tuple(HINGE), (0, -0.62, 1.07), "Head"),
+        ("Wing.L", tuple(WING_ROOT), tuple(wr), "Body"), ("WingTip.L", tuple(wr), tuple(tip), "Wing.L"),
+        ("Wing.R", tuple(mir(WING_ROOT)), tuple(mir(wr)), "Body"), ("WingTip.R", tuple(mir(wr)), tuple(mir(tip)), "Wing.R"),
+        ("Tail", TAIL[0], TAIL[2], "Root"), ("Tail2", TAIL[2], TAIL[4], "Tail"), ("Tail3", TAIL[4], tuple(t5), "Tail2"),
+    ])
+
+def animate(arm):
+    nl = WING_N; nr = Vector((-WING_N.x, WING_N.y, WING_N.z)) * -1.0        # Flügel heben: Drehung um die Flächennormale
+
+    def pose(flap=0.0, fold=0.0, sweep=0.0, pitch=0.0, fwd=0.0, jaw=0.0, tail=0.0, tail2=0.0, tail3=0.0, lift=0.0, hop=0.0,
+             bob=0.0, lean=0.0, turn=0.0):
+        reset_pose(arm)
+        for nm, n, sg in ((".L", nl, 1), (".R", nr, -1)):
+            rot_world(arm, "Wing" + nm, (0, 0, 1), sweep * sg)
+            rot_world(arm, "Wing" + nm, n, flap)
+            rot_world(arm, "WingTip" + nm, n, fold)
+        rot_world(arm, "Head", (1, 0, 0), -pitch); rot_world(arm, "Head", (0, 0, 1), turn)
+        move_world(arm, "Head", (0, -fwd, 0.25 * fwd))
+        rot_world(arm, "Jaw", (1, 0, 0), jaw)
+        rot_world(arm, "Tail", (0, 0, 1), tail); rot_world(arm, "Tail", (1, 0, 0), lift)
+        rot_world(arm, "Tail2", (0, 0, 1), tail2); rot_world(arm, "Tail3", (0, 0, 1), tail3)
+        rot_world(arm, "Body", (1, 0, 0), -lean)
+        move_world(arm, "Body", (0, 0, bob)); move_world(arm, "Root", (0, 0, hop))
+
+    S = lambda t, ph=0.0: math.sin((t - ph) * 2 * math.pi)
+    idle = [(i * 8, (lambda t=i / 8.0: pose(flap=5 + 7 * S(t), fold=5 * S(t, 0.12), pitch=1.5 + 2.2 * S(t, 0.05), jaw=1.5 + 1.5 * S(t, 0.3),
+                                            tail=7 * S(t), tail2=9 * S(t, 0.12), tail3=11 * S(t, 0.24), lift=2 + 2 * S(t, 0.1),
+                                            bob=0.012 * S(t, 0.02), turn=1.5 * S(t * 0.5)))) for i in range(9)]
+    aim = dict(flap=24, fold=6, sweep=5, pitch=7, fwd=0.05, jaw=20, lift=9, tail2=0, lean=1.5)
+    shoot = [(0, lambda: pose(**aim)),
+             (3, lambda: pose(flap=37, fold=13, sweep=9, pitch=3, fwd=0.11, jaw=29, lift=14, lean=3.5, bob=-0.012)),
+             (7, lambda: pose(flap=19, fold=1, sweep=3, pitch=8.5, fwd=0.035, jaw=17, lift=7, lean=0.8)),
+             (12, lambda: pose(**aim))]
+    win = [(i * 6, (lambda t=i / 8.0: pose(flap=16 + 22 * S(t * 2), fold=10 * S(t * 2, 0.1), pitch=9 + 3 * S(t * 2), jaw=13 + 5 * S(t * 2),
+                                           tail=14 * S(t), tail2=14 * S(t, 0.1), tail3=16 * S(t, 0.2), lift=10,
+                                           hop=0.13 * abs(S(t)), lean=2 + 2 * S(t * 2), turn=4 * S(t)))) for i in range(9)]
+    make_actions(arm, [("Idle", idle), ("Shoot", shoot), ("Victory", win)])
+
+def clearance(arm, g):
+    """Prüfschritt C: kleinster Abstand zwischen Teilen, die sich nicht berühren dürfen, über alle Bewegungen.
+    Negative Werte bedeuten: ein Punkt steckt im anderen Teil."""
+    grp = np.zeros(len(g.data.vertices), np.float32); g.data.attributes["gruppe"].data.foreach_get("value", grp)
+    grp = np.rint(grp).astype(int)
+    pairs = [("Flügel – Kopf", (G_WL, G_WR), (G_HEAD,)), ("Flügel – Flügel", (G_WL,), (G_WR,)), ("Kiefer – Halsreif", (G_JAW,), (G_NECK,)),
+             ("Kopf – Halsreif", (G_HEAD,), (G_NECK,)), ("Flügel – Schwanz", (G_WL, G_WR), (G_TAIL,))]
+    polys = [tuple(p.vertices) for p in g.data.polygons]
+    worst = {}
+    arm.animation_data_create()
+    for act in bpy.data.actions:
+        arm.animation_data.action = act
+        f0, f1 = int(act.frame_range[0]), int(act.frame_range[1])
+        for f in range(f0, f1 + 1, 2 if f1 - f0 > 20 else 1):
+            bpy.context.scene.frame_set(f)
+            dg = bpy.context.evaluated_depsgraph_get(); me = g.evaluated_get(dg).data
+            co = [v.co.copy() for v in me.vertices]
+            for name, A, Bg in pairs:
+                tris = [p for p in polys if grp[p[0]] in Bg]
+                idx = sorted({i for p in tris for i in p}); remap = {i: k for k, i in enumerate(idx)}
+                bvh = BVHTree.FromPolygons([co[i] for i in idx], [tuple(remap[i] for i in p) for p in tris])
+                best = 9.0
+                for i in np.where(np.isin(grp, A))[0]:
+                    loc, nrm, _, dist = bvh.find_nearest(co[i], 0.3)
+                    if loc is not None:
+                        d = dist if (co[i] - loc).dot(nrm) >= 0 else -dist
+                        best = min(best, d)
+                key = (name, act.name)
+                if best < worst.get(key, (9.0, 0))[0]:
+                    worst[key] = (best, f)
+    arm.animation_data.action = None; reset_pose(arm); bpy.context.scene.frame_set(0)
+    for (name, an), (d, f) in sorted(worst.items()):
+        print("ABSTAND %-18s %-8s %6.3f (Bild %d)" % (name, an, d, f))
+
 # ---------------------------------------------------------------- Ablauf
 
 def grey(name, col):
     return look(name, col, rough=0.6)
 
-def build_form(out):
-    """Prüfschritt A: nur die Formen, neutral eingefärbt nach Teilen"""
-    M = {"haut": grey("Haut", (0.55, 0.55, 0.58)), "platte": grey("Platte", (0.4, 0.4, 0.46)), "horn": grey("Horn", (0.8, 0.78, 0.7)),
-         "haut2": grey("Flughaut", (0.62, 0.7, 0.72))}
-    body = give(body_shape(), M["haut"]); head = give(head_shape(), M["haut"]); jaw = give(jaw_shape(), M["haut"])
-    bvh = BVHTree.FromObject(body, bpy.context.evaluated_depsgraph_get())
-    parts = [body, head, jaw]
-    parts += [give(o, M["platte"]) for o in head_plates() + spine_plates(bvh)]
-    parts += [give(horn(s), M["horn"]) for s in (1, -1)] + [give(o, M["horn"]) for o in claws()]
+def build(out, form=False):
+    SIZE = int(os.environ.get("TEXTUR", "2048"))
+    body = body_shape()
+    line = belly_line(BVHTree.FromObject(body, bpy.context.evaluated_depsgraph_get()))
+    belly_bulge(body, line)
+    to_tris(body, 5000); head = to_tris(head_shape(), 3400); jaw = to_tris(jaw_shape(), 700)
+    dg = bpy.context.evaluated_depsgraph_get()
+    bvh_b = BVHTree.FromObject(body, dg); bvh_h = BVHTree.FromObject(head, dg); bvh_j = BVHTree.FromObject(jaw, dg)
+    mark(body, T_BODY, G_BODY); body_weights(body)
+    parts = [body, mark(head, T_HEAD, G_HEAD, "Head"), mark(jaw, T_JAW, G_JAW, "Jaw")]
+    parts += [mark(o, T_PLATE, G_HEAD, "Head") for o in head_plates()] + [mark(horn(s), T_HORN, G_HEAD, "Head") for s in (1, -1)]
+    for o in spine_plates(bvh_b):
+        yy = sum(v.co.y for v in o.data.vertices) / len(o.data.vertices)
+        bone = "Body" if yy < 0.5 else "Tail" if yy < TAIL[2][1] else "Tail2" if yy < TAIL[4][1] else "Tail3"
+        parts.append(mark(o, T_PLATE, G_BODY if bone == "Body" else G_TAIL, bone))
+    parts += [mark(o, T_CLAW, G_BODY, "Root") for o in claws()]
     for s in (1, -1):
         bones, skin = wing(s)
-        parts += [give(o, M["haut"]) for o in bones] + [give(skin, M["haut2"])]
+        for o in bones[:-1] + [skin]:
+            mark(o, T_MEM if o is skin else T_WARM, G_WL if s > 0 else G_WR); wing_weights(o, s)
+        parts += bones[:-1] + [skin, mark(bones[-1], T_WARM, G_BODY, "Body")]
+    eye_m = eye_material()
+    eye_parts = [mark(o, 20, G_HEAD, "Head") for o in eyes(bvh_h, eye_m)]
+    parts += [mark(o, T_BROW, G_HEAD, "Head") for o in brows(bvh_h)]
+    up, low, tongue = teeth_tongue(bvh_h, bvh_j)
+    parts += [mark(o, T_TOOTH, G_HEAD, "Head") for o in up] + [mark(o, T_TOOTH, G_JAW, "Jaw") for o in low]
+    parts += [mark(o, T_TONGUE, G_JAW, "Jaw") for o in tongue]
+    ring, front_r = collar(bvh_b)
+    frame, gem = pendant(front_r)
+    tgem, tring = tail_gem()
+    parts += [mark(ring, T_GOLD, G_NECK, "Body"), frame, gem, tgem, tring]
+    for o, t, grp, bone in ((frame, T_GOLD, G_NECK, "Body"), (gem, T_GEM, G_NECK, "Body"), (tgem, T_GEM, G_TAIL, "Tail3"), (tring, T_GOLD, G_TAIL, "Tail3")):
+        if o is not tring:
+            md = o.modifiers.new("Kanten", 'EDGE_SPLIT'); md.split_angle = math.radians(18); apply_mod(o, md)
+        mark(o, t, grp, bone)
+    # Glitzersterne und Nasenlöcher: Stellen auf der Haut
+    sparks = {"skin": [], "nose": []}
+    for s in (1, -1):
+        hit, n, _, _ = bvh_h.ray_cast(Vector((0.105 * s, H0.y - 2.0, H0.z - 0.02)), Vector((0, 1, 0)), 6.0)
+        sparks["nose"].append((tuple(hit), tuple(n)))
+        for bv, o, d, size in ((bvh_h, (0.9 * s, -0.42, 1.27), (-1 * s, 0.25, 0), 0.04), (bvh_h, (0.9 * s, -0.3, 1.2), (-1 * s, 0.1, 0), 0.024),
+                               (bvh_b, (0.9 * s, 0.18, 0.56), (-1 * s, 0, 0), 0.045), (bvh_b, (0.9 * s, 0.34, 0.4), (-1 * s, 0, 0), 0.026),
+                               (bvh_b, (0.9 * s, -0.2, 0.66), (-1 * s, 0, 0), 0.034), (bvh_b, (0.9 * s, -0.32, 0.36), (-1 * s, 0, 0), 0.024),
+                               (bvh_b, (0.5 * s, 0.82, 0.9), (-0.8 * s, 0, -1), 0.026), (bvh_b, (0.16 * s, 0.02, 2.0), (0, 0, -1), 0.03)):
+            hit, n, _, _ = bv.ray_cast(Vector(o), Vector(d).normalized(), 6.0)
+            if hit is not None:
+                sparks["skin"].append((tuple(hit), tuple(n), size))
+    if form:
+        M = {T_PLATE: grey("Platte", (0.4, 0.4, 0.46)), T_HORN: grey("Horn", (0.8, 0.78, 0.7)), T_MEM: grey("Flughaut", (0.62, 0.7, 0.72)),
+             T_GOLD: grey("Gold", (0.75, 0.68, 0.45)), T_GEM: grey("Stein", (0.6, 0.8, 0.8)), T_BROW: grey("Braue", (0.2, 0.2, 0.25))}
+        hautm = grey("Haut", (0.55, 0.55, 0.58))
+        for o in parts:
+            t = int(round(o.data.attributes["teil"].data[0].value)); give(o, M.get(T_HORN if t in (T_CLAW, T_TOOTH) else t, hautm))
     g = join_parts(parts, "Fuenkchen")
     for p in g.data.polygons:
         p.use_smooth = True
-    zs = [v.co.z for v in g.data.vertices]; ys = [v.co.y for v in g.data.vertices]; xs = [v.co.x for v in g.data.vertices]
-    print("MASSE x %.2f..%.2f y %.2f..%.2f z %.2f..%.2f, Flächen %d" % (min(xs), max(xs), min(ys), max(ys), min(zs), max(zs), len(g.data.polygons)))
+    if not form:
+        g.data.materials.clear(); g.data.materials.append(image_material("Fuenkchen", SIZE, color=(0.5, 0.25, 0.79), rough=0.42))
+        smart_uv(g, margin=0.004)
+        paint(g, line, sparks)
+        skin_m = g.data.materials[0]
+        gold_m = skin_m.copy(); gold_m.name = "Gold"
+        pr = gold_m.node_tree.nodes["Principled BSDF"]; pr.inputs["Metallic"].default_value = 0.85; pr.inputs["Roughness"].default_value = 0.3
+        gem_m = skin_m.copy(); gem_m.name = "Kristall"; gem_m.node_tree.nodes["Principled BSDF"].inputs["Roughness"].default_value = 0.12
+        g.data.materials.append(gold_m); g.data.materials.append(gem_m)
+        tags = np.rint(part_tags(g)).astype(int)
+        for p in g.data.polygons:
+            t = tags[p.vertices[0]]
+            p.material_index = 1 if t == T_GOLD else 2 if t == T_GEM else 0
+    g = join_parts([g] + eye_parts, "Fuenkchen")
+    # Skelett
+    bpy.context.scene.render.fps = FPS
+    arm = skeleton()
+    g.parent = arm
+    md = g.modifiers.new("Armature", 'ARMATURE'); md.object = arm
+    reset_pose(arm)
+    animate(arm)
+    add_muzzle(arm, "Head", MUZZLE)
+    clearance(arm, g)
+    co = np.array([tuple(v.co) for v in g.data.vertices])
+    tris = sum(len(p.vertices) - 2 for p in g.data.polygons)
+    print("MASSE x %.2f..%.2f y %.2f..%.2f z %.2f..%.2f" % (co[:, 0].min(), co[:, 0].max(), co[:, 1].min(), co[:, 1].max(), co[:, 2].min(), co[:, 2].max()))
+    print("DREIECKE", tris, "TEXTUREN", sorted({tuple(i.size) for i in bpy.data.images}), "MATERIALIEN", [m.name for m in g.data.materials],
+          "KNOCHEN", len(arm.data.bones), "AKTIONEN", [(a.name, int(a.frame_range[1])) for a in bpy.data.actions])
     bpy.ops.object.select_all(action='SELECT')
-    bpy.ops.export_scene.gltf(filepath=out, export_format='GLB', export_yup=True, export_apply=True)
+    bpy.ops.export_scene.gltf(filepath=out, export_format='GLB', export_animations=True, export_animation_mode='ACTIONS',
+                              export_yup=True, export_apply=False, export_force_sampling=True,
+                              export_image_format='JPEG', export_jpeg_quality=90)
 
 if __name__ == "__main__":
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    if STUFE == "form":
-        build_form(OUT)
+    build(OUT, form=(STUFE == "form"))
     print("FERTIG", OUT)
