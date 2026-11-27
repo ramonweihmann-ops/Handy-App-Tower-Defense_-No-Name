@@ -371,6 +371,9 @@ func _parse_args() -> void:
 			_auto_pull = true
 		elif arg.begins_with("--boss-aussehen="):
 			GameData.test_boss_look = arg.get_slice("=", 1)   # Labor: Boss mit diesem Aussehen (Prüfbilder)
+		elif arg.begins_with("--monster-aussehen="):
+			for pair in arg.get_slice("=", 1).split(","):   # Labor: art:look,… (Prüfbilder noch nicht zugeordneter Monster)
+				GameData.test_looks[pair.get_slice(":", 0)] = pair.get_slice(":", 1)
 		elif arg.begins_with("--feld="):
 			_field_test = arg.get_slice("=", 1)   # Labor: dieses Schlachtfeld statt dem des Levels (Prüfbilder)
 		elif arg.begins_with("--level="):

@@ -141,6 +141,11 @@ const LOOK_DATA := {
 	"juwelen_schnecke": {"height": 2.45},
 	# Schlangen (Vorlagen vom 26.11.2026, noch keiner Welt zugeordnet): als Boss deutlich größer als die Monster der Welt
 	"schlangen_koenigin": {"height": 3.0},
+	# Schlangennest (tools/monster/schlangennest.py): Schlüpfling etwa so groß wie der Kopf der Königin, Haubenflatterer
+	# etwas größer, Schuppenpanzer niedrig und breit
+	"nest_schleimling": {"height": 1.15},
+	"nest_tentakler": {"height": 1.5},
+	"nest_panzerkaefer": {"height": 1.05},
 	"schlangen_zauberin": {"height": 3.4},
 	"edelstein_golem": {"height": 3.3},
 	"sturm_wolke": {"height": 2.9, "lift": 0.5},

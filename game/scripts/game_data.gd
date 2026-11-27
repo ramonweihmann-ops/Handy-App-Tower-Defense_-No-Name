@@ -495,8 +495,14 @@ static func monster_looks_on() -> bool:
 	return MONSTER_LOOKS_LIVE or test_monster_looks
 
 
+## Labor (--monster-aussehen=art:look,…): diese Aussehen statt denen der Welt, auch ohne Weltzuordnung (Prüfbilder)
+static var test_looks := {}
+
+
 ## Aussehen eines Gegners in der Welt dieses Levels: eigener Boss oder eigenes Monster, leer = Grundmodell
 static func enemy_look(level: int, kind: String) -> String:
+	if test_looks.has(kind):
+		return str(test_looks[kind])
 	var b := boss_look(level, kind)
 	if b != "" or not monster_looks_on():
 		return b
