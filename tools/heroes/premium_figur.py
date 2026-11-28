@@ -9,17 +9,25 @@ from mathutils.kdtree import KDTree
 
 # ---------------------------------------------------------------- Formen
 
-def blob(name, parts, voxel=0.012, smooth=6):
-    """Weiche Form aus Kugeln und Kapseln: parts = [("e", Mitte, Halbachsen[, Drehung]) | ("c", von, bis, Radius)]"""
-    R = mb_family(name)
+def blob(name, parts, voxel=0.012, smooth=6, ground=False):
+    """Weiche Form aus Kugeln und Kapseln: parts = [("e", Mitte, Halbachsen[, Drehung]) | ("c", von, bis, Radius)].
+    ground: unten bei z = 0 flach abschneiden (Sohlen); sonst bleibt die Form rundum rund."""
+    R = mb_family(name); up = Vector((0, 0, 0.0 if ground else 20.0))
     for p in parts:
         if p[0] == "e":
-            mb_ell(R, tuple(p[1]), tuple(p[2]), p[3] if len(p) > 3 else None)
+            mb_ell(R, tuple(Vector(p[1]) + up), tuple(p[2]), p[3] if len(p) > 3 else None)
         else:
-            mb_caps(R, tuple(p[1]), tuple(p[2]), p[3])
+            mb_caps(R, tuple(Vector(p[1]) + up), tuple(Vector(p[2]) + up), p[3])
     g = mb_to_mesh(R)
     finish_skin(g, voxel, 1.0, smooth_it=smooth)
+    g.data.transform(Matrix.Translation(-up)); g.data.update()
     return g
+
+def lock(name, p0, p1, p2, r, flat=0.75, n=9, segs=10, axis=None):
+    """Haarsträhne: dick am Ansatz, läuft in eine runde Spitze aus"""
+    pts = [qbez(Vector(p0), Vector(p1), Vector(p2), t) for t in np.linspace(0, 1, n)]
+    rad = [r * (0.75 + 0.5 * math.sin(math.pi * min(t * 1.6, 1.0) * 0.5) - 0.25) * (1 - t ** 2.2) + 0.012 * r for t in np.linspace(0, 1, n)]
+    return sweep(name, pts, rad, segs=segs, flat=flat, flat_axis=axis)
 
 def place(o, origin, X, Y, Z):
     """Teil aus seinem eigenen Maß (x, y, z) in die Welt setzen: Achsen X, Y, Z ab origin"""
