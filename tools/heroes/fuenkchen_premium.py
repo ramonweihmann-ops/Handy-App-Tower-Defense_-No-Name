@@ -354,7 +354,8 @@ def line_param(P, pts):
 # ---------------------------------------------------------------- Bauchschilde
 
 SEG = 0.118                                     # Länge eines Bauchschilds entlang des Bauchs
-BELLY_W = ([0.0, 0.2, 0.42, 0.6, 0.8, 1.0, 1.2, 1.45, 1.95, 2.3], [0.12, 0.17, 0.155, 0.105, 0.105, 0.15, 0.115, 0.095, 0.05, 0.024])
+BELLY_W = ([0.0, 0.15, 0.32, 0.46, 0.62, 0.8, 0.96, 1.1, 1.3, 1.5, 1.95, 2.3],          # Lage entlang der Bauchlinie
+           [0.12, 0.16, 0.15, 0.108, 0.084, 0.086, 0.13, 0.11, 0.084, 0.086, 0.05, 0.024])  # halbe Breite: schmal zwischen den Beinen
 
 def belly_line(bvh):
     """Mittellinie der hellen Unterseite: Kehle, Brust, Bauch, Schwanzunterseite (auf der Haut)"""
@@ -373,8 +374,7 @@ def belly_fields(P, N, line):
     ax_ = np.abs(x); y = P[..., 1]; z = P[..., 2]
     legf = np.hypot(ax_ - FRONT[0], y - FRONT[1]) / 0.158                                    # Vorderbein: Kreis um die Beinachse
     legh = np.hypot((ax_ - 0.275) / 0.185, (y - HIND[1] + 0.02) / 0.235)                    # Oberschenkel: Ellipse
-    free = np.maximum(smoothstep(1.0, 1.1, np.minimum(legf, legh)), smoothstep(0.5, 0.6, z))
-    m = smoothstep(w + 0.003, w - 0.003, ax_) * smoothstep(0.36, 0.31, d) * free * smoothstep(0.4, 0.1, N[..., 2])
+    m = smoothstep(w + 0.003, w - 0.003, ax_) * smoothstep(0.36, 0.31, d) * smoothstep(0.4, 0.1, N[..., 2])
     frac = ((par + 1.5 * x * x) / SEG) % 1.0
     return m, frac, np.abs(x) / np.maximum(w, 1e-3)
 
@@ -552,17 +552,30 @@ def star_solid(name, center, normal, up, R, r, depth, apex, inset=0.86, back=0.0
     return o
 
 def pendant(front, bvh):
-    """Sternanhänger: hängt vorn am Halsreif und liegt unten auf der Brust; goldene Fassung, darin der türkise Stein"""
-    low = bvh.ray_cast(Vector((0, -2.0, front.z - 0.21)), Vector((0, 1, 0)), 6.0)[0] + Vector((0, -0.014, 0))
-    top = front + Vector((0, -0.004, 0.02))
+    """Sternanhänger: hängt an einer kleinen Öse unten am Halsreif und schwebt frei vor der Brust (liegt nicht auf).
+    Liefert (Fassung, Stein, Öse)."""
+    fwd, ex, axis = collar_frame()
+    eye = front - axis * 0.058 + Vector((0, -0.004, 0))                             # Öse: unter der Unterkante des Bands
+    R = 0.122
+    low = min((bvh.ray_cast(Vector((0, -2.0, eye.z - dz)), Vector((0, 1, 0)), 6.0)[0] for dz in (0.1, 0.16, 0.22, 0.28)), key=lambda q: q.y)
+    low = Vector((0, low.y - 0.05, eye.z - 0.26))                                   # tiefster Punkt: gut vor der Brust
+    top = eye + Vector((0, -0.006, -0.016))
     up = (top - low).normalized(); n = Vector((1, 0, 0)).cross(up).normalized()
     if n.y > 0:
         n = -n
-    c = low.lerp(top, 0.5) + n * 0.012
-    STAR.update(c=c + n * 0.03, n=n)
-    frame = star_solid("Sternfassung", c, n, up, 0.142, 0.074, 0.03, 0.006, inset=0.88)
-    gem = star_solid("Sternstein", c + n * 0.03, n, up, 0.098, 0.047, 0.006, 0.032, inset=0.95)
-    return frame, gem
+    c = top - up * (R + 0.004)
+    STAR.update(c=c + n * 0.028, n=n)
+    frame = star_solid("Sternfassung", c, n, up, R, R * 0.52, 0.028, 0.006, inset=0.88)
+    gem = star_solid("Sternstein", c + n * 0.028, n, up, R * 0.69, R * 0.33, 0.006, 0.028, inset=0.95)
+    bm = bmesh.new(); rings = []
+    for i in range(14):
+        a_ = i * 2 * math.pi / 14; out = Vector((math.cos(a_), 0, math.sin(a_)))
+        rings.append([bm.verts.new(eye + out * (0.021 + 0.0075 * math.cos(q)) + Vector((0, 0.0075 * math.sin(q), 0))) for q in [j * 2 * math.pi / 6 for j in range(6)]])
+    for i in range(14):
+        r0, r1 = rings[i], rings[(i + 1) % 14]
+        for j in range(6):
+            bm.faces.new([r0[j], r1[j], r1[(j + 1) % 6], r0[(j + 1) % 6]])
+    return frame, gem, finish("Sternoese", bm)
 
 def tail_gem():
     """Schwanzspitze: geschliffene türkise Raute in einem kleinen goldenen Ring"""
@@ -682,9 +695,9 @@ def paint(g, line, sparks):
     bel = bel * bd
     bcol = three(BEL_L, BEL_M, (0.3, 0.66, 0.7), frac ** 1.1)
     bcol = mix(bcol, (0.1, 0.38, 0.5), np.clip(smoothstep(0.82, 0.93, frac) * smoothstep(1.0, 0.985, frac), 0, 1))               # Fuge
-    bcol = mix(bcol, BEL_D, 0.45 * smoothstep(0.72, 1.0, edge))
+    bcol = mix(bcol, (0.16, 0.46, 0.56), 0.7 * smoothstep(0.86, 0.95, edge))          # schmale dunklere Kante statt eines breiten Verlaufs
     bcol = bcol * (0.86 + 0.14 * tz)[..., None]
-    bcol = mix(bcol, (0.16, 0.36, 0.5), 0.45 * occ)
+    bcol = mix(bcol, (0.16, 0.36, 0.5), 0.45 * occ * smoothstep(0.62, 0.5, z))       # auf der Brust kein Schatten vom Anhänger
     col = col * (1 - bel[..., None]) + bcol * bel[..., None]
     # ---- Maul: Gaumen und Mundboden, Nasenlöcher, Lidrand
     inm = (y < YH + 0.03) * smoothstep(0.52, 0.74, occ)                             # nur verdeckte Flächen: die Lippen bleiben violett
@@ -1003,9 +1016,9 @@ def build(out, form=False):
     parts += [mark(o, T_TOOTH, G_HEAD, "Head") for o in up] + [mark(o, T_TOOTH, G_JAW, "Jaw") for o in low]
     parts += [mark(o, T_TONGUE, G_JAW, "Jaw") for o in tongue]
     ring, front = collar(bvh_b)
-    frame, gem = pendant(front, bvh_b)
+    frame, gem, bail = pendant(front, bvh_b)
     tgem, tring = tail_gem()
-    parts += [mark(ring, T_GOLD, G_NECK, "Body"), frame, gem, tgem, tring]
+    parts += [mark(ring, T_GOLD, G_NECK, "Body"), mark(bail, T_GOLD, G_NECK, "Body"), frame, gem, tgem, tring]
     for o, t, grp, bone in ((frame, T_GOLD, G_NECK, "Body"), (gem, T_GEM, G_NECK, "Body"), (tgem, T_GEM, G_TAIL, "Tail3"), (tring, T_GOLD, G_TAIL, "Tail3")):
         if o is not tring:
             md = o.modifiers.new("Kanten", 'EDGE_SPLIT'); md.split_angle = math.radians(18); apply_mod(o, md)
