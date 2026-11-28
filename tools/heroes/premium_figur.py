@@ -178,3 +178,16 @@ def turn_hand(arm, sfx, fingers, back):
     pb.matrix = M
     update()
     return F1
+
+def ribbon(name, pts, normals, w, th, segs=8):
+    """Flaches Band entlang einer Linie auf der Haut: Breite quer zur Linie in der Hautfläche, Dicke von der Haut weg"""
+    P = [Vector(p) for p in pts]; n = len(P); bm = bmesh.new(); rings = []
+    for i in range(n):
+        t = (P[min(i + 1, n - 1)] - P[max(i - 1, 0)]).normalized()
+        nn = Vector(normals[i]); nn = (nn - t * nn.dot(t)).normalized(); c = t.cross(nn)
+        rings.append([bm.verts.new(P[i] + c * (w * math.cos(a)) + nn * (th * math.sin(a))) for a in [k * 2 * math.pi / segs for k in range(segs)]])
+    for a, b in zip(rings, rings[1:]):
+        for k in range(segs):
+            bm.faces.new([a[k], a[(k + 1) % segs], b[(k + 1) % segs], b[k]])
+    bm.faces.new(rings[0][::-1]); bm.faces.new(rings[-1])
+    return finish(name, bm)
