@@ -593,23 +593,23 @@ def tail_gem():
         for k in range(n):
             bm.faces.new([r0[k], r0[(k + 1) % n], r1[k]]); bm.faces.new([r0[(k + 1) % n], r1[(k + 1) % n], r1[k]])
     bm = bmesh.new(); n = 6; h = math.pi / n
-    base = bm.verts.new(e - t * 0.015); tip = bm.verts.new(e + t * 0.33)
-    r1 = ring(bm, 0.055, 0.058, n); r2 = ring(bm, 0.125, 0.09, n, h); r3 = ring(bm, 0.215, 0.052, n, 2 * h)
+    base = bm.verts.new(e - t * 0.015); tip = bm.verts.new(e + t * 0.43)
+    r1 = ring(bm, 0.07, 0.074, n); r2 = ring(bm, 0.16, 0.118, n, h); r3 = ring(bm, 0.28, 0.068, n, 2 * h)
     for k in range(n):
         bm.faces.new([base, r1[(k + 1) % n], r1[k]]); bm.faces.new([tip, r3[k], r3[(k + 1) % n]])
     strip(bm, r1, r2); strip(bm, r2, r3)
     gem = finish("Schwanzstein", bm, smooth=False)
     # Fassung: Kelch mit sechs spitzen Blättern, die den Stein halten
     bm = bmesh.new(); m = 12
-    c0 = ring(bm, -0.035, 0.044, m); c1 = ring(bm, 0.012, 0.064, m)
-    c2 = [bm.verts.new(e + t * (0.108 if k % 2 == 0 else 0.05) + (ex * math.cos(k * 2 * math.pi / m) + ez * (0.8 * math.sin(k * 2 * math.pi / m))) * (0.092 if k % 2 == 0 else 0.07))
+    c0 = ring(bm, -0.035, 0.046, m); c1 = ring(bm, 0.015, 0.078, m)
+    c2 = [bm.verts.new(e + t * (0.14 if k % 2 == 0 else 0.062) + (ex * math.cos(k * 2 * math.pi / m) + ez * (0.8 * math.sin(k * 2 * math.pi / m))) * (0.12 if k % 2 == 0 else 0.088))
           for k in range(m)]
     for ra, rb in ((c0, c1), (c1, c2)):
         for k in range(m):
             bm.faces.new([ra[k], ra[(k + 1) % m], rb[(k + 1) % m], rb[k]])
     cup = finish("Schwanzfassung", bm)
     gold = [cup]
-    for along, R, r in ((-0.03, 0.05, 0.016), (0.014, 0.068, 0.009)):               # Goldring am Ansatz, schmaler Wulst darüber
+    for along, R, r in ((-0.03, 0.052, 0.017), (0.017, 0.082, 0.01)):               # Goldring am Ansatz, schmaler Wulst darüber
         c = e + t * along; bm = bmesh.new(); rings = []
         for i in range(14):
             a_ = i * 2 * math.pi / 14; out = ex * math.cos(a_) + ez * (0.8 * math.sin(a_))
@@ -814,12 +814,12 @@ def paint(g, line, sparks):
     ds = np.linalg.norm(P - f3(STAR["c"]), axis=-1)
     cg = mix(cg, (1.0, 0.93, 0.42), 0.85 * smoothstep(0.07, 0.01, ds))
     col = col * (1 - ge[..., None]) + cg * ge[..., None]
-    ta = np.clip((P - f3(TAILGEM["e"])) @ f3(TAILGEM["t"]) / 0.33, 0, 1)            # Schwanzstein: innen tief, zur Spitze hin hell
+    ta = np.clip((P - f3(TAILGEM["e"])) @ f3(TAILGEM["t"]) / 0.43, 0, 1)            # Schwanzstein: innen tief, zur Spitze hin hell
     tg_ = ge * (ds > 0.4)
     cg = mix(cg, (0.04, 0.36, 0.6), 0.45 * tg_ * (1 - ta))
     cg = mix(cg, (0.85, 1.0, 0.98), 0.6 * tg_ * ta ** 1.6)
     col = col * (1 - tg_[..., None]) + cg * tg_[..., None]
-    em += cg * (0.22 * ge + 0.3 * tg_)[..., None]
+    em += cg * (0.22 * ge + 0.4 * tg_)[..., None]
     # ---- Glitzersterne auf der Haut
     for c, n, size in sparks["skin"]:
         s_ = sparkle(P, c, n, size) * m_skin * (1 - bel)
@@ -964,8 +964,8 @@ def animate(arm):
     S = lambda t, ph=0.0: math.sin((t - ph) * 2 * math.pi)
     wave = lambda t, amp, lag=0.07: tuple(amp * (0.7 + 0.12 * i) * S(t, lag * i) for i in range(5))
     add = lambda u, v: tuple(a_ + b_ for a_, b_ in zip(u, v))
-    CURL = (17, 22, 24, 20, 14)                 # Zielhaltung: Schwanz nach oben eingerollt, der Stein steht hinter dem Rücken
-    SIDE = (7, 9, 9, 7, 5)                      # und leicht zur Seite, damit er den Rücken nicht verdeckt
+    CURL = (20, 25, 27, 23, 16)                 # Zielhaltung: Schwanz nach oben eingerollt, der Stein steht hinter dem Rücken
+    SIDE = (4, 5, 5, 4, 3)                      # und leicht zur Seite, damit er den Rücken nicht verdeckt
     idle = [(i * 8, (lambda t=i / 8.0: pose(flap=5 + 7 * S(t), fold=5 * S(t, 0.12), pitch=1.5 + 2.2 * S(t, 0.05), jaw=1.2 + 1.2 * S(t, 0.3),
                                             yaw=wave(t, 8), lift=add((5, 8, 10, 10, 8), wave(t, 2.5, 0.05)),
                                             bob=0.012 * S(t, 0.02), turn=1.5 * S(t * 0.5)))) for i in range(9)]
@@ -973,9 +973,9 @@ def animate(arm):
     # Schuss: der Schwanz peitscht mit (rollt sich enger ein und schlägt zur anderen Seite), dann zurück
     shoot = [(0, lambda: pose(**aim)),
              (3, lambda: pose(flap=24, fold=20, sweep=-2, pitch=11, fwd=0.11, up=0.035, jaw=16, lean=3.5, bob=-0.012,
-                              yaw=(-5, -9, -13, -15, -15), lift=(22, 27, 29, 25, 19))),
+                              yaw=(-2, -4, -6, -7, -7), lift=(24, 29, 31, 27, 20))),
              (7, lambda: pose(flap=8, fold=5, sweep=-8, pitch=9.5, fwd=0.035, up=0.022, jaw=7, lean=0.8,
-                              yaw=(12, 16, 16, 12, 9), lift=(14, 19, 21, 17, 11))),
+                              yaw=(11, 14, 14, 11, 8), lift=(17, 22, 24, 20, 13))),
              (12, lambda: pose(**aim))]
     win = [(i * 6, (lambda t=i / 8.0: pose(flap=10 + 18 * S(t * 2), fold=6 + 12 * S(t * 2, 0.1), sweep=8, pitch=9 + 3 * S(t * 2), up=0.02, jaw=5 + 4 * S(t * 2),
                                            yaw=wave(t, 15, 0.08), lift=(14, 18, 20, 16, 12),
