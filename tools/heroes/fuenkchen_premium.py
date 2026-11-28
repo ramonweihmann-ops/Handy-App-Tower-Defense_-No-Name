@@ -131,7 +131,8 @@ def lip_up(x, y):
 
 def lip_gap(x, y):
     """Öffnung zwischen den Lippen: vorn in der Mitte weit, zu den Mundwinkeln und nach hinten geschlossen"""
-    return 0.128 * np.clip(1 - (x / MOUTH_W) ** 2, 0, 1) ** 0.62 * smoothstep(-0.28, -0.5, y)
+    g = 0.128 * np.clip(1 - (x / MOUTH_W) ** 2, 0, 1) ** 0.5 * smoothstep(-0.28, -0.5, y)
+    return np.where(g < 0.022, 0.0, g)                                              # endet rund statt als schmaler Schlitz
 
 def palate(x, y):
     """Gaumen: hinter der Oberlippe wölbt sich das Maul nach oben"""
@@ -170,10 +171,11 @@ def head_shape():
     mb_ell(R, H0, (0.395, 0.33, 0.33))                                              # Schädel
     mb_ell(R, H0 + Vector((0, -0.18, -0.19)), (0.3, 0.3, 0.175))                    # Untergesicht und kräftiges Kinn
     mb_ell(R, H0 + Vector((0, -0.37, -0.03)), (0.225, 0.2, 0.128))                  # breite Schnauze: ihr unterer Rand ist die Oberlippe
+    mb_ell(R, H0 + Vector((0, -0.33, -0.215)), (0.2, 0.19, 0.105))                  # Unterkiefer gehört zur Schnauze, etwas kürzer
     for s in (1, -1):
         mb_ell(R, H0 + Vector((0.21 * s, -0.14, -0.13)), (0.2, 0.2, 0.17))          # Wangen
-        mb_ell(R, H0 + Vector((0.1 * s, -0.48, 0.062)), (0.072, 0.07, 0.05))        # Nasenhöcker
-        mb_ell(R, H0 + Vector((0.105 * s, -0.555, 0.078)), (0.03, 0.03, 0.024), neg=True)   # Nasenloch
+        mb_ell(R, H0 + Vector((0.085 * s, -0.5, 0.05)), (0.06, 0.06, 0.036))        # Nasenspitze: nur ein flacher Ansatz
+        mb_ell(R, H0 + Vector((0.085 * s, -0.56, 0.07)), (0.017, 0.017, 0.014), neg=True)   # kleines Nasenloch
     g = mb_to_mesh(R)
     finish_skin(g, 0.012, 1.0, smooth_it=6)
     cut(g, mouth_solid(), 'DIFFERENCE')
@@ -662,7 +664,8 @@ def paint(g, line, sparks):
     skin = np.clip(skin * (1 + 0.95 * sc)[..., None] + f3((0.07, 0.05, 0.04)) * np.clip(sc, 0, 1)[..., None], 0, 1)
     skin = mix(skin, SK_L, 0.22 * hd * front * smoothstep(-0.2, 0.25, N[..., 2]))        # Schnauze und Wangen etwas heller
     skin = mix(skin, (0.56, 0.24, 0.8), 0.5 * wa)                                          # Flügelarme: eine Spur röter
-    skin = mix(skin, SK_SHADOW, 0.55 * occ)
+    corner = hd * front * smoothstep(0.1, 0.03, np.abs(z - lip_up(x, y))) * smoothstep(MOUTH_W - 0.07, MOUTH_W - 0.02, np.abs(x))
+    skin = mix(skin, SK_SHADOW, 0.55 * occ * (1 - 0.85 * corner))                 # an den Mundwinkeln kein dunkler Strich
     m_skin = np.clip(hd + jw + bd + wa, 0, 1)
     col = col * (1 - m_skin[..., None]) + skin * m_skin[..., None]
     # ---- helle Unterseite mit Schilden
@@ -676,7 +679,7 @@ def paint(g, line, sparks):
     col = col * (1 - bel[..., None]) + bcol * bel[..., None]
     # ---- Maul: Gaumen und Mundboden, Nasenlöcher, Lidrand
     inm = (y < YH + 0.03) * smoothstep(0.52, 0.74, occ)                             # nur verdeckte Flächen: die Lippen bleiben violett
-    cav = hd * inm * (z < palate(x, y) + 0.03) * (z > lip_low(x, y) - 0.03) * smoothstep(0.004, 0.02, lip_gap(x, y) + 0.02 * (np.abs(x) < MOUTH_W + 0.02))
+    cav = hd * inm * (z < palate(x, y) + 0.03) * (z > lip_low(x, y) - 0.03) * smoothstep(0.004, 0.02, lip_gap(x, y))
     deep = smoothstep(-0.68, -0.4, y)                                               # nach hinten dunkler
     up_side = smoothstep(0.2, -0.3, N[..., 2])                                      # Gaumen dunkler als der Mundboden
     mcol = gradient((0.66, 0.18, 0.34), (0.5, 0.11, 0.27), up_side)
@@ -684,7 +687,7 @@ def paint(g, line, sparks):
     col = col * (1 - cav[..., None]) + mcol * cav[..., None]
     em += mcol * (0.3 * cav)[..., None]                                             # Maulinneres bleibt auch im Schatten warm
     for c, n in sparks["nose"]:
-        col = mix(col, (0.17, 0.05, 0.3), hd * 0.92 * np.exp(-(np.linalg.norm(P - f3(c), axis=-1) / 0.02) ** 2))
+        col = mix(col, (0.2, 0.07, 0.36), hd * 0.85 * np.exp(-(np.linalg.norm(P - f3(c), axis=-1) / 0.012) ** 2))
     a, dep, b = EYE_R
     for c, e1, e2, d in EYES:
         L = P - f3(c)
@@ -1001,7 +1004,7 @@ def build(out, form=False):
     # Glitzersterne und Nasenlöcher: Stellen auf der Haut
     sparks = {"skin": [], "nose": []}
     for s in (1, -1):
-        hit, n, _, _ = bvh_h.ray_cast(Vector((0.105 * s, H0.y - 2.0, H0.z + 0.078)), Vector((0, 1, 0)), 6.0)
+        hit, n, _, _ = bvh_h.ray_cast(Vector((0.085 * s, H0.y - 2.0, H0.z + 0.07)), Vector((0, 1, 0)), 6.0)
         sparks["nose"].append((tuple(hit), tuple(n)))
         for bv, o, d, size in ((bvh_h, (0.9 * s, -0.42, 1.27), (-1 * s, 0.25, 0), 0.04), (bvh_h, (0.9 * s, -0.3, 1.2), (-1 * s, 0.1, 0), 0.024),
                                (bvh_b, (0.9 * s, 0.18, 0.56), (-1 * s, 0, 0), 0.045), (bvh_b, (0.9 * s, 0.34, 0.4), (-1 * s, 0, 0), 0.026),
