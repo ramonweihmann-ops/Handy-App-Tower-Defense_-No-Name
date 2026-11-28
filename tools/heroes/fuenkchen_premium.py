@@ -577,26 +577,49 @@ def pendant(front, bvh):
             bm.faces.new([r0[j], r1[j], r1[(j + 1) % 6], r0[(j + 1) % 6]])
     return frame, gem, finish("Sternoese", bm)
 
+TAILGEM = {}                                    # Fußpunkt und Achse des Schwanzsteins (für die Bemalung)
+
 def tail_gem():
-    """Schwanzspitze: geschliffene türkise Raute in einem kleinen goldenen Ring"""
+    """Schwanzspitze: geschliffener türkiser Kristall (Sockel, Gürtel, Krone, Spitze) in einer goldenen Fassung aus
+    sechs Blättern, darunter ein Goldring. Liefert (Stein, Goldteile)."""
     e = Vector(TAIL[-1]); t = (Vector(TAIL[-1]) - Vector(TAIL[-2])).normalized()
     ex = Vector((1, 0, 0)); ez = t.cross(ex).normalized()
-    bm = bmesh.new()
-    a = bm.verts.new(e - t * 0.02); b = bm.verts.new(e + t * 0.25)
-    mid = [bm.verts.new(e + t * 0.085 + ex * (0.075 * cx) + ez * (0.058 * cz)) for cx, cz in ((1, 0), (0, 1), (-1, 0), (0, -1))]
-    for k in range(4):
-        bm.faces.new([a, mid[(k + 1) % 4], mid[k]]); bm.faces.new([b, mid[k], mid[(k + 1) % 4]])
+    TAILGEM.update(e=e, t=t)
+    def ring(bm, along, rx, n, phase=0.0, rz=0.8):
+        return [bm.verts.new(e + t * along + ex * (rx * math.cos(phase + k * 2 * math.pi / n)) + ez * (rx * rz * math.sin(phase + k * 2 * math.pi / n))) for k in range(n)]
+    def strip(bm, r0, r1):
+        """zwei gegeneinander verdrehte Ringe mit Dreiecken verbinden (geschliffene Facetten)"""
+        n = len(r0)
+        for k in range(n):
+            bm.faces.new([r0[k], r0[(k + 1) % n], r1[k]]); bm.faces.new([r0[(k + 1) % n], r1[(k + 1) % n], r1[k]])
+    bm = bmesh.new(); n = 6; h = math.pi / n
+    base = bm.verts.new(e - t * 0.015); tip = bm.verts.new(e + t * 0.33)
+    r1 = ring(bm, 0.055, 0.058, n); r2 = ring(bm, 0.125, 0.09, n, h); r3 = ring(bm, 0.215, 0.052, n, 2 * h)
+    for k in range(n):
+        bm.faces.new([base, r1[(k + 1) % n], r1[k]]); bm.faces.new([tip, r3[k], r3[(k + 1) % n]])
+    strip(bm, r1, r2); strip(bm, r2, r3)
     gem = finish("Schwanzstein", bm, smooth=False)
-    c = e + t * 0.012; bm = bmesh.new(); rings = []
-    for i in range(14):
-        a_ = i * 2 * math.pi / 14; out = ex * math.cos(a_) + ez * math.sin(a_)
-        rings.append([bm.verts.new(c + out * (0.05 + 0.016 * math.cos(q)) + t * (0.02 * math.sin(q))) for q in [j * 2 * math.pi / 6 for j in range(6)]])
-    for i in range(14):
-        r0, r1 = rings[i], rings[(i + 1) % 14]
-        for j in range(6):
-            bm.faces.new([r0[j], r1[j], r1[(j + 1) % 6], r0[(j + 1) % 6]])
-    ring = finish("Schwanzring", bm)
-    return gem, ring
+    # Fassung: Kelch mit sechs spitzen Blättern, die den Stein halten
+    bm = bmesh.new(); m = 12
+    c0 = ring(bm, -0.035, 0.044, m); c1 = ring(bm, 0.012, 0.064, m)
+    c2 = [bm.verts.new(e + t * (0.108 if k % 2 == 0 else 0.05) + (ex * math.cos(k * 2 * math.pi / m) + ez * (0.8 * math.sin(k * 2 * math.pi / m))) * (0.092 if k % 2 == 0 else 0.07))
+          for k in range(m)]
+    for ra, rb in ((c0, c1), (c1, c2)):
+        for k in range(m):
+            bm.faces.new([ra[k], ra[(k + 1) % m], rb[(k + 1) % m], rb[k]])
+    cup = finish("Schwanzfassung", bm)
+    gold = [cup]
+    for along, R, r in ((-0.03, 0.05, 0.016), (0.014, 0.068, 0.009)):               # Goldring am Ansatz, schmaler Wulst darüber
+        c = e + t * along; bm = bmesh.new(); rings = []
+        for i in range(14):
+            a_ = i * 2 * math.pi / 14; out = ex * math.cos(a_) + ez * (0.8 * math.sin(a_))
+            rings.append([bm.verts.new(c + out * (R + r * math.cos(q)) + t * (r * 1.2 * math.sin(q))) for q in [j * 2 * math.pi / 6 for j in range(6)]])
+        for i in range(14):
+            r0, r1_ = rings[i], rings[(i + 1) % 14]
+            for j in range(6):
+                bm.faces.new([r0[j], r1_[j], r1_[(j + 1) % 6], r0[(j + 1) % 6]])
+        gold.append(finish("Schwanzring", bm))
+    return gem, gold
 
 # ---------------------------------------------------------------- Bemalung
 
@@ -791,7 +814,12 @@ def paint(g, line, sparks):
     ds = np.linalg.norm(P - f3(STAR["c"]), axis=-1)
     cg = mix(cg, (1.0, 0.93, 0.42), 0.85 * smoothstep(0.07, 0.01, ds))
     col = col * (1 - ge[..., None]) + cg * ge[..., None]
-    em += cg * (0.22 * ge)[..., None]
+    ta = np.clip((P - f3(TAILGEM["e"])) @ f3(TAILGEM["t"]) / 0.33, 0, 1)            # Schwanzstein: innen tief, zur Spitze hin hell
+    tg_ = ge * (ds > 0.4)
+    cg = mix(cg, (0.04, 0.36, 0.6), 0.45 * tg_ * (1 - ta))
+    cg = mix(cg, (0.85, 1.0, 0.98), 0.6 * tg_ * ta ** 1.6)
+    col = col * (1 - tg_[..., None]) + cg * tg_[..., None]
+    em += cg * (0.22 * ge + 0.3 * tg_)[..., None]
     # ---- Glitzersterne auf der Haut
     for c, n, size in sparks["skin"]:
         s_ = sparkle(P, c, n, size) * m_skin * (1 - bel)
@@ -801,14 +829,22 @@ def paint(g, line, sparks):
 
 # ---------------------------------------------------------------- Gewichte
 
+TAIL_BONES = ("Tail", "Tail2", "Tail3", "Tail4", "Tail5")
+
+def tail_bone(y):
+    """Knochen des Schwanzes an der Stelle y (für starre Teile)"""
+    return TAIL_BONES[sum(1 for j in range(1, 5) if y > TAIL[j][1])]
+
 def body_weights(o):
-    gr = {n: o.vertex_groups.new(name=n) for n in ("Root", "Body", "Tail", "Tail2", "Tail3")}
+    gr = {n: o.vertex_groups.new(name=n) for n in ("Root", "Body") + TAIL_BONES}
     for v in o.data.vertices:
         p = v.co
         tl = ramp(p.y, 0.42, 0.64) * (1 - (1 - ramp(p.y, 0.5, 0.6)) * ramp(abs(p.x), 0.15, 0.24))
-        t2 = ramp(p.y, TAIL[2][1] - 0.1, TAIL[2][1] + 0.1); t3 = ramp(p.y, TAIL[4][1] - 0.08, TAIL[4][1] + 0.08)
+        r = [1.0] + [ramp(p.y, TAIL[j][1] - 0.075, TAIL[j][1] + 0.075) for j in range(1, 5)] + [0.0]
         leg = 1 - ramp(p.z, 0.1, 0.42)
-        w = {"Tail3": tl * t3, "Tail2": tl * t2 * (1 - t3), "Tail": tl * (1 - t2), "Root": (1 - tl) * leg, "Body": (1 - tl) * (1 - leg)}
+        w = {"Root": (1 - tl) * leg, "Body": (1 - tl) * (1 - leg)}
+        for i, n in enumerate(TAIL_BONES):
+            w[n] = tl * (r[i] - r[i + 1])
         for n, x in w.items():
             if x > 0.002:
                 gr[n].add([v.index], x, 'REPLACE')
@@ -902,14 +938,16 @@ def skeleton():
         ("Jaw", tuple(HINGE), (0, -0.68, 1.12), "Head"),
         ("Wing.L", tuple(WING_ROOT), tuple(wr), "Body"), ("WingTip.L", tuple(wr), tuple(tip), "Wing.L"),
         ("Wing.R", tuple(mir(WING_ROOT)), tuple(mir(wr)), "Body"), ("WingTip.R", tuple(mir(wr)), tuple(mir(tip)), "Wing.R"),
-        ("Tail", TAIL[0], TAIL[2], "Root"), ("Tail2", TAIL[2], TAIL[4], "Tail"), ("Tail3", TAIL[4], tuple(t5), "Tail2"),
+        ("Tail", TAIL[0], TAIL[1], "Root"), ("Tail2", TAIL[1], TAIL[2], "Tail"), ("Tail3", TAIL[2], TAIL[3], "Tail2"),
+        ("Tail4", TAIL[3], TAIL[4], "Tail3"), ("Tail5", TAIL[4], tuple(t5), "Tail4"),
     ])
 
 def animate(arm):
     nl = WING_N; nr = Vector((-WING_N.x, WING_N.y, WING_N.z)) * -1.0        # Flügel heben: Drehung um die Flächennormale
 
-    def pose(flap=0.0, fold=0.0, sweep=0.0, pitch=0.0, fwd=0.0, jaw=0.0, tail=0.0, tail2=0.0, tail3=0.0, lift=0.0, hop=0.0,
+    def pose(flap=0.0, fold=0.0, sweep=0.0, pitch=0.0, fwd=0.0, jaw=0.0, yaw=(0, 0, 0, 0, 0), lift=(0, 0, 0, 0, 0), hop=0.0,
              bob=0.0, lean=0.0, turn=0.0, up=0.0):
+        """yaw, lift: Drehung je Schwanzknochen (seitlich, nach oben), vom Ansatz zur Spitze"""
         reset_pose(arm)
         for nm, n, sg in ((".L", nl, 1), (".R", nr, -1)):
             rot_world(arm, "Wing" + nm, (0, 0, 1), sweep * sg)
@@ -918,22 +956,29 @@ def animate(arm):
         rot_world(arm, "Head", (1, 0, 0), -pitch); rot_world(arm, "Head", (0, 0, 1), turn)
         move_world(arm, "Head", (0, -fwd, up))
         rot_world(arm, "Jaw", (1, 0, 0), jaw)
-        rot_world(arm, "Tail", (0, 0, 1), tail); rot_world(arm, "Tail", (1, 0, 0), lift)
-        rot_world(arm, "Tail2", (0, 0, 1), tail2); rot_world(arm, "Tail3", (0, 0, 1), tail3)
+        for nm, a_, l_ in zip(TAIL_BONES, yaw, lift):
+            rot_world(arm, nm, (0, 0, 1), a_); rot_world(arm, nm, (1, 0, 0), l_)
         rot_world(arm, "Body", (1, 0, 0), -lean)
         move_world(arm, "Body", (0, 0, bob)); move_world(arm, "Root", (0, 0, hop))
 
     S = lambda t, ph=0.0: math.sin((t - ph) * 2 * math.pi)
+    wave = lambda t, amp, lag=0.07: tuple(amp * (0.7 + 0.12 * i) * S(t, lag * i) for i in range(5))
+    add = lambda u, v: tuple(a_ + b_ for a_, b_ in zip(u, v))
+    CURL = (17, 22, 24, 20, 14)                 # Zielhaltung: Schwanz nach oben eingerollt, der Stein steht hinter dem Rücken
+    SIDE = (7, 9, 9, 7, 5)                      # und leicht zur Seite, damit er den Rücken nicht verdeckt
     idle = [(i * 8, (lambda t=i / 8.0: pose(flap=5 + 7 * S(t), fold=5 * S(t, 0.12), pitch=1.5 + 2.2 * S(t, 0.05), jaw=1.2 + 1.2 * S(t, 0.3),
-                                            tail=7 * S(t), tail2=9 * S(t, 0.12), tail3=11 * S(t, 0.24), lift=2 + 2 * S(t, 0.1),
+                                            yaw=wave(t, 8), lift=add((5, 8, 10, 10, 8), wave(t, 2.5, 0.05)),
                                             bob=0.012 * S(t, 0.02), turn=1.5 * S(t * 0.5)))) for i in range(9)]
-    aim = dict(flap=12, fold=10, sweep=-7, pitch=9, fwd=0.05, up=0.025, jaw=9, lift=9, lean=1.5)
+    aim = dict(flap=12, fold=10, sweep=-7, pitch=9, fwd=0.05, up=0.025, jaw=9, yaw=SIDE, lift=CURL, lean=1.5)
+    # Schuss: der Schwanz peitscht mit (rollt sich enger ein und schlägt zur anderen Seite), dann zurück
     shoot = [(0, lambda: pose(**aim)),
-             (3, lambda: pose(flap=24, fold=20, sweep=-2, pitch=11, fwd=0.11, up=0.035, jaw=16, lift=14, lean=3.5, bob=-0.012)),
-             (7, lambda: pose(flap=8, fold=5, sweep=-8, pitch=9.5, fwd=0.035, up=0.022, jaw=7, lift=7, lean=0.8)),
+             (3, lambda: pose(flap=24, fold=20, sweep=-2, pitch=11, fwd=0.11, up=0.035, jaw=16, lean=3.5, bob=-0.012,
+                              yaw=(-5, -9, -13, -15, -15), lift=(22, 27, 29, 25, 19))),
+             (7, lambda: pose(flap=8, fold=5, sweep=-8, pitch=9.5, fwd=0.035, up=0.022, jaw=7, lean=0.8,
+                              yaw=(12, 16, 16, 12, 9), lift=(14, 19, 21, 17, 11))),
              (12, lambda: pose(**aim))]
     win = [(i * 6, (lambda t=i / 8.0: pose(flap=10 + 18 * S(t * 2), fold=6 + 12 * S(t * 2, 0.1), sweep=8, pitch=9 + 3 * S(t * 2), up=0.02, jaw=5 + 4 * S(t * 2),
-                                           tail=14 * S(t), tail2=14 * S(t, 0.1), tail3=16 * S(t, 0.2), lift=10,
+                                           yaw=wave(t, 15, 0.08), lift=(14, 18, 20, 16, 12),
                                            hop=0.13 * abs(S(t)), lean=2 + 2 * S(t * 2), turn=4 * S(t)))) for i in range(9)]
     make_actions(arm, [("Idle", idle), ("Shoot", shoot), ("Victory", win)])
 
@@ -1001,7 +1046,7 @@ def build(out, form=False):
     parts += [mark(o, T_PLATE, G_HEAD, "Head") for o in head_plates()] + [mark(horn(s), T_HORN, G_HEAD, "Head") for s in (1, -1)]
     for o in spine_plates(bvh_b):
         yy = sum(v.co.y for v in o.data.vertices) / len(o.data.vertices)
-        bone = "Body" if yy < 0.5 else "Tail" if yy < TAIL[2][1] else "Tail2" if yy < TAIL[4][1] else "Tail3"
+        bone = "Body" if yy < 0.5 else tail_bone(yy)
         parts.append(mark(o, T_PLATE, G_BODY if bone == "Body" else G_TAIL, bone))
     parts += [mark(o, T_CLAW, G_BODY, "Root") for o in claws()]
     for s in (1, -1):
@@ -1017,11 +1062,11 @@ def build(out, form=False):
     parts += [mark(o, T_TONGUE, G_JAW, "Jaw") for o in tongue]
     ring, front = collar(bvh_b)
     frame, gem, bail = pendant(front, bvh_b)
-    tgem, tring = tail_gem()
-    parts += [mark(ring, T_GOLD, G_NECK, "Body"), mark(bail, T_GOLD, G_NECK, "Body"), frame, gem, tgem, tring]
-    for o, t, grp, bone in ((frame, T_GOLD, G_NECK, "Body"), (gem, T_GEM, G_NECK, "Body"), (tgem, T_GEM, G_TAIL, "Tail3"), (tring, T_GOLD, G_TAIL, "Tail3")):
-        if o is not tring:
-            md = o.modifiers.new("Kanten", 'EDGE_SPLIT'); md.split_angle = math.radians(18); apply_mod(o, md)
+    tgem, tgold = tail_gem()
+    parts += [mark(ring, T_GOLD, G_NECK, "Body"), mark(bail, T_GOLD, G_NECK, "Body"), frame, gem, tgem]
+    parts += [mark(o, T_GOLD, G_TAIL, "Tail5") for o in tgold]
+    for o, t, grp, bone in ((frame, T_GOLD, G_NECK, "Body"), (gem, T_GEM, G_NECK, "Body"), (tgem, T_GEM, G_TAIL, "Tail5")):
+        md = o.modifiers.new("Kanten", 'EDGE_SPLIT'); md.split_angle = math.radians(18); apply_mod(o, md)
         mark(o, t, grp, bone)
     # Glitzersterne und Nasenlöcher: Stellen auf der Haut
     sparks = {"skin": [], "nose": []}
