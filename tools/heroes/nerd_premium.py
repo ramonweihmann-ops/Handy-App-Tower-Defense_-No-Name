@@ -7,11 +7,11 @@ import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from premium_figur import *
 
-HC = Vector((0.0, 0.0, 1.62))                   # Kopfmitte
-J = dict(hips=(0, 0, 0.66), spine=(0, 0, 0.82), chest=(0, 0, 1.02), neck=(0, 0.01, 1.3), head=(0, 0.01, 1.42), top=(0, 0.01, 1.95),
-         clav=(0.07, 0, 1.25), shoulder=(0.26, 0, 1.235), elbow=(0.415, 0, 0.975), wrist=(0.555, 0, 0.745), palm=(0.615, 0, 0.64),
-         hip=(0.125, 0, 0.64), knee=(0.15, -0.01, 0.385), ankle=(0.16, 0, 0.15), toe=(0.17, -0.24, 0.04))
-HAND_K = 1.12
+HC = Vector((0.0, 0.0, 1.63))                   # Kopfmitte
+J = dict(hips=(0, 0, 0.68), spine=(0, 0, 0.82), chest=(0, 0, 1.0), neck=(0, 0.01, 1.28), head=(0, 0.01, 1.4), top=(0, 0.01, 1.95),
+         clav=(0.07, 0, 1.24), shoulder=(0.275, 0, 1.225), elbow=(0.43, 0, 0.965), wrist=(0.57, 0, 0.735), palm=(0.63, 0, 0.63),
+         hip=(0.15, 0, 0.66), knee=(0.215, -0.01, 0.43), ankle=(0.265, 0, 0.2), toe=(0.29, -0.3, 0.05))       # breiter Stand wie in der Vorlage
+HAND_K = 1.22
 V = lambda p: Vector(p)
 mir = lambda p: Vector((-p[0], p[1], p[2]))
 
@@ -21,9 +21,9 @@ G_BODY, G_HEAD, G_HANDL, G_HANDR, G_LAPTOP, G_PHONE, G_PACK = range(7)
 # ---------------------------------------------------------------- Körper im Hoodie, Hose
 
 def body_shape():
-    parts = [("e", (0, 0, 1.1), (0.27, 0.2, 0.2)), ("e", (0, -0.01, 0.9), (0.275, 0.215, 0.17)),         # Brust, Bauch
-             ("e", (0, -0.005, 0.775), (0.285, 0.225, 0.06)),                                            # Saum des Hoodies
-             ("e", (0, 0, 0.665), (0.235, 0.185, 0.12)),                                                 # Becken
+    parts = [("e", (0, 0, 1.08), (0.29, 0.21, 0.2)), ("e", (0, -0.01, 0.89), (0.3, 0.23, 0.17)),         # Brust, Bauch
+             ("e", (0, -0.005, 0.755), (0.31, 0.24, 0.06)),                                              # Saum des Hoodies
+             ("e", (0, 0, 0.67), (0.27, 0.195, 0.115)),                                                  # Becken
              ("e", (0, 0.17, 1.25), (0.2, 0.105, 0.14))]                                                 # Kapuze im Nacken
     for k in range(12):                                                                                  # Kragenwulst der Kapuze
         a = k * 2 * math.pi / 12
@@ -34,23 +34,23 @@ def body_shape():
         parts += [("e", sh + V((0, 0, -0.01)), (0.115, 0.115, 0.115)), ("c", sh, el, 0.098), ("c", el, wr - d * 0.05, 0.092),
                   ("e", wr - d * 0.05, (0.084, 0.084, 0.084))]                                           # Ärmel mit Bündchen
         hp, kn, an = [V((p[0] * s, p[1], p[2])) for p in (J["hip"], J["knee"], J["ankle"])]
-        parts += [("c", hp + V((0, 0, -0.02)), kn, 0.132), ("c", kn, an + V((0, 0, 0.1)), 0.125),
-                  ("e", an + V((0, 0, 0.1)), (0.145, 0.15, 0.075))]                                     # weite Hose, unten gerafft
+        parts += [("c", hp + V((0, 0, -0.02)), kn, 0.14), ("c", kn, an + V((0, 0, 0.1)), 0.135),
+                  ("e", an + V((0, 0, 0.11)), (0.158, 0.162, 0.08))]                                     # weite Hose, unten gerafft
     return blob("Koerper", parts, voxel=0.013, smooth=7)
 
 def head_shape():
-    parts = [("e", HC, (0.29, 0.275, 0.28)), ("e", HC + V((0, -0.02, -0.12)), (0.245, 0.235, 0.17)),     # Schädel, Kinnpartie
+    parts = [("e", HC, (0.3, 0.285, 0.29)), ("e", HC + V((0, -0.02, -0.125)), (0.255, 0.245, 0.175)),    # Schädel, Kinnpartie
              ("e", HC + V((0, -0.285, -0.07)), (0.036, 0.04, 0.034)),                                    # Nase
              ("c", (0, 0.01, 1.27), (0, 0.01, 1.45), 0.088)]                                             # Hals
     for s in (1, -1):
-        parts.append(("e", HC + V((0.285 * s, 0.02, -0.04)), (0.05, 0.05, 0.078)))                      # Ohren
+        parts.append(("e", HC + V((0.297 * s, 0.02, -0.04)), (0.055, 0.055, 0.085)))                    # Ohren
     return blob("Kopf", parts, voxel=0.011, smooth=6)
 
 def hair_shape():
     """Frisur aus wenigen großen runden Strähnen: eine Kappe über dem Schädel, darauf die Tolle, die nach links oben
     schwingt, Büschel an den Schläfen und wilde Spitzen am Hinterkopf. Liefert die Teile (nicht verschmolzen: zwischen
     den Strähnen bleiben klare Furchen)."""
-    cap = blob("Haarkappe", [("e", HC + V((0, 0.04, 0.08)), (0.312, 0.305, 0.265)), ("e", HC + V((0, 0.14, -0.04)), (0.295, 0.215, 0.27))], voxel=0.014, smooth=4)
+    cap = blob("Haarkappe", [("e", HC + V((0, 0.04, 0.085)), (0.325, 0.315, 0.275)), ("e", HC + V((0, 0.145, -0.04)), (0.305, 0.225, 0.28))], voxel=0.014, smooth=4)
     L = [  # Ansatz, Stützpunkt, Spitze (ab Kopfmitte), Dicke
         ((-0.2, -0.2, 0.2), (0.0, -0.36, 0.36), (0.3, -0.2, 0.33), 0.125),      # große Tolle: von rechts vorn nach links oben
         ((-0.24, -0.1, 0.24), (-0.02, -0.2, 0.46), (0.27, -0.06, 0.4), 0.12),   # zweite Welle darüber
@@ -69,20 +69,20 @@ def hair_shape():
     L += [((0.1, -0.16, 0.27), (0.26, -0.2, 0.36), (0.36, -0.1, 0.24), 0.1),      # füllt die Tolle links auf
           ((-0.05, 0.1, 0.3), (-0.2, 0.16, 0.42), (-0.32, 0.12, 0.3), 0.1),       # oben rechts
           ((0.1, 0.2, 0.22), (0.2, 0.34, 0.24), (0.22, 0.38, 0.06), 0.095), ((-0.1, 0.2, 0.22), (-0.2, 0.34, 0.24), (-0.22, 0.38, 0.06), 0.095)]
-    locks = [lock("Straehne%d" % i, HC + V(a_), HC + V(b_), HC + V(c_), r * 1.22, flat=1.0) for i, (a_, b_, c_, r) in enumerate(L)]
+    locks = [lock("Straehne%d" % i, HC + V(a_) * 1.0, HC + V(b_) * 0.94, HC + V(c_) * 0.94, r * 1.3, flat=1.0) for i, (a_, b_, c_, r) in enumerate(L)]
     return [cap] + locks
 
 def shoe(s):
     x = J["ankle"][0]
-    parts = [("e", (x, -0.1, 0.11), (0.138, 0.235, 0.108)), ("e", (x, -0.245, 0.1), (0.132, 0.135, 0.098)),         # Schuh, Kappe
-             ("e", (x, 0.07, 0.125), (0.125, 0.11, 0.125)), ("e", (x, 0.0, 0.225), (0.118, 0.125, 0.07)),          # Ferse, Schaft
-             ("e", (x, -0.095, 0.035), (0.15, 0.265, 0.046))]                                                     # kräftige Sohle
+    parts = [("e", (x, -0.11, 0.125), (0.152, 0.26, 0.122)), ("e", (x, -0.275, 0.112), (0.146, 0.15, 0.108)),       # Schuh, Kappe
+             ("e", (x, 0.08, 0.145), (0.14, 0.125, 0.14)), ("e", (x, 0.0, 0.265), (0.132, 0.14, 0.08)),            # Ferse, Schaft
+             ("e", (x, -0.105, 0.04), (0.166, 0.295, 0.052))]                                                     # kräftige Sohle
     g = blob("Schuh", parts, voxel=0.011, smooth=5, ground=True)
-    g.data.transform(Matrix.Translation((x, 0, 0)) @ Matrix.Rotation(math.radians(-8), 4, 'Z') @ Matrix.Translation((-x, 0, 0)))
-    laces = [rounded_box("Band", (x, -0.15 + 0.072 * i, 0.2 + 0.02 * i), (0.085, 0.023, 0.014), 0.009,
+    g.data.transform(Matrix.Translation((x, 0, 0)) @ Matrix.Rotation(math.radians(-13), 4, 'Z') @ Matrix.Translation((-x, 0, 0)))
+    laces = [rounded_box("Band", (x, -0.17 + 0.08 * i, 0.228 + 0.022 * i), (0.094, 0.026, 0.015), 0.01,
                          Euler((math.radians(-14), 0, 0))) for i in range(3)]
     for o in laces:
-        o.data.transform(Matrix.Translation((x, 0, 0)) @ Matrix.Rotation(math.radians(-8), 4, 'Z') @ Matrix.Translation((-x, 0, 0)))
+        o.data.transform(Matrix.Translation((x, 0, 0)) @ Matrix.Rotation(math.radians(-13), 4, 'Z') @ Matrix.Translation((-x, 0, 0)))
     out = [g] + laces
     if s < 0:
         out = [mirror_x(o) for o in out]
@@ -97,14 +97,14 @@ def glasses(bvh):
         pts = []
         for k in range(28):
             a = k * 2 * math.pi / 28
-            u = 0.092 * abs(math.cos(a)) ** 0.5 * (1 if math.cos(a) >= 0 else -1); w = 0.072 * abs(math.sin(a)) ** 0.5 * (1 if math.sin(a) >= 0 else -1)
-            x = (0.118 + u) * s; z = HC.z - 0.012 + w
+            u = 0.1 * abs(math.cos(a)) ** 0.42 * (1 if math.cos(a) >= 0 else -1); w = 0.084 * abs(math.sin(a)) ** 0.42 * (1 if math.sin(a) >= 0 else -1)
+            x = (0.128 + u) * s; z = HC.z - 0.015 + w
             hit = bvh.ray_cast(V((x, -2.0, z)), V((0, 1, 0)), 6.0)[0]
             pts.append(V((x, min(hit.y if hit is not None else -0.2, -0.2) - 0.034, z)))
         ys = sum(q.y for q in pts) / len(pts)
         pts = [V((q.x, 0.6 * ys + 0.4 * q.y, q.z)) for q in pts]                                         # fast ebener Rahmen
-        parts.append(loop_tube("Rahmen%d" % s, [tuple(q) for q in pts], 0.021, segs=8))
-        a = V((0.212 * s, ys + 0.004, HC.z + 0.02)); b = V((0.292 * s, 0.0, HC.z + 0.03))
+        parts.append(loop_tube("Rahmen%d" % s, [tuple(q) for q in pts], 0.025, segs=8))
+        a = V((0.23 * s, ys + 0.004, HC.z + 0.02)); b = V((0.305 * s, 0.0, HC.z + 0.03))
         parts.append(sweep("Buegel%d" % s, [a, a.lerp(b, 0.5) + V((0.012 * s, 0, 0)), b], [0.014, 0.013, 0.012], segs=6))
     parts.append(sweep("Steg", [V((-0.03, ys - 0.004, HC.z + 0.012)), V((0, ys - 0.012, HC.z + 0.02)), V((0.03, ys - 0.004, HC.z + 0.012))], [0.014] * 3, segs=6))
     return parts
@@ -116,7 +116,7 @@ def face_parts(bvh, eye_m):
         hit, n, _, _ = bvh.ray_cast(V((x, -2.0, z)), V((0, 1, 0)), 6.0)
         return hit + n * lift
     for s in (1, -1):
-        cx, cz, a, b = 0.118 * s, HC.z - 0.02, 0.036, 0.062
+        cx, cz, a, b = 0.128 * s, HC.z - 0.02, 0.038, 0.066
         bm = bmesh.new(); uvl = bm.loops.layers.uv.new("UVMap"); uv = {}
         c = bm.verts.new(on(cx, cz, 0.006)); uv[c] = (0.5, 0.5); rings = []; n = 20
         for t in (0.4, 0.75, 1.0):
@@ -271,7 +271,7 @@ def hold_pose(arm, tap=0.0, push=0.0, breathe=0.0, nod=0.0, lean=0.0, hop=0.0, r
     rot_world(arm, "Spine", (1, 0, 0), 2 + lean); rot_world(arm, "Chest", (1, 0, 0), 3 + breathe + lean)     # leicht vorgebeugt
     rot_world(arm, "Neck", (1, 0, 0), 3 + nod); rot_world(arm, "Head", (1, 0, 0), 4 + nod); rot_world(arm, "Head", (0, 0, 1), 12)   # Blick zum Laptop
     for sfx, sg in ((".L", 1), (".R", -1)):
-        rot_world(arm, "UpLeg" + sfx, (0, 1, 0), -7 * sg); rot_world(arm, "Leg" + sfx, (0, 1, 0), 2 * sg); rot_world(arm, "Foot" + sfx, (0, 1, 0), 5 * sg)
+        pass                                                                        # der breite Stand steckt schon in der Ruhelage
     update()
     C = LAP_C + V((0, -push, 0.4 * push))
     # linke Hand: flach unter der Basis, Finger zeigen schräg nach vorn rechts, Daumen außen
@@ -313,11 +313,11 @@ def animate(arm):
 
 # ---------------------------------------------------------------- Bemalung
 
-HEM = 0.74                                      # Unterkante des Hoodies
+HEM = 0.718                                     # Unterkante des Hoodies
 HOOD_L, HOOD_M, HOOD_D = (0.86, 0.81, 0.98), (0.74, 0.67, 0.93), (0.52, 0.44, 0.78)
-DARK_L, DARK_M, DARK_D = (0.42, 0.3, 0.68), (0.3, 0.2, 0.53), (0.17, 0.1, 0.34)
+DARK_L, DARK_M, DARK_D = (0.38, 0.27, 0.62), (0.25, 0.16, 0.45), (0.14, 0.08, 0.28)
 HAIR_L, HAIR_M, HAIR_D = (0.72, 0.46, 0.27), (0.55, 0.32, 0.18), (0.34, 0.18, 0.1)
-SKIN_L, SKIN_M, SKIN_D = (1.0, 0.84, 0.7), (0.99, 0.76, 0.6), (0.88, 0.6, 0.46)
+SKIN_L, SKIN_M, SKIN_D = (1.0, 0.86, 0.73), (1.0, 0.79, 0.64), (0.92, 0.66, 0.52)
 
 def paint(g):
     ao = vertex_ao(g, rays=16, dist=0.26)
@@ -338,7 +338,7 @@ def paint(g):
     Pa = np.stack([ax, y, z], -1)
     rel = Pa - f3(cuff_c); along = rel @ f3(d_arm)
     cuff = smoothstep(0.0, 0.012, along + 0.035) * (np.linalg.norm(rel, axis=-1) < 0.16) * cl
-    tro = smoothstep(HEM + 0.003, HEM - 0.003, z) * (ax < 0.4) * (1 - cuff) * cl
+    tro = smoothstep(HEM + 0.003, HEM - 0.003, z) * (ax < 0.47) * (1 - cuff) * cl
     hood = cl * (1 - tro) * (1 - cuff)
     hc = three(HOOD_D, HOOD_M, HOOD_L, lit)
     fold = fbm3(P * f3((1.0, 1.0, 2.6)), 5.0, 3, 3)
@@ -372,7 +372,7 @@ def paint(g):
     for s in (1, -1):
         sc = mix(sc, (1.0, 0.62, 0.58), 0.42 * np.exp(-(((x - 0.17 * s) / 0.055) ** 2 + ((z - (HC.z - 0.105)) / 0.04) ** 2)) * (y < -0.1))   # Wangen
         sc = mix(sc, SKIN_D, 0.6 * np.exp(-(((ax - 0.3) / 0.02) ** 2 + ((z - (HC.z - 0.04)) / 0.04) ** 2 + ((y - 0.005) / 0.03) ** 2)))     # Ohrmuschel
-    lay(sk, mix(sc, (0.72, 0.42, 0.34), 0.38 * occ))
+    lay(sk, mix(sc, (0.8, 0.5, 0.4), 0.28 * occ))
     # ---- Haare
     hr = sel(T_HAIR)
     hcol = three(HAIR_D, HAIR_M, HAIR_L, smoothstep(0.1, 0.95, 0.75 * lit + 0.25 * (1 - occ)))
@@ -381,9 +381,9 @@ def paint(g):
     shm = sel(T_SHOE)
     scol = three(DARK_D, (0.36, 0.25, 0.62), (0.5, 0.38, 0.78), lit)
     light = three((0.62, 0.56, 0.84), (0.84, 0.8, 0.96), (0.96, 0.94, 1.0), lit)
-    white = np.clip(smoothstep(0.062, 0.054, z) + smoothstep(-0.262, -0.275, y) * (z > 0.05) + smoothstep(0.125, 0.14, y) * (z < 0.2), 0, 1)
+    white = np.clip(smoothstep(0.072, 0.064, z) + smoothstep(-0.29, -0.305, y) * (z > 0.05) + smoothstep(0.14, 0.155, y) * (z < 0.23), 0, 1)
     scol = scol * (1 - white[..., None]) + light * white[..., None]
-    scol = mix(scol, (0.24, 0.16, 0.44), 0.8 * smoothstep(0.006, 0.002, np.abs(z - 0.064)))     # Linie über der Sohle
+    scol = mix(scol, (0.24, 0.16, 0.44), 0.8 * smoothstep(0.006, 0.002, np.abs(z - 0.074)))     # Linie über der Sohle
     lay(shm, mix(scol, (0.12, 0.07, 0.26), 0.45 * occ))
     # ---- Rucksack, Gurte, Taschen
     for t_, base in ((T_PACK, ((0.2, 0.12, 0.4), (0.34, 0.23, 0.6), (0.48, 0.36, 0.76))), (T_STRAP, ((0.14, 0.08, 0.3), (0.24, 0.16, 0.45), (0.36, 0.26, 0.6))),

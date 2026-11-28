@@ -8,12 +8,12 @@ import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from premium_figur import *
 
-HC = Vector((0.0, -0.01, 1.63))                 # Helmmitte
-J = dict(hips=(0, 0, 0.7), spine=(0, 0, 0.86), chest=(0, 0, 1.04), neck=(0, 0.01, 1.28), head=(0, 0.01, 1.36), top=(0, 0.01, 2.0),
-         clav=(0.08, 0, 1.26), shoulder=(0.3, 0, 1.235), elbow=(0.465, 0, 0.99), wrist=(0.575, -0.02, 0.77), palm=(0.62, -0.03, 0.67),
-         hip=(0.14, 0, 0.68), knee=(0.19, -0.01, 0.43), ankle=(0.21, 0, 0.18), toe=(0.22, -0.28, 0.05))
-HAND_K = 1.2
-BELT_Z = 0.815
+HC = Vector((0.0, -0.01, 1.66))                 # Helmmitte
+J = dict(hips=(0, 0, 0.76), spine=(0, 0, 0.9), chest=(0, 0, 1.06), neck=(0, 0.01, 1.29), head=(0, 0.01, 1.37), top=(0, 0.01, 2.0),
+         clav=(0.08, 0, 1.26), shoulder=(0.315, 0, 1.24), elbow=(0.49, 0, 1.0), wrist=(0.6, -0.02, 0.785), palm=(0.645, -0.03, 0.685),
+         hip=(0.165, 0, 0.74), knee=(0.24, -0.01, 0.5), ankle=(0.295, 0, 0.24), toe=(0.32, -0.3, 0.06))       # breiter Stand, lange Beine
+HAND_K = 1.3
+BELT_Z = 0.875
 V = lambda p: Vector(p)
 
 T_BODY, T_HELM, T_VISOR, T_GLOVE, T_BOOT, T_METAL, T_LEATHER, T_TEAL, T_RIM = range(9)
@@ -22,29 +22,29 @@ G_BODY, G_HEAD, G_HANDL, G_HANDR = range(4)
 # ---------------------------------------------------------------- Formen
 
 def body_shape():
-    parts = [("e", (0, 0, 1.08), (0.3, 0.205, 0.2)), ("e", (0, 0, 0.92), (0.27, 0.2, 0.15)),             # Brust, Taille
-             ("e", (0, 0, 0.845), (0.285, 0.21, 0.05)),                                                  # Saum der Jacke
-             ("e", (0, 0, 0.72), (0.25, 0.19, 0.12)),                                                    # Becken
-             ("c", (0, 0.01, 1.2), (0, 0.01, 1.36), 0.098)]                                              # Hals
+    parts = [("e", (0, 0, 1.1), (0.31, 0.21, 0.19)), ("e", (0, 0, 0.97), (0.275, 0.2, 0.13)),            # Brust, Taille
+             ("e", (0, 0, 0.905), (0.29, 0.212, 0.05)),                                                  # Saum der Jacke
+             ("e", (0, 0, 0.78), (0.265, 0.195, 0.12)),                                                  # Becken
+             ("c", (0, 0.01, 1.2), (0, 0.01, 1.37), 0.098)]                                              # Hals
     for k in range(12):                                                                                  # Jackenkragen
         a = k * 2 * math.pi / 12
         parts.append(("e", (0.17 * math.sin(a), 0.03 - 0.15 * math.cos(a), 1.275 - 0.02 * math.cos(a)), (0.06, 0.06, 0.05)))
     for s in (1, -1):
         sh, el, wr = [V((p[0] * s, p[1], p[2])) for p in (J["shoulder"], J["elbow"], J["wrist"])]
         d = (wr - el).normalized()
-        parts += [("e", sh + V((0.01 * s, 0, 0)), (0.135, 0.13, 0.13)), ("c", sh, el + (sh - el).normalized() * 0.03, 0.118),
-                  ("e", el + (sh - el).normalized() * 0.03, (0.132, 0.132, 0.085), V((0, 0, 1)).rotation_difference((el - sh).normalized())),   # aufgeschobener Ärmel
-                  ("c", el, wr - d * 0.03, 0.088)]                                                       # nackter Unterarm
+        parts += [("e", sh + V((0.01 * s, 0, 0)), (0.152, 0.14, 0.14)), ("c", sh, el + (sh - el).normalized() * 0.04, 0.128),
+                  ("e", el + (sh - el).normalized() * 0.04, (0.15, 0.15, 0.09), V((0, 0, 1)).rotation_difference((el - sh).normalized())),      # aufgeschobener Ärmel
+                  ("c", el, wr - d * 0.03, 0.092)]                                                       # nackter Unterarm
         hp, kn, an = [V((p[0] * s, p[1], p[2])) for p in (J["hip"], J["knee"], J["ankle"])]
-        parts += [("c", hp, kn, 0.138), ("c", kn, an + V((0, 0, 0.14)), 0.125)]
+        parts += [("c", hp, kn, 0.142), ("c", kn, an + V((0, 0, 0.14)), 0.128)]
     return blob("Koerper", parts, voxel=0.013, smooth=7)
 
 def helmet_shape():
     """dicke runde Schale mit Kinnteil und zwei runden Seitenteilen"""
-    parts = [("e", HC, (0.365, 0.385, 0.355)), ("e", HC + V((0, -0.1, -0.21)), (0.29, 0.27, 0.13)),       # Schale, Kinnteil
-             ("e", HC + V((0, 0.05, -0.22)), (0.3, 0.3, 0.13))]                                           # unterer Rand
+    parts = [("e", HC, (0.345, 0.365, 0.34)), ("e", HC + V((0, -0.1, -0.2)), (0.275, 0.26, 0.125)),       # Schale, Kinnteil
+             ("e", HC + V((0, 0.04, -0.21)), (0.285, 0.285, 0.12))]                                       # unterer Rand
     for s in (1, -1):
-        parts.append(("e", HC + V((0.35 * s, 0.04, -0.03)), (0.06, 0.12, 0.12)))                         # Seitenteil
+        parts.append(("e", HC + V((0.33 * s, 0.04, -0.03)), (0.06, 0.12, 0.12)))                         # Seitenteil
     return blob("Helm", parts, voxel=0.012, smooth=6)
 
 def visor(bvh):
@@ -63,20 +63,23 @@ def visor(bvh):
             bm.faces.new([grid[j][i], grid[j][i + 1], grid[j + 1][i + 1], grid[j + 1][i]])
     vis = finish("Visier", bm)
     edge = [at(ph, zs[0], 0.014) for ph in phis] + [at(ph, zs[-1], 0.014) for ph in phis[::-1]]
-    rim = loop_tube("Visierrahmen", [tuple(q) for q in edge], 0.028, segs=8)
+    rim = loop_tube("Visierrahmen", [tuple(q) for q in edge], 0.034, segs=8)
     return vis, rim
 
 def boot(s):
     x = J["ankle"][0]
-    parts = [("e", (x, -0.1, 0.125), (0.152, 0.25, 0.118)), ("e", (x, -0.265, 0.12), (0.148, 0.145, 0.112)),       # Fuß, runde Kappe
-             ("e", (x, 0.07, 0.14), (0.14, 0.12, 0.135)), ("c", (x, 0.0, 0.2), (x, 0.0, 0.4), 0.142),             # Ferse, Schaft
-             ("e", (x, -0.1, 0.04), (0.168, 0.285, 0.052))]                                                      # dicke Sohle
+    parts = [("e", (x, -0.11, 0.14), (0.165, 0.27, 0.132)), ("e", (x, -0.29, 0.135), (0.16, 0.16, 0.125)),         # Fuß, runde Kappe
+             ("e", (x, 0.08, 0.16), (0.152, 0.13, 0.15)), ("c", (x, 0.0, 0.22), (x, 0.0, 0.43), 0.152),           # Ferse, Schaft
+             ("e", (x, -0.11, 0.045), (0.182, 0.31, 0.058))]                                                     # dicke Sohle
     g = blob("Stiefel", parts, voxel=0.012, smooth=5, ground=True)
-    R = Matrix.Translation((x, 0, 0)) @ Matrix.Rotation(math.radians(-9), 4, 'Z') @ Matrix.Translation((-x, 0, 0))
+    R = Matrix.Translation((x, 0, 0)) @ Matrix.Rotation(math.radians(-14), 4, 'Z') @ Matrix.Translation((-x, 0, 0))
     g.data.transform(R)
-    straps = [torus("Riemen%d" % i, (x, 0.0, zz), (0, 0, 1), 0.148, 0.03, n=20, m=8, flat=0.45) for i, zz in enumerate((0.26, 0.385))]
-    buckles = [rounded_box("Schnalle%d" % i, (x + 0.02, -0.165, zz), (0.058, 0.014, 0.044), 0.012) for i, zz in enumerate((0.26, 0.385))]
-    toe = [rounded_box("Kappe", (x, -0.3, 0.2), (0.07, 0.03, 0.012), 0.01, Euler((math.radians(-25), 0, 0)))]
+    straps = [torus("Riemen%d" % i, (x, 0.0, zz), (0, 0, 1), 0.16, 0.04, n=20, m=8, flat=0.42) for i, zz in enumerate((0.28, 0.42))]
+    buckles = [torus("Schnalle%d" % i, (x + 0.02, -0.176, zz), (0, 1, 0), 0.05, 0.014, n=4, m=6) for i, zz in enumerate((0.28, 0.42))]
+    for o in buckles:                                                                                             # viereckiger Rahmen
+        c = sum((v.co for v in o.data.vertices), V((0, 0, 0))) / len(o.data.vertices)
+        o.data.transform(Matrix.Translation(c) @ Matrix.Rotation(math.radians(45), 4, 'Y') @ Matrix.Translation(-c))
+    toe = [rounded_box("Kappe", (x, -0.33, 0.225), (0.08, 0.034, 0.013), 0.011, Euler((math.radians(-25), 0, 0)))]
     for o in straps + buckles + toe:
         o.data.transform(R)
     out = [g], straps, buckles + toe
@@ -94,15 +97,15 @@ def jacket_parts(bvh):
         return hit + d * lift
     for s in (1, -1):
         # breiter Aufschlag: liegt als flaches Blatt auf der Brust, Spitze nach außen oben
-        pts = [on(s * xx, zz, 0.012) for xx, zz in ((0.085, 0.93), (0.115, 1.02), (0.15, 1.12), (0.175, 1.2), (0.16, 1.26))]
+        pts = [on(s * xx, zz, 0.012) for xx, zz in ((0.09, 0.98), (0.12, 1.06), (0.155, 1.15), (0.18, 1.22), (0.165, 1.275))]
         nrm = [V((0, -1, 0.15))] * len(pts)
-        lap = ribbon("Aufschlag%d" % s, pts, nrm, 0.06, 0.016, segs=8)
+        lap = ribbon("Aufschlag%d" % s, pts, nrm, 0.072, 0.018, segs=8)
         leather.append(lap)
-        zipl = [on(s * xx, zz, 0.027) for xx, zz in ((0.05, 0.87), (0.07, 0.96), (0.1, 1.06), (0.128, 1.15), (0.14, 1.22))]
+        zipl = [on(s * xx, zz, 0.03) for xx, zz in ((0.055, 0.93), (0.074, 1.0), (0.104, 1.09), (0.132, 1.17), (0.144, 1.235))]
         metal.append(sweep("Zipper%d" % s, zipl, [0.009] * len(zipl), segs=6))
-        for xx, zz in ((0.2, 1.215), (0.165, 0.985)):
+        for xx, zz in ((0.215, 1.235), (0.175, 1.02)):
             metal.append(sphere("Niete", tuple(on(s * xx, zz, 0.024)), 0.02, segs=(10, 6)))
-        ep = V((0.26 * s, 0.0, 1.345)); leather.append(rounded_box("Klappe%d" % s, ep, (0.075, 0.045, 0.014), 0.012, Euler((0, math.radians(-16 * s), 0))))
+        ep = V((0.27 * s, 0.0, 1.36)); leather.append(rounded_box("Klappe%d" % s, ep, (0.075, 0.045, 0.014), 0.012, Euler((0, math.radians(-16 * s), 0))))
         metal.append(sphere("Niete", tuple(ep + V((0.035 * s, 0, 0.012))), 0.018, segs=(10, 6)))
         kn = V((J["knee"][0] * s, 0, J["knee"][2] + 0.05)); kp = on(kn.x, kn.z, 0.0)
         leather.append(rounded_box("Knie%d" % s, kp + V((0, 0.012, 0)), (0.085, 0.03, 0.095), 0.03, Euler((math.radians(4), 0, 0))))
@@ -123,7 +126,7 @@ def jacket_parts(bvh):
     metal.append(rounded_box("Schnalle", fr, (0.07, 0.014, 0.05), 0.014))
     cl = on(-0.14, BELT_Z - 0.03, 0.02)
     metal += [rounded_box("Clip", cl + V((0, 0, -0.03)), (0.022, 0.012, 0.055), 0.01), sphere("Clipknopf", tuple(cl + V((0, -0.012, -0.065))), 0.022, segs=(10, 6))]
-    sl = on(0.06, 0.875, 0.03)
+    sl = on(0.065, 0.94, 0.034)
     metal.append(rounded_box("Schieber", sl, (0.017, 0.01, 0.036), 0.008))
     return leather, metal
 
@@ -155,10 +158,10 @@ def paint(g):
     Pa = np.stack([ax, y, z], -1); rel = Pa - f3(el); t = (rel @ f3(d)) / L
     rad = np.linalg.norm(rel - (rel @ f3(d))[..., None] * f3(d), axis=-1)
     fore = smoothstep(0.1, 0.13, t) * (rad < 0.15) * (ax > 0.4) * bd                                      # nackter Unterarm
-    neck = smoothstep(1.265, 1.275, z) * (np.hypot(x, y - 0.01) < 0.125) * bd
+    neck = smoothstep(1.275, 1.285, z) * (np.hypot(x, y - 0.01) < 0.125) * bd
     front = smoothstep(-0.2, -0.5, N[..., 1])
-    w = np.interp(z, [0.86, 0.95, 1.05, 1.15, 1.24, 1.3], [0.04, 0.062, 0.092, 0.122, 0.14, 0.15]).astype(np.float32)
-    shirt = smoothstep(w + 0.003, w - 0.003, ax) * front * (z > 0.862) * (z < 1.275) * bd * (1 - neck)
+    w = np.interp(z, [0.92, 1.0, 1.08, 1.17, 1.25, 1.3], [0.045, 0.066, 0.095, 0.125, 0.142, 0.15]).astype(np.float32)
+    shirt = smoothstep(w + 0.003, w - 0.003, ax) * front * (z > 0.922) * (z < 1.285) * bd * (1 - neck)
     tro = smoothstep(BELT_Z + 0.02, BELT_Z + 0.014, z) * (ax < 0.42) * bd * (1 - fore)
     jc = mix(leather, (0.05, 0.03, 0.1), 0.45 * occ)
     tc = three((0.07, 0.06, 0.11), (0.15, 0.13, 0.21), (0.29, 0.26, 0.37), lit)
@@ -199,8 +202,8 @@ def paint(g):
     # ---- Stiefel, Leder, Metall, Leuchte
     bt = sel(T_BOOT)
     bc = three((0.06, 0.05, 0.1), (0.14, 0.12, 0.2), (0.3, 0.27, 0.4), lit)
-    bc = mix(bc, (0.04, 0.03, 0.08), 0.7 * smoothstep(0.075, 0.066, z))                                   # Profilsohle dunkler
-    bc = mix(bc, (0.03, 0.02, 0.06), 0.7 * (z < 0.07) * smoothstep(0.6, 0.9, 0.5 + 0.5 * np.sin(y * 70)))
+    bc = mix(bc, (0.04, 0.03, 0.08), 0.7 * smoothstep(0.085, 0.076, z))                                   # Profilsohle dunkler
+    bc = mix(bc, (0.03, 0.02, 0.06), 0.7 * (z < 0.08) * smoothstep(0.6, 0.9, 0.5 + 0.5 * np.sin(y * 60)))
     lay(bt, mix(bc, (0.03, 0.02, 0.06), 0.45 * occ))
     lay(sel(T_LEATHER), mix(three((0.09, 0.08, 0.14), (0.21, 0.18, 0.28), (0.4, 0.36, 0.5), lit), (0.04, 0.03, 0.08), 0.45 * occ))
     lay(sel(T_METAL), mix(three(SIL_D, SIL_M, SIL_L, lit), (0.3, 0.27, 0.42), 0.4 * occ))
@@ -217,10 +220,10 @@ def stand(arm, breathe=0.0, lean=0.0, hop=0.0, twist=0.0, right=None, left=None,
     rot_world(arm, "Spine", (0, 0, 1), 5 + twist); rot_world(arm, "Chest", (0, 0, 1), 6 + twist)
     rot_world(arm, "Chest", (1, 0, 0), breathe + lean); rot_world(arm, "Head", (0, 0, 1), -9 - 2 * twist); rot_world(arm, "Head", (1, 0, 0), nod)
     for sfx, sg in ((".L", 1), (".R", -1)):
-        rot_world(arm, "UpLeg" + sfx, (0, 1, 0), -6 * sg); rot_world(arm, "Leg" + sfx, (0, 1, 0), 3 * sg); rot_world(arm, "Foot" + sfx, (0, 1, 0), 3 * sg)
+        pass                                                                    # der breite Stand steckt schon in der Ruhelage
     update()
-    wr = right or (V((-0.47, -0.2, 0.9)), V((0.15, -0.75, -0.6)), V((-0.75, -0.5, 0.3)))
-    wl = left or (V((0.53, -0.02, 0.84)), V((-0.1, -0.3, -0.95)), V((0.95, -0.2, 0.0)))
+    wr = right or (V((-0.5, -0.2, 0.93)), V((0.15, -0.75, -0.6)), V((-0.75, -0.5, 0.3)))
+    wl = left or (V((0.56, -0.02, 0.86)), V((-0.1, -0.3, -0.95)), V((0.95, -0.2, 0.0)))
     reach(arm, ".R", wr[0], (-0.8, 0.5, 0.0)); turn_hand(arm, ".R", wr[1], wr[2])
     reach(arm, ".L", wl[0], (0.8, 0.5, 0.1)); turn_hand(arm, ".L", wl[1], wl[2])
 
