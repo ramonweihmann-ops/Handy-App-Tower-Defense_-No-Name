@@ -164,22 +164,31 @@ def cut(o, cutter, op):
     bpy.data.objects.remove(cutter, do_unlink=True)
     return o
 
+NOSTRIL = (0.085, 0.055)                         # Nasenloch: x und Höhe über der Kopfmitte
+
 def head_shape():
     """Kopf als eine runde Form: Schädel, Wangen, breites Untergesicht mit Kinn, darauf die kleine Schnauze.
     Das Maul wird danach als lächelnde Höhle herausgeschnitten; an den Mundwinkeln bleibt die Haut geschlossen."""
     R = mb_family("Kopf")
     mb_ell(R, H0, (0.395, 0.33, 0.33))                                              # Schädel
     mb_ell(R, H0 + Vector((0, -0.18, -0.19)), (0.3, 0.3, 0.175))                    # Untergesicht und kräftiges Kinn
-    mb_ell(R, H0 + Vector((0, -0.37, -0.03)), (0.225, 0.2, 0.128))                  # breite Schnauze: ihr unterer Rand ist die Oberlippe
+    mb_ell(R, H0 + Vector((0, -0.37, -0.02)), (0.225, 0.2, 0.138))                  # breite, runde Schnauze: ihr unterer Rand ist die Oberlippe
+    mb_ell(R, H0 + Vector((0, -0.455, 0.02)), (0.165, 0.115, 0.085))                # Nasenrücken: eine einzige runde Wölbung
     mb_ell(R, H0 + Vector((0, -0.33, -0.215)), (0.2, 0.19, 0.105))                  # Unterkiefer gehört zur Schnauze, etwas kürzer
     for s in (1, -1):
         mb_ell(R, H0 + Vector((0.21 * s, -0.14, -0.13)), (0.2, 0.2, 0.17))          # Wangen
-        mb_ell(R, H0 + Vector((0.085 * s, -0.5, 0.05)), (0.06, 0.06, 0.036))        # Nasenspitze: nur ein flacher Ansatz
-        mb_ell(R, H0 + Vector((0.085 * s, -0.56, 0.07)), (0.017, 0.017, 0.014), neg=True)   # kleines Nasenloch
     g = mb_to_mesh(R)
     finish_skin(g, 0.012, 1.0, smooth_it=6)
     cut(g, mouth_solid(), 'DIFFERENCE')
     finish_skin(g, 0.011, 1.0, smooth_it=5)                                         # Lippen rund, Maulhöhle sauber vernetzt
+    bvh = BVHTree.FromObject(g, bpy.context.evaluated_depsgraph_get())
+    for s in (1, -1):                                                               # Nasenlöcher: kleine Mulden in der runden Schnauze
+        hit, n, _, _ = bvh.ray_cast(Vector((NOSTRIL[0] * s, H0.y - 2.0, H0.z + NOSTRIL[1])), Vector((0, 1, 0)), 6.0)
+        for v in g.data.vertices:
+            d = (v.co - hit).length / 0.024
+            if d < 1:
+                v.co -= n * (0.012 * (1 - d * d) ** 2)
+    g.data.update()
     return g
 
 def head_weights(o):
@@ -687,7 +696,7 @@ def paint(g, line, sparks):
     col = col * (1 - cav[..., None]) + mcol * cav[..., None]
     em += mcol * (0.3 * cav)[..., None]                                             # Maulinneres bleibt auch im Schatten warm
     for c, n in sparks["nose"]:
-        col = mix(col, (0.2, 0.07, 0.36), hd * 0.85 * np.exp(-(np.linalg.norm(P - f3(c), axis=-1) / 0.012) ** 2))
+        col = mix(col, (0.2, 0.07, 0.36), hd * 0.88 * np.exp(-(np.linalg.norm(P - f3(c), axis=-1) / 0.015) ** 2))
     a, dep, b = EYE_R
     for c, e1, e2, d in EYES:
         L = P - f3(c)
@@ -1004,7 +1013,7 @@ def build(out, form=False):
     # Glitzersterne und Nasenlöcher: Stellen auf der Haut
     sparks = {"skin": [], "nose": []}
     for s in (1, -1):
-        hit, n, _, _ = bvh_h.ray_cast(Vector((0.085 * s, H0.y - 2.0, H0.z + 0.07)), Vector((0, 1, 0)), 6.0)
+        hit, n, _, _ = bvh_h.ray_cast(Vector((NOSTRIL[0] * s, H0.y - 2.0, H0.z + NOSTRIL[1])), Vector((0, 1, 0)), 6.0)
         sparks["nose"].append((tuple(hit), tuple(n)))
         for bv, o, d, size in ((bvh_h, (0.9 * s, -0.42, 1.27), (-1 * s, 0.25, 0), 0.04), (bvh_h, (0.9 * s, -0.3, 1.2), (-1 * s, 0.1, 0), 0.024),
                                (bvh_b, (0.9 * s, 0.18, 0.56), (-1 * s, 0, 0), 0.045), (bvh_b, (0.9 * s, 0.34, 0.4), (-1 * s, 0, 0), 0.026),
