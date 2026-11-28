@@ -198,6 +198,7 @@ def cargo(s):
     return [mirror_x(o) for o in out] if s < 0 else out
 
 LAP_W, LAP_D = 0.2, 0.14
+LAP_OPEN = {}                                   # Lage des aufgeklappten Deckels (für den Schusspunkt am Energiezeichen)
 
 def laptop():
     """Laptop im eigenen Maß: Basis liegt auf z = 0, Scharnier hinten bei y = -Tiefe, der Deckel steht aufgeklappt.
@@ -206,7 +207,7 @@ def laptop():
     base = tag(rounded_box("Basis", (0, 0, Tk), (W, D, Tk), 0.008), 0)
     lid = tag(rounded_box("Deckel", (0, 0, 0), (W, D, Tk * 0.85), 0.008), 1)
     open_m = Matrix.Translation((0, -D, 2 * Tk)) @ Matrix.Rotation(math.radians(108), 4, 'X') @ Matrix.Translation((0, D, 0))
-    lid.data.transform(open_m)
+    lid.data.transform(open_m); LAP_OPEN["m"] = open_m
     hinge = tag(sweep("Scharnier", [V((-W * 0.7, -D, 2 * Tk)), V((0, -D, 2 * Tk)), V((W * 0.7, -D, 2 * Tk))], [0.011] * 3, segs=8), 2)
     g = join_parts([base, lid, hinge], "LaptopTeil")
     g.data.materials.clear(); g.data.materials.append(image_material("Laptop", 512, color=(0.5, 0.47, 0.62), rough=0.35))
@@ -456,12 +457,14 @@ def build(out):
     P = hold_pose(arm)
     lap = laptop()
     lap.data.transform(P["rest"]); lap.data.update()
+    muzzle = P["rest"] @ (LAP_OPEN["m"] @ V((0, 0, 0.03)))                          # vor dem Energiezeichen auf dem Deckel
     lap.data.attributes.remove(lap.data.attributes["teil"])
     mark(lap, 21, G_LAPTOP, "Hand.L")
     reset_pose(arm)
     g = join_parts([g, lap], "Nerd")
     g.parent = arm; md = g.modifiers.new("Armature", 'ARMATURE'); md.object = arm
     animate(arm)
+    add_muzzle(arm, "Hand.L", muzzle)
     co = np.array([tuple(v.co) for v in g.data.vertices])
     print("MASSE x %.2f..%.2f y %.2f..%.2f z %.2f..%.2f" % (co[:, 0].min(), co[:, 0].max(), co[:, 1].min(), co[:, 1].max(), co[:, 2].min(), co[:, 2].max()))
     print("DREIECKE", sum(len(p.vertices) - 2 for p in g.data.polygons), "AKTIONEN", [(a_.name, int(a_.frame_range[1])) for a_ in bpy.data.actions])

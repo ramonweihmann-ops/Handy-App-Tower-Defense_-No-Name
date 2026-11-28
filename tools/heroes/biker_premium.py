@@ -41,7 +41,7 @@ def body_shape():
 
 def helmet_shape():
     """dicke runde Schale mit Kinnteil und zwei runden Seitenteilen"""
-    parts = [("e", HC, (0.365, 0.385, 0.35)), ("e", HC + V((0, -0.14, -0.2)), (0.3, 0.26, 0.15)),         # Schale, Kinnteil
+    parts = [("e", HC, (0.365, 0.385, 0.355)), ("e", HC + V((0, -0.1, -0.21)), (0.29, 0.27, 0.13)),       # Schale, Kinnteil
              ("e", HC + V((0, 0.05, -0.22)), (0.3, 0.3, 0.13))]                                           # unterer Rand
     for s in (1, -1):
         parts.append(("e", HC + V((0.35 * s, 0.04, -0.03)), (0.06, 0.12, 0.12)))                         # Seitenteil
@@ -50,11 +50,11 @@ def helmet_shape():
 def visor(bvh):
     """geschlossenes dunkles Visier: liegt als eigene, leicht erhabene Fläche auf der Schale, mit kräftigem Rahmen.
     Liefert (Visier, Rahmen)."""
-    nphi, nz = 26, 9; phis = np.linspace(math.radians(-82), math.radians(82), nphi); zs = np.linspace(-0.105, 0.105, nz)
+    nphi, nz = 26, 9; phis = np.linspace(math.radians(-84), math.radians(84), nphi); zs = np.linspace(-0.15, 0.15, nz)
     def at(ph, dz, lift):
         d = V((math.sin(ph), -math.cos(ph), 0))
-        shrink = 1 - 0.55 * (abs(ph) / math.radians(82)) ** 3                                             # zu den Seiten schmaler
-        z = HC.z - 0.005 + dz * shrink + 0.02
+        shrink = 1 - 0.5 * (abs(ph) / math.radians(84)) ** 3                                              # zu den Seiten schmaler
+        z = HC.z + 0.005 + dz * shrink
         hit = bvh.ray_cast(V((0, HC.y, z)) + d * 1.2, -d, 3.0)[0]
         return hit + d * lift
     bm = bmesh.new(); grid = [[bm.verts.new(at(ph, dz, 0.012)) for ph in phis] for dz in zs]
@@ -63,7 +63,7 @@ def visor(bvh):
             bm.faces.new([grid[j][i], grid[j][i + 1], grid[j + 1][i + 1], grid[j + 1][i]])
     vis = finish("Visier", bm)
     edge = [at(ph, zs[0], 0.014) for ph in phis] + [at(ph, zs[-1], 0.014) for ph in phis[::-1]]
-    rim = loop_tube("Visierrahmen", [tuple(q) for q in edge], 0.022, segs=8)
+    rim = loop_tube("Visierrahmen", [tuple(q) for q in edge], 0.028, segs=8)
     return vis, rim
 
 def boot(s):
@@ -116,7 +116,7 @@ def jacket_parts(bvh):
     n = 28; pts, nrm = [], []
     for k in range(n + 1):
         a = k * 2 * math.pi / n; d = V((math.sin(a), -math.cos(a), 0))
-        hit = bvh.ray_cast(V((0, 0, BELT_Z)) + d * 1.2, -d, 3.0)[0]
+        hit = bvh.ray_cast(V((0, 0, BELT_Z)), d, 3.0)[0]                                 # von innen: trifft die Hüfte, nicht die Arme
         pts.append(hit + d * 0.006); nrm.append(d)
     leather.append(ribbon("Guertel", pts, nrm, 0.036, 0.016, segs=8))
     fr = on(0.0, BELT_Z, 0.02)
@@ -129,7 +129,7 @@ def jacket_parts(bvh):
 
 # ---------------------------------------------------------------- Bemalung
 
-LEA_L, LEA_M, LEA_D = (0.36, 0.3, 0.46), (0.22, 0.17, 0.3), (0.1, 0.07, 0.16)       # Anthrazit mit violettem Stich
+LEA_L, LEA_M, LEA_D = (0.34, 0.31, 0.42), (0.17, 0.15, 0.23), (0.07, 0.06, 0.11)     # Anthrazit mit violettem Stich
 SKIN_L, SKIN_M, SKIN_D = (1.0, 0.84, 0.7), (0.99, 0.76, 0.6), (0.86, 0.58, 0.45)
 SIL_L, SIL_M, SIL_D = (0.98, 0.97, 1.0), (0.8, 0.78, 0.88), (0.5, 0.47, 0.6)
 
@@ -161,7 +161,7 @@ def paint(g):
     shirt = smoothstep(w + 0.003, w - 0.003, ax) * front * (z > 0.862) * (z < 1.275) * bd * (1 - neck)
     tro = smoothstep(BELT_Z + 0.02, BELT_Z + 0.014, z) * (ax < 0.42) * bd * (1 - fore)
     jc = mix(leather, (0.05, 0.03, 0.1), 0.45 * occ)
-    tc = three((0.09, 0.06, 0.15), (0.19, 0.15, 0.27), (0.3, 0.25, 0.4), lit)
+    tc = three((0.07, 0.06, 0.11), (0.15, 0.13, 0.21), (0.29, 0.26, 0.37), lit)
     tc = mix(tc, (0.09, 0.06, 0.15), 0.3 * smoothstep(0.5, 0.72, fbm3(P * f3((1.0, 1.0, 2.2)), 5.5, 9, 3)))
     tc = mix(tc, (0.07, 0.04, 0.12), 0.5 * smoothstep(0.006, 0.002, ax) * front * (z > 0.6))             # Naht vorn
     lay(bd, jc)
@@ -172,8 +172,8 @@ def paint(g):
     lay(np.clip(fore + neck, 0, 1), mix(skin, (0.72, 0.42, 0.34), 0.38 * occ))
     # ---- Helm: zwei helle Längsstreifen, Lüftungsschlitze am Kinn, Seitenteile
     hm = sel(T_HELM)
-    hc = three((0.1, 0.07, 0.16), (0.22, 0.17, 0.32), (0.42, 0.36, 0.56), lit)
-    stripe = smoothstep(0.04, 0.052, ax) * smoothstep(0.155, 0.143, ax) * (z > HC.z + 0.13) * smoothstep(-0.34, -0.3, y - HC.y) + \
+    hc = three((0.06, 0.05, 0.1), (0.15, 0.13, 0.22), (0.38, 0.34, 0.5), lit)
+    stripe = smoothstep(0.04, 0.052, ax) * smoothstep(0.155, 0.143, ax) * (z > HC.z + 0.17) * smoothstep(-0.34, -0.3, y - HC.y) + \
              smoothstep(0.04, 0.052, ax) * smoothstep(0.155, 0.143, ax) * (y > HC.y) * (z > HC.z - 0.1)
     hc = hc * (1 - np.clip(stripe, 0, 1)[..., None]) + three((0.62, 0.58, 0.8), (0.86, 0.83, 0.96), (1.0, 1.0, 1.0), lit) * np.clip(stripe, 0, 1)[..., None]
     for k in (-1, 0, 1):                                                                                 # drei Schlitze am Kinnteil
@@ -181,9 +181,9 @@ def paint(g):
     side = np.hypot(y - (HC.y + 0.04), z - (HC.z - 0.03))
     hc = mix(hc, (0.1, 0.07, 0.16), 0.5 * smoothstep(0.012, 0.004, np.abs(side - 0.085)) * (ax > 0.33))  # Ring im Seitenteil
     lay(hm, mix(hc, (0.04, 0.02, 0.08), 0.4 * occ))
-    lay(sel(T_RIM), mix(three((0.08, 0.05, 0.13), (0.17, 0.13, 0.25), (0.34, 0.28, 0.46), lit), (0.03, 0.02, 0.06), 0.4 * occ))
+    lay(sel(T_RIM), mix(three((0.06, 0.05, 0.1), (0.14, 0.12, 0.2), (0.32, 0.28, 0.42), lit), (0.03, 0.02, 0.06), 0.4 * occ))
     vs = sel(T_VISOR)
-    vc = gradient((0.03, 0.02, 0.07), (0.13, 0.1, 0.22), smoothstep(HC.z - 0.1, HC.z + 0.12, z))          # unten tief, oben heller
+    vc = gradient((0.03, 0.02, 0.07), (0.13, 0.1, 0.22), smoothstep(HC.z - 0.14, HC.z + 0.16, z))          # unten tief, oben heller
     streak = smoothstep(0.035, 0.012, np.abs((x * 0.8 + (z - HC.z) * 0.9) - 0.06)) + 0.6 * smoothstep(0.018, 0.006, np.abs((x * 0.8 + (z - HC.z) * 0.9) - 0.14))
     vc = mix(vc, (0.42, 0.36, 0.6), 0.5 * np.clip(streak, 0, 1) * (y < HC.y - 0.1))                       # weiche schräge Spiegelung
     lay(vs, vc)
@@ -198,11 +198,11 @@ def paint(g):
     lay(gl, gcol)
     # ---- Stiefel, Leder, Metall, Leuchte
     bt = sel(T_BOOT)
-    bc = three((0.07, 0.05, 0.12), (0.17, 0.13, 0.25), (0.33, 0.27, 0.44), lit)
+    bc = three((0.06, 0.05, 0.1), (0.14, 0.12, 0.2), (0.3, 0.27, 0.4), lit)
     bc = mix(bc, (0.04, 0.03, 0.08), 0.7 * smoothstep(0.075, 0.066, z))                                   # Profilsohle dunkler
     bc = mix(bc, (0.03, 0.02, 0.06), 0.7 * (z < 0.07) * smoothstep(0.6, 0.9, 0.5 + 0.5 * np.sin(y * 70)))
     lay(bt, mix(bc, (0.03, 0.02, 0.06), 0.45 * occ))
-    lay(sel(T_LEATHER), mix(three((0.12, 0.09, 0.19), (0.25, 0.2, 0.35), (0.42, 0.36, 0.54), lit), (0.05, 0.03, 0.1), 0.45 * occ))
+    lay(sel(T_LEATHER), mix(three((0.09, 0.08, 0.14), (0.21, 0.18, 0.28), (0.4, 0.36, 0.5), lit), (0.04, 0.03, 0.08), 0.45 * occ))
     lay(sel(T_METAL), mix(three(SIL_D, SIL_M, SIL_L, lit), (0.3, 0.27, 0.42), 0.4 * occ))
     tl = sel(T_TEAL); tcol = three((0.08, 0.6, 0.66), (0.2, 0.9, 0.9), (0.7, 1.0, 0.98), lit)
     lay(tl, tcol); em += tcol * (0.9 * tl)[..., None]
