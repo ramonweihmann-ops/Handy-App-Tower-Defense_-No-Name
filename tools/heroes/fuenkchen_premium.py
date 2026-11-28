@@ -123,17 +123,19 @@ def body_shape():
 
 # ---------------------------------------------------------------- Kopf und Unterkiefer
 
+MOUTH_W = 0.29                                  # halbe Breite der Maulöffnung: breites Grinsen bis in die Wangen
+
 def lip_up(x, y):
     """Mundlinie (Unterkante der Oberlippe): in der Mitte flach, zu den Mundwinkeln hin ansteigend = Lächeln"""
-    return LIP + 0.1 * smoothstep(0.16, 0.4, np.abs(x)) ** 1.2
+    return LIP + 0.1 * np.clip(np.abs(x) / 0.36, 0, 1.3) ** 2.3
 
 def lip_gap(x, y):
     """Öffnung zwischen den Lippen: vorn in der Mitte weit, zu den Mundwinkeln und nach hinten geschlossen"""
-    return 0.128 * np.clip(1 - (x / 0.235) ** 2, 0, 1) ** 0.75 * smoothstep(-0.28, -0.5, y)
+    return 0.138 * np.clip(1 - (x / MOUTH_W) ** 2, 0, 1) ** 0.62 * smoothstep(-0.28, -0.5, y)
 
 def palate(x, y):
     """Gaumen: hinter der Oberlippe wölbt sich das Maul nach oben"""
-    return lip_up(x, y) + 0.045 * np.clip(1 - (x / 0.22) ** 2, 0, 1) * smoothstep(-0.69, -0.56, y) * smoothstep(-0.3, -0.42, y)
+    return lip_up(x, y) + 0.045 * np.clip(1 - (x / (MOUTH_W - 0.02)) ** 2, 0, 1) * smoothstep(-0.69, -0.56, y) * smoothstep(-0.3, -0.42, y)
 
 def lip_low(x, y):
     return lip_up(x, y) - lip_gap(x, y)
@@ -141,7 +143,7 @@ def lip_low(x, y):
 def mouth_solid():
     """Schnittkörper für das Maul: der Raum zwischen Unterlippe/Mundboden und Oberlippe/Gaumen. An den Mundwinkeln
     und hinten läuft er auf null aus, dort bleibt die Haut geschlossen."""
-    xs = np.linspace(-0.235, 0.235, 41); ys = np.linspace(-1.0, -0.28, 49)
+    xs = np.linspace(-MOUTH_W, MOUTH_W, 53); ys = np.linspace(-1.0, -0.28, 49)
     X, Y = np.meshgrid(xs, ys); T = palate(X, Y); Bt = lip_low(X, Y)
     bm = bmesh.new(); ny, nx = len(ys), len(xs)
     top = [[bm.verts.new((X[j, i], Y[j, i], T[j, i])) for i in range(nx)] for j in range(ny)]
@@ -175,7 +177,7 @@ def head_shape():
     g = mb_to_mesh(R)
     finish_skin(g, 0.012, 1.0, smooth_it=6)
     cut(g, mouth_solid(), 'DIFFERENCE')
-    finish_skin(g, 0.011, 1.0, smooth_it=3)                                         # Lippen rund, Maulhöhle sauber vernetzt
+    finish_skin(g, 0.011, 1.0, smooth_it=5)                                         # Lippen rund, Maulhöhle sauber vernetzt
     return g
 
 def head_weights(o):
@@ -462,25 +464,25 @@ def teeth_tongue(bvh):
     Liefert (oben, unten, Zunge)."""
     up, low = [], []
     for s in (1, -1):
-        x = 0.125 * s
+        x = 0.15 * s
         yl = bvh.ray_cast(Vector((x, -2.0, LIP + 0.02)), Vector((0, 1, 0)), 6.0)[0].y
         hit = bvh.ray_cast(Vector((x, yl + 0.036, LIP - 0.04)), Vector((0, 0, 1)), 1.0)[0]
         up.append(sweep("Fang%d" % s, [hit + Vector((0, 0, 0.012)), hit + Vector((0, 0, -0.022)), hit + Vector((0, 0.003, -0.05))], [0.025, 0.02, 0.006], segs=8))
-        x = 0.15 * s
+        x = 0.2 * s
         zl = float(lip_low(np.float32(x), np.float32(-0.6)))
         yl = bvh.ray_cast(Vector((x, -2.0, zl - 0.02)), Vector((0, 1, 0)), 6.0)[0].y
         hit = bvh.ray_cast(Vector((x, yl + 0.038, LIP - 0.012)), Vector((0, 0, -1)), 1.0)[0]
         low.append(sweep("Zahn%d" % s, [hit + Vector((0, 0, -0.012)), hit + Vector((0, 0, 0.01)), hit + Vector((0, 0, 0.026))], [0.02, 0.017, 0.007], segs=8))
-    a = bvh.ray_cast(Vector((0, -0.62, LIP - 0.006)), Vector((0, 0, -1)), 1.0)[0]; b = bvh.ray_cast(Vector((0, -0.42, LIP + 0.01)), Vector((0, 0, -1)), 1.0)[0]
+    a = bvh.ray_cast(Vector((0, -0.64, LIP - 0.006)), Vector((0, 0, -1)), 1.0)[0]; b = bvh.ray_cast(Vector((0, -0.44, LIP + 0.01)), Vector((0, 0, -1)), 1.0)[0]
     along = (a - b).normalized(); upv = Vector((1, 0, 0)).cross(along)
     if upv.z < 0:
         upv = -upv
-    c = a.lerp(b, 0.42)
-    tongue = sphere("Zunge", (0, 0, 0), 1.0, segs=(14, 8))
+    c = a.lerp(b, 0.62)
+    tongue = sphere("Zunge", (0, 0, 0), 1.0, segs=(16, 10))
     for v in tongue.data.vertices:
         sx, sy, sz = v.co
-        wide = 0.112 * (1 - 0.25 * max(sy, 0) ** 2)                                  # vorn rund, hinten breit
-        v.co = c + Vector((1, 0, 0)) * (sx * wide) + along * (sy * 0.15) + upv * (sz * 0.032 + 0.016 - 0.016 * sx * sx * (sz > 0))
+        wide = 0.165 * (1 - 0.3 * max(sy, 0) ** 2)                                   # vorn rund, hinten breit
+        v.co = c + Vector((1, 0, 0)) * (sx * wide) + along * (sy * 0.15) + upv * (sz * 0.05 + 0.03 - 0.03 * sx * sx * (sz > 0))
     return up, low, [tongue]
 
 # ---------------------------------------------------------------- Schmuck
@@ -676,13 +678,13 @@ def paint(g, line, sparks):
     inm = (y < YH + 0.03)
     roof = hd * smoothstep(-0.25, -0.6, N[..., 2]) * smoothstep(0.03, 0.012, np.abs(z - palate(x, y))) * inm
     deep = smoothstep(-0.68, -0.4, y)                                               # nach hinten dunkler
-    col = mix(col, (0.5, 0.13, 0.33), roof)
-    col = mix(col, (0.24, 0.05, 0.22), roof * deep)
+    col = mix(col, (0.6, 0.15, 0.3), roof)
+    col = mix(col, (0.36, 0.07, 0.2), roof * deep)
     floor = hd * smoothstep(0.25, 0.6, N[..., 2]) * smoothstep(0.03, 0.012, np.abs(z - lip_low(x, y))) * inm * smoothstep(0.004, 0.02, lip_gap(x, y))
-    crease = hd * smoothstep(0.011, 0.003, np.abs(z - lip_up(x, y))) * smoothstep(0.2, 0.25, np.abs(x)) * smoothstep(0.41, 0.33, np.abs(x)) * (y < H0.y - 0.1)
-    col = mix(col, (0.26, 0.09, 0.44), 0.7 * crease)                                # Lachfalte vom Mundwinkel zur Wange
-    col = mix(col, (0.56, 0.16, 0.36), floor)
-    col = mix(col, (0.27, 0.06, 0.23), floor * deep)
+    col = mix(col, (0.66, 0.18, 0.34), floor)
+    col = mix(col, (0.4, 0.08, 0.22), floor * deep)
+    inner = np.clip(roof + floor, 0, 1)
+    em += col * (0.3 * inner)[..., None]                                            # Maulinneres bleibt auch im Schatten warm
     for c, n in sparks["nose"]:
         col = mix(col, (0.17, 0.05, 0.3), hd * 0.92 * np.exp(-(np.linalg.norm(P - f3(c), axis=-1) / 0.02) ** 2))
     a, dep, b = EYE_R
@@ -741,10 +743,11 @@ def paint(g, line, sparks):
     br = sel(T_BROW)
     col = col * (1 - br[..., None]) + gradient((0.11, 0.05, 0.2), (0.27, 0.15, 0.42), tz) * br[..., None]
     tg = sel(T_TONGUE)
-    tc = gradient((0.72, 0.26, 0.44), (0.98, 0.52, 0.64), smoothstep(0.1, 0.85, N[..., 2]))
-    tc = mix(tc, (0.74, 0.28, 0.46), 0.4 * np.exp(-(x / 0.008) ** 2) * (y > -0.62))
-    tc = mix(tc, (0.42, 0.1, 0.3), 0.55 * smoothstep(-0.55, -0.4, y))
+    tc = gradient((0.78, 0.25, 0.4), (1.0, 0.5, 0.58), smoothstep(0.0, 0.8, N[..., 2]))
+    tc = mix(tc, (0.8, 0.27, 0.42), 0.45 * np.exp(-(x / 0.009) ** 2) * (y > -0.66))
+    tc = mix(tc, (0.5, 0.11, 0.28), 0.5 * smoothstep(-0.52, -0.36, y))
     col = col * (1 - tg[..., None]) + tc * tg[..., None]
+    em += tc * (0.3 * tg)[..., None]
     th = sel(T_TOOTH)
     col = col * (1 - th[..., None]) + mix(np.zeros(P.shape, np.float32) + f3((1.0, 0.98, 0.92)), (0.86, 0.74, 0.6), 0.6 * occ) * th[..., None]
     # ---- Gold: Verlauf, Gravur im Band des Halsreifs
