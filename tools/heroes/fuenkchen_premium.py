@@ -18,7 +18,7 @@ STUFE = os.environ.get("STUFE", "voll")
 H0 = Vector((0.0, -0.22, 1.40))                 # Kopfmitte
 YH = H0.y - 0.05                                # hier endet der Unterkiefer nach hinten
 HINGE = Vector((0.0, YH, H0.z - 0.04))          # Kiefergelenk (Drehachse quer), auf Höhe der Mundwinkel
-LIP = H0.z - 0.115                              # Oberlippe: Höhe der Mundlinie in der Mitte
+LIP = H0.z - 0.14                               # Oberlippe: Höhe der Mundlinie in der Mitte
 NECK = (Vector((0.0, -0.14, 0.82)), Vector((0.0, -0.2, 1.1)))
 TAIL = [(0.0, 0.4, 0.56), (0.0, 0.62, 0.49), (0.0, 0.84, 0.41), (0.0, 1.04, 0.35), (0.0, 1.22, 0.31), (0.0, 1.38, 0.3)]
 TAIL_R = [0.215, 0.185, 0.15, 0.115, 0.082, 0.055]
@@ -123,7 +123,7 @@ def body_shape():
 
 # ---------------------------------------------------------------- Kopf und Unterkiefer
 
-MOUTH_W = 0.29                                  # halbe Breite der Maulöffnung: breites Grinsen bis in die Wangen
+MOUTH_W = 0.25                                  # halbe Breite der Maulöffnung: breites Grinsen bis in die Wangen
 
 def lip_up(x, y):
     """Mundlinie (Unterkante der Oberlippe): in der Mitte flach, zu den Mundwinkeln hin ansteigend = Lächeln"""
@@ -131,7 +131,7 @@ def lip_up(x, y):
 
 def lip_gap(x, y):
     """Öffnung zwischen den Lippen: vorn in der Mitte weit, zu den Mundwinkeln und nach hinten geschlossen"""
-    return 0.138 * np.clip(1 - (x / MOUTH_W) ** 2, 0, 1) ** 0.62 * smoothstep(-0.28, -0.5, y)
+    return 0.128 * np.clip(1 - (x / MOUTH_W) ** 2, 0, 1) ** 0.62 * smoothstep(-0.28, -0.5, y)
 
 def palate(x, y):
     """Gaumen: hinter der Oberlippe wölbt sich das Maul nach oben"""
@@ -168,12 +168,12 @@ def head_shape():
     Das Maul wird danach als lächelnde Höhle herausgeschnitten; an den Mundwinkeln bleibt die Haut geschlossen."""
     R = mb_family("Kopf")
     mb_ell(R, H0, (0.395, 0.33, 0.33))                                              # Schädel
-    mb_ell(R, H0 + Vector((0, -0.2, -0.17)), (0.3, 0.3, 0.165))                     # Untergesicht und Kinn
-    mb_ell(R, H0 + Vector((0, -0.36, 0.0)), (0.185, 0.2, 0.115))                    # Schnauze mit der Nase
+    mb_ell(R, H0 + Vector((0, -0.18, -0.19)), (0.3, 0.3, 0.175))                    # Untergesicht und kräftiges Kinn
+    mb_ell(R, H0 + Vector((0, -0.37, -0.03)), (0.225, 0.2, 0.128))                  # breite Schnauze: ihr unterer Rand ist die Oberlippe
     for s in (1, -1):
         mb_ell(R, H0 + Vector((0.21 * s, -0.14, -0.13)), (0.2, 0.2, 0.17))          # Wangen
-        mb_ell(R, H0 + Vector((0.095 * s, -0.47, 0.085)), (0.072, 0.07, 0.05))      # Nasenhöcker
-        mb_ell(R, H0 + Vector((0.1 * s, -0.545, 0.1)), (0.03, 0.03, 0.024), neg=True)   # Nasenloch
+        mb_ell(R, H0 + Vector((0.1 * s, -0.48, 0.062)), (0.072, 0.07, 0.05))        # Nasenhöcker
+        mb_ell(R, H0 + Vector((0.105 * s, -0.555, 0.078)), (0.03, 0.03, 0.024), neg=True)   # Nasenloch
     g = mb_to_mesh(R)
     finish_skin(g, 0.012, 1.0, smooth_it=6)
     cut(g, mouth_solid(), 'DIFFERENCE')
@@ -464,11 +464,11 @@ def teeth_tongue(bvh):
     Liefert (oben, unten, Zunge)."""
     up, low = [], []
     for s in (1, -1):
-        x = 0.15 * s
+        x = 0.118 * s
         yl = bvh.ray_cast(Vector((x, -2.0, LIP + 0.02)), Vector((0, 1, 0)), 6.0)[0].y
         hit = bvh.ray_cast(Vector((x, yl + 0.036, LIP - 0.04)), Vector((0, 0, 1)), 1.0)[0]
         up.append(sweep("Fang%d" % s, [hit + Vector((0, 0, 0.012)), hit + Vector((0, 0, -0.022)), hit + Vector((0, 0.003, -0.05))], [0.025, 0.02, 0.006], segs=8))
-        x = 0.2 * s
+        x = 0.16 * s
         zl = float(lip_low(np.float32(x), np.float32(-0.6)))
         yl = bvh.ray_cast(Vector((x, -2.0, zl - 0.02)), Vector((0, 1, 0)), 6.0)[0].y
         hit = bvh.ray_cast(Vector((x, yl + 0.038, LIP - 0.012)), Vector((0, 0, -1)), 1.0)[0]
@@ -481,7 +481,7 @@ def teeth_tongue(bvh):
     tongue = sphere("Zunge", (0, 0, 0), 1.0, segs=(16, 10))
     for v in tongue.data.vertices:
         sx, sy, sz = v.co
-        wide = 0.165 * (1 - 0.3 * max(sy, 0) ** 2)                                   # vorn rund, hinten breit
+        wide = 0.14 * (1 - 0.3 * max(sy, 0) ** 2)                                   # vorn rund, hinten breit
         v.co = c + Vector((1, 0, 0)) * (sx * wide) + along * (sy * 0.15) + upv * (sz * 0.05 + 0.03 - 0.03 * sx * sx * (sz > 0))
     return up, low, [tongue]
 
@@ -675,16 +675,14 @@ def paint(g, line, sparks):
     bcol = mix(bcol, (0.16, 0.36, 0.5), 0.45 * occ)
     col = col * (1 - bel[..., None]) + bcol * bel[..., None]
     # ---- Maul: Gaumen und Mundboden, Nasenlöcher, Lidrand
-    inm = (y < YH + 0.03)
-    roof = hd * smoothstep(-0.25, -0.6, N[..., 2]) * smoothstep(0.03, 0.012, np.abs(z - palate(x, y))) * inm
+    inm = (y < YH + 0.03) * smoothstep(0.52, 0.74, occ)                             # nur verdeckte Flächen: die Lippen bleiben violett
+    cav = hd * inm * (z < palate(x, y) + 0.03) * (z > lip_low(x, y) - 0.03) * smoothstep(0.004, 0.02, lip_gap(x, y) + 0.02 * (np.abs(x) < MOUTH_W + 0.02))
     deep = smoothstep(-0.68, -0.4, y)                                               # nach hinten dunkler
-    col = mix(col, (0.6, 0.15, 0.3), roof)
-    col = mix(col, (0.36, 0.07, 0.2), roof * deep)
-    floor = hd * smoothstep(0.25, 0.6, N[..., 2]) * smoothstep(0.03, 0.012, np.abs(z - lip_low(x, y))) * inm * smoothstep(0.004, 0.02, lip_gap(x, y))
-    col = mix(col, (0.66, 0.18, 0.34), floor)
-    col = mix(col, (0.4, 0.08, 0.22), floor * deep)
-    inner = np.clip(roof + floor, 0, 1)
-    em += col * (0.3 * inner)[..., None]                                            # Maulinneres bleibt auch im Schatten warm
+    up_side = smoothstep(0.2, -0.3, N[..., 2])                                      # Gaumen dunkler als der Mundboden
+    mcol = gradient((0.66, 0.18, 0.34), (0.5, 0.11, 0.27), up_side)
+    mcol = mcol * (1 - deep[..., None]) + gradient((0.4, 0.08, 0.22), (0.3, 0.05, 0.18), up_side) * deep[..., None]
+    col = col * (1 - cav[..., None]) + mcol * cav[..., None]
+    em += mcol * (0.3 * cav)[..., None]                                             # Maulinneres bleibt auch im Schatten warm
     for c, n in sparks["nose"]:
         col = mix(col, (0.17, 0.05, 0.3), hd * 0.92 * np.exp(-(np.linalg.norm(P - f3(c), axis=-1) / 0.02) ** 2))
     a, dep, b = EYE_R
@@ -866,7 +864,7 @@ def add_muzzle(arm, bone, world_pos):
     update()
     return m
 
-MUZZLE = Vector((0.0, -0.75, 1.215))            # Sternenatem: zwischen den geöffneten Kiefern, vorn
+MUZZLE = Vector((0.0, -0.76, LIP - 0.06))            # Sternenatem: zwischen den geöffneten Kiefern, vorn
 
 def skeleton():
     wr = wing_pt(WRIST[0], WRIST[1]); tip = wing_pt(*FINGERS[0][1])
@@ -1003,7 +1001,7 @@ def build(out, form=False):
     # Glitzersterne und Nasenlöcher: Stellen auf der Haut
     sparks = {"skin": [], "nose": []}
     for s in (1, -1):
-        hit, n, _, _ = bvh_h.ray_cast(Vector((0.1 * s, H0.y - 2.0, H0.z + 0.1)), Vector((0, 1, 0)), 6.0)
+        hit, n, _, _ = bvh_h.ray_cast(Vector((0.105 * s, H0.y - 2.0, H0.z + 0.078)), Vector((0, 1, 0)), 6.0)
         sparks["nose"].append((tuple(hit), tuple(n)))
         for bv, o, d, size in ((bvh_h, (0.9 * s, -0.42, 1.27), (-1 * s, 0.25, 0), 0.04), (bvh_h, (0.9 * s, -0.3, 1.2), (-1 * s, 0.1, 0), 0.024),
                                (bvh_b, (0.9 * s, 0.18, 0.56), (-1 * s, 0, 0), 0.045), (bvh_b, (0.9 * s, 0.34, 0.4), (-1 * s, 0, 0), 0.026),
